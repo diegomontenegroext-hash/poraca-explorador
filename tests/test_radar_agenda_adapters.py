@@ -340,6 +340,18 @@ Kevin - Liniers: Eternotour
                 self.assertEqual(rows[0]["event_time"],clock)
                 self.assertIn(room,rows[0]["venue"])
 
+    def test_argentino_browser_does_not_leak_sidebar_into_title(self):
+        d=date(2026,11,1)
+        markup=('<div>Inicio</div><div>el teatro Historia Salas TEMPORADA '
+                'SALA Astor Piazzolla Obra teatral “Mi vida anterior” '
+                'de Teresa Donato y Dennis Smith | Domingo 1/11 | 19:00</div>'
+                '<div>Fecha del evento 01/11/2026 19:00:00</div>')
+        rows=ad.extract_listings(markup,"https://teatroargentino.gba.gob.ar/meet/93")
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["title"],
+                         'Obra teatral “Mi vida anterior” de Teresa Donato y Dennis Smith')
+        self.assertNotIn("Historia Salas",rows[0]["title"])
+
     def test_argentino_header_conflict_is_not_promoted(self):
         html=('<div>SALA Astor Piazzolla</div>'
               '<div>Concierto | Músicos de prueba | Viernes 13/11 | 20:00</div>'
