@@ -4,15 +4,26 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "dry-run no graba; write usa el secreto Neon aislado"
+        description: "dry-run sin Neon / write en base experimental"
         type: choice
         required: true
         default: dry-run
         options:
           - dry-run
           - write
+      scope:
+        description: "full: barrido 13 fuentes / incremental: solo vencidas"
+        type: choice
+        required: true
+        default: incremental
+        options:
+          - incremental
+          - full
   schedule:
-    # UTC-3 Argentina: 22:20, 10:20, 16:20
+    # 2026-10-28 00:50 ART: primera exploracion full.
+    # GitHub puede retrasar la ejecucion; solo habilitada en 2026 por el gate.
+    - cron: '50 3 28 10 *'
+    # Tres corridas posteriores por dia, siempre incrementales (UTC-3).
     - cron: '20 1,13,19 * * *'
 
 permissions:
@@ -25,17 +36,33 @@ concurrency:
 jobs:
   radar:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
+      - name: Comprobar fecha de bootstrap
+        id: gate
+        env:
+          SCHEDULE_EXPR: ${{ github.event.schedule }}
+        shell: bash
+        run: |
+          if [[ "$SCHEDULE_EXPR" == '50 3 28 10 *' && "$(date -u +%Y-%m-%d)" != '2026-10-28' ]]; then
+            echo "active=false" >> "$GITHUB_OUTPUT"
+            echo "El cron bootstrap anual queda inactivo fuera de 2026-10-28"
+          else
+            echo "active=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Obtener el explorador
+        if: ${{ steps.gate.outputs.active == 'true' }}
         uses: actions/checkout@v4
-      - name: Probar las reglas sin red
+      - name: Validar reglas
+        if: ${{ steps.gate.outputs.active == 'true' }}
         run: python3 -m unittest discover -s tests -v
-      - name: Preparar cliente Neon en modo escritura
-        if: ${{ github.event_name == 'schedule' || inputs.mode == 'write' }}
+      - name: Instalar cliente Neon en escrituras
+        if: ${{ steps.gate.outputs.active == 'true' && (github.event_name == 'schedule' || inputs.mode == 'write') }}
         run: python3 -m pip install --disable-pip-version-check "psycopg[binary]>=3.2,<4"
-      - name: Recolectar fuentes culturales y guardar candidatos aislados
+      - name: Recolectar y guardar candidatos aislados
+        if: ${{ steps.gate.outputs.active == 'true' }}
         env:
           NEON_EXPLORADOR_DATABASE_URL: ${{ secrets.NEON_EXPLORADOR_DATABASE_URL }}
           RADAR_MODE: ${{ github.event_name == 'schedule' && 'write' || inputs.mode || 'dry-run' }}
-        run: python3 src/radar_parallel.py --mode "$RADAR_MODE"
+          RADAR_SCOPE: ${{ github.event.schedule == '50 3 28 10 *' && 'full' || inputs.scope || 'incremental' }}
+        run: python3 src/radar_parallel.py --mode "$RADAR_MODE" --scope "$RADAR_SCOPE"
