@@ -324,6 +324,10 @@ def scan_source(source,budget,mode):
             print(json.dumps({"source":source["source_id"],
                   "adapter":"argentino_browser",
                   "pages":len(pages),"sessions":len(check["_listings"]),
+                  "pages_with_event_label":sum(bool(re.search(r"Fecha\\s+del\\s+evento",
+                       re.sub(r"<[^>]*>"," ",markup),re.I)) for markup in pages.values()),
+                  "pages_with_caption_pipe":sum("|" in markup for markup in pages.values()),
+                  "markup_sizes":[len(m) for m in pages.values()],
                   "error":reason}),flush=True)
     # Genda may return only a JS shell to the HTTP client. Use one bounded
     # browser session solely for missing Genda date-page observations.
