@@ -207,6 +207,15 @@ def discover_links(body: str, page: Parser, base_url: str) -> list[tuple[str, st
         if not u or u in results or u.rstrip("/") == base_url.rstrip("/"):
             continue
         parsed = urlparse(u)
+        segments = [part.lower() for part in parsed.path.strip("/").split("/") if part]
+        # Las paginas de categorias, etiquetas y paginacion NO son eventos.
+        if not exact_instagram(u) and (
+            any(part in {"categoria", "category", "categorias", "tag", "tags",
+                         "page", "wp-content", "author", "archivo"} for part in segments)
+            or (segments and segments[-1] in {"agenda", "eventos", "clases",
+                "teatro", "musica", "cine", "exposiciones", "cartelera"})
+        ):
+            continue
         if exact_instagram(u):
             results[u] = title
         elif parsed.hostname == host and (LOCAL_DETAIL.search(parsed.path) or
@@ -363,6 +372,7 @@ def main() -> int:
             print(json.dumps({"source":source["source_id"], "http":check["http_status"],
                               "status":check["status"],"pages":check["pages_opened"],
                               "links_found":check["discovered_links"],
+                              "error_type":check["error_type"],
                               "candidates":len(candidates),"sample_urls":[x["original_url"] for x in candidates[:2]]},
                              ensure_ascii=False))
         status = "completed" if good == count else "partial"
