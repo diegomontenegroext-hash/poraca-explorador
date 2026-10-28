@@ -129,7 +129,7 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
                 if url==root:
                     return 200,'<a href="/?fecha='+d.isoformat()+'">Calendario</a>',None
                 return 200,'<html><body>Trayendo la cartelera...</body></html>',None
-        browser_html='<p>Cine</p><p>Función demostración de Genda</p><p>20:00 hs | Cine Select</p>'
+        browser_html='Cine\nFunción demostración de Genda\n20:00 hs | Cine Select\n+ Info\nAvisame'
         source=dict(source_id="genda",url=root,source_role="secondary_agenda",seed_urls=[])
         with patch.object(rd,"render_date_pages",return_value=({day:browser_html},None)) as render:
             check,candidates=rd.scan_source(source,Budget(),"full")
@@ -137,6 +137,30 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertTrue(any(v["title"]=="Función demostración de Genda" for v in check["_listings"]))
         self.assertEqual(check["_listings"][0]["evidence_tier"],"secondary_agenda")
         render.assert_called_once()
+
+    def test_genda_visible_text_with_real_card_sequence(self):
+        d=date.today()+timedelta(days=1)
+        text="""Qué hacer en La Plata
+Teatro
+HAMLET...No quiero morir
+15:00 hs | Escuela de Teatro La Plata
++ Info
+Avisame!
+¿Con quién irías?
+Cine
+Éramos tan flacos - Dir. Carlos Castro
+18:30 hs | Cine Select (Espacio INCAA)
++ Info
+Música En vivo Espectáculo
+Kevin - Liniers: Eternotour
+20:00 hs | Teatro Metro
++ Info
+"""
+        got=ad.extract_listings(text,"https://agendalaplata.ar/?fecha="+d.isoformat())
+        self.assertEqual(len(got),3)
+        self.assertEqual(got[0]["title"],"HAMLET...No quiero morir")
+        self.assertEqual(got[1]["venue"],"Cine Select (Espacio INCAA)")
+        self.assertEqual(got[2]["event_time"],"20:00")
 
     def test_browser_scope_rejects_unknown_urls_and_future_dates(self):
         from radar_genda_browser import validated_date_pages
