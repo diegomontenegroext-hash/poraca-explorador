@@ -435,6 +435,22 @@ Kevin - Liniers: Eternotour
             self.assertEqual(ad.extract_listings(html,
                 "https://www.alternativateatral.com/obra10001-evento"),[])
     
+    def test_edita_official_home_has_two_dates_no_hours(self):
+        html=('<h1>#EDITA2026 #10AÑOS</h1><p>EDITA: 5 y 6 de diciembre</p>'
+              '<p>La Feria de Editoriales más importante de la región con '
+              'más de 150 editoriales. Frente al Museo Provincial Emilio '
+              'Pettoruti, avenida 51 entre 5 y 6, La Plata.</p>')
+        with patch.object(ad,"active_date",return_value=True):
+            got=ad.extract_listings(html,"https://feriaedita.com.ar/")
+        self.assertEqual([x["event_date"] for x in got],
+                         ["2026-12-05","2026-12-06"])
+        self.assertTrue(all(x["event_time"] is None for x in got))
+        self.assertTrue(all(x["evidence_tier"]=="primary_program" for x in got))
+
+    def test_edita_missing_year_marker_does_not_guess_year(self):
+        html=('<p>EDITA: 5 y 6 de diciembre</p>'
+              '<p>La Plata, Frente al Museo Pettoruti</p>')
+        self.assertEqual(ad.extract_listings(html,"https://feriaedita.com.ar/"),[])
     def test_stale_event_is_not_accepted_as_listing(self):
         got=ad.extract_listings(
             '<h1>Obra</h1><p>Entrada: $ 2.000,00 - Viernes - 19:30 hs - 12/10/2024</p>',
