@@ -267,7 +267,15 @@ def extract_og_image(body,base_url):
             continue
         match=re.search(r"content\s*=\s*['\"]([^'\"]+)['\"]",tag,re.I)
         if match:
-            return safe_public_link(html.unescape(match.group(1)),base_url)
+            try:
+                target=urlsplit(urljoin(base_url,html.unescape(match.group(1))))
+                if (target.scheme=="https" and target.hostname and not target.username
+                    and not target.password and target.port in (None,443)
+                    and len(target.geturl())<=2400):
+                    return urlunsplit(("https",target.netloc.lower(),target.path,
+                                      target.query,""))
+            except ValueError:
+                continue
     return None
 
 
