@@ -179,13 +179,19 @@ def extract_listings(raw,url):
                           url,"casa_metro_detalle_fecha_hora","primary_venue")
             if r: out.append(r)
     elif host.endswith("operalp.com.ar") and path.rstrip("/")=="/agenda":
-        # Official listing gives dates, but not always a time. Keep it unverified.
-        raw_text=re.sub(r"<[^>]+>","\n",raw)
-        raw_text=html.unescape(raw_text)
-        for m in re.finditer(r"<h2\b[^>]*>(.*?)</h2>(.{0,700}?)(?=<h2\b|</section|$)",raw,re.I|re.S):
+        # Every heading is one dated performance on the official site. The
+        # organizer's outbound ticket URL is the ORIGINAL click-through,
+        # not a URL guessed from the title. Never infer a clock from a slug.
+        headings=list(re.finditer(r"<h[234]\b[^>]*>(.*?)</h[234]\s*>",raw,re.I|re.S))
+        for i,m in enumerate(headings[:60]):
             title=tidy(re.sub(r"<[^>]+>"," ",m.group(1)))
-            d=parse_dmy(tidy(re.sub(r"<[^>]+>"," ",m.group(2))))
-            r=make_record(title,d,None,"Teatro Ópera La Plata",url,
+            end=headings[i+1].start() if i+1<len(headings) else len(raw)
+            tail=raw[m.end():min(end,m.end()+4000)]
+            d=parse_dmy(tidy(re.sub(r"<[^>]+>"," ",tail)))
+            ticket=re.search(r'''href\s*=\s*["'](https://livepass\.com\.ar/events/[^"']+)["']''',
+                             tail,re.I)
+            proof_url=html.unescape(ticket.group(1)) if ticket else url
+            r=make_record(title,d,None,"Teatro Ópera La Plata",proof_url,
                           "opera_official_program_date_only","primary_program")
             if r: out.append(r)
     elif "agendalaplata.ar" in host:
@@ -207,6 +213,26 @@ def extract_listings(raw,url):
                 r=make_record(title,day,m.group(1).zfill(5),m.group(2),url,
                               "genda_dated_listing","secondary_agenda")
                 if r:out.append(r)
+            # Some responsive layouts put the cards in non-<p> wrappers.
+            # Inspect human-visible line sequence; require actual time and
+            # venue, never treat a page title or a generic CTA as an event.
+            if not any(r["method"]=="genda_dated_listing" for r in out):
+                lines=[tidy(x) for x in "".join(blocks.text).splitlines() if tidy(x)]
+                for i,line in enumerate(lines):
+                    m=re.search(r"\b((?:[01]?\d|2[0-3]):[0-5]\d)\s*hs?\s*\|\s*(.{3,160})",line,re.I)
+                    if not m or i<1:continue
+                    title=lines[i-1]
+                    if (len(title)<6 or len(title)>180 or
+                        re.search(r"avisame|con qui[eé]n|buscar evento|publicar|recib[ií]",
+                                  title,re.I)):
+                        continue
+                    category=" ".join(lines[max(0,i-4):i-1])
+                    if not re.search(r"Cine|Teatro|Música|Muestra|Expo|Taller|Ciencia|Danza|Literatura|Actividad|Fiesta",
+                                     category,re.I):
+                        continue
+                    r=make_record(title,day,m.group(1).zfill(5),m.group(2),url,
+                                  "genda_dated_listing","secondary_agenda")
+                    if r:out.append(r)
     seen=set()
     unique=[]
     for r in out:
@@ -220,7 +246,7 @@ def special_links(url,page):
     host,path=scope(url)
     if host.endswith("agendalaplata.ar") and path=="/":
         links=[]
-        now=datetime.now().date()
+        now=datetime.now(ZoneInfo("America/Argentina/Buenos_Aires")).date()
         for raw,label in page.links:
             if not raw.startswith("https://") and not raw.startswith("/?") and not raw.startswith("?"):
                 continue
