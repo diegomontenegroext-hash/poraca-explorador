@@ -132,40 +132,65 @@ def parse_html(body: str) -> Parser:
 
 
 def structured_event(page: Parser) -> dict:
+    """Read explicit schema.org event roles, never infer a performer from title."""
+    def name_of(value):
+        if isinstance(value,dict):
+            return compact(value.get("name") or "",180)
+        if isinstance(value,str):
+            return compact(value,180)
+        return ""
+
     for script in page.jsonld[:10]:
         try:
             item = json.loads(script)
         except (json.JSONDecodeError, ValueError):
             continue
         queue = item if isinstance(item, list) else [item]
-        while queue:
+        steps = 0
+        while queue and steps < 160:
+            steps += 1
             node = queue.pop(0)
             if not isinstance(node, dict):
                 continue
             typ = node.get("@type", "")
-            if isinstance(typ, list):
-                has_event = "Event" in typ
-            else:
-                has_event = typ == "Event"
-            if has_event:
-                date = node.get("startDate", "")
+            values = typ if isinstance(typ,list) else [typ]
+            is_event = any(isinstance(t,str) and
+                t.rsplit("/",1)[-1].casefold() in (
+                    "event","musicevent","theaterevent","danceevent",
+                    "festivalevent","festival","visualartsevent",
+                    "educationevent","screeningevent","comedyEvent".casefold())
+                for t in values)
+            if is_event:
+                date_value = node.get("startDate","")
                 loc = node.get("location")
                 org = node.get("organizer")
                 if isinstance(loc, list):
-                    loc = next((n for n in loc if isinstance(n, dict)), {})
+                    loc = next((n for n in loc if isinstance(n,(dict,str))),None)
                 if isinstance(org, list):
-                    org = next((n for n in org if isinstance(n, dict)), {})
+                    org = next((n for n in org if isinstance(n,(dict,str))),None)
+                performers = []
+                performer_data = node.get("performer") or node.get("performers") or []
+                if not isinstance(performer_data,list):
+                    performer_data = [performer_data]
+                for performer in performer_data[:12]:
+                    value = name_of(performer)
+                    # Exact role supplied by event JSON-LD; still a LEAD,
+                    # not verified local identity or relationship.
+                    if 3 <= len(value) <= 180 and value not in performers:
+                        performers.append(value)
                 return {
                     "name": compact(str(node.get("name") or "")),
-                    "date": str(date)[:40] if date else None,
-                    "venue": compact((loc or {}).get("name", "")) if isinstance(loc, dict) else None,
-                    "organizer": compact((org or {}).get("name", "")) if isinstance(org, dict) else None,
+                    "date": str(date_value)[:40] if date_value else None,
+                    "venue": name_of(loc) or None,
+                    "organizer": name_of(org) or None,
+                    "performers": performers[:8],
                 }
             graph = node.get("@graph")
-            if isinstance(graph, list):
+            if isinstance(graph,list):
                 queue.extend(graph[:30])
+            elif isinstance(graph,dict):
+                queue.append(graph)
     return {}
-
 
 def iso_event_fields(date_value: str | None) -> tuple[str | None, str | None]:
     """Convert absolute schema.org timestamps to LOCAL Argentina event time.
@@ -267,6 +292,16 @@ def make_candidate(url: str, source_id: str, label: str, detail: Parser | None,
         "metadata_keys": sorted(detail.meta) if detail else [],
         "announced_only": True,
     }
+    if event:
+        # Passive, source-attributed leads. This key is stored in the
+        # existing JSONB evidence field; no entities or new tables.
+        evidence["cultural_signals_v1"] = {
+            "status": "lead_unverified",
+            "origin": "schema_org_event_on_opened_original",
+            "artists": event.get("performers",[]),
+            "organizers": [event["organizer"]] if event.get("organizer") else [],
+            "venues": [event["venue"]] if event.get("venue") else [],
+        }
     return {
         "candidate_key": hashlib.sha256(url.encode("utf-8")).hexdigest(),
         "original_url": url, "kind": kind, "title": title or None,
