@@ -313,6 +313,40 @@ Kevin - Liniers: Eternotour
         self.assertEqual(check["_listings"][0]["event_date"],d.isoformat())
         browser.assert_called_once()
 
+    def test_argentino_real_browser_div_headlines_three_schedules(self):
+        # Renderer actually has no relevant <p> elements around captions;
+        # the weekday/date/hour and exact Fecha del evento remain visible.
+        cases=(
+            ("93","Obra teatral “Mi vida anterior” de Teresa Donato y Dennis Smith",
+             "Domingo",date(2026,11,1),"19:00","Mi vida anterior","Astor Piazzolla"),
+            ("97","Concierto | Horacio Lavandera y Cuarteto de la UNNOBA",
+             "Martes",date(2026,11,3),"19:30","Horacio Lavandera","Alberto Ginastera"),
+            ("98","Masterclass | “Seamos realistas, soñemos lo imposible” con Nacha Guevara",
+             "Viernes",date(2026,11,13),"20:00","Nacha Guevara","Astor Piazzolla"),
+        )
+        for identifier,title,weekday,when,clock,expected,room in cases:
+            with self.subTest(event=identifier):
+                markup=('<html><body><div>Inicio</div><div>SALA '+room+'</div>'
+                        '<div>'+title+' | '+weekday+' '+str(when.day)+'/'+str(when.month)
+                        +' | '+clock+'</div>'
+                        '<div>Inicio de adquisición 22/10/2026 12:00:00</div>'
+                        '<div>Fecha del evento '+when.strftime("%d/%m/%Y")
+                        +' '+clock+':00</div></body></html>')
+                rows=ad.extract_listings(markup,
+                    "https://teatroargentino.gba.gob.ar/meet/"+identifier)
+                self.assertEqual(len(rows),1)
+                self.assertIn(expected,rows[0]["title"])
+                self.assertEqual(rows[0]["event_date"],when.isoformat())
+                self.assertEqual(rows[0]["event_time"],clock)
+                self.assertIn(room,rows[0]["venue"])
+
+    def test_argentino_header_conflict_is_not_promoted(self):
+        html=('<div>SALA Astor Piazzolla</div>'
+              '<div>Concierto | Músicos de prueba | Viernes 13/11 | 20:00</div>'
+              '<div>Fecha del evento 13/11/2026 21:00:00</div>')
+        rows=ad.extract_listings(html,"https://teatroargentino.gba.gob.ar/meet/1098")
+        self.assertEqual(rows,[])
+
     def test_lumen_no_date_or_no_emphasis_not_a_structured_event(self):
         html='<article><p>Una presentación de nuestra asociación cultural.</p></article>'
         self.assertEqual(ad.extract_listings(html,
