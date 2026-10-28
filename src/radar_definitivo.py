@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""RADAR DEFINITIVO 0.1 — motor autonomo con Neon experimental y cursor por fuente.
+"""RADAR DEFINITIVO 0.2 — ingesta reversible a Neon y cursor por fuente.
 
-No es aceptador canonico, no escribe en neondb, no publica eventos.
+Escribe SOLO al schema radar_definitivo; nunca acepta ni publica eventos.
 Instagram: solo permalinks publicos encontrados en fuentes web; perfiles
 catalogados como 'discover_only' no son scrapeados ni se leen Stories.
 """
@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date, timedelta
 import hashlib
 import json
 import os
@@ -17,23 +17,31 @@ import re
 import sys
 import time
 import uuid
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin, urlsplit, urlunsplit, quote, parse_qsl, urlencode
 
 from radar_parallel import (
-    DB_NAME, DB_ROLE, clean_link, compact, discover_links,
+    clean_link, compact, discover_links, WORDS, LOCAL_DETAIL,
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
 )
 
 SCHEMA = "radar_definitivo"
-MAX_SOURCES = 36
-MAX_DETAILS_FULL = 8
+EXPECTED_LAB_DB = "poraca_explorador"
+EXPECTED_LAB_ROLE = "poraca_explorador_writer"
+EXPECTED_OPERATIVE_DB = "neondb"
+EXPECTED_OPERATIVE_LOGIN = "poraca_definitivo_ingest"
+EXPECTED_OPERATIVE_SCOPE = "poraca_definitivo_scope"
+MAX_SOURCES_FULL = 75
+MAX_SOURCES_INCREMENTAL = 45
+MAX_DETAILS_FULL = 6
 MAX_DETAILS_INCREMENTAL = 4
-MAX_REQUESTS = 200
-MAX_INSTAGRAM = 18
-MAX_SECONDS = 19 * 60
-MAX_DOMAIN_REQUESTS = 24
-MAX_EMBEDDED_PER_DETAIL = 2
-MIN_SOURCE_DELAY_SECONDS = 0.15
+MAX_REQUESTS = 360
+MAX_INSTAGRAM = 24
+MAX_SECONDS = 24 * 60
+MAX_DOMAIN_REQUESTS = 26
+MAX_EMBEDDED_PER_DETAIL = 3
+MIN_SOURCE_DELAY_SECONDS = 0.2
+MIN_INSTAGRAM_INTERVAL_SECONDS = 4.0
+MAX_DISCOVERY_LINKS = 100
 
 class Budget:
     def __init__(self, seconds=MAX_SECONDS):
@@ -41,6 +49,7 @@ class Budget:
         self.deadline = self.started + seconds
         self.total = 0
         self.instagram = 0
+        self.last_instagram_request = None
         self.by_host = Counter()
         self.blocked_hosts = set()
 
@@ -68,6 +77,11 @@ class Budget:
         self.by_host[host] += 1
         if exact_instagram(url):
             self.instagram += 1
+            if self.last_instagram_request is not None:
+                pause = MIN_INSTAGRAM_INTERVAL_SECONDS - (time.monotonic()-self.last_instagram_request)
+                if pause>0 and pause<self.remaining():
+                    time.sleep(pause)
+            self.last_instagram_request=time.monotonic()
         if MIN_SOURCE_DELAY_SECONDS:
             time.sleep(MIN_SOURCE_DELAY_SECONDS)
         status, body, error = fetch(url)
@@ -80,20 +94,36 @@ class Budget:
 
 
 def isolated_connection():
-    value = os.environ.get("NEON_EXPLORADOR_DATABASE_URL", "")
+    # Automatic cutover only when the operator supplies a dedicated secret.
+    # Until then Github continues experimental ingestion and is explicit about target.
+    operational = bool(os.getenv("NEON_RADAR_OPERATIONAL_DATABASE_URL"))
+    value = (os.getenv("NEON_RADAR_OPERATIONAL_DATABASE_URL") if operational
+             else os.getenv("NEON_EXPLORADOR_DATABASE_URL",""))
     if not value:
-        raise RuntimeError("Missing NEON_EXPLORADOR_DATABASE_URL repository secret")
+        raise RuntimeError("Missing configured Neon secret")
     try:
         import psycopg
     except ImportError as exc:
         raise RuntimeError("Install psycopg[binary]") from exc
     conn = psycopg.connect(value, connect_timeout=12)
     with conn.cursor() as cur:
-        cur.execute("SELECT current_database(),current_user,to_regclass('radar_definitivo.sources')")
-        db,role,table=cur.fetchone()
-    if db != DB_NAME or role != DB_ROLE or table is None:
-        conn.close()
-        raise RuntimeError("Isolation guard: wrong DB, role or missing radar_definitivo schema")
+        cur.execute("SELECT current_database(),session_user,to_regclass('radar_definitivo.sources')")
+        db,login,table=cur.fetchone()
+        expected_db = EXPECTED_OPERATIVE_DB if operational else EXPECTED_LAB_DB
+        expected_login = EXPECTED_OPERATIVE_LOGIN if operational else EXPECTED_LAB_ROLE
+        if db != expected_db or login != expected_login or table is None:
+            conn.close()
+            raise RuntimeError("Isolation guard: database/role/schema mismatch")
+        if operational:
+            cur.execute("SET ROLE poraca_definitivo_scope")
+            cur.execute("SELECT current_user,has_table_privilege(current_user,'public.radar_agenda_events','INSERT')")
+            scoped_role,can_publish=cur.fetchone()
+            if scoped_role != EXPECTED_OPERATIVE_SCOPE or can_publish:
+                conn.close()
+                raise RuntimeError("Scope guard: operational role has unexpected publish privileges")
+    conn.commit()
+    print("TARGET "+("OPERATIONAL_STAGING_NEONDB" if operational else
+                     "EXPERIMENTAL_PORACA_EXPLORADOR"),flush=True)
     return conn
 
 
@@ -105,28 +135,62 @@ def choose_sources(conn, mode):
                         consecutive_failures FROM radar_definitivo.sources
                         WHERE {where}
                         ORDER BY last_checked_at ASC NULLS FIRST, priority DESC,source_id
-                        LIMIT %s""", (MAX_SOURCES,))
+                        LIMIT %s""", (MAX_SOURCES_FULL if mode=="full" else MAX_SOURCES_INCREMENTAL,))
         return [dict(source_id=a,name=b,url=c,source_role=d,priority=e,
                      cadence_hours=f,consecutive_failures=g)
                 for a,b,c,d,e,f,g in cur.fetchall()]
 
 
+def safe_public_link(raw,base):
+    """Resolve complete public URLs, preserving only safe agenda date parameters."""
+    try:
+        url=urljoin(base,raw.strip())
+        p=urlsplit(url)
+        if p.scheme!="https" or not p.hostname or p.username or p.password:
+            return None
+        if p.port not in (None,443):
+            return None
+        if p.hostname in {"localhost","127.0.0.1","0.0.0.0","::1"} or p.hostname.endswith(".local"):
+            return None
+        path=quote(p.path or "/",safe="/%:@+~,-")
+        q=[(k,v) for k,v in parse_qsl(p.query,keep_blank_values=True)
+            if k in {"fecha","date","month","year"} and len(v)<=16]
+        canonical=urlunsplit(("https",p.hostname.lower(),path,urlencode(q),""))
+        return canonical if len(canonical)<=1400 else None
+    except (ValueError,UnicodeError):
+        return None
+
+
 def links_from_page(body, page, url):
-    """Candidate URL discovery restricted to original source links, no profile scraping."""
-    links = discover_links(body,page,url)
-    seen = set()
-    out = []
-    for href,label in links:
-        if href in seen:
+    """Preserve links and date parameters; never treat profile roots as Instagram posts."""
+    seen=set()
+    out=[]
+    hostname=urlparse(url).hostname
+    # Original anchor links, not a fixed first-18 excerpt from the pilot.
+    for href,label in page.links[:900]:
+        target=safe_public_link(href,url)
+        if not target or target in seen or target.rstrip("/")==url.rstrip("/"):
             continue
-        if not exact_instagram(href):
-            parts = urlparse(href).path.lower().split("/")
-            if any(p in {"categoria","categoría","categorias","tag","tags","recintos",
-                         "page","pagina","página","lista","archivo","author"}
-                   for p in parts):
-                continue
-        seen.add(href)
-        out.append((href,label))
+        p=urlparse(target)
+        parts=[x.casefold() for x in p.path.strip("/").split("/") if x]
+        if not exact_instagram(target) and (
+            any(x in {"categoria","categoría","categorias","tag","tags","recintos",
+                      "page","pagina","página","lista","archivo","author","wp-content"} for x in parts)
+            or any(target.lower().endswith(ext) for ext in (".jpg",".jpeg",".png",".webp",".pdf",".svg",".mp4"))):
+            continue
+        if exact_instagram(target) or (
+            p.hostname==hostname and (LOCAL_DETAIL.search(p.path) or
+            (WORDS.search(label or "") and len(parts)>=2))):
+            seen.add(target)
+            out.append((target,label))
+            if len(out)>=MAX_DISCOVERY_LINKS:
+                break
+    # Permalinks from source HTML, including embeds or scripts.
+    for target,label in discover_links(body,page,url):
+        normalized=safe_public_link(target,url)
+        if normalized and exact_instagram(normalized) and normalized not in seen:
+            out.append((normalized,label))
+            seen.add(normalized)
     return sorted(out,key=lambda item:(not exact_instagram(item[0]),item[0]))
 
 
@@ -141,6 +205,8 @@ def scan_source(source,budget,mode):
     page=parse_html(body)
     links=links_from_page(body,page,root)
     check["links_found"]=len(links)
+    if not links:
+        check["status"]="index_only"
     max_details=MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL
     candidates=[]
     known=set()
@@ -154,6 +220,11 @@ def scan_source(source,budget,mode):
         record=make_candidate(url,source["source_id"],label,detail,stat)
         record["evidence"]["radar"]="definitivo"
         record["evidence"]["source_root"]=root
+        record["evidence"]["linked_from"]=root
+        if data:
+            image_url=extract_og_image(data,url)
+            if image_url:
+                record["evidence"]["og_image_url"]=image_url
         if detail_error:
             record["evidence"]["detail_error"]=detail_error
         candidates.append(record)
@@ -174,6 +245,10 @@ def scan_source(source,budget,mode):
                 candidate=make_candidate(post,source["source_id"],label2,ppage,pstat)
                 candidate["evidence"]["radar"]="definitivo"
                 candidate["evidence"]["linked_from"]=url
+                if pbody:
+                    image_url=extract_og_image(pbody,post)
+                    if image_url:
+                        candidate["evidence"]["og_image_url"]=image_url
                 if perror:
                     candidate["evidence"]["detail_error"]=perror
                 candidates.append(candidate)
@@ -181,6 +256,53 @@ def scan_source(source,budget,mode):
                 if pstat==429:
                     break
     return check,candidates
+
+
+def extract_og_image(body,base_url):
+    # Reference only: do not download or publish an image.
+    import html
+    tags=re.findall(r"<meta\b[^>]*>",body[:200_000],flags=re.I)
+    for tag in tags:
+        if not re.search(r"(?:property|name)\s*=\s*['\"]og:image['\"]",tag,re.I):
+            continue
+        match=re.search(r"content\s*=\s*['\"]([^'\"]+)['\"]",tag,re.I)
+        if match:
+            return safe_public_link(html.unescape(match.group(1)),base_url)
+    return None
+
+
+def credible_occurrence(candidate):
+    """Structural observation, not an accepted event."""
+    if not candidate.get("event_date") or not candidate["evidence"].get("structured_event_found"):
+        return None
+    if candidate.get("kind") not in {"event_detail","news_article"}:
+        return None
+    if not candidate["evidence"].get("detail_opened"):
+        return None
+    try:
+        event_day=date.fromisoformat(candidate["event_date"])
+    except (ValueError,TypeError):
+        return None
+    today=datetime.now(timezone.utc).date()
+    if not today-timedelta(days=14)<=event_day<=today+timedelta(days=365):
+        return None
+    title=compact(candidate.get("title") or "",180)
+    if len(title)<8 or title.lower() in {"casa metro la plata","inicio","cartelera"}:
+        return None
+    return event_day
+
+
+def classify_category(title):
+    t=(title or "").casefold()
+    for cat,words in [("cine",("cine","película","film","proyección")),
+                      ("teatro",("teatro","obra","función","escena")),
+                      ("musica",("recital","concierto","música","show","banda")),
+                      ("danza",("danza","milonga","tango","baile")),
+                      ("arte",("exposición","muestra","galería")),
+                      ("formacion",("taller","curso","cerámica","clase","yoga"))]:
+        if any(w in t for w in words):
+            return cat
+    return "comunidad"
 
 
 def entity_for(source_id,name,entity_type,url,origin):
@@ -227,6 +349,34 @@ def save_source_result(conn,run_id,source,check,candidates):
                      c["event_date"],c["event_time"],c["venue"],c["organizer"],
                      bool(c["evidence"].get("detail_opened")),
                      json.dumps(c["evidence"]),c["original_url"]))
+            source_page=c["evidence"].get("linked_from") or source["url"]
+            edge_key=hashlib.sha256((source["source_id"]+"|"+source_page+"|"+c["original_url"]).encode("utf-8")).hexdigest()
+            cur.execute("""INSERT INTO radar_definitivo.link_edges
+               (edge_key,source_id,from_url,to_url,relation,evidence)
+               VALUES(%s,%s,%s,%s,%s,%s::jsonb)
+               ON CONFLICT(edge_key) DO UPDATE SET last_seen_at=now()""",
+               (edge_key,source["source_id"],source_page,c["original_url"],
+                "original_instagram_permalink" if exact_instagram(c["original_url"]) else "detail",
+                json.dumps({"runId":run_id,"http":c["evidence"].get("detail_http")})))
+            image_url=c["evidence"].get("og_image_url")
+            if image_url:
+                media_key=hashlib.sha256((c["candidate_key"]+"|"+image_url).encode()).hexdigest()
+                cur.execute("""INSERT INTO radar_definitivo.media_references
+                   (media_key,candidate_key,media_url,origin_url)
+                   VALUES(%s,%s,%s,%s)
+                   ON CONFLICT(media_key) DO NOTHING""",
+                   (media_key,c["candidate_key"],image_url,c["original_url"]))
+            when=credible_occurrence(c)
+            if when:
+                occurrence_key=hashlib.sha256((c["candidate_key"]+"|"+str(when)+"|"+(c.get("event_time") or "")).encode()).hexdigest()
+                cur.execute("""INSERT INTO radar_definitivo.event_occurrences
+                  (occurrence_key,candidate_key,event_date,event_time,venue,organizer,
+                   category,first_party_evidence,proof_url,proof_method)
+                  VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                  ON CONFLICT(occurrence_key) DO UPDATE SET last_seen_at=now()""",
+                  (occurrence_key,c["candidate_key"],when,c.get("event_time"),c.get("venue"),
+                   c.get("organizer"),classify_category(c.get("title")),False,
+                   c["original_url"],"public_jsonld_event_unverified"))
             cur.execute("""INSERT INTO radar_definitivo.candidate_sources(candidate_key,source_id)
                       VALUES (%s,%s) ON CONFLICT(candidate_key,source_id)
                       DO UPDATE SET last_seen_at=now()""",
@@ -250,8 +400,9 @@ def save_source_result(conn,run_id,source,check,candidates):
            VALUES(%s,%s,%s,%s,%s,%s,%s)""",
            (run_id,source["source_id"],check["http_status"],
             check["status"],check["details_opened"],check["links_found"],check["error_type"]))
-        fail=source["consecutive_failures"]+1 if check["status"]!="ok" else 0
-        cadence=source["cadence_hours"] if not fail else min(48,2**min(5,fail))
+        fail=source["consecutive_failures"]+1 if check["status"]=="failed" else 0
+        cadence=(min(12,source["cadence_hours"]) if check["status"]=="index_only" else
+                 source["cadence_hours"] if not fail else min(48,2**min(5,fail)))
         cur.execute("""UPDATE radar_definitivo.sources
            SET last_checked_at=now(),last_status=%s,
                consecutive_failures=%s,next_due_at=now()+(%s*interval '1 hour')
@@ -270,11 +421,11 @@ def main():
     try:
         conn=isolated_connection()
     except Exception as exc:
-        print("CONFIG_ERROR: "+str(exc),file=sys.stderr)
+        print("CONFIG_ERROR: "+type(exc).__name__+" (check DB/role/secret)",file=sys.stderr)
         return 2
     budget=Budget()
     run_id="definitivo-"+datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")+"-"+uuid.uuid4().hex[:6]
-    stats=dict(selected=0,checked=0,success=0,urls=0,candidates=0,new=0,entities=0)
+    stats=dict(selected=0,checked=0,success=0,index_only=0,urls=0,candidates=0,new=0,entities=0)
     try:
         sources=choose_sources(conn,args.mode)
         stats["selected"]=len(sources)
@@ -304,6 +455,7 @@ def main():
                 candidates=[];new=0;entities=0
             stats["checked"]+=1
             stats["success"]+=int(check["status"]=="ok")
+            stats["index_only"]+=int(check["status"]=="index_only")
             stats["urls"]+=check["links_found"]
             stats["candidates"]+=len(candidates)
             stats["new"]+=new
@@ -315,7 +467,10 @@ def main():
                              ensure_ascii=False),flush=True)
         state=("complete" if stats["checked"]==stats["selected"] and
                stats["checked"]==stats["success"] else "partial")
-        info=dict(**stats,mode=args.mode,requests=budget.total,instagram_requests=budget.instagram,
+        info=dict(**stats,mode=args.mode,
+                  target="operational_neondb_staging" if os.getenv("NEON_RADAR_OPERATIONAL_DATABASE_URL")
+                  else "experimental_poraca_explorador",
+                  requests=budget.total,instagram_requests=budget.instagram,
                   remaining_seconds=budget.remaining(),notes="all candidates unverified")
         with conn.cursor() as cur:
             cur.execute("""UPDATE radar_definitivo.runs SET finished_at=now(),
