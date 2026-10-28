@@ -451,25 +451,34 @@ def extract_listings(raw,url):
         title=next((t for tag,t in blocks.headings if tag=="h1"),None)
         if title:
             text=tidy(" ".join(blocks.text))
-            # Organizer lists its VENUE in a <p> before a real address. This
-            # is evidence from current HTML, never inherited baseline venue.
+            # "Histórico de funciones" lists PAST VENUES, often immediately
+            # after the current performance. Never use an archive room or
+            # ticket date to describe an upcoming function.
+            current_text=re.split(r"\bHist[oó]rico\s+de\s+funciones\b",
+                                  text,maxsplit=1,flags=re.I)[0]
+            # This HTML variant sometimes wraps venue/address in a <p>,
+            # while responsive alternatives use <div> / plain text.
             mvenue=re.search(
                 r"<p\b[^>]*>\s*([^<]{4,95})<br\s*/?>\s*"
                 r"(?:Calle|Av\.?|Avenida|Diagonal|Diag\.?|"
                 r"Ruta|Boulevard|Bulevar)\b",raw,re.I|re.S)
             venue=tidy(mvenue.group(1)) if mvenue else None
+            if venue and venue.casefold() not in current_text.casefold():
+                venue=None
             if not venue:
-                # Some upstream renderers flatten <p>/<br> differently.
-                # Match only a concrete printed ROOM label. No names are
-                # inferred from the baseline or the venue's URL.
+                # A specific venue MUST be printed in the CURRENT part of
+                # this original. Neither a historical venue nor the URL
+                # determines where today's performance takes place.
                 known_room=re.search(
                     r"\b(TEATRO ESTUDIO DE LAS ARTES|ESPACIO 44|"
-                    r"EN ESO ESTAMOS|ESCENARIO[- ]?40)\b",text,re.I)
+                    r"EN ESO ESTAMOS|ESCENARIO[- ]?40|"
+                    r"CENTRO CULTURAL VIEJO ALMACEN EL OBRERO)\b",
+                    current_text,re.I)
                 if known_room:venue=tidy(known_room.group(1))
-            if not venue and "av. 51 entre 9 y 10" in text.casefold():
+            if not venue and "av. 51 entre 9 y 10" in current_text.casefold():
                 venue="Teatro Argentino"
             # 'Entrada:' can contain several clocks before a printed date.
-            for m in re.finditer(r"Entrada:\s*.{0,220}?\b([0-3]?\d/[01]?\d/20\d{2})",text,re.I):
+            for m in re.finditer(r"Entrada:\s*.{0,220}?\b([0-3]?\d/[01]?\d/20\d{2})",current_text,re.I):
                 d=parse_dmy(m.group(1))
                 times=list(dict.fromkeys(CLOCK.findall(m.group(0))))
                 for tm in times[:6]:
@@ -488,7 +497,7 @@ def extract_listings(raw,url):
                 r"\s*-\s*(?:Hasta\s+el\s+)?"
                 r"([0-3]?\d/[01]?\d/20\d{2})"
                 r"(?:\s+y\s+([0-3]?\d/[01]?\d/20\d{2}))?",
-                text,re.I):
+                current_text,re.I):
                 for value in (m.group(3),m.group(4)):
                     if not value:continue
                     d=parse_dmy(value)
