@@ -1,6 +1,6 @@
-# POR ACA - RADAR DEFINITIVO
-# FULL comparativa de brechas: Alternativa sin Entrada, salas, Teatro Metro, fuentes existentes.
+# POR ACA — RADAR DEFINITIVO
+# Ensayo operativo focalizado EDITA; dos fechas oficiales sin horario y sin publicar.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
-trigger_mode=full
-trigger_reason=source_gap_priority_20261028_full_after_parser_qa
+trigger_mode=incremental
+trigger_reason=edita_2026_two_days_official_original_readback
