@@ -62,6 +62,46 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertIn("Evento futuro",names)
         self.assertNotIn("Actividad ya realizada",names)
 
+    def test_alpedo_browser_dates_allow_only_same_site_and_four_day_horizon(self):
+        from radar_genda_browser import validated_alpedo_date_pages
+        today=date(2026,10,28)
+        urls=[
+            "https://alpedo.ar/?fecha=2026-10-28",
+            "https://alpedo.ar/?fecha=2026-10-29",
+            "https://alpedo.ar/?fecha=2026-10-29",
+            "https://alpedo.ar/?fecha=2026-11-07",
+            "https://alpedo.ar/?cinema=1&fecha=2026-10-30",
+            "https://evil.example/?fecha=2026-10-30",
+            "https://alpedo.ar/?fecha=2026-10-31",
+        ]
+        self.assertEqual(validated_alpedo_date_pages(urls,today=today),[
+            "https://alpedo.ar/?fecha=2026-10-28",
+            "https://alpedo.ar/?fecha=2026-10-29",
+            "https://alpedo.ar/?fecha=2026-10-31"])
+
+    def test_alpedo_browser_recovery_after_index_only_http(self):
+        today=rd.datetime.now(rd.timezone.utc).astimezone(
+            rd.ZoneInfo("America/Argentina/Buenos_Aires")).date()
+        month=next(k for k,v in ad.MONTHS.items() if v==today.month)
+        dated="https://alpedo.ar/?fecha="+today.isoformat()
+        html=(f"<p>{month} {today.year}</p>"
+              "<h6>Taller de literatura</h6>"
+              "<p>19:00</p><p>Café de las artes</p>")
+        budget=rd.Budget(seconds=100)
+        budget.request=lambda url:(200,"<html><p>Agenda</p></html>",None)
+        src={"source_id":"rd-web-cb094233",
+             "source_role":"secondary_agenda","url":"https://alpedo.ar/"}
+        with patch.object(rd,"render_alpedo_date_pages",
+                          return_value=({dated:html},None)) as browser:
+            check,candidates=rd.scan_source(src,budget,"full")
+        browser.assert_called_once()
+        self.assertEqual(check["status"],"ok")
+        self.assertEqual(check["_alpedo_render_pages"],1)
+        self.assertEqual(len(check["_listings"]),1)
+        self.assertEqual(check["_listings"][0]["venue"],"Café de las artes")
+        self.assertEqual(check["_listings"][0]["evidence_tier"],"secondary_agenda")
+        self.assertEqual(candidates,[])
+
     def test_alternativa_multiple_sessions_per_day(self):
         today=date.today()+timedelta(days=2)
         tomorrow=today+timedelta(days=1)
