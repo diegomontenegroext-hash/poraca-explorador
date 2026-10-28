@@ -3,7 +3,7 @@ import sys
 import unittest
 from unittest.mock import patch
 from collections import Counter
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from urllib.parse import quote
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
@@ -70,6 +70,21 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertEqual(links[0][0],"https://agendalaplata.ar/?fecha="+d.isoformat())
         opera=rd.parse_html('<a href="https://livepass.com.ar/events/carmen-en-opera">Comprar</a>')
         self.assertEqual(len(ad.special_links("https://operalp.com.ar/agenda/",opera)),1)
+
+    def test_genda_rotates_distant_days_without_missing_near_days(self):
+        day=date.today()
+        dates=[day+timedelta(days=i) for i in range(20)]
+        html="".join('<a href="/?fecha='+d.isoformat()+'">Día</a>' for d in dates)
+        page=rd.parse_html(html)
+        a=ad.special_links("https://agendalaplata.ar/",page,
+                           at=datetime(day.year,day.month,day.day,9))
+        b=ad.special_links("https://agendalaplata.ar/",page,
+                           at=datetime(day.year,day.month,day.day,17))
+        self.assertEqual(len(a),5)
+        self.assertEqual(len(b),5)
+        self.assertTrue(a[0][0].endswith(day.isoformat()))
+        self.assertTrue(a[1][0].endswith((day+timedelta(days=1)).isoformat()))
+        self.assertNotEqual([u for u,_ in a],[u for u,_ in b])
 
     def test_validated_query_parameters_lumen_artis(self):
         u=rd.safe_public_link("?p=2907&post_type=funcion&utm_source=untrusted","https://lumenartis.org/")
