@@ -194,6 +194,77 @@ Kevin - Liniers: Eternotour
               "https://agendalaplata.ar/?fecha=not-a-date"]
         self.assertEqual(validated_date_pages(urls,today=date.today()),[base])
 
+    def test_metro_official_ticket_date_not_box_office_hours(self):
+        d=date.today()+timedelta(days=2)
+        month=next(k for k,v in ad.MONTHS.items() if v==d.month)
+        html=('<section><h2>Kevin Johanse + Liniers</h2>'
+              '<p><strong>Día/s y horario/s:</strong><small>Jueves, '
+              +str(d.day)+' de '+month.title()+' de '+str(d.year)
+              +' . 21:00 hs.</small></p>'
+              '<p>Horarios de atención: lunes a sábados 10:00 a 19:00 hs</p></section>')
+        url="https://www.teatrometrolp.com.ar/entrada/kevin-johanse-liniers-100884"
+        got=ad.extract_listings(html,url)
+        self.assertEqual(len(got),1)
+        self.assertEqual(got[0]["event_date"],d.isoformat())
+        self.assertEqual(got[0]["event_time"],"21:00")
+        self.assertEqual(got[0]["venue"],"Teatro Metro")
+        self.assertEqual(got[0]["proof_url"],url)
+
+    def test_metro_index_multiple_shows_exact_dates_and_hours(self):
+        d=date.today()+timedelta(days=2)
+        d2=d+timedelta(days=1)
+        html=('<h3>Kevin Johanse + Liniers</h3><p>Descripción...</p><p>Jueves, '
+              +d.strftime("%d/%m/%Y")+' - 21:00 hs.</p>'
+              +'<h3>Juli Bellese</h3><p>'+d2.strftime("%d/%m/%Y")
+              +' - 21:00 hs.</p>')
+        got=ad.extract_listings(html,"https://www.teatrometrolp.com.ar/entradas/cartelera/")
+        self.assertEqual(len(got),2)
+        self.assertEqual({x["event_date"] for x in got},{d.isoformat(),d2.isoformat()})
+        self.assertTrue(all(x["proof_url"].endswith("/entradas/cartelera/") for x in got))
+
+    def test_argentino_official_event_date_not_booking_date(self):
+        d=date.today()+timedelta(days=4)
+        html=('<p>SALA Astor Piazzolla</p><p>Obra teatral “Mi vida anterior” '
+              'de Teresa Donato y Dennis Smith | Domingo 1/11 | 19:00</p>'
+              '<p>Inicio de adquisición 22/10/2026 12:00:00</p>'
+              '<p>Fecha del evento '+d.strftime("%d/%m/%Y")+' 19:00:00</p>'
+              '<p>Cierre de adquisición '+d.strftime("%d/%m/%Y")+' 19:00:00</p>')
+        url="https://teatroargentino.gba.gob.ar/meet/93"
+        got=ad.extract_listings(html,url)
+        self.assertEqual(len(got),1)
+        self.assertEqual(got[0]["event_date"],d.isoformat())
+        self.assertEqual(got[0]["event_time"],"19:00")
+        self.assertIn("Astor Piazzolla",got[0]["venue"])
+        self.assertIn("Mi vida anterior",got[0]["title"])
+
+    def test_argentino_concert_keeps_person_not_generic_concierto(self):
+        d=date.today()+timedelta(days=4)
+        html=('<p>SALA Alberto Ginastera</p>'
+              '<p>Concierto | Horacio Lavandera y Cuarteto de la UNNOBA | Martes 3/11 | 19:30</p>'
+              '<p>Fecha del evento '+d.strftime("%d/%m/%Y")+' 19:30:00</p>')
+        got=ad.extract_listings(html,"https://teatroargentino.gba.gob.ar/meet/97")
+        self.assertEqual(len(got),1)
+        self.assertEqual(got[0]["title"],"Horacio Lavandera y Cuarteto de la UNNOBA")
+
+    def test_lumen_official_prose_date_and_original_title(self):
+        d=date.today()+timedelta(days=4)
+        month=next(k for k,v in ad.MONTHS.items() if v==d.month)
+        html=('<article><p>El <strong>domingo '+str(d.day)+' de '+month
+              +' a las 18 h</strong>, el Teatro recibirá a Novo Ensamble, '
+              'que presentará <em>El dúo de La Africana</em>, una zarzuela.</p></article>')
+        url="https://lumenartis.org/?p=2907&post_type=funcion"
+        got=ad.extract_listings(html,url)
+        self.assertEqual(len(got),1)
+        self.assertEqual(got[0]["title"],"El dúo de La Africana")
+        self.assertEqual(got[0]["event_date"],d.isoformat())
+        self.assertEqual(got[0]["event_time"],"18:00")
+        self.assertEqual(got[0]["evidence_tier"],"primary_venue")
+
+    def test_lumen_no_date_or_no_emphasis_not_a_structured_event(self):
+        html='<article><p>Una presentación de nuestra asociación cultural.</p></article>'
+        self.assertEqual(ad.extract_listings(html,
+           "https://lumenartis.org/?p=2907&post_type=funcion"),[])
+
     def test_stale_event_is_not_accepted_as_listing(self):
         got=ad.extract_listings(
             '<h1>Obra</h1><p>Entrada: $ 2.000,00 - Viernes - 19:30 hs - 12/10/2024</p>',
