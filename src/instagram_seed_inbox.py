@@ -7,6 +7,8 @@ diferencia entre una publicación revisada y un perfil monitorizado.
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
+from html import unescape
+from html.parser import HTMLParser
 import json
 from pathlib import Path
 import re
@@ -18,6 +20,30 @@ REVISIT_HOURS = 36
 INBOX = Path(__file__).resolve().parents[1] / "ops" / "instagram-exact-seeds.json"
 PERMALINK = re.compile(r"^/(p|reel)/([A-Za-z0-9_-]{5,50})/?$")
 ACCOUNT = re.compile(r"^[a-zA-Z0-9_.]{2,30}$")
+
+
+class InstagramPublicMeta(HTMLParser):
+    """Preserva texto íntegro disponible en metas HTML, sin pedir un feed."""
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.values = {}
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == "meta":
+            key = (attrs.get("property") or attrs.get("name") or "").lower()
+            if key in {"description", "og:description", "og:url"}:
+                value = attrs.get("content") or ""
+                self.values[key] = unescape(value)[:8000]
+        if tag == "link" and "canonical" in (attrs.get("rel") or "").lower():
+            self.values["canonical_url"] = attrs.get("href") or ""
+
+
+def public_instagram_metadata(body):
+    """No trunca a 500 caracteres como el Parser genérico de agendas."""
+    parser = InstagramPublicMeta()
+    parser.feed((body or "")[:300_000])
+    return parser.values
 
 
 def normalized_post(url):
@@ -87,7 +113,8 @@ def choose_seed_sources(conn, path=INBOX, today=None):
         inventory = {row[0]: row for row in cur.fetchall()}
         cur.execute("""SELECT url FROM radar_definitivo.candidates
                        WHERE url=ANY(%s)
-                         AND last_seen_at>=now()-(%s*interval '1 hour')""",
+                         AND last_seen_at>=now()-(%s*interval '1 hour')
+                         AND evidence->>'public_caption_extraction'='html_meta_full_v2'""",
                     (urls, REVISIT_HOURS))
         seen = {row[0] for row in cur.fetchall()}
     grouped = {}
