@@ -684,6 +684,7 @@ def special_links(url,page,at=None):
         # Aperturas DENTRO de MAX_DETAILS_FULL=6, nunca cron adicional.
         discovered={}
         tickets={}
+        filtered_root=None
         for href,label in page.links:
             raw=(href or "").strip()
             if not raw or raw.startswith("//"):
@@ -700,7 +701,17 @@ def special_links(url,page,at=None):
                 or p.username or p.password or p.port not in (None,443)
                 or p.fragment):
                 continue
-            if re.fullmatch(r"/entradas/cartelera/([1-3])/?",p.path,re.I):
+            if (p.path.rstrip("/")=="/entradas/cartelera"
+                and p.query in ("anio=&mes=","mes=&anio=")
+                and not urlsplit(url).query):
+                # La portada simple puede servir un índice corto, pero el
+                # propio enlace oficial 'CARTELERA' con filtros vacíos
+                # devuelve más funciones. Comprobado HTTP200 28/10:
+                # Las Hijas 08/11 19:30 y 21:30, ambas originales.
+                filtered_root=("https://"+p.hostname+
+                               "/entradas/cartelera/?"+p.query,
+                               "cartelera oficial, filtros vacios")
+            elif re.fullmatch(r"/entradas/cartelera/([1-3])/?",p.path,re.I):
                 if p.query and not re.fullmatch(
                         r"(?:anio=&mes=|mes=&anio=)",p.query):
                     continue
@@ -714,7 +725,9 @@ def special_links(url,page,at=None):
                 # oficial, nunca construir un slug desde el título.
                 normalized="https://"+p.hostname+p.path.rstrip("/")
                 tickets.setdefault(normalized,(normalized,"detalle oficial"))
-        page_link=[discovered[min(discovered)]] if discovered else []
+        page_link=([filtered_root] if filtered_root else [])
+        if discovered:
+            page_link.append(discovered[min(discovered)])
         if not page_link and tickets:
             # El original devuelve HTTP200 en /1/ pero no siempre ofrece
             # 'Siguiente'. Una apertura adicional sólo si hay fichas
