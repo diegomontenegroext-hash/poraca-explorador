@@ -70,3 +70,52 @@ def render_date_pages(urls, max_seconds=75):
     except Exception as exc:
         return result, "BROWSER_RENDER_FAILED:"+type(exc).__name__
     return result,None
+
+
+def render_argentino_event_pages(urls,max_seconds=55):
+    """Read only explicit /meet/<id> Teatro Argentino event pages, no login."""
+    from urllib.parse import urlsplit
+    import re
+    valid=[]
+    for url in urls[:8]:
+        parts=urlsplit(url)
+        if (parts.scheme=="https" and parts.hostname=="teatroargentino.gba.gob.ar"
+            and parts.port is None and not parts.query and not parts.fragment
+            and re.fullmatch(r"/meet/[0-9]{1,8}/?",parts.path)
+            and url not in valid):
+            valid.append(url)
+        if len(valid)>=4:break
+    if not valid:return {},None
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return {},"BROWSER_PACKAGE_UNAVAILABLE"
+    result={}
+    start=time.monotonic()
+    try:
+        with sync_playwright() as p:
+            browser=p.chromium.launch(channel="chrome",headless=True,
+                                     args=["--no-sandbox","--disable-dev-shm-usage"])
+            context=browser.new_context(locale="es-AR",timezone_id="America/Argentina/Buenos_Aires")
+            context.set_default_timeout(6000)
+            context.route("**/*",lambda route: route.abort()
+                if route.request.resource_type in ("image","font","media") else route.continue_())
+            page=context.new_page()
+            for url in valid:
+                if time.monotonic()-start>max_seconds-8:break
+                try:
+                    response=page.goto(url,wait_until="domcontentloaded",timeout=12000)
+                    if response and response.status==429:break
+                    if response and response.status>=400:continue
+                    try:
+                        page.wait_for_function(
+                            "() => document.body?.innerText.includes('Fecha del evento')",
+                            timeout=6500)
+                    except Exception:pass
+                    result[url]=page.content()[:650_000]
+                except Exception:continue
+            context.close()
+            browser.close()
+    except Exception as ex:
+        return result,"BROWSER_RENDER_FAILED:"+type(ex).__name__
+    return result,None
