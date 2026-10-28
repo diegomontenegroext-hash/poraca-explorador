@@ -7,6 +7,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/radar-definitivo.yml'
+      - 'ops/radar-fallback-trigger.txt'  # Guardia GPT 05:00, commit diario solo si FULL falto
   workflow_dispatch:
     inputs:
       mode:
