@@ -1,5 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Sentinel para Guardia GPT 05:00 ART.
-# Solo una activacion por fecha local.
-fallback_date=2026-10-28
-fallback_reason=missing_or_failed_scheduled_full
+# Disparo por Guardia GPT - orquestador principal.
+trigger_date=2026-10-28
+trigger_slot=bootstrap
+trigger_mode=incremental
+trigger_reason=gpt_primary_scheduler_smoke_test
