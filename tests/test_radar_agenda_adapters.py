@@ -524,6 +524,23 @@ Kevin - Liniers: Eternotour
         self.assertEqual(ad.special_links(
             "https://www.teatrometrolp.com.ar/entradas/cartelera/1/",page),[])
 
+    def test_metro_second_page_verified_fallback_when_index_has_no_next(self):
+        root="https://www.teatrometrolp.com.ar/entradas/cartelera/"
+        page=rd.parse_html(
+            '<a href="https://www.teatrometrolp.com.ar/entrada/'
+            'lisandro-aristimuno-experiencia-coral-100959">Ver más</a>'
+            '<a href="https://evil.example/entradas/cartelera/1/">No</a>')
+        links=ad.special_links(root,page)
+        self.assertEqual(links,[
+            ("https://www.teatrometrolp.com.ar/entradas/cartelera/1/",
+             "cartelera oficial verificada, pagina 1")])
+        # No abrir página extra si el original no muestra fichas individuales.
+        self.assertEqual(ad.special_links(root,rd.parse_html(
+            '<a href="https://evil.example/entrada/falso">Intruso</a>')),[])
+        self.assertEqual(ad.special_links(root,rd.parse_html(
+            '<a href="https://www.teatrometrolp.com.ar/entrada/'
+            'fake?token=secret">Query insegura</a>')),[])
+
     def test_metro_second_page_individual_sessions_and_no_boxoffice_clock(self):
         d=date.today()+timedelta(days=20)
         d2=d+timedelta(days=21)
