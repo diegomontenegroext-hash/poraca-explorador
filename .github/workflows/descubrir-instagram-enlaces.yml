@@ -1,0 +1,28 @@
+name: Por Aca - descubrir enlaces Instagram desde agendas
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'src/discover_post_links.py'
+      - 'tests/test_discover_post_links.py'
+      - '.github/workflows/descubrir-instagram-enlaces.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: poraca-discover-public-links
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Obtener repositorio
+        uses: actions/checkout@v4
+      - name: Probar extraccion sin red
+        run: python3 -m unittest discover -s tests -v
+      - name: Detectar enlaces de posts en paginas publicas
+        run: python3 src/discover_post_links.py
