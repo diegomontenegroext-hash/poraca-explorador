@@ -533,13 +533,48 @@ Kevin - Liniers: Eternotour
         links=ad.special_links(root,page)
         self.assertEqual(links,[
             ("https://www.teatrometrolp.com.ar/entradas/cartelera/1/",
-             "cartelera oficial verificada, pagina 1")])
+             "cartelera oficial verificada, pagina 1"),
+            ("https://www.teatrometrolp.com.ar/entrada/lisandro-aristimuno-experiencia-coral-100959",
+             "detalle oficial")])
         # No abrir página extra si el original no muestra fichas individuales.
         self.assertEqual(ad.special_links(root,rd.parse_html(
             '<a href="https://evil.example/entrada/falso">Intruso</a>')),[])
         self.assertEqual(ad.special_links(root,rd.parse_html(
             '<a href="https://www.teatrometrolp.com.ar/entrada/'
             'fake?token=secret">Query insegura</a>')),[])
+
+    def test_metro_original_ticket_rotation_bounded_and_distinct_sessions(self):
+        root="https://www.teatrometrolp.com.ar/entradas/cartelera/"
+        first=["kevin-johanse-100001","juli-bellese-100002",
+               "las-hijas-100958","las-hijas-101000",
+               "ni-media-palabra-100003","cuarto-veronica-100004",
+               "coda-100005","final-100006"]
+        html='<a href="/entradas/cartelera/1/?anio=&mes=">Siguiente</a>'
+        html+="".join('<a href="https://www.teatrometrolp.com.ar/entrada/'+
+                      slug+'">ver más info</a>' for slug in first)
+        html+='<a href="https://evil.example/entrada/otro">Intruso</a>'
+        html+='<a href="https://www.teatrometrolp.com.ar/entrada/x?token=bad">Intruso</a>'
+        page=rd.parse_html(html)
+        a=ad.special_links(root,page,at=datetime(2026,10,28,5))
+        b=ad.special_links(root,page,at=datetime(2026,10,29,5))
+        self.assertEqual(len(a),6)
+        self.assertEqual(len({u for u,_ in a}),6)
+        self.assertTrue(a[0][0].endswith("/entradas/cartelera/1/"))
+        self.assertEqual([u for u,_ in a[1:3]],
+          ["https://www.teatrometrolp.com.ar/entrada/"+slug for slug in first[:2]])
+        self.assertNotEqual(a[3:],b[3:],"Rotation must change later candidates")
+        # Todos los demás se recorren con rotación, no sólo los primeros.
+        reached={u for at in range(24) for u,_ in ad.special_links(
+            root,page,at=datetime(2026,10,28+at%3,5+8*(at//3)%24))
+                if "/entrada/" in u}
+        self.assertTrue(all("https://www.teatrometrolp.com.ar/entrada/"+s in reached
+                            for s in first))
+        self.assertTrue(all(u.startswith("https://www.teatrometrolp.com.ar/")
+                            and "token" not in u and "evil" not in u
+                            for u,_ in a))
+        # En el detalle NO se vuelve a seguir cartelera o abrir nuevas paginas.
+        self.assertEqual(ad.special_links(
+            "https://www.teatrometrolp.com.ar/entrada/las-hijas-100958",page),[])
 
     def test_metro_second_page_individual_sessions_and_no_boxoffice_clock(self):
         d=date.today()+timedelta(days=20)
