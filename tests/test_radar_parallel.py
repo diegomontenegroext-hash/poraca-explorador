@@ -30,6 +30,15 @@ class RadarParallelTests(unittest.TestCase):
         self.assertIn("https://www.0221.com.ar/que-hago/banda-platense-n200/", found)
         self.assertTrue(all("/contacto" not in url for url in found))
 
+    def test_categories_are_not_events(self):
+        page = ('<a href="/agenda/categoria/clases/">Clases</a>'
+                '<a href="/agenda/categoria/clases/avanzados/">Nivel Avanzados</a>'
+                '<a href="/agenda/evento/milonga-cultural/">Milonga cultural</a>')
+        urls = [u for u, _ in radar.discover_links(page, radar.parse_html(page),
+                    "https://laplatatango.com.ar/agenda/lista/")]
+        self.assertFalse(any("/categoria/" in u for u in urls))
+        self.assertIn("https://laplatatango.com.ar/agenda/evento/milonga-cultural/", urls)
+
     def test_schema_event_date_from_jsonld(self):
         raw = ('<script type="application/ld+json">'
                '{"@type":"Event","name":"Feria cultural","startDate":"2026-11-01T18:30:00-03:00",'
