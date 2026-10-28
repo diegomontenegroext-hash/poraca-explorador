@@ -84,6 +84,49 @@ class RadarParallelTests(unittest.TestCase):
         self.assertEqual(radar.iso_event_fields(event["date"]), ("2026-11-01","18:30"))
         self.assertEqual(event["venue"], "Centro Cultural")
 
+    def test_explicit_music_event_performers_passive_cultural_signals(self):
+        raw = ('<script type="application/ld+json">'
+            '{"@graph":[{"@type":"WebSite","name":"Sitio"},'
+            '{"@type":"MusicEvent","name":"Festival en La Plata",'
+            '"startDate":"2026-11-20T21:00:00-03:00",'
+            '"location":{"@type":"Place","name":"Sala local"},'
+            '"organizer":{"@type":"Organization","name":"Productora invitada"},'
+            '"performer":[{"@type":"MusicGroup","name":"Banda visitante"},'
+            '{"@type":"Person","name":"DJ local"},'
+            '{"@type":"Person","name":"DJ local"}]}]}</script>')
+        url="https://venue.example.org/evento/festival/"
+        page=radar.parse_html(raw)
+        event=radar.structured_event(page)
+        self.assertEqual(event["performers"],["Banda visitante","DJ local"])
+        item=radar.make_candidate(url,"source-cultural","Festival",page,200)
+        self.assertEqual(item["event_date"],"2026-11-20")
+        self.assertEqual(item["event_time"],"21:00")
+        self.assertEqual(item["organizer"],"Productora invitada")
+        self.assertEqual(item["venue"],"Sala local")
+        signal=item["evidence"]["cultural_signals_v1"]
+        self.assertEqual(signal["status"],"lead_unverified")
+        self.assertEqual(signal["artists"],["Banda visitante","DJ local"])
+        self.assertEqual(signal["organizers"],["Productora invitada"])
+        self.assertEqual(signal["venues"],["Sala local"])
+
+    def test_not_infer_artist_or_entities_from_title(self):
+        html='<title>Artista visitante en La Plata</title>'
+        candidate=radar.make_candidate("https://site.example.org/evento/artista/",
+            "src", "Artista visitante", radar.parse_html(html),200)
+        self.assertNotIn("cultural_signals_v1",candidate["evidence"])
+        self.assertIsNone(candidate["organizer"])
+
+    def test_event_performer_text_allowed_only_in_structured_role(self):
+        html=('<script type="application/ld+json">'
+            '{"@type":"Event","name":"Teatro y lectura",'
+            '"startDate":"2026-11-07","performer":"Grupo Escénico",'
+            '"location":"Espacio cultural","organizer":"Colectivo"}'
+            '</script>')
+        event=radar.structured_event(radar.parse_html(html))
+        self.assertEqual(event["performers"],["Grupo Escénico"])
+        self.assertEqual(event["venue"],"Espacio cultural")
+        self.assertEqual(event["organizer"],"Colectivo")
+
     def test_unverified_when_only_index_link(self):
         row = radar.make_candidate("https://www.0221.com.ar/que-hago/un-show-n123/",
                                     "src-0221","Un show",None,None)
