@@ -213,7 +213,10 @@ def source_specific_sessions(raw,url,blocks):
             caption=next((t for name,t in blocks.chunks
                 if name=="p" and "|" in t and
                 re.search(r"obra|concierto|clase|funci[oó]n|teatro|masterclass",t,re.I)),None)
-            title=tidy(caption.split("|")[0]) if caption else None
+            pieces=[tidy(x) for x in caption.split("|")] if caption else []
+            title=(pieces[1] if len(pieces)>1 and
+                   pieces[0].casefold() in ("concierto","teatro","masterclass","obra teatral")
+                   else pieces[0] if pieces else None)
             room=next((t for name,t in blocks.chunks
                 if name=="p" and re.match(r"\s*SALA\s+\w+",t,re.I)),None)
             venue=("Teatro Argentino — "+room if room else "Teatro Argentino")
