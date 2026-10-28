@@ -23,7 +23,8 @@ SCOPED_HOSTS={"agendalaplata.ar","www.agendalaplata.ar",
               "casametro.com.ar","www.casametro.com.ar",
               "operalp.com.ar","www.operalp.com.ar",
               "teatrometrolp.com.ar","www.teatrometrolp.com.ar",
-              "teatroargentino.gba.gob.ar","lumenartis.org","www.lumenartis.org"}
+              "teatroargentino.gba.gob.ar","lumenartis.org","www.lumenartis.org",
+              "agendadecine.com","www.agendadecine.com"}
 def tidy(s):
     return re.sub(r"\s+"," ",html.unescape(s or "")).strip()
 
@@ -264,6 +265,32 @@ def source_specific_sessions(raw,url,blocks):
                 rec=make_record(title,d,clock,"Lumen Artis / Teatro de Cámara de City Bell",
                                 url,"lumen_official_prose_date","primary_venue")
                 if rec:records.append(rec)
+    elif host in ("agendadecine.com","www.agendadecine.com") and (
+        path.endswith("/octubre-en-cine-select") or path.endswith("/octubre-en-cine-ecoselect")):
+        # Time/date from a specialized SECONDARY cinema programme, not
+        # from a municipality/official owner. October-only historical URL.
+        local_today=datetime.now(ZoneInfo("America/Argentina/Buenos_Aires")).date()
+        venue=("Cine Ecoselect (Espacio INCAA)"
+               if path.endswith("cine-ecoselect") else "Cine Select (Espacio INCAA)")
+        for t,paragraph in blocks.chunks[:250]:
+            if t!="p":continue
+            m=re.match(
+                r"^(?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)\s+"
+                r"([0-3]?\d)\s+de\s+octubre\s+"
+                r"((?:[01]?\d|2[0-3]):[0-5]\d)\s+[—–-]\s+(.{6,340})$",
+                paragraph,re.I)
+            if not m:continue
+            try: d=date(local_today.year,10,int(m.group(1)))
+            except ValueError:continue
+            tail=m.group(3)
+            # "Espacio INCAA (entrada $5000): Película / Dir..."
+            # or "Ciclo Freakshow: Película"; no inference of screening time.
+            title=tail.split(": ",1)[1] if ": " in tail else tail
+            title=title.split(" / Dir",1)[0].strip()
+            title=title.lstrip("_ ")
+            rec=make_record(title,d,m.group(2),venue,url,
+                            "agendadecine_monthly_screening","secondary_cinema_agenda")
+            if rec:records.append(rec)
     return records
 
 def extract_listings(raw,url):
