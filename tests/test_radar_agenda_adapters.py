@@ -565,7 +565,7 @@ Kevin - Liniers: Eternotour
         self.assertNotEqual(a[3:],b[3:],"Rotation must change later candidates")
         # Todos los demás se recorren con rotación, no sólo los primeros.
         reached={u for at in range(24) for u,_ in ad.special_links(
-            root,page,at=datetime(2026,10,28+at%3,5+8*(at//3)%24))
+            root,page,at=datetime(2026,10,28+at%3,5+8*((at//3)%3)))
                 if "/entrada/" in u}
         self.assertTrue(all("https://www.teatrometrolp.com.ar/entrada/"+s in reached
                             for s in first))
