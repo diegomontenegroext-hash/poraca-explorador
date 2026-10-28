@@ -19,12 +19,9 @@ on:
         options:
           - incremental
           - full
-  schedule:
-    # 2026-10-28 00:50 ART: primera exploracion full.
-    # GitHub puede retrasar la ejecucion; solo habilitada en 2026 por el gate.
-    - cron: '50 3 28 10 *'
-    # Tres corridas posteriores por dia, siempre incrementales (UTC-3).
-    - cron: '20 1,13,19 * * *'
+  # Piloto archivado: ejecucion manual solamente.
+  # El Radar Definitivo tiene el unico cron GitHub activo.
+
 
 permissions:
   contents: read
