@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Optional controlled browser read of Genda date pages; never web-wide crawling."""
 from __future__ import annotations
-from datetime import date,timedelta
+from datetime import date,datetime,timedelta
+from zoneinfo import ZoneInfo
 from urllib.parse import urlsplit,parse_qs
 import time
 
 def validated_date_pages(urls, today=None):
-    today=today or date.today()
+    today=today or datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date()
     accepted=[]
     for url in urls[:5]:
         p=urlsplit(url)
