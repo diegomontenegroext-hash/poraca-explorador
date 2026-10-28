@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# FULL comparativa del adaptador fuente-especifico 1, sin promocion publica.
+# Segunda FULL comparativa, adaptador Genda con Chrome y Opera sin hora inventada
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=full
-trigger_reason=agenda_parser_comparison_20261028
+trigger_reason=agenda_adapters_tanda2_genda_browser_opera
