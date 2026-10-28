@@ -44,7 +44,8 @@ Importado desde las tablas históricas de Radar sin alterar los originales:
 - `event_occurrences`: ocurrencias de evento estructuradas desde JSON-LD y fechas válidas, **siempre** `observed_unverified`.
 - `entities`: lugares/organizaciones descubiertos y perfil de origen, **siempre** propuestas.
 - Vistas `run_live_progress` y `operational_health` para monitoreo.
-- `motor_observations_preview` prepara el formato `radar_v3_source_observations` sin escribir ni aceptar eventos en esa tabla todavía.
+- `motor_observations_preview` prepara una sola observación por ocurrencia compatible con `radar_v3_source_observations`, sin escribir ni aceptar eventos en esa tabla todavía.
+- `possible_duplicate_events` ofrece detección conservadora de posibles duplicados entre URLs distintas por título normalizado, fecha y sede: sólo diagnóstico, no fusión automática.
 
 **No se modificaron** `public.radar_agenda_events`, `public.radar_v3_source_observations`, `public.radar_v3_source_sweep_checks`, las reglas del Motor/Puente ni el backend privado. La API actual sigue leyendo sus contratos previos. El nuevo Radar no debe declararse sustituto **funcional completo de la cadena Motor → Puente → Web** hasta integración y QA separados.
 
@@ -67,6 +68,7 @@ SELECT kind,review_state,count(*) FROM radar_definitivo.candidates GROUP BY 1,2;
 SELECT event_date,event_time,venue,proof_url,review_state
 FROM radar_definitivo.event_occurrences ORDER BY first_seen_at DESC LIMIT 30;
 SELECT * FROM radar_definitivo.motor_observations_preview LIMIT 30;
+SELECT * FROM radar_definitivo.possible_duplicate_events LIMIT 30;
 ```
 
 ## Próximas mejoras reales
