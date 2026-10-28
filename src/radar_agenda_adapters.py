@@ -204,15 +204,19 @@ def alpedo_dated_sessions(raw,url):
     if not header or MONTHS.get(header.group(1).casefold())!=day.month or int(header.group(2))!=day.year:
         return []
     cards=list(re.finditer(r"<h6\b[^>]*>(.*?)</h6\s*>",raw[:450_000],re.I|re.S))
+    # "Finalizadas" begins an archive of earlier activities. It marks
+    # upcoming sections by position, rather than invalidating the last
+    # legitimate future card immediately before that heading.
+    archive=re.search(r">\s*Finalizadas\s*<",raw[:450_000],re.I)
     out=[]
     for i,m in enumerate(cards[:100]):
+        if archive and m.start()>archive.start():
+            continue
         title=tidy(re.sub(r"<[^>]+>"," ",m.group(1)))
         if not 5<=len(title)<=180:
             continue
         end=cards[i+1].start() if i+1<len(cards) else min(m.end()+1600,len(raw))
         tail=raw[m.end():min(end,m.end()+1800)]
-        if re.search(r"\bFinalizadas\b",tail,re.I):
-            continue
         card_text=tidy(re.sub(r"<[^>]+>"," ",tail))
         clocks=CLOCK.findall(card_text)
         # "07:00 a 19:00" is museum opening hours, not a dated show.
