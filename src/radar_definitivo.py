@@ -25,7 +25,7 @@ from radar_parallel import (
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
 )
 from radar_agenda_adapters import extract_listings, special_links
-from instagram_seed_inbox import choose_seed_sources
+from instagram_seed_inbox import choose_seed_sources, public_instagram_metadata
 from radar_genda_browser import render_date_pages, validated_date_pages, render_argentino_event_pages, render_alpedo_date_pages
 
 SCHEMA = "radar_definitivo"
@@ -267,10 +267,21 @@ def scan_exact_instagram_seeds(source, budget):
         })
         # El resumen visible del candidato tiene limite; mantener el texto
         # disponible para poder separar varios anuncios con rigor posterior.
-        caption = detail.meta.get("description") or detail.meta.get("og:description") or ""
+        full_meta = public_instagram_metadata(body)
+        caption = full_meta.get("description") or full_meta.get("og:description") or ""
         if caption:
-            candidate["evidence"]["public_caption_text"] = compact(caption, 8000)
-        candidate["evidence"]["metadata_source_url"] = detail.meta.get("og:url")
+            candidate["evidence"]["public_caption_text"] = caption
+        candidate["evidence"]["public_caption_extraction"] = "html_meta_full_v2"
+        claimed_url = full_meta.get("og:url") or full_meta.get("canonical_url")
+        candidate["evidence"]["metadata_source_url"] = claimed_url
+        if claimed_url:
+            p = urlsplit(claimed_url)
+            account = source["account"].lower()
+            pieces = [s.lower() for s in p.path.strip("/").split("/")]
+            if (p.hostname in {"instagram.com", "www.instagram.com"}
+                and len(pieces) >= 3 and pieces[0] == account
+                and pieces[1] in {"reel", "p"}):
+                candidate["evidence"]["attribution_status"] = "public_url_account_matched"
         image_url = extract_og_image(body, post)
         if image_url:
             candidate["evidence"]["og_image_url"] = image_url
