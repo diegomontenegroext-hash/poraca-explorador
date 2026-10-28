@@ -24,7 +24,7 @@ from radar_parallel import (
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
 )
 from radar_agenda_adapters import extract_listings, special_links
-from radar_genda_browser import render_date_pages, validated_date_pages
+from radar_genda_browser import render_date_pages, validated_date_pages, render_argentino_event_pages
 
 SCHEMA = "radar_definitivo"
 EXPECTED_LAB_DB = "poraca_explorador"
@@ -301,6 +301,30 @@ def scan_source(source,budget,mode):
                 known.add(post)
                 if pstat==429:
                     break
+    # Some official Teatro Argentino details are hydrated after initial HTML.
+    # Only render explicit /meet/<id> URLs already discovered or in the
+    # historical WATCHLIST, and only if the HTTP parser found no session.
+    if urlparse(root).hostname=="teatroargentino.gba.gob.ar":
+        missed=[]
+        for url,_ in links[:max_details]:
+            if urlparse(url).hostname!="teatroargentino.gba.gob.ar":
+                continue
+            if any(x["proof_url"]==url for x in check["_listings"]):
+                continue
+            if budget.can_fetch(url):
+                missed.append(url)
+        if missed and budget.remaining()>50:
+            missed=missed[:3]
+            budget.total+=len(missed)
+            budget.by_host[urlparse(root).hostname]+=len(missed)
+            pages,reason=render_argentino_event_pages(
+                missed,max_seconds=min(65,budget.remaining()-8))
+            for u,markup in pages.items():
+                check["_listings"].extend(extract_listings(markup,u))
+            print(json.dumps({"source":source["source_id"],
+                  "adapter":"argentino_browser",
+                  "pages":len(pages),"sessions":len(check["_listings"]),
+                  "error":reason}),flush=True)
     # Genda may return only a JS shell to the HTTP client. Use one bounded
     # browser session solely for missing Genda date-page observations.
     if urlparse(root).hostname in ("agendalaplata.ar","www.agendalaplata.ar"):
