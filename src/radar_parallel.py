@@ -17,7 +17,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from html.parser import HTMLParser
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urljoin, urlparse
+from urllib.parse import quote, unquote, urljoin, urlparse
 from urllib.request import Request, urlopen
 
 DB_NAME = "poraca_explorador"
@@ -207,10 +207,10 @@ def discover_links(body: str, page: Parser, base_url: str) -> list[tuple[str, st
         if not u or u in results or u.rstrip("/") == base_url.rstrip("/"):
             continue
         parsed = urlparse(u)
-        segments = [part.lower() for part in parsed.path.strip("/").split("/") if part]
+        segments = [unquote(part).lower() for part in parsed.path.strip("/").split("/") if part]
         # Las paginas de categorias, etiquetas y paginacion NO son eventos.
         if not exact_instagram(u) and (
-            any(part in {"categoria", "category", "categorias", "tag", "tags",
+            any(part in {"categoria", "categoría", "category", "categorias", "recintos", "tag", "tags",
                          "page", "wp-content", "author", "archivo"} for part in segments)
             or (segments and segments[-1] in {"agenda", "eventos", "clases",
                 "teatro", "musica", "cine", "exposiciones", "cartelera"})
