@@ -708,7 +708,23 @@ def special_links(url,page,at=None):
                                     "/entradas/cartelera/"+str(page_number)+"/",
                                     "cartelera oficial, pagina "+str(page_number))
         # Una única página adicional por FULL, sin recursión/paginación infinita.
-        return [discovered[min(discovered)]] if discovered else []
+        if discovered:
+            return [discovered[min(discovered)]]
+        # Original verificado 28/10/2026: /entradas/cartelera/1/
+        # devuelve HTTP 200 y funciones posteriores incluso cuando la portada
+        # carece de enlace siguiente. Sólo usarlo como un detalle acotado si la
+        # portada contiene fichas de funciones originales /entrada/.
+        # Nunca construir índices arbitrarios ni seguir fuera del dominio.
+        for href,label in page.links:
+            p=urlsplit((href or "").strip())
+            if (p.scheme=="https"
+                and p.hostname in ("teatrometrolp.com.ar",
+                                   "www.teatrometrolp.com.ar")
+                and re.fullmatch(r"/entrada/[a-z0-9_.-]+/?",p.path,re.I)
+                and not p.query and not p.fragment):
+                return [("https://"+host+"/entradas/cartelera/1/",
+                         "cartelera oficial verificada, pagina 1")]
+        return []
     if host in ("casametro.com.ar","www.casametro.com.ar") and (
             path in ("/","/cartelera/","/categoria-producto/casa-metro/")):
         # casa_metro_dated_links_rotating: the original category is ordered
