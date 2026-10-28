@@ -27,7 +27,8 @@ SCOPED_HOSTS={"agendalaplata.ar","www.agendalaplata.ar",
               "agendadecine.com","www.agendadecine.com",
               "feriaedita.com.ar","www.feriaedita.com.ar",
               "gritos.planetario.unlp.edu.ar",
-              "www.fcnym.unlp.edu.ar"}
+              "www.fcnym.unlp.edu.ar",
+              "alpedo.ar","www.alpedo.ar"}
 def tidy(s):
     return re.sub(r"\s+"," ",html.unescape(s or "")).strip()
 
@@ -175,11 +176,70 @@ def lumen_unyearred_date(value,now=None):
             possibilities.append(day)
     return min(possibilities) if len(possibilities)==1 else None
 
+def alpedo_dated_sessions(raw,url):
+    """Read date-scoped Alpedó cards only; all evidence stays SECONDARY.
+
+    Alpedó's initial HTTP shell can contain no cards. The bounded browser
+    fallback supplies rendered HTML for exactly the visited date URL.
+    A card is an h6 TITLE followed by one clock and one explicit venue
+    before the NEXT h6; generic museum opening-hour ranges are excluded.
+    """
+    p=urlsplit(url)
+    if (p.scheme!="https" or p.hostname not in ("alpedo.ar","www.alpedo.ar")
+        or p.path!="/" or p.port is not None or p.fragment):
+        return []
+    query=parse_qs(p.query)
+    if set(query)!={"fecha"} or len(query["fecha"])!=1:
+        return []
+    try:day=date.fromisoformat(query["fecha"][0])
+    except (TypeError,ValueError):return []
+    if not active_date(day):
+        return []
+    # Require the rendered month's label to corroborate the URL date.
+    # A stale SPA showing yesterday's page must not pollute tomorrow.
+    plain=tidy(re.sub(r"<[^>]+>"," ",raw[:250_000]))
+    header=re.search(r"\b(enero|febrero|marzo|abril|mayo|junio|julio|"
+        r"agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+"
+        r"(20\d{2})\b",plain,re.I)
+    if not header or MONTHS.get(header.group(1).casefold())!=day.month or int(header.group(2))!=day.year:
+        return []
+    cards=list(re.finditer(r"<h6\b[^>]*>(.*?)</h6\s*>",raw[:450_000],re.I|re.S))
+    out=[]
+    for i,m in enumerate(cards[:100]):
+        title=tidy(re.sub(r"<[^>]+>"," ",m.group(1)))
+        if not 5<=len(title)<=180:
+            continue
+        end=cards[i+1].start() if i+1<len(cards) else min(m.end()+1600,len(raw))
+        tail=raw[m.end():min(end,m.end()+1800)]
+        if re.search(r"\bFinalizadas\b",tail,re.I):
+            continue
+        card_text=tidy(re.sub(r"<[^>]+>"," ",tail))
+        clocks=CLOCK.findall(card_text)
+        # "07:00 a 19:00" is museum opening hours, not a dated show.
+        if len(clocks)!=1:
+            continue
+        match=CLOCK.search(card_text)
+        if not match:
+            continue
+        venue=card_text[match.end():].strip(" |·–—:-")
+        venue=re.split(r"\b(?:Más información|Detalles|Inscribite|Compartir)\b",
+                       venue,maxsplit=1,flags=re.I)[0].strip()
+        if not 4<=len(venue)<=130:
+            continue
+        rec=make_record(title,day,clocks[0].zfill(5),venue,url,
+                        "alpedo_dated_card_rendered","secondary_agenda")
+        if rec:out.append(rec)
+    # Duplicate mobile markup must not multiply observations.
+    return list({(x["title"],x["event_date"],x["event_time"],x["venue"]):x
+                for x in out}.values())
+
 def source_specific_sessions(raw,url,blocks):
     """Four known official layouts; no extrapolation of recurrences."""
     host,path=scope(url)
     visible=tidy(" ".join(blocks.text))
     records=[]
+    if host in ("alpedo.ar","www.alpedo.ar"):
+        return alpedo_dated_sessions(raw,url)
     if host.endswith("teatrometrolp.com.ar"):
         venue="Teatro Metro"
         if re.fullmatch(r"/entrada/[^/]+/?",path):
