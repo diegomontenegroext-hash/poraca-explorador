@@ -1,27 +1,24 @@
 name: Por Aca - Radar Definitivo (Neon operativo)
-# Cutover confirmado por usuario: exigir credencial operativa; nunca caer en laboratorio.
-# Segundo ensayo controlado: validar commit con casts JSONB y persistencia por fuente.
+
+# Orquestador temporal: Guardia GPT en 05:00 / 13:00 / 21:00 ART.
+# Cada commit a ops/radar-fallback-trigger.txt dispara un unico job.
+# Sin cron GitHub hasta verificar por separado su confiabilidad.
 
 on:
   push:
     branches: [main]
     paths:
-      - '.github/workflows/radar-definitivo.yml'
-      - 'ops/radar-fallback-trigger.txt'  # Guardia GPT 05:00, commit diario solo si FULL falto
+      - 'ops/radar-fallback-trigger.txt'
   workflow_dispatch:
     inputs:
       mode:
-        description: "FULL diario o incremental; se graba en schema staging sin publicar"
+        description: "FULL o incremental; escritura operativa solo en staging Neon"
         required: true
         type: choice
         default: incremental
         options:
           - incremental
           - full
-  schedule:
-    # America/Argentina/Buenos_Aires (UTC-3). GitHub puede retrasar.
-    - cron: '17 6 * * *'       # FULL 03:17 ART diario
-    - cron: '17 14,22 * * *'   # incrementales 11:17 / 19:17 ART
 
 permissions:
   contents: read
@@ -32,30 +29,51 @@ concurrency:
 
 jobs:
   definitivo:
-    name: Descubrir, deduplicar y registrar en staging Neon
+    name: Ingesta Neon desde Guardia GPT
     runs-on: ubuntu-latest
     timeout-minutes: 38
     steps:
       - name: Obtener codigo
         uses: actions/checkout@v4
+      - name: Resolver alcance e identidad del disparo
+        id: alcance
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_MODE: ${{ inputs.mode }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            mode="$(sed -n 's/^trigger_mode=//p' ops/radar-fallback-trigger.txt | tail -1)"
+            slot="$(sed -n 's/^trigger_slot=//p' ops/radar-fallback-trigger.txt | tail -1)"
+            day="$(sed -n 's/^trigger_date=//p' ops/radar-fallback-trigger.txt | tail -1)"
+            [[ "$mode" == "full" || "$mode" == "incremental" ]] || { echo "::error::invalid trigger_mode"; exit 1; }
+            [[ "$slot" == "05" || "$slot" == "13" || "$slot" == "21" || "$slot" == "bootstrap" ]] || { echo "::error::invalid trigger_slot"; exit 1; }
+            [[ "$day" =~ ^20[0-9]{2}-[0-9]{2}-[0-9]{2}$ ]] || { echo "::error::invalid trigger_date"; exit 1; }
+            echo "Disparo GPT: $day $slot / $mode"
+          else
+            mode="$MANUAL_MODE"
+            [[ "$mode" == "full" || "$mode" == "incremental" ]] || exit 1
+            echo "Disparo manual: $mode"
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
       - name: QA local obligatorio
         run: |
           python3 -m compileall -q src
           python3 -m unittest discover -s tests -v
-      - name: Cliente de Neon
+      - name: Cliente Neon
         run: python3 -m pip install --disable-pip-version-check "psycopg[binary]>=3.2,<4"
-      - name: Verificar presencia del secreto operativo
+      - name: Exigir secreto operativo
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
-        shell: bash
         run: |
           if [ -z "$NEON_RADAR_OPERATIONAL_DATABASE_URL" ]; then
-            echo "::error::Falta NEON_RADAR_OPERATIONAL_DATABASE_URL. Nunca usar laboratorio en sustitucion."
+            echo "::error::Falta secreto neondb, prohibido volver al laboratorio."
             exit 1
           fi
-      - name: Ejecutar Radar Definitivo en Neon operativa
+      - name: Registrar en Neon operativa
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
           RADAR_REQUIRE_OPERATIONAL: "true"
-          RADAR_SCOPE: ${{ github.event_name == 'push' && 'full' || github.event.schedule == '17 6 * * *' && 'full' || inputs.mode || 'incremental' }}
+          RADAR_SCOPE: ${{ steps.alcance.outputs.mode }}
         run: python3 src/radar_definitivo.py --mode "$RADAR_SCOPE"
