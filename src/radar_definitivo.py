@@ -442,7 +442,8 @@ def save_source_result(conn,run_id,source,check,candidates):
                       DO UPDATE SET last_seen_at=now()""",
                         (c["candidate_key"],source["source_id"]))
             # New artists/venues ONLY when source explicitly offers named structured Event.
-            if c["evidence"].get("structured_event_found"):
+            if (os.getenv("RADAR_ENABLE_ENTITY_PROPOSALS","false").lower()=="true"
+                and c["evidence"].get("structured_event_found")):
                 for typ,val in (("venue",c["venue"]),("organizer",c["organizer"])):
                     ent=entity_for(source["source_id"],val or "",typ,c["original_url"],
                                    "event_jsonld_original")
