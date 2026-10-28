@@ -18,13 +18,15 @@ class FakeBudget:
 
 class RadarDefinitivoTests(unittest.TestCase):
     def test_bounds_and_isolation(self):
-        self.assertGreaterEqual(rd.MAX_SOURCES,30)
-        self.assertLessEqual(rd.MAX_SOURCES,50)
+        self.assertGreaterEqual(rd.MAX_SOURCES_FULL,60)
+        self.assertLessEqual(rd.MAX_SOURCES_FULL,100)
+        self.assertLessEqual(rd.MAX_SOURCES_INCREMENTAL,50)
         self.assertGreater(rd.MAX_DETAILS_FULL,rd.MAX_DETAILS_INCREMENTAL)
         self.assertLessEqual(rd.MAX_REQUESTS,250)
         self.assertEqual(rd.SCHEMA,"radar_definitivo")
-        self.assertEqual(rd.DB_NAME,"poraca_explorador")
-        self.assertEqual(rd.DB_ROLE,"poraca_explorador_writer")
+        self.assertEqual(rd.EXPECTED_LAB_DB,"poraca_explorador")
+        self.assertEqual(rd.EXPECTED_OPERATIVE_DB,"neondb")
+        self.assertEqual(rd.EXPECTED_OPERATIVE_SCOPE,"poraca_definitivo_scope")
 
     def test_instagram_profiles_are_not_fetched_as_posts(self):
         b=rd.Budget(seconds=100)
@@ -81,6 +83,29 @@ class RadarDefinitivoTests(unittest.TestCase):
         self.assertEqual(entity["entity_type"],"venue")
         self.assertTrue(entity["evidence"]["not_verified"])
         self.assertIsNone(rd.entity_for("s1","","venue","https://x.org/","test"))
+
+    def test_full_urls_preserve_agenda_dates(self):
+        p=rd.parse_html('<a href="/evento/milonga/?fecha=2026-11-01">Milonga</a>')
+        got=rd.links_from_page('<a href="/evento/milonga/?fecha=2026-11-01">Milonga</a>',p,
+                "https://agenda.example.org/")
+        self.assertTrue(any("fecha=2026-11-01" in url for url,_ in got))
+        self.assertIsNone(rd.safe_public_link("http://127.0.0.1/admin","https://agenda.example.org/"))
+
+    def test_recency_requires_jsonld_original_event_and_valid_year(self):
+        today=rd.datetime.now(rd.timezone.utc).date()
+        a=dict(kind="event_detail",title="Festival cultural en La Plata",
+               event_date=str(today+rd.timedelta(days=12)),
+               event_time="20:00",evidence={"structured_event_found":True,"detail_opened":True})
+        self.assertEqual(rd.credible_occurrence(a),today+rd.timedelta(days=12))
+        b=dict(a,event_date="2025-01-01")
+        self.assertIsNone(rd.credible_occurrence(b))
+        c=dict(a,evidence={"structured_event_found":False,"detail_opened":True})
+        self.assertIsNone(rd.credible_occurrence(c))
+
+    def test_ig_ogimage_is_reference_only(self):
+        body='<meta property="og:image" content="https://example.org/poster.jpg?foo=bar">'
+        self.assertEqual(rd.extract_og_image(body,"https://example.org/evento/"),
+                         "https://example.org/poster.jpg")
 
     def test_budget_stops_excess_and_rate_limited_domain(self):
         budget=rd.Budget(seconds=10)
