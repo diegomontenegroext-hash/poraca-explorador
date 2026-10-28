@@ -1,4 +1,5 @@
 name: Por Aca - Radar Definitivo (operativo por etapas)
+# Cutover gradual: usa neondb SOLO al existir el secret de produccion; mientras tanto ingesta experimental.
 
 on:
   push:
