@@ -584,8 +584,45 @@ def extract_listings(raw,url):
     return unique[:100]
 
 def special_links(url,page,at=None):
-    """Source-discovered Genda dates rotated by slot; official Opera ticket URLs."""
+    """Verified source-specific discovery with near-date priority and rotation."""
     host,path=scope(url)
+    if host in ("casametro.com.ar","www.casametro.com.ar") and (
+            path in ("/","/cartelera/","/categoria-producto/casa-metro/")):
+        # casa_metro_dated_links_rotating: the original category is ordered
+        # by upcoming event date. Its ticket/product URLs carry the exact
+        # clock in their own detail pages; at most 6 details can be opened
+        # per FULL. Keep the first 3, rotate the rest between 8h slots.
+        # Never traverse outbound links, images or unrelated WooCommerce URLs.
+        by_url={}
+        for href,label in page.links:
+            raw=(href or "").strip()
+            if not raw or raw.startswith("//"):
+                continue
+            if raw.startswith("/"):
+                absolute="https://"+host+raw
+            elif raw.startswith("https://"):
+                absolute=raw
+            else:
+                continue
+            p=urlsplit(absolute)
+            if (p.scheme!="https" or p.hostname not in
+                    ("casametro.com.ar","www.casametro.com.ar") or
+                    p.port not in (None,443) or p.username or p.password or
+                    p.query or p.fragment or
+                    not re.fullmatch(r"/evento/[a-z0-9-]+/?",p.path,re.I)):
+                continue
+            by_url.setdefault(absolute,(absolute,"cartelera oficial, detalle"))
+            if len(by_url)>=40:
+                break
+        ordered=list(by_url.values())
+        now=at or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
+        front=ordered[:3]
+        later=ordered[3:]
+        if later:
+            offset=(now.date().toordinal()*3+now.hour//8)%len(later)
+            front.extend(later[(offset+i)%len(later)]
+                         for i in range(min(3,len(later))))
+        return front[:6]
     if host.endswith("agendalaplata.ar") and path=="/":
         now=at or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
         today=now.date()
