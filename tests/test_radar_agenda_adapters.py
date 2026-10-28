@@ -469,6 +469,40 @@ Kevin - Liniers: Eternotour
             '<span>Fecha:octubre 31, 2026</span><span>Horario: 22:00</span></li>')
         self.assertEqual(ad.extract_listings(markup,url),[])
 
+    def test_fcnym_unlp_official_lecture_from_published_prose(self):
+        url=("https://www.fcnym.unlp.edu.ar/novedades/"
+             "leccion-magistral-emilio-custodio-sobre-aguas-subterraneas-en-fcnym/")
+        markup=(
+            '<script type="application/ld+json">'
+            '{"@type":"NewsArticle","datePublished":"2026-10-23T20:48:59+00:00"}'
+            '</script><main><h1>“Lección Magistral Emilio Custodio”'
+            ' sobre aguas subterráneas en FCNYM</h1><p>'
+            'La Lección será dictada por el Dr. Jesús Carrera:'
+            ' miércoles 18 de noviembre a las 10 horas en el '
+            'Auditorio de Planta Baja de la Facultad de Ciencias Naturales '
+            'y Museo. La conferencia se transmitirá por YOUTUBE.</p></main>')
+        rows=ad.extract_listings(markup,url)
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["event_date"],"2026-11-18")
+        self.assertEqual(rows[0]["event_time"],"10:00")
+        self.assertIn("Lección Magistral Emilio Custodio",rows[0]["title"])
+        self.assertEqual(rows[0]["review_state"],"observed_unverified")
+        self.assertEqual(rows[0]["evidence_tier"],"primary_organizer")
+
+    def test_fcnym_unlp_lecture_rejects_missing_or_wrong_year_evidence(self):
+        url=("https://www.fcnym.unlp.edu.ar/novedades/"
+             "leccion-magistral-emilio-custodio-sobre-aguas-subterraneas-en-fcnym/")
+        body=('<main><h1>Lección Magistral Emilio Custodio</h1><p>'
+              'miércoles 18 de noviembre a las 10 horas en el Auditorio '
+              'de Planta Baja de la Facultad de Ciencias Naturales y Museo'
+              '</p><p>Copyright 2026</p></main>')
+        self.assertEqual(ad.extract_listings(body,url),[])
+        wrong=('<time datetime="2025-10-23T11:00:00"></time>'+body)
+        self.assertEqual(ad.extract_listings(wrong,url),[])
+        self.assertEqual(ad.extract_listings(
+            '<time datetime="2026-10-23"></time>'+body,
+            "https://example.com/otro-evento"),[])
+
     def test_gritos_official_festival_range_one_umbrella_no_invented_sessions(self):
         url="https://gritos.planetario.unlp.edu.ar/2026/index.html"
         markup=("<h1>GRITOS en el planetario</h1>"
