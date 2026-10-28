@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Prueba incremental focalizada: sedes originales de Alternativa, no aceptar ni publicar.
+# Validar salas Alternativa con HTML aplanado y sin publicar ni promover registros.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=incremental
-trigger_reason=alternativa_venue_original_recovery_and_date_semantics_20261028
+trigger_reason=alternativa_venue_flat_html_fix_v2
