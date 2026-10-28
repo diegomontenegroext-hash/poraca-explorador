@@ -62,6 +62,31 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertIn("Evento futuro",names)
         self.assertNotIn("Actividad ya realizada",names)
 
+    def test_alpedo_realistic_last_session_before_finalizadas(self):
+        # Shape from the real dated agenda: a one-clock upcoming card
+        # is immediately followed by the archive header and older clocks.
+        when=date.today()+timedelta(days=1)
+        month=next(k for k,v in ad.MONTHS.items() if v==when.month)
+        html=(f"<p>{month.capitalize()} {when.year}</p>"
+            "<p>20:00 a 22:00</p><h6>República de los Niños</h6>"
+            "<p>07:00 a 22:00</p><p>República de los Niños</p>"
+            "<h6>Arctic Monkeys - AM</h6><p>20:00</p>"
+            "<p>Bocanada Bar</p>"
+            "<h6>Cantobar - Karaoke</h6><p>21:00</p>"
+            "<p>Teatro Bar Cultural La Ferretería</p>"
+            "<p><i>Finalizadas</i></p>"
+            "<h6>Actividad de ayer</h6><p>10:00</p>"
+            "<p>Centro Cultural de archivo</p>")
+        url="https://alpedo.ar/?fecha="+when.isoformat()
+        events=ad.extract_listings(html,url)
+        names=[x["title"] for x in events]
+        self.assertEqual(set(names),{"Arctic Monkeys - AM","Cantobar - Karaoke"})
+        self.assertEqual(len(events),2)
+        self.assertNotIn("Actividad de ayer",names)
+        self.assertEqual(events[-1]["event_time"],"21:00")
+        self.assertEqual(events[-1]["venue"],
+            "Teatro Bar Cultural La Ferretería")
+
     def test_alpedo_browser_dates_allow_only_same_site_and_four_day_horizon(self):
         from radar_genda_browser import validated_alpedo_date_pages
         today=date(2026,10,28)
