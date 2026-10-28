@@ -289,6 +289,30 @@ Kevin - Liniers: Eternotour
         self.assertEqual(got[0]["title"],"El dúo de La Africana")
         self.assertEqual(got[0]["event_date"],d.isoformat())
 
+    def test_argentino_browser_fallback_when_http_only_has_shell(self):
+        d=date.today()+timedelta(days=6)
+        root="https://teatroargentino.gba.gob.ar/"
+        detail="https://teatroargentino.gba.gob.ar/meet/93"
+        class Budget:
+            total=0
+            by_host=Counter()
+            def can_fetch(self,u):return u in (root,detail)
+            def remaining(self):return 95
+            def request(self,u):
+                return (200,"<p>Programación general</p>",None) if u==root else (
+                    200,"<html><title>Teatro Argentino</title><body>Cargando...</body></html>",None)
+        rendered=('<p>SALA Astor Piazzolla</p>'
+            '<p>Obra teatral “Mi vida anterior” de Teresa Donato y Dennis Smith | Domingo 1/11 | 19:00</p>'
+            '<p>Fecha del evento '+d.strftime("%d/%m/%Y")+' 19:00:00</p>')
+        source=dict(source_id="argentino",url=root,source_role="primary_venue",
+                    seed_urls=[detail])
+        with patch.object(rd,"render_argentino_event_pages",
+                          return_value=({detail:rendered},None)) as browser:
+            check,records=rd.scan_source(source,Budget(),"incremental")
+        self.assertEqual(len(check["_listings"]),1)
+        self.assertEqual(check["_listings"][0]["event_date"],d.isoformat())
+        browser.assert_called_once()
+
     def test_lumen_no_date_or_no_emphasis_not_a_structured_event(self):
         html='<article><p>Una presentación de nuestra asociación cultural.</p></article>'
         self.assertEqual(ad.extract_listings(html,
