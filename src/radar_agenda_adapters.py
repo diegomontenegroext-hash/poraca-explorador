@@ -335,15 +335,45 @@ def extract_listings(raw,url):
     if "alternativateatral.com" in host and re.match(r"/obra\d+",path):
         title=next((t for tag,t in blocks.headings if tag=="h1"),None)
         if title:
-            # Several clock times may appear before ONE printed performance date.
+            # Organizer lists its VENUE in a <p> before a real address. This
+            # is evidence from current HTML, never inherited baseline venue.
+            mvenue=re.search(
+                r"<p\b[^>]*>\s*([^<]{4,95})<br\s*/?>\s*"
+                r"(?:Calle|Av\.?|Avenida|Diagonal|Diag\.?|"
+                r"Ruta|Boulevard|Bulevar)\b",raw,re.I|re.S)
+            venue=tidy(mvenue.group(1)) if mvenue else (
+                "Teatro Argentino" if "av. 51 entre 9 y 10" in raw.lower() else None)
             text=tidy(" ".join(blocks.text))
+            # 'Entrada:' can contain several clocks before a printed date.
             for m in re.finditer(r"Entrada:\s*.{0,220}?\b([0-3]?\d/[01]?\d/20\d{2})",text,re.I):
                 d=parse_dmy(m.group(1))
                 times=list(dict.fromkeys(CLOCK.findall(m.group(0))))
                 for tm in times[:6]:
-                    r=make_record(title,d,tm,"Teatro Argentino" if "av. 51 entre 9 y 10" in text.lower()
-                                  else None,url,"alternativa_obra_funcion_text","primary_ticket_listing")
-                    if r: out.append(r)
+                    rec=make_record(title,d,tm,venue,url,
+                                    "alternativa_obra_funcion_text","primary_ticket_listing")
+                    if rec:out.append(rec)
+            # Other works advertise explicit individual dates *without* an
+            # Entrada label. 'Hasta el' is never expanded into recurring
+            # Fridays/Sundays. Only printed dates are considered, with a
+            # weekday/date agreement check before adding a session.
+            weekdays={"lunes":0,"martes":1,"miercoles":2,"miércoles":2,
+                      "jueves":3,"viernes":4,"sabado":5,"sábado":5,"domingo":6}
+            for m in re.finditer(
+                r"\b(lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)"
+                r"\s*-\s*((?:[01]?\d|2[0-3]):[0-5]\d)\s*hs"
+                r"\s*-\s*(?:Hasta\s+el\s+)?"
+                r"([0-3]?\d/[01]?\d/20\d{2})"
+                r"(?:\s+y\s+([0-3]?\d/[01]?\d/20\d{2}))?",
+                text,re.I):
+                for value in (m.group(3),m.group(4)):
+                    if not value:continue
+                    d=parse_dmy(value)
+                    if not d or d.weekday()!=weekdays[m.group(1).casefold()]:
+                        continue
+                    rec=make_record(title,d,m.group(2).zfill(5),venue,url,
+                                    "alternativa_explicit_date_no_ticket_label",
+                                    "primary_ticket_listing")
+                    if rec:out.append(rec)
     elif "casametro.com.ar" in host and "/evento/" in path:
         title=next((t for tag,t in blocks.headings if tag=="h1"),None)
         plain=tidy(" ".join(blocks.text))
