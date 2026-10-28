@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
 import radar_definitivo as rd
+import radar_parallel as rp
 
 class FakeBudget:
     def __init__(self, pages):
@@ -117,3 +118,28 @@ class RadarDefinitivoTests(unittest.TestCase):
 
 if __name__=="__main__":
     unittest.main()
+
+
+class CulturalIsoTimeTests(unittest.TestCase):
+    def test_utc_jsonld_is_local_argentina_time(self):
+        self.assertEqual(rp.iso_event_fields("2026-11-09T23:30:00Z"),
+                         ("2026-11-09","20:30"))
+        self.assertEqual(rp.iso_event_fields("2026-11-14T19:30:00+00:00"),
+                         ("2026-11-14","16:30"))
+        self.assertEqual(rp.iso_event_fields("2026-11-09T01:30:00Z"),
+                         ("2026-11-08","22:30"))
+
+    def test_explicit_local_offset_and_naive_stay_local(self):
+        self.assertEqual(rp.iso_event_fields("2026-11-09T20:30:00-03:00"),
+                         ("2026-11-09","20:30"))
+        self.assertEqual(rp.iso_event_fields("2026-11-09T20:30"),
+                         ("2026-11-09","20:30"))
+        self.assertEqual(rp.iso_event_fields("2026-11-09"),("2026-11-09",None))
+
+    def test_invalid_dates_and_timezones_rejected(self):
+        for text in ("2026-02-30","2026-11-09T25:30:00Z",
+                     "2026-11-09T20:30Zgarbage","2026-11-09T20:30:00+29:00",
+                     "2026-11-09T20:30 UTC",""):
+            with self.subTest(text=text):
+                self.assertEqual(rp.iso_event_fields(text),(None,None))
+
