@@ -507,6 +507,45 @@ Kevin - Liniers: Eternotour
         self.assertEqual(got[0]["venue"],"Teatro Metro")
         self.assertEqual(got[0]["proof_url"],url)
 
+    def test_metro_official_pagination_only_existing_source_link(self):
+        root="https://www.teatrometrolp.com.ar/entradas/cartelera/"
+        page=rd.parse_html(
+            '<a href="/entradas/cartelera/1/?anio=&mes=">Siguiente</a>'
+            '<a href="https://evil.example/entradas/cartelera/2/">Falso</a>'
+            '<a href="/entradas/cartelera/2/?token=secret">No permitido</a>'
+            '<a href="/entradas/cartelera/1/?anio=&mes=">Repetido</a>'
+        )
+        links=ad.special_links(root,page)
+        self.assertEqual(links,[
+            ("https://www.teatrometrolp.com.ar/entradas/cartelera/1/",
+             "cartelera oficial, pagina 1")])
+        self.assertEqual(ad.special_links(root,rd.parse_html(
+            '<a href="https://evil.example/entradas/cartelera/1/">Falso</a>')),[])
+        self.assertEqual(ad.special_links(
+            "https://www.teatrometrolp.com.ar/entradas/cartelera/1/",page),[])
+
+    def test_metro_second_page_individual_sessions_and_no_boxoffice_clock(self):
+        d=date.today()+timedelta(days=20)
+        d2=d+timedelta(days=21)
+        html=(
+            '<h3>Lisandro Aristimuño - Experiencia Coral</h3>'
+            '<p>'+d.strftime("%d/%m/%Y")+' - 20:00 hs.</p>'
+            '<h3>Pan con Manteca</h3><p>'
+            +d2.strftime("%d/%m/%Y")+' - 21:00 hs.</p>'
+            '<p>Horarios de atencion: lunes a sabados de 10 a 19 hs.</p>'
+        )
+        url="https://www.teatrometrolp.com.ar/entradas/cartelera/1/"
+        got=ad.extract_listings(html,url)
+        self.assertEqual(len(got),2)
+        self.assertEqual({x["event_time"] for x in got},{"20:00","21:00"})
+        self.assertEqual({x["proof_url"] for x in got},{url})
+        self.assertTrue(all(x["review_state"]=="observed_unverified"
+                            and x["evidence_tier"]=="primary_program"
+                            for x in got))
+        # La fecha de boleteria no debe generar una tercera funcion.
+        self.assertEqual(ad.extract_listings(
+            '<p>Horarios de atención 10:00 a 19:00</p>',url),[])
+
     def test_metro_index_multiple_shows_exact_dates_and_hours(self):
         d=date.today()+timedelta(days=2)
         d2=d+timedelta(days=1)
