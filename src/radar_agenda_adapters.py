@@ -352,6 +352,41 @@ def source_specific_sessions(raw,url,blocks):
                         start,None,"Planetario UNLP · Paseo del Bosque",
                         url,"gritos_festival_official_date_range_start","primary_program")
                     if rec:records.append(rec)
+    elif host.endswith("casametro.com.ar") and path.rstrip("/")=="/categoria-producto/casa-metro":
+        # WooCommerce's official category page prints date, starting clock,
+        # venue and title in EACH product card. Keep the fields scoped to
+        # the same <li class="product">; never zip dates with other cards.
+        # Ticket end time (often 00:00) is NOT a second performance.
+        for card in re.findall(
+                r"<li\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bproduct\b)[^>]*>"
+                r"(.*?)</li\s*>",raw[:700_000],re.I|re.S)[:100]:
+            heading=re.search(r"<h2\b[^>]*>(.*?)</h2\s*>",card,re.I|re.S)
+            if not heading:
+                continue
+            title=tidy(re.sub(r"<[^>]+>"," ",heading.group(1)))
+            card_text=tidy(re.sub(r"<[^>]+>"," ",card))
+            dm=re.search(
+                r"\bFecha\s*:\s*([a-záéíóúñ]+)\s+([0-3]?\d)\s*,?\s*(20\d{2})\b",
+                card_text,re.I)
+            tm=re.search(
+                r"\bHorario\s*:\s*((?:[01]?\d|2[0-3]):[0-5]\d)\b",
+                card_text,re.I)
+            if not (dm and tm):
+                continue
+            month=MONTHS.get(dm.group(1).casefold())
+            try:
+                event_day=date(int(dm.group(3)),month,int(dm.group(2))) if month else None
+            except ValueError:
+                event_day=None
+            venue=("Auditorio Charly García" if
+                   re.search(r"\bAuditorio Charly García\b",card_text,re.I)
+                   else "Casa Metro" if re.search(r"\bCasa Metro\b",card_text,re.I)
+                   else None)
+            if venue:
+                record=make_record(
+                    title,event_day,tm.group(1).zfill(5),venue,url,
+                    "casa_metro_official_category_card","primary_program")
+                if record: records.append(record)
     elif host.endswith("feriaedita.com.ar") and path in ("","/"):
         # Official 2026 homepage advertises "EDITA: 5 y 6 de diciembre",
         # with #EDITA2026 printed elsewhere. This establishes TWO dates but
