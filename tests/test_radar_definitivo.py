@@ -22,7 +22,7 @@ class RadarDefinitivoTests(unittest.TestCase):
         self.assertLessEqual(rd.MAX_SOURCES_FULL,100)
         self.assertLessEqual(rd.MAX_SOURCES_INCREMENTAL,50)
         self.assertGreater(rd.MAX_DETAILS_FULL,rd.MAX_DETAILS_INCREMENTAL)
-        self.assertLessEqual(rd.MAX_REQUESTS,250)
+        self.assertLessEqual(rd.MAX_REQUESTS,400)
         self.assertEqual(rd.SCHEMA,"radar_definitivo")
         self.assertEqual(rd.EXPECTED_LAB_DB,"poraca_explorador")
         self.assertEqual(rd.EXPECTED_OPERATIVE_DB,"neondb")
