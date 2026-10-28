@@ -372,12 +372,13 @@ def scan_source(source,budget,mode):
                  "sessions":len(check["_listings"]),
                  "error":reason}),flush=True)
     # Alpedó serves an HTML shell to plain HTTP clients: source_checks
-    # consistently show index_only:200 and 0 links. A bounded Chromium
+    # often show index_only:200 and 0 links. An extra generic menu link
+    # must NOT silently disable the bounded Chromium fallback. A bounded Chromium
     # session reads date pages already supported by the official web UI.
     # Unlike Genda, Alpedó has many museum opening-hour ranges; the parser
     # deliberately excludes those and all data stays SECONDARY.
     if (urlparse(root).hostname in ("alpedo.ar","www.alpedo.ar")
-        and urlparse(root).path=="/" and check["status"]=="index_only"
+        and urlparse(root).path=="/" and not check["_listings"]
         and budget.remaining()>55 and budget.total+3<=MAX_REQUESTS):
         day=datetime.now(timezone.utc).astimezone(
             ZoneInfo("America/Argentina/Buenos_Aires")).date()
