@@ -1,0 +1,22 @@
+name: Por Aca - QA Radar Definitivo
+on:
+  push:
+    paths:
+      - 'src/radar_definitivo.py'
+      - 'tests/test_radar_definitivo.py'
+      - '.github/workflows/radar-definitivo-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compilar y probar sin Neon
+        run: |
+          python3 -m compileall -q src
+          python3 -m unittest discover -s tests -v
