@@ -2,11 +2,6 @@ name: Por Acá - prueba de fuentes
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'src/**'
-      - 'tests/**'
-      - '.github/workflows/probar-fuentes.yml'
 
 permissions:
   contents: read
