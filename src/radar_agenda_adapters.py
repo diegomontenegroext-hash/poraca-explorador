@@ -6,7 +6,9 @@ URLs are always real source/document URLs; no manufactured post anchors.
 """
 from __future__ import annotations
 from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 from html.parser import HTMLParser
+import json
 import html
 import re
 from urllib.parse import urlsplit, parse_qs
@@ -67,7 +69,7 @@ def parse_dmy(s):
         return None
 
 def active_date(d,at=None):
-    at=at or datetime.now().date()
+    at=at or datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date()
     return bool(d and at-timedelta(days=14)<=d<=at+timedelta(days=365))
 
 def make_record(title,when,time,venue,url,method,tier):
@@ -90,13 +92,66 @@ def scope(url):
     p=urlsplit(url)
     return (p.hostname or "").lower(), p.path.lower()
 
+def structured_sessions(raw,url):
+    """All schema.org Events, not only the first one in a JSON-LD graph."""
+    tier=("secondary_agenda" if "agendalaplata.ar" in scope(url)[0]
+          else "primary_structured_page")
+    out=[]
+    scripts=re.findall(r"<script\b(?=[^>]*\btype\s*=\s*['\"]application/ld\+json['\"])[^>]*>(.*?)</script\s*>",
+                       raw[:700_000],re.I|re.S)
+    for script in scripts[:25]:
+        try: root=json.loads(html.unescape(script).strip())
+        except (ValueError,TypeError): continue
+        nodes=[root]
+        attempts=0
+        while nodes and attempts<250:
+            attempts+=1
+            item=nodes.pop(0)
+            if isinstance(item,list):
+                nodes.extend(item[:120]);continue
+            if not isinstance(item,dict):
+                continue
+            for key in ("@graph","itemListElement","mainEntity","hasPart","events"):
+                if isinstance(item.get(key),(dict,list)):
+                    nodes.append(item[key])
+            typ=item.get("@type",[])
+            types=typ if isinstance(typ,list) else [typ]
+            if not any(isinstance(t,str) and t.lower().split("/")[-1] in
+                       ("event","musicevent","theaterevent","danceevent","visualartsevent",
+                        "educationevent","festival","screeningevent")
+                       for t in types):
+                continue
+            title=item.get("name")
+            if not isinstance(title,str):continue
+            starts=item.get("startDate")
+            starts=starts if isinstance(starts,list) else [starts]
+            loc=item.get("location")
+            if isinstance(loc,list):loc=next((v for v in loc if isinstance(v,(dict,str))),None)
+            venue=loc.get("name") if isinstance(loc,dict) else loc if isinstance(loc,str) else None
+            for value in starts[:20]:
+                if not isinstance(value,str):continue
+                try:
+                    if len(value)==10:
+                        d=date.fromisoformat(value)
+                        clock=None
+                    else:
+                        dt=datetime.fromisoformat(value.replace("Z","+00:00"))
+                        if dt.tzinfo:dt=dt.astimezone(ZoneInfo("America/Argentina/Buenos_Aires"))
+                        d=dt.date()
+                        clock=dt.strftime("%H:%M")
+                except ValueError:continue
+                r=make_record(title,d,clock,venue,url,
+                              "schema_org_event_sessions",tier)
+                if r:out.append(r)
+    return out
+
 def extract_listings(raw,url):
     """Returns individual session observations; never returns verified status."""
     host,path=scope(url)
     if host not in SCOPED_HOSTS:
         return []
     blocks=visible_blocks(raw)
-    out=[]
+    out=structured_sessions(raw,url)
     if "alternativateatral.com" in host and re.match(r"/obra\d+",path):
         title=next((t for tag,t in blocks.headings if tag=="h1"),None)
         if title:
