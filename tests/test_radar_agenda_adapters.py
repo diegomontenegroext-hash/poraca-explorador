@@ -89,6 +89,16 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertTrue(any(x["title"]=="Función de prueba" for x in check["_listings"]))
         self.assertGreaterEqual(check["details_opened"],1)
 
+    def test_jsonld_graph_multiple_sessions_local_time(self):
+        when=date.today()+timedelta(days=3)
+        payload='{"@context":"https://schema.org","@graph":[{"@type":"Event","name":"Teatro documento","startDate":"'+when.isoformat()+'T22:30:00Z","location":{"@type":"Place","name":"Sala experimental"}},{"@type":"MusicEvent","name":"Otra función","startDate":"'+when.isoformat()+'","location":{"name":"Teatro Centro"}}]}'
+        html='<script type="application/ld+json">'+payload+'</script>'
+        got=ad.extract_listings(html,"https://agendalaplata.ar/?fecha="+when.isoformat())
+        self.assertEqual(len(got),2)
+        self.assertEqual(got[0]["event_time"],"19:30")
+        self.assertEqual(got[1]["event_time"],None)
+        self.assertTrue(all(g["review_state"]=="observed_unverified" for g in got))
+
     def test_stale_event_is_not_accepted_as_listing(self):
         got=ad.extract_listings(
             '<h1>Obra</h1><p>Entrada: $ 2.000,00 - Viernes - 19:30 hs - 12/10/2024</p>',
