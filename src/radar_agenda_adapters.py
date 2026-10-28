@@ -216,6 +216,11 @@ def alpedo_dated_sessions(raw,url):
         if not 5<=len(title)<=180:
             continue
         end=cards[i+1].start() if i+1<len(cards) else min(m.end()+1600,len(raw))
+        # The archive header can sit immediately after the LAST current
+        # card. Trim it instead of throwing away that real performance;
+        # otherwise "Finalizadas" supplies unrelated clocks/venues.
+        if archive and m.end()<=archive.start()<end:
+            end=archive.start()
         tail=raw[m.end():min(end,m.end()+1800)]
         card_text=tidy(re.sub(r"<[^>]+>"," ",tail))
         clocks=CLOCK.findall(card_text)
