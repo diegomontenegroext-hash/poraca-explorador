@@ -1,7 +1,7 @@
 # POR ACA - RADAR DEFINITIVO
-# Validacion extraordinaria de permalink exacto de Luti, sin alterar la Guardia.
-# Neon staging solamente; no publica ni ejecuta Motor/Puente.
+# Segunda validacion extraordinaria de parser caption completo Luti.
+# Staging Neon; no modifica slots programados, no Motor, no Puente.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=incremental
-trigger_reason=luti_exact_reel_provenance_qa_20261028_2000_art
+trigger_reason=luti_reel_full_caption_v2_readback_20261028_2010_art
