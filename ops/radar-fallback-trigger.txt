@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Diagnosticar marker fecha y contenido visible Argentino desde browser limitado.
+# Solo diagnóstico de marca de fecha presente en las fichas Argentino; staging.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=incremental
-trigger_reason=argentino_date_field_presence_diagnostic
+trigger_reason=argentino_html_date_presence_v2
