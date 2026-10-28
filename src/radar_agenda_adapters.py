@@ -334,6 +334,12 @@ def source_specific_sessions(raw,url,blocks):
             dates=re.search(
                 r"\bDel\s+([0-3]?\d)\s*/\s*OCT\s+al\s+([0-3]?\d)\s*/\s*NOV\s+2026\b",
                 visible,re.I)
+            if not dates:
+                # The same original repeats the date RANGE in prose.
+                dates=re.search(
+                    r"\bentre\s+los\s+d[ií]as\s+([0-3]?\d)\s+de\s+octubre"
+                    r"\s+y\s+([0-3]?\d)\s+de\s+noviembre\s+de\s+2026\b",
+                    visible,re.I)
             if dates:
                 try:
                     start=date(2026,10,int(dates.group(1)))
