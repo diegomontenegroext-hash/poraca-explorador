@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Disparo por Guardia GPT - orquestador principal.
+# FULL comparativa del adaptador fuente-especifico 1, sin promocion publica.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
-trigger_mode=incremental
-trigger_reason=gpt_primary_scheduler_smoke_test
+trigger_mode=full
+trigger_reason=agenda_parser_comparison_20261028
