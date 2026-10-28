@@ -395,6 +395,15 @@ Kevin - Liniers: Eternotour
         self.assertEqual(records[0]["venue"],"TEATRO ESTUDIO DE LAS ARTES")
         self.assertEqual(records[0]["event_date"],"2026-10-30")
 
+    def test_alternativa_room_from_flattened_html(self):
+        html=('<h1>Epifanía</h1><div>La Plata: ESCENARIO-40 '
+              'Calle 40 #1180</div><p>Viernes - 21:30 hs - 30/10/2026</p>')
+        with patch.object(ad,"active_date",return_value=True):
+            records=ad.extract_listings(html,
+                "https://www.alternativateatral.com/obra102876-epifania")
+        self.assertEqual(len(records),1)
+        self.assertEqual(records[0]["venue"],"ESCENARIO-40")
+
     def test_alternativa_hasta_day_does_not_invent_recurring_sessions(self):
         url="https://www.alternativateatral.com/obra103415-el-animo"
         html=('<h1>El Ánimo</h1><p>EN ESO ESTAMOS<br/>Calle 62 No. 274 e/ 1 y 115'
