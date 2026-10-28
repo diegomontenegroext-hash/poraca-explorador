@@ -438,6 +438,10 @@ def main():
         sources=choose_sources(conn,args.mode)
         stats["selected"]=len(sources)
         with conn.cursor() as cur:
+            # Historic runner aborts should never appear as still-running forever.
+            cur.execute("""UPDATE radar_definitivo.runs SET status='interrupted',
+                 finished_at=now(),summary=summary || '{"stopReason":"stale_previous_run"}'::jsonb
+                 WHERE status='running' AND started_at<now()-interval '55 minutes'""")
             cur.execute("""INSERT INTO radar_definitivo.runs(run_id,mode,sources_selected)
                            VALUES(%s,%s,%s)""",
                         (run_id,args.mode,len(sources)))
@@ -468,6 +472,20 @@ def main():
             stats["candidates"]+=len(candidates)
             stats["new"]+=new
             stats["entities"]+=entities
+            # Live persisted acknowledgement after EVERY source, including index-only/errors.
+            with conn.cursor() as cur:
+                cur.execute("""UPDATE radar_definitivo.runs SET
+                  sources_checked=%s,sources_success=%s,urls_discovered=%s,
+                  candidates_seen=%s,candidates_new=%s,entities_new=%s,
+                  summary=jsonb_build_object('phase','running','lastSource',%s,
+                    'httpRequests',%s,'instagramRequests',%s,'target',%s)
+                  WHERE run_id=%s""",
+                    (stats["checked"],stats["success"],stats["urls"],
+                     stats["candidates"],stats["new"],stats["entities"],
+                     source["source_id"],budget.total,budget.instagram,
+                     "operational_neondb_staging" if os.getenv("NEON_RADAR_OPERATIONAL_DATABASE_URL")
+                     else "experimental_poraca_explorador",run_id))
+            conn.commit()
             print(json.dumps({"source":source["source_id"],"status":check["status"],
                               "http":check["http_status"],"links":check["links_found"],
                               "candidates":len(candidates),"new":new,
