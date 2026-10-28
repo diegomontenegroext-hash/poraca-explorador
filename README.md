@@ -1,5 +1,18 @@
 # Por Acá · Explorador cultural
 
+## Radar Definitivo — nuevo motor experimental autónomo
+
+**Implementado el 28/10/2026:** segundo motor independiente dentro de este mismo repositorio, con [workflow Radar Definitivo](.github/workflows/radar-definitivo.yml), [código](src/radar_definitivo.py), [pruebas](tests/test_radar_definitivo.py) y [contrato completo](docs/RADAR_DEFINITIVO_20261028.md).
+
+- **225 fuentes catalogadas en Neon experimental:** 63 webs habilitadas para lectura, 39 webs históricas en revisión y 123 perfiles culturales de Instagram como inventario de descubrimiento (NO scrapeo directo de feeds).
+- **Esquema Neon exclusivo:** `poraca_explorador.radar_definitivo`, con tablas independientes para fuentes, corridas, controles, candidatos, corroboraciones y entidades culturales tentativas.
+- **Primer disparo autónomo:** `push` de la creación del workflow; arranca modo `full` automáticamente; [consultar ejecución inicial](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/runs/40630215172). No declarar éxito hasta que finalice.
+- **Después:** seguimiento incremental 3 veces al día (07:27, 15:27, 23:27 ART), y un barrido `full` semanal (domingo 02:42 ART). Los horarios son solicitudes al programador de GitHub, que puede retrasarlos.
+- **Límite:** 36 webs por corrida, hasta 8 enlaces por web en full, hasta 4 en incremental, 200 peticiones totales, 19 minutos internos y 30 minutos de workflow, parada por 429.
+- **Sin promoción automática:** cada candidato queda sin verificar; no altera la web, la API, la Neon operativa ni los otros dos radares.
+
+---
+
 ## Nuevo: Radar paralelo 0.1 · base Neon aislada
 
 **Ya instalados:** programa `src/radar_parallel.py`, pruebas, [workflow Radar paralelo](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/workflows/radar-paralelo.yml) y base independiente `poraca_explorador` con 15 fuentes activas. El Radar original de ChatGPT sigue intacto.
