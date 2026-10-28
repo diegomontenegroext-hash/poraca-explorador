@@ -59,7 +59,10 @@ def render_date_pages(urls, max_seconds=75):
                             timeout=6500)
                     except Exception:
                         pass
-                    result[url]=page.content()[:650_000]
+                    # The rendered *visible text* keeps card lines that
+                    # DOM template wrappers or hidden mobile duplicates can
+                    # confuse when reparsed as generic HTML.
+                    result[url]=page.locator("body").inner_text(timeout=5000)[:240_000]
                 except Exception:
                     continue
             context.close()
