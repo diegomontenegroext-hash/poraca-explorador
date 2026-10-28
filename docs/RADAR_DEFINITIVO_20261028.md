@@ -1,68 +1,79 @@
-# RADAR DEFINITIVO — Contrato de operación 0.1
+# POR ACÁ — RADAR DEFINITIVO V0.2 · TRASPASO CONTROLADO DEL 28/10/2026
 
-**Fecha:** 28/10/2026. **Estado:** ejecutor independiente de GitHub Actions con código, fuente y esquema propios. NO es todavía el Radar canónico de Por Acá ni reemplaza ChatGPT Radar.
+## Decisión y estado real
 
-## Separación
-- **Repositorio GitHub:** `diegomontenegroext-hash/poraca-explorador`. No se creó otro repositorio: el conector actual no expone una acción de creación de repositorios, de modo que se creó un **workflow y motor independientes dentro del existente**, sin modificar el piloto.
-- **Código:** `src/radar_definitivo.py`; pruebas `tests/test_radar_definitivo.py`.
-- **Workflow:** `.github/workflows/radar-definitivo.yml`, distinto de `radar-paralelo.yml`; concurrency propia para evitar duplicaciones internas.
-- **Neon:** proyecto `frosty-union-52906378`, rama `br-mute-recipe-b4odj2bl`, base ya protegida por nombre/rol `poraca_explorador`, **schema independiente `radar_definitivo`**. Tablas exclusivas `sources`, `runs`, `source_checks`, `candidates`, `candidate_sources`, `entities`.
-- **Acceso:** mismo secret cifrado de GitHub `NEON_EXPLORADOR_DATABASE_URL` ya validado; nunca almacenado en el repositorio. Verificación exacta de database, role y existencia de schema antes de escribir.
-- **No** tocar `neondb`, Motor, Puente, API, Vercel ni la tarea ChatGPT Radar.
+El usuario autorizó reemplazar la tarea ChatGPT por el Radar Definitivo de GitHub Actions. Se comprobó mediante el conector de Automations que `Por Acá — Sistema cultural Chat V1` (ID `6adf39eef92481918c559fdc8838e316`) quedó `is_enabled=false`; el Semáforo financiero no se tocó. `radar-paralelo.yml` es un piloto archivado (ejecución manual solamente); **el único Radar cultural de GitHub programado es `radar-definitivo.yml`.**
 
-## Fuentes reales: inventario y capacidad
-Se migraron exclusivamente **nombres/URLs públicas y papeles de fuente** desde la investigación histórica de Radar a una nueva tabla experimental.
-- **63 webs/servicios habilitados para adquisición** (`monitoring_mode='fetch'`).
-- **39 URL web históricas en revisión** (`monitoring_mode='review'`), por ejemplo páginas de una única actividad, entradas antiguas y otras que no conviene monitorear permanentemente.
-- **123 cuentas reales de Instagram** (`monitoring_mode='discover_only'`) del catálogo histórico `radar_lab_sources`: Guajira, Luti, La Selva Yoga y otras. Tres registros antiguos `research-...` no eran handles válidos, por eso no se convirtieron en perfiles públicos.
-- **123 perfiles candidatos como fuentes culturales** en tabla `entities`, sin presumir que representan eventos o artistas nuevos.
-- El programa *no intenta leer en masa los 123 perfiles*, dado que las raíces de perfiles devuelven frecuentemente 429. Detecta URL exactas de `/p/` y `/reel/` en agendas y artículos y prueba sus metadatos públicos con presupuesto y parada por 429. No ve Stories ni realiza login.
+**Configuración ya integrada en main:** [workflow](../.github/workflows/radar-definitivo.yml), [motor](../src/radar_definitivo.py), [tests](../tests/test_radar_definitivo.py), [QA](../.github/workflows/radar-definitivo-ci.yml).
 
-## Dos modos de ejecución
-**FULL:** selecciona hasta 36 webs habilitadas que menos recientemente se revisaron, priorizando las nunca revisadas. Hasta 8 detalles por web y hasta 2 permalinks exactos Instagram enlazados dentro de cada detalle. La cobertura de las 63 webs necesita *al menos dos lotes* si todas son accesibles y no hay límites; FULL no equivale a certificar todas las fuentes de una vez.
+**Advertencia indispensable:** el pipeline usa `NEON_RADAR_OPERATIONAL_DATABASE_URL` si el secreto existe en GitHub; mientras falta ese secreto usa expresamente `NEON_EXPLORADOR_DATABASE_URL` y mantiene la **ingesta en la base de laboratorio**. No anunciar que GitHub está escribiendo en `neondb` hasta tener un run con `target=operational_neondb_staging` y lectura independiente en Neon. El modo provisional evita la pérdida completa de adquisición después de la pausa de ChatGPT.
 
-**INCREMENTAL:** selecciona hasta 36 webs con `next_due_at <= now()`, máximo 4 detalles por fuente. Guarda `last_checked_at`, siguiente fecha según `cadence_hours`, razón de fallos y backoff. Misma URL repetida no crea candidato duplicado. Se actualizan los metadatos cuando se logró nueva lectura. En ambos modos se guarda cada fuente como transacción independiente para conservar progreso frente a errores.
+## Única acción manual pendiente para cutover a Neon operativa
 
-**Presupuestos por corrida:** 19 minutos de adquisición, 30 minutos del workflow GitHub, máximo 200 solicitudes HTTP, 18 solicitudes a posts Instagram, 24 solicitudes por host y pausa mínima entre solicitudes. Un 429 bloquea ese dominio para el resto de la corrida; sin proxies, scraping autenticado ni evasión de límites. Los horarios de GitHub son aproximados.
+Abrir la consola Neon, proyecto `bitacora`, rama **`poraca-production`**, seleccionar **Database `neondb`** y **Role `poraca_definitivo_ingest`**. Copiar **connection string** con SSL desde *Connect*. En [Actions secrets del repositorio](https://github.com/diegomontenegroext-hash/poraca-explorador/settings/secrets/actions) crear `NEON_RADAR_OPERATIONAL_DATABASE_URL` con esa cadena completa. No publicar la contraseña en chat ni GitHub. No reemplazar el secreto anterior de laboratorio.
 
-## Qué se guarda y qué NO
-- Run: inicio, fin, modo, cantidad de fuentes seleccionadas/revisadas, aperturas, links hallados, URLs candidatas nuevas y observadas, posibles entidades, estado parcial/completo.
-- Por fuente: HTTP, detalles abiertos, errores, próximo control, fallos consecutivos.
-- Por candidato: URL, tipo de ficha, título/descripción corta, fecha/hora/sede/organizador **cuando existan explícitos**, metadatos y procedencia y fuentes que corroboraron.
-- Entidades candidatas a partir de nombres *explícitos* en JSON-LD Event (organizador/sede). Todas quedan en `review_state='candidate'`.
-- **No guarda HTML completo, contenidos privados, Stories ni fotografías descargadas.** No aceptan ni publica eventos nuevos automáticamente.
-- **No equiparar** número de URLs con eventos, ni fuente social catalogada con cuenta efectivamente leída. Las imágenes deberán tener un procedimiento de procedencia independiente.
+Cada vez que se ejecute, el motor verificará `current_database()=neondb`, `session_user=poraca_definitivo_ingest`, existencia del schema y a continuación ejecutará `SET ROLE poraca_definitivo_scope`. Comprueba que el rol de ejecución final no tiene permiso de INSERT en `public.radar_agenda_events`; de lo contrario aborta. Esta medida limita **las operaciones del proceso** a su esquema; el rol Neon de login se crea con membresías administradas por el proveedor, por lo que no debe confundirse esta reducción de privilegios en tiempo de ejecución con una limitación absoluta de la credencial original. Evaluar endurecimiento del rol más adelante con soporte de Neon.
 
-## Verificación operativa en Neon
+## Horarios y límites
 
-La vista `radar_definitivo.run_live_progress` muestra progreso mientras el workflow sigue funcionando, sin esperar a que actualice el resumen final de `runs`.
+`FULL`: **03:17 ART todos los días** (`17 6 * * *` UTC). Puede recorrer hasta 75 fuentes; el inventario actual registra 63 webs con `monitoring_mode=fetch`. Abre hasta 6 vínculos por fuente y prioriza las webs nunca visitadas o menos recientes. Si se agota el presupuesto, las fuentes restantes quedan pendientes.
+
+`INCREMENTAL`: **11:17 y 19:17 ART** (`17 14,22 * * *` UTC). Selecciona sólo fuentes vencidas por `next_due_at`, hasta 45 fuentes y 4 vínculos por fuente, con backoff por fallo y reintento temprano de índices vacíos.
+
+**Límites por corrida:** 360 solicitudes HTTP, hasta 26 por host, hasta 24 URLs exactas de Instagram, **mínimo 4 segundos entre accesos a Instagram** y 200 ms mínimos entre solicitudes en general; presupuesto interno 24 minutos y timeout GitHub 38 minutos. Cada HTTP usa timeout de 10 s. Ante 429, se bloquea el host por el resto del run. La próxima visita no salta artificialmente su cola.
+
+Los horarios son una solicitud al scheduler de GitHub, que puede retrasar u omitir ejecuciones; no prometer puntualidad antes de observar `event=schedule`.
+
+## Fuentes y alcance real
+
+Importado desde las tablas históricas de Radar sin alterar los originales:
+- **225 URLs/fuentes catalogadas**, de ellas **63 webs activas**, 39 URLs históricas retenidas en revisión y 123 perfiles de Instagram para descubrimiento indirecto.
+- Perfiles (`discover_only`) **no** implican lectura de feed: se intentan únicamente URLs públicas de publicaciones `/p/` y reels `/reel/` descubiertas en agendas/medios.
+- El inventario incluye Luti, La Selva Yoga, Dionisio, 0221, El Día, Genda, Teatro Metro/Ópera, Alternativa Teatral, etc. Sin atribuirles cobertura observada si no se abrió cada una.
+- El motor conserva URLs completas con parámetros de fecha pertinentes y vínculos de Instagram, y registra referencias a imágenes OG sin descargar ni publicar imágenes. Algunas agendas generadas con JS pueden dar índice vacío, que se registra como `index_only`.
+
+## Neon: dos bases, destino operativo preparado
+
+**Laboratorio:** DB `poraca_explorador`, schema `radar_definitivo`. Primera corrida histórica de GitHub `#40630215172` en modo full finalizó `success` en GitHub y `partial` en adquisición: 36 fuentes intentadas, 33 accesibles, 66 candidatos, 11 URLs IG. Esos datos son sólo candidatos.
+
+**Operativa:** DB `neondb`, schema `radar_definitivo` ya creado sin tocar los datos públicos existentes. Se migraron como *baseline candidato*, no como eventos confirmados, **225 fuentes, 129 entidades candidatas y 66 candidatos con sus 71 atribuciones**. Tablas separadas:
+- `sources`: papeles, cadencia, prioridad, cursor y errores.
+- `runs` y `source_checks`: inicio/fin, runId, cobertura realmente realizada, errores/timed out y estadísticas propias.
+- `candidates` y `candidate_sources`: deduplicación por URL, registro de apariciones y evidencia original.
+- `link_edges` y `media_references`: referencias de enlaces y fotos, sin descarga.
+- `event_occurrences`: ocurrencias de evento estructuradas desde JSON-LD y fechas válidas, **siempre** `observed_unverified`.
+- `entities`: lugares/organizaciones descubiertos y perfil de origen, **siempre** propuestas.
+- Vistas `run_live_progress` y `operational_health` para monitoreo.
+- `motor_observations_preview` prepara el formato `radar_v3_source_observations` sin escribir ni aceptar eventos en esa tabla todavía.
+
+**No se modificaron** `public.radar_agenda_events`, `public.radar_v3_source_observations`, `public.radar_v3_source_sweep_checks`, las reglas del Motor/Puente ni el backend privado. La API actual sigue leyendo sus contratos previos. El nuevo Radar no debe declararse sustituto **funcional completo de la cadena Motor → Puente → Web** hasta integración y QA separados.
+
+## Calidad, deduplicación y QA
+
+- Una URL reencontrada actualiza `seen_count` y `last_seen_at`, y suma su fuente; no genera un candidato nuevo.
+- Una ocurrencia de fecha sólo se estructura si hay página realmente abierta, JSON-LD `Event`, fecha válida cercana (14 días pasados a 365 futuros) y título concreto. **No equivale a evento confirmado**.
+- La categoría inferida es un borrador: `cine, teatro, musica, danza, arte, formacion, comunidad`.
+- Duplicados *semánticos* con distintas URLs, conflictos de horarios/salas y acreditación de primera fuente aún requieren Motor.
+- Las fuentes de Instagram pueden ser 429; la ausencia de acceso se registra, no se reporta como éxito o novedad.
+- QA sintáctico y unitario corre en GitHub antes de que el workflow de producción haga solicitudes.
+- El esquema operativo no es un destino de publicación directa: requiere posterior habilitación del contrato Motor 5.2 con reconciliación estricta.
+
+## Lecturas independientes (Neon → neondb → poraca-production)
 
 ```sql
-SELECT * FROM radar_definitivo.run_live_progress
-ORDER BY started_at DESC LIMIT 5;
-```
-
-Consultas de detalle:
-
-```sql
-SELECT run_id,mode,started_at,finished_at,status,sources_selected,
-       sources_checked,sources_success,urls_discovered,candidates_new,
-       candidates_seen,entities_new,summary
-FROM radar_definitivo.runs ORDER BY started_at DESC LIMIT 10;
-
-SELECT kind,monitoring_mode,count(*) FROM radar_definitivo.sources GROUP BY 1,2;
+SELECT * FROM radar_definitivo.operational_health;
+SELECT * FROM radar_definitivo.run_live_progress ORDER BY started_at DESC LIMIT 10;
 SELECT kind,review_state,count(*) FROM radar_definitivo.candidates GROUP BY 1,2;
-SELECT status,count(*) FROM radar_definitivo.source_checks GROUP BY 1;
-SELECT source_id,name,last_checked_at,next_due_at,last_status
-FROM radar_definitivo.sources WHERE monitoring_mode='fetch'
-ORDER BY last_checked_at NULLS FIRST,priority DESC LIMIT 30;
+SELECT event_date,event_time,venue,proof_url,review_state
+FROM radar_definitivo.event_occurrences ORDER BY first_seen_at DESC LIMIT 30;
+SELECT * FROM radar_definitivo.motor_observations_preview LIMIT 30;
 ```
 
-## Próxima etapa de excelencia
-1. Confirmar una corrida real de GitHub, readback en Neon y revisar fuente por fuente resultados sin inventar éxitos.
-2. Completar reconocimiento de más formatos (RSS, Atom, sitemaps, JSON-LD diversos, calendarios por día), autores y imágenes, categorías y circuitos.
-3. Recoger Instagram desde más agendas que enlacen publicaciones; validar si existe un camino público no intrusivo para perfiles y medir su rendimiento.
-4. Identificar recencia, fechas de cada función/ciclo, lugares, artistas y causas de conflictos. Aún no hay equivalencia semántica con Motor 5.2.
-5. Reconciliar duplicados entre Neon experimental y operativa y diseñar promoción sólo de datos verificados y revisados, antes de sustituir el Radar ChatGPT.
+## Próximas mejoras reales
 
-El nombre **Definitivo** expresa la arquitectura objetivo, no una certificación de cobertura total alcanzada.
+1. Validar primer run **operativo** después de instalar `NEON_RADAR_OPERATIONAL_DATABASE_URL`; contrastar los contadores de `neondb` con el Summary GitHub.
+2. Implementar adaptadores por fuente (RSS, eventos institucionales, selectores de calendario, ticketera, agenda por día); no declarar que el extractor genérico resuelve automáticamente JS.
+3. Reconciliación por título normalizado + fecha + hora + sede entre URLs diferentes, y pruebas de cambios/cancelaciones.
+4. Ampliar descubrimiento indirecto desde redes sin eludir 429, y determinar recencia real de cada fuente.
+5. Cuando exista evidencia y QA, habilitar una promoción controlada **sólo de observaciones no confirmadas** hacia Motor, sin aceptar eventos automáticamente ni alterar fichas por defecto.
+6. Tras varios días estables, decidir si conviene dar de baja definitivamente el piloto manual.
