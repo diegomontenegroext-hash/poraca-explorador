@@ -1,0 +1,85 @@
+name: Por Aca - Prueba autonoma de cron (sin GPT)
+# No invoca Radar ni modifica eventos. 28 y 29 octubre 2026.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/radar-cron-probe.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '13,43 12-17 28,29 10 *'
+permissions:
+  contents: read
+concurrency:
+  group: poraca-cron-probe
+  cancel-in-progress: false
+jobs:
+  heartbeat:
+    name: Registrar latido en tabla diagnostica
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Mostrar tipo de evento y horas
+        env:
+          EVENT_TYPE: \${{ github.event_name }}
+          SCHEDULE_EXPR: \${{ github.event.schedule }}
+        run: |
+          echo "EVENT=$EVENT_TYPE SCHEDULE=$SCHEDULE_EXPR"
+          echo "UTC=$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          echo "ART=$(TZ=America/Argentina/Buenos_Aires date '+%Y-%m-%dT%H:%M:%S%z')"
+      - name: Comprobar dias experimentales
+        id: gate
+        env:
+          EVENT_TYPE: \${{ github.event_name }}
+        run: |
+          today="$(date -u +%Y-%m-%d)"
+          if [[ "$EVENT_TYPE" == "schedule" && "$today" != "2026-10-28" && "$today" != "2026-10-29" ]]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Instalar cliente Neon
+        if: steps.gate.outputs.enabled == 'true'
+        run: python3 -m pip install --disable-pip-version-check 'psycopg[binary]>=3.2,<4'
+      - name: Grabar prueba sin tocar datos culturales
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          NEON_RADAR_OPERATIONAL_DATABASE_URL: \${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
+          EVENT_TYPE: \${{ github.event_name }}
+          SCHEDULE_EXPR: \${{ github.event.schedule }}
+          GH_RUN_ID: \${{ github.run_id }}
+          GH_SHA: \${{ github.sha }}
+          GH_WORKFLOW_REF: \${{ github.workflow_ref }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import psycopg
+          url = os.getenv("NEON_RADAR_OPERATIONAL_DATABASE_URL")
+          if not url:
+              raise RuntimeError("Neon secret is missing")
+          with psycopg.connect(url, connect_timeout=15) as con:
+              with con.cursor() as cur:
+                  cur.execute("SELECT current_database(),session_user")
+                  if cur.fetchone() != ("neondb","poraca_definitivo_ingest"):
+                      raise RuntimeError("Wrong database or role")
+                  cur.execute("SET ROLE poraca_definitivo_scope")
+                  cur.execute("SELECT current_user,has_table_privilege(current_user,'public.radar_agenda_events','INSERT')")
+                  role, can_publish = cur.fetchone()
+                  if role!="poraca_definitivo_scope" or can_publish:
+                      raise RuntimeError("Unsafe role")
+                  cur.execute("""
+                      INSERT INTO radar_definitivo.scheduler_probe_runs
+                        (github_run_id,event_type,workflow_ref,scheduled_cron,commit_sha)
+                      VALUES (%s,%s,%s,%s,%s)
+                      ON CONFLICT(github_run_id) DO NOTHING
+                  """,(int(os.environ["GH_RUN_ID"]),os.environ["EVENT_TYPE"],
+                       os.environ["GH_WORKFLOW_REF"],os.getenv("SCHEDULE_EXPR") or None,
+                       os.environ["GH_SHA"]))
+          print("NEON_PROBE_SUCCESS",os.environ["EVENT_TYPE"],os.environ["GH_RUN_ID"])
+          PY
+      - name: Resumen
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          EVENT_TYPE: \${{ github.event_name }}
+          GH_RUN_ID: \${{ github.run_id }}
+        run: echo "Cron Probe (sin GPT) event=$EVENT_TYPE run=$GH_RUN_ID"
