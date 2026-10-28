@@ -25,6 +25,7 @@ from radar_parallel import (
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
 )
 from radar_agenda_adapters import extract_listings, special_links
+from instagram_seed_inbox import choose_seed_sources
 from radar_genda_browser import render_date_pages, validated_date_pages, render_argentino_event_pages, render_alpedo_date_pages
 
 SCHEMA = "radar_definitivo"
@@ -239,7 +240,49 @@ def links_from_page(body, page, url):
     return sorted(out,key=lambda item:(not exact_instagram(item[0]),item[0]))
 
 
+def scan_exact_instagram_seeds(source, budget):
+    """Leer exclusivamente permalinks aportados, NUNCA el perfil de origen."""
+    check = dict(source_id=source["source_id"], http_status=None, status="failed",
+                 error_type="EXACT_PERMALINK_ONLY_PROFILE_NOT_SCANNED",
+                 details_opened=0, links_found=0, _listings=[], _seed_only=True)
+    candidates = []
+    for post in source["seed_urls"]:
+        if not budget.can_fetch(post):
+            break
+        status, body, error = budget.request(post)
+        check["http_status"] = status
+        if not body:
+            check["error_type"] = error or "PERMALINK_UNAVAILABLE"
+            if status == 429:
+                break
+            continue
+        detail = parse_html(body)
+        candidate = make_candidate(post, source["source_id"], "shared_exact_permalink", detail, status)
+        candidate["evidence"].update({
+            "radar": "definitivo", "source_root": source["url"],
+            "seeded_permalink": True, "seed_method": "shared_public_exact_url",
+            "profile_not_scanned": True,
+            "claimed_account": source["account"],
+            "attribution_status": "requires_original_check",
+        })
+        # El resumen visible del candidato tiene limite; mantener el texto
+        # disponible para poder separar varios anuncios con rigor posterior.
+        caption = detail.meta.get("description") or detail.meta.get("og:description") or ""
+        if caption:
+            candidate["evidence"]["public_caption_text"] = compact(caption, 8000)
+        candidate["evidence"]["metadata_source_url"] = detail.meta.get("og:url")
+        image_url = extract_og_image(body, post)
+        if image_url:
+            candidate["evidence"]["og_image_url"] = image_url
+        candidates.append(candidate)
+        check["details_opened"] += 1
+        check["status"] = "ok"
+    return check, candidates
+
+
 def scan_source(source,budget,mode):
+    if source.get("seed_only"):
+        return scan_exact_instagram_seeds(source,budget)
     root=source["url"]
     status,body,error=budget.request(root)
     check=dict(source_id=source["source_id"],http_status=status,
@@ -545,7 +588,9 @@ def save_source_result(conn,run_id,source,check,candidates):
                VALUES(%s,%s,%s,%s,%s,%s::jsonb)
                ON CONFLICT(edge_key) DO UPDATE SET last_seen_at=now()""",
                (edge_key,source["source_id"],source_page,c["original_url"],
-                "original_instagram_permalink" if exact_instagram(c["original_url"]) else "detail",
+                ("seeded_exact_permalink" if c["evidence"].get("seeded_permalink")
+                 else "original_instagram_permalink" if exact_instagram(c["original_url"])
+                 else "detail"),
                 json.dumps({"runId":run_id,"http":c["evidence"].get("detail_http")})))
             image_url=c["evidence"].get("og_image_url")
             if image_url:
@@ -593,12 +638,13 @@ def save_source_result(conn,run_id,source,check,candidates):
         fail=source["consecutive_failures"]+1 if check["status"]=="failed" else 0
         cadence=(min(12,source["cadence_hours"]) if check["status"]=="index_only" else
                  source["cadence_hours"] if not fail else min(48,2**min(5,fail)))
-        cur.execute("""UPDATE radar_definitivo.sources
-           SET last_checked_at=now(),last_status=%s,
-               consecutive_failures=%s,next_due_at=now()+(%s*interval '1 hour')
-           WHERE source_id=%s""",
-           (check["status"]+":"+str(check["http_status"] or check["error_type"]),
-            fail,cadence,source["source_id"]))
+        if not check.get("_seed_only"):
+            cur.execute("""UPDATE radar_definitivo.sources
+               SET last_checked_at=now(),last_status=%s,
+                   consecutive_failures=%s,next_due_at=now()+(%s*interval '1 hour')
+               WHERE source_id=%s""",
+               (check["status"]+":"+str(check["http_status"] or check["error_type"]),
+                fail,cadence,source["source_id"]))
         # Commit per source: crash/retry preserves already discovered data.
     conn.commit()
     return new_candidates,entity_new
@@ -618,6 +664,9 @@ def main():
     stats=dict(selected=0,checked=0,success=0,index_only=0,urls=0,candidates=0,new=0,entities=0,listings=0)
     try:
         sources=choose_sources(conn,args.mode)
+        # Buzon pequeño de permalinks exactos: no implica monitorizar perfiles.
+        sources.extend(choose_seed_sources(conn))
+        stats["seed_accounts"]=sum(1 for s in sources if s.get("seed_only"))
         stats["selected"]=len(sources)
         with conn.cursor() as cur:
             # Historic runner aborts should never appear as still-running forever.
@@ -673,7 +722,8 @@ def main():
                               "http":check["http_status"],"links":check["links_found"],
                               "candidates":len(candidates),"new":new,
                               "details":check["details_opened"],"listings":len(check.get("_listings",[])),
-                              "error":check["error_type"]},
+                              "error":check["error_type"],
+                              "exact_permalink_only":bool(check.get("_seed_only"))},
                              ensure_ascii=False),flush=True)
         # Separate new records created BY THIS run from repeated sightings.
         # Do not confuse previously harvested URLs/occurrences with new work.
@@ -706,7 +756,8 @@ def main():
                         "|---:|---:|---:|---:|---:|---:|---:|---:|\n")
                 f.write(f"| {stats['selected']} | {stats['checked']} | {stats['success']} | "
                         f"{stats['listings']} | {stats['new_listings']} | {stats['urls']} | {stats['new']} | {budget.instagram} |\n\n")
-                f.write("Las fuentes IG catalogadas NO se consultan por perfil. Todos los candidatos quedan pendientes.\n")
+                f.write(f"Permalinks IG exactos: {stats['seed_accounts']} cuentas en buzon; "
+                        "NO equivale a revisar feeds. Candidatos sin aceptar.\\n")
         return 0 if (stats["checked"]>0 or not sources) else 1
     except Exception as exc:
         conn.rollback()
