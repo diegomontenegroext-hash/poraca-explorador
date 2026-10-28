@@ -1,15 +1,16 @@
 # Por Acá · Explorador cultural
 
-## Radar Definitivo — nuevo motor experimental autónomo
+## Radar Definitivo — adquisición principal de Por Acá
 
-**Implementado el 28/10/2026:** segundo motor independiente dentro de este mismo repositorio, con [workflow Radar Definitivo](.github/workflows/radar-definitivo.yml), [código](src/radar_definitivo.py), [pruebas](tests/test_radar_definitivo.py) y [contrato completo](docs/RADAR_DEFINITIVO_20261028.md).
+**28/10/2026:** ChatGPT Radar V1 **pausado por decisión del usuario**. Se configuró el **Radar Definitivo** en GitHub con **un barrido amplio diario (03:17 ART)** y **dos incrementales (11:17 y 19:17 ART)**. El piloto de GitHub queda disponible solamente para ejecución manual.
 
-- **225 fuentes catalogadas en Neon experimental:** 63 webs habilitadas para lectura, 39 webs históricas en revisión y 123 perfiles culturales de Instagram como inventario de descubrimiento (NO scrapeo directo de feeds).
-- **Esquema Neon exclusivo:** `poraca_explorador.radar_definitivo`, con tablas independientes para fuentes, corridas, controles, candidatos, corroboraciones y entidades culturales tentativas.
-- **Primer disparo autónomo:** `push` de la creación del workflow; arranca modo `full` automáticamente; [consultar ejecución inicial](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/runs/40630215172). No declarar éxito hasta que finalice.
-- **Después:** seguimiento incremental 3 veces al día (07:27, 15:27, 23:27 ART), y un barrido `full` semanal (domingo 02:42 ART). Los horarios son solicitudes al programador de GitHub, que puede retrasarlos.
-- **Límite:** 36 webs por corrida, hasta 8 enlaces por web en full, hasta 4 en incremental, 200 peticiones totales, 19 minutos internos y 30 minutos de workflow, parada por 429.
-- **Sin promoción automática:** cada candidato queda sin verificar; no altera la web, la API, la Neon operativa ni los otros dos radares.
+[Workflow](.github/workflows/radar-definitivo.yml) · [Código](src/radar_definitivo.py) · [Tests](tests/test_radar_definitivo.py) · [Contrato completo y paso de conexión operativa](docs/RADAR_DEFINITIVO_20261028.md)
+
+**Inventario:** 225 fuentes históricas, 63 webs activas, 39 páginas en revisión y 123 perfiles de Instagram como fuente de descubrimiento indirecto. Se conservan los límites de 360 solicitudes totales, 24 URLs IG por ejecución con **mínimo cuatro segundos de separación** y tope interno de 24 minutos por corrida; se registra 429 sin intentar eludirlo.
+
+**Neon:** se creó `neondb.radar_definitivo` con las fuentes y antecedentes candidatos, sin afectar la API ni los eventos aceptados. El destino **NO se activa automáticamente hasta guardar en GitHub el secreto `NEON_RADAR_OPERATIONAL_DATABASE_URL`** con la cadena de `neondb`/rol `poraca_definitivo_ingest`. Mientras tanto, Github seguirá escribiendo solamente en `poraca_explorador.radar_definitivo`. Los resultados son observaciones sin verificar: no se publican ni alimentan el Motor por defecto.
+
+**QA actual:** [suite unitaria más reciente](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/workflows/radar-definitivo-ci.yml). La evidencia final de cutover será un run GitHub con `target=operational_neondb_staging` y lectura independiente de nuevas corridas en `neondb`.
 
 ---
 
