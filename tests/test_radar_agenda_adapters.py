@@ -435,6 +435,32 @@ Kevin - Liniers: Eternotour
             self.assertEqual(ad.extract_listings(html,
                 "https://www.alternativateatral.com/obra10001-evento"),[])
     
+    def test_gritos_official_festival_range_one_umbrella_no_invented_sessions(self):
+        url="https://gritos.planetario.unlp.edu.ar/2026/index.html"
+        markup=("<h1>GRITOS en el planetario</h1>"
+                "<h2>Festival Internacional de Cine de Horror de La Plata</h2>"
+                "<h3>V Edición - 2026 -</h3>"
+                "<p>Del 30/OCT al 1/NOV 2026</p>"
+                "<p>Tres días bajo el domo del Planetario de la Universidad Nacional</p>")
+        rows=ad.extract_listings(markup,url)
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["event_date"],"2026-10-30")
+        self.assertIsNone(rows[0]["event_time"])
+        self.assertEqual(rows[0]["venue"],"Planetario UNLP · Paseo del Bosque")
+        self.assertEqual(rows[0]["proof_url"],url)
+        self.assertEqual(rows[0]["review_state"],"observed_unverified")
+        self.assertEqual(rows[0]["evidence_tier"],"primary_program")
+        self.assertEqual(rows[0]["method"],"gritos_festival_official_date_range_start")
+
+    def test_gritos_does_not_infer_from_edition_year_without_range(self):
+        url="https://gritos.planetario.unlp.edu.ar/2026/index.html"
+        markup=("<h1>Festival Internacional de Cine de Horror</h1>"
+                "<p>V Edición - 2026 - Planetario UNLP</p>"
+                "<p>30/OCT al 1/NOV pero sin año explícito en el rango</p>")
+        self.assertEqual(ad.extract_listings(markup,url),[])
+        self.assertEqual(ad.extract_listings(markup,
+            "https://example.com/2026/index.html"),[])
+
     def test_edita_official_home_has_two_dates_no_hours(self):
         html=('<h1>#EDITA2026 #10AÑOS</h1><p>EDITA: 5 y 6 de diciembre</p>'
               '<p>La Feria de Editoriales más importante de la región con '
