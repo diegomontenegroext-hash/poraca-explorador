@@ -1,6 +1,6 @@
-# POR ACA — RADAR DEFINITIVO
-# Ensayo operativo focalizado EDITA; dos fechas oficiales sin horario y sin publicar.
+# POR ACA RADAR DEFINITIVO
+# Revalidacion puntual: JSON-LD con UTC convertido a Argentina, Doble-T; staging unicamente
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=incremental
-trigger_reason=edita_2026_two_days_official_original_readback
+trigger_reason=doblet_jsonld_timezone_local_correctness
