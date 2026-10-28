@@ -452,6 +452,18 @@ Kevin - Liniers: Eternotour
         self.assertEqual(rows[0]["evidence_tier"],"primary_program")
         self.assertEqual(rows[0]["method"],"gritos_festival_official_date_range_start")
 
+    def test_gritos_festival_prose_range_no_inferred_screenings(self):
+        url="https://gritos.planetario.unlp.edu.ar/2026/index.html"
+        markup=("<h1>GRITOS en el planetario</h1>"
+                "<h2>Festival Internacional de Cine de Horror de La Plata</h2>"
+                "<h3>V Edición - 2026 -</h3>"
+                "<p>El festival se desarrollará entre los días 30 de octubre "
+                "y 1 de noviembre de 2026 en el Planetario de la UNLP</p>")
+        rows=ad.extract_listings(markup,url)
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["event_date"],"2026-10-30")
+        self.assertIsNone(rows[0]["event_time"])
+
     def test_gritos_does_not_infer_from_edition_year_without_range(self):
         url="https://gritos.planetario.unlp.edu.ar/2026/index.html"
         markup=("<h1>Festival Internacional de Cine de Horror</h1>"
