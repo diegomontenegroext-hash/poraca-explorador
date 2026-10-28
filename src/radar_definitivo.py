@@ -477,8 +477,8 @@ def main():
                 cur.execute("""UPDATE radar_definitivo.runs SET
                   sources_checked=%s,sources_success=%s,urls_discovered=%s,
                   candidates_seen=%s,candidates_new=%s,entities_new=%s,
-                  summary=jsonb_build_object('phase','running','lastSource',%s,
-                    'httpRequests',%s,'instagramRequests',%s,'target',%s)
+                  summary=jsonb_build_object('phase','running','lastSource',%s::text,
+                    'httpRequests',%s::integer,'instagramRequests',%s::integer,'target',%s::text)
                   WHERE run_id=%s""",
                     (stats["checked"],stats["success"],stats["urls"],
                      stats["candidates"],stats["new"],stats["entities"],
