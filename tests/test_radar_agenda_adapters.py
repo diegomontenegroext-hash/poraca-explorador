@@ -1,6 +1,8 @@
 import pathlib
 import sys
 import unittest
+from unittest.mock import patch
+from collections import Counter
 from datetime import date, timedelta
 from urllib.parse import quote
 
@@ -98,6 +100,53 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertEqual(got[0]["event_time"],"19:30")
         self.assertEqual(got[1]["event_time"],None)
         self.assertTrue(all(g["review_state"]=="observed_unverified" for g in got))
+
+    def test_opera_heading_segments_beyond_700_and_official_ticket_link(self):
+        d=date.today()+timedelta(days=4)
+        link="https://livepass.com.ar/events/esquina-libertad-en-el-opera-lp"
+        # Real Elementor templates contain several wrappers between headings.
+        html=('<section><h2>Esquina Libertad en el Teatro Ópera LP</h2>'
+              + '<div class="elementor-container">'*12
+              + ('<span class="event-decoration">Información artística</span>'*30)
+              + '<li>'+d.strftime("%d/%m/%Y")+'</li>'
+              + '<a href="'+link+'">Comprar Tickets</a></section>')
+        got=ad.extract_listings(html,"https://operalp.com.ar/agenda/")
+        self.assertEqual(len(got),1)
+        self.assertEqual(got[0]["event_date"],d.isoformat())
+        self.assertEqual(got[0]["event_time"],None)
+        self.assertEqual(got[0]["proof_url"],link)
+
+    def test_genda_date_render_fallback_when_http_has_empty_shell(self):
+        d=date.today()+timedelta(days=1)
+        root="https://agendalaplata.ar/"
+        day=root+"?fecha="+d.isoformat()
+        class Budget:
+            total=0
+            by_host=Counter()
+            def remaining(self):return 95
+            def can_fetch(self,url):return url in (root,day)
+            def request(self,url):
+                if url==root:
+                    return 200,'<a href="/?fecha='+d.isoformat()+'">Calendario</a>',None
+                return 200,'<html><body>Trayendo la cartelera...</body></html>',None
+        browser_html='<p>Cine</p><p>Función demostración de Genda</p><p>20:00 hs | Cine Select</p>'
+        source=dict(source_id="genda",url=root,source_role="secondary_agenda",seed_urls=[])
+        with patch.object(rd,"render_date_pages",return_value=({day:browser_html},None)) as render:
+            check,candidates=rd.scan_source(source,Budget(),"full")
+        self.assertEqual(check["_genda_render_pages"],1)
+        self.assertTrue(any(v["title"]=="Función demostración de Genda" for v in check["_listings"]))
+        self.assertEqual(check["_listings"][0]["evidence_tier"],"secondary_agenda")
+        render.assert_called_once()
+
+    def test_browser_scope_rejects_unknown_urls_and_future_dates(self):
+        from radar_genda_browser import validated_date_pages
+        d=date.today()+timedelta(days=1)
+        base="https://agendalaplata.ar/?fecha="+d.isoformat()
+        urls=[base,"https://evil.example/?fecha="+d.isoformat(),
+              "https://agendalaplata.ar/admin?fecha="+d.isoformat(),
+              "https://agendalaplata.ar/?fecha=2040-02-10",
+              "https://agendalaplata.ar/?fecha=not-a-date"]
+        self.assertEqual(validated_date_pages(urls,today=date.today()),[base])
 
     def test_stale_event_is_not_accepted_as_listing(self):
         got=ad.extract_listings(
