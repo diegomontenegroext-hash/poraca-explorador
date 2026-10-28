@@ -543,6 +543,46 @@ Kevin - Liniers: Eternotour
             '<a href="https://www.teatrometrolp.com.ar/entrada/'
             'fake?token=secret">Query insegura</a>')),[])
 
+    def test_metro_full_catalogue_link_recovers_two_distinct_primary_sessions(self):
+        root="https://www.teatrometrolp.com.ar/entradas/cartelera/"
+        html=(
+          '<a href="https://www.teatrometrolp.com.ar/entradas/cartelera/?mes=&anio=">'
+          'CARTELERA</a>'
+          '<a href="https://www.teatrometrolp.com.ar/entrada/kevin-johanse-100884">'
+          'ver más info</a>'
+          '<a href="https://www.teatrometrolp.com.ar/entrada/las-hijas-100958">'
+          'ver más info</a>'
+        )
+        links=ad.special_links(root,rd.parse_html(html),
+                  at=datetime(2026,10,28,5))
+        self.assertEqual(links[0],(
+           "https://www.teatrometrolp.com.ar/entradas/cartelera/?mes=&anio=",
+           "cartelera oficial, filtros vacios"))
+        self.assertLessEqual(len(links),6)
+        self.assertFalse(any("evil" in u for u,_ in links))
+        # Recibir /cartelera/?mes=&anio= no construye otro self-loop.
+        self.assertFalse(any("filtros vacios" in label for _,label in
+           ad.special_links(links[0][0],rd.parse_html(html),
+                            at=datetime(2026,10,28,5))))
+        page=(
+           '<h3>Las Hijas</h3><p>08/11/2026 - 19:30 hs.</p>'
+           '<h3>LAS HIJAS</h3><p>08/11/2026 - 21:30 hs.</p>'
+        )
+        got=ad.extract_listings(page,links[0][0])
+        self.assertEqual({(x["title"].lower(),x["event_date"],x["event_time"])
+                          for x in got},
+                         {("las hijas","2026-11-08","19:30"),
+                          ("las hijas","2026-11-08","21:30")})
+        self.assertTrue(all(x["evidence_tier"]=="primary_program" and
+                            x["review_state"]=="observed_unverified"
+                            for x in got))
+        self.assertEqual(ad.special_links(root,rd.parse_html(
+             '<a href="https://evil.example/entradas/cartelera/?mes=&anio=">'
+             'Falso</a>')),[])
+        self.assertEqual(ad.special_links(root,rd.parse_html(
+             '<a href="https://www.teatrometrolp.com.ar/entradas/cartelera/'
+             '?mes=11&anio=2026">No filtro libre</a>')),[])
+
     def test_metro_original_ticket_rotation_bounded_and_distinct_sessions(self):
         root="https://www.teatrometrolp.com.ar/entradas/cartelera/"
         first=["kevin-johanse-100001","juli-bellese-100002",
