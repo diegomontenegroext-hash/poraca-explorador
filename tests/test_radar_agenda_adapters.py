@@ -25,6 +25,39 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertEqual({x["event_date"] for x in out},{today.isoformat(),tomorrow.isoformat()})
         self.assertTrue(all(x["review_state"]=="observed_unverified" for x in out))
 
+    def test_alternativa_current_venue_not_historical_venue(self):
+        # Regression: the original page can carry the 2026 current
+        # room followed by "Histórico de funciones" with a PAST room and
+        # expired/fictitious dates. Neither should leak into the agenda.
+        days=(4-date.today().weekday())%7 or 7
+        current=date.today()+timedelta(days=days)
+        fake=current+timedelta(days=8)
+        html=(
+            '<h1>Las del Lirio. Tullido retrato familiar</h1>'
+            '<div>CENTRO CULTURAL VIEJO ALMACEN EL OBRERO</div>'
+            '<div>Av 13 1900 esquina 71 La Plata</div>'
+            '<p>Viernes - 21:30 hs - Hasta el '+current.strftime("%d/%m/%Y")+'</p>'
+            '<div>1 Histórico de funciones</div>'
+            '<p>EN ESO ESTAMOS<br>Calle 62 e/1 y 115</p>'
+            '<p>Entrada: 21:00 hs - '+fake.strftime("%d/%m/%Y")+'</p>')
+        url=("https://www.alternativateatral.com/"
+             "obra102973-las-del-lirio-tullido-retrato-familiar")
+        got=ad.extract_listings(html,url)
+        self.assertEqual(len(got),1)
+        self.assertEqual(got[0]["event_date"],current.isoformat())
+        self.assertEqual(got[0]["event_time"],"21:30")
+        self.assertEqual(got[0]["venue"],"CENTRO CULTURAL VIEJO ALMACEN EL OBRERO")
+        self.assertNotIn(fake.isoformat(),{x["event_date"] for x in got})
+
+    def test_alternativa_historical_only_is_not_current_program(self):
+        when=date.today()+timedelta(days=3)
+        html=('<h1>Programa de archivo</h1>'
+            '<div>1 Histórico de funciones</div>'
+            '<p>EN ESO ESTAMOS<br>Calle 62 e/1 y 115</p>'
+            '<p>Entrada: 21:00 hs - '+when.strftime("%d/%m/%Y")+'</p>')
+        url="https://www.alternativateatral.com/obra102973-programa-archivo"
+        self.assertEqual(ad.extract_listings(html,url),[])
+
     def test_casa_metro_explicit_spanish_date_and_venue(self):
         when=date.today()+timedelta(days=9)
         month=list(ad.MONTHS)[0]  # month text below built using inverse map
