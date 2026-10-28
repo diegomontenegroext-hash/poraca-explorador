@@ -110,7 +110,16 @@ def run():
                         r["permalinks"].append(permalink)
                         discovered.setdefault(permalink, []).append(url)
         results.append(r)
+    # Una sola prueba de lectura en Instagram del primer permalink hallado,
+    # con los mismos límites de la prueba exacta. No se busca el feed ni se
+    # recorren todas las publicaciones; el dato sigue siendo candidato.
+    sample_post = None
+    if discovered:
+        from instagram_exact_probe import probe as probe_exact
+        candidate_url = next(iter(discovered))
+        sample_post = probe_exact({"id": "primer_enlace_descubierto_automaticamente", "url": candidate_url})
     result = {
+        "sample_post_read": sample_post,
         "checked_at_utc": datetime.now(timezone.utc).isoformat(),
         "mode": "read_only_public_sites_links_only",
         "new_post_links_detected": len(discovered),
@@ -130,6 +139,9 @@ def run():
             lines.append(f"| {r['source']} | {r['http'] or '—'} | {r['inspected']} | {len(r['permalinks'])} |")
         lines.append("")
         lines.append(f"**Enlaces distintos detectados: {len(discovered)}.** No son publicaciones nuevas verificadas.")
+        if sample_post:
+            lines.append(f"Primer permalink consultado: HTTP {sample_post.get('http_status', '—')} — {sample_post['result']}.")
+            lines.append("La metadata de Instagram no confirma fecha/hora/sede ni vigencia del evento.")
         with open(summary, "a", encoding="utf-8") as out:
             out.write("\n".join(lines) + "\n")
 
