@@ -435,6 +435,40 @@ Kevin - Liniers: Eternotour
             self.assertEqual(ad.extract_listings(html,
                 "https://www.alternativateatral.com/obra10001-evento"),[])
     
+    def test_casa_metro_official_category_cards_keep_dates_scoped(self):
+        url="https://casametro.com.ar/categoria-producto/casa-metro/"
+        markup=(
+            '<ul class="products">'
+            '<li class="product"><span>Fecha:octubre 31, 2026</span>'
+            '<span>Horario: 20:00 - 00:00</span><span>Casa Metro</span>'
+            '<h2>Música como en casa – Segundo tiempo sexteto</h2></li>'
+            '<li class="product"><span>Fecha:noviembre 01, 2026</span>'
+            '<span>Horario: 19:00 - 00:00</span><span>Casa Metro</span>'
+            '<h2>Sofía Calvo | Es hora de hablar</h2></li>'
+            '<li class="product"><span>Casa Metro</span>'
+            '<h2>Sin fecha visible</h2></li>'
+            '</ul>')
+        rows=ad.extract_listings(markup,url)
+        self.assertEqual(len(rows),2)
+        self.assertEqual(
+            [(r["title"],r["event_date"],r["event_time"]) for r in rows],
+            [("Música como en casa – Segundo tiempo sexteto","2026-10-31","20:00"),
+             ("Sofía Calvo | Es hora de hablar","2026-11-01","19:00")])
+        self.assertTrue(all(r["proof_url"]==url for r in rows))
+        self.assertTrue(all(r["evidence_tier"]=="primary_program" for r in rows))
+        self.assertTrue(all(r["review_state"]=="observed_unverified" for r in rows))
+
+    def test_casa_metro_category_rejects_missing_time_and_mismatched_card(self):
+        url="https://casametro.com.ar/categoria-producto/casa-metro/"
+        markup=(
+            '<li class="product"><h2>Concierto sin hora</h2>'
+            '<span>Fecha:octubre 31, 2026</span><span>Casa Metro</span></li>'
+            '<li class="product"><h2>Concierto sin fecha</h2>'
+            '<span>Horario: 21:00 - 00:00</span><span>Casa Metro</span></li>'
+            '<li class="product"><h2>Sin sede impresa</h2>'
+            '<span>Fecha:octubre 31, 2026</span><span>Horario: 22:00</span></li>')
+        self.assertEqual(ad.extract_listings(markup,url),[])
+
     def test_gritos_official_festival_range_one_umbrella_no_invented_sessions(self):
         url="https://gritos.planetario.unlp.edu.ar/2026/index.html"
         markup=("<h1>GRITOS en el planetario</h1>"
