@@ -305,10 +305,16 @@ def scan_source(source,budget,mode):
             for u,markup in rendered.items():
                 check["_listings"].extend(extract_listings(markup,u))
             check["_genda_render_pages"]=len(rendered)
-            if reason and not check["_listings"]:
-                check["error_type"]=reason
             if not check["_listings"]:
+                check["error_type"]=reason or ("GENDA_NO_SESSIONS_AFTER_RENDER_"+
+                                        str(len(rendered))+"_PAGES")
                 check["status"]="index_only"
+            print(json.dumps({"source":source["source_id"],"adapter":"genda_browser",
+                 "browser_pages":len(rendered),
+                 "visible_clock_lines":sum(len(re.findall(r"\\b\\d{1,2}:\\d{2}\\s*hs\\b",
+                                             content,re.I)) for content in rendered.values()),
+                 "sessions":len(check["_listings"]),
+                 "error":reason}),flush=True)
     return check,candidates
 
 
