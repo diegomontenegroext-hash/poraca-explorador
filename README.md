@@ -2,15 +2,15 @@
 
 ## Radar Definitivo — adquisición principal de Por Acá
 
-**28/10/2026:** ChatGPT Radar V1 **pausado por decisión del usuario**. Se configuró el **Radar Definitivo** en GitHub con **un barrido amplio diario (03:17 ART)** y **dos incrementales (11:17 y 19:17 ART)**. El piloto de GitHub queda disponible solamente para ejecución manual.
+**Operación al 28/10/2026:** la tarea ChatGPT recolectora anterior está **pausada**. Una sola tarea **«Por Acá — Radar GitHub 3 veces al día»** actúa como programador GPT **05:00 FULL, 13:00 incremental y 21:00 incremental ART**. Hace `GitHub.fetch_file/update_file` sobre `ops/radar-fallback-trigger.txt` y el workflow [Radar Definitivo](.github/workflows/radar-definitivo.yml) ejecuta el programa. No hay `schedule` directo de GitHub porque ningún disparo horario fue confirmado en las primeras pruebas.
 
-[Workflow](.github/workflows/radar-definitivo.yml) · [Código](src/radar_definitivo.py) · [Tests](tests/test_radar_definitivo.py) · [Contrato completo y paso de conexión operativa](docs/RADAR_DEFINITIVO_20261028.md)
+**Integración comprobada:** prueba `incremental` disparada por commit [GitHub #40682506769](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/runs/40682506769), `SUCCESS`; `neondb.radar_definitivo.runs` registró `mode=incremental`, `target=operational_neondb_staging` y 0 fuentes vencidas a esa hora. Las próximas pruebas reales del programador son las 13:00/21:00 ART. 13 fuentes prioritarias accesibles tienen ahora cadencia 7 h; el resto mantiene sus umbrales.
 
-**Inventario:** 225 fuentes históricas, 63 webs activas, 39 páginas en revisión y 123 perfiles de Instagram como fuente de descubrimiento indirecto. Se conservan los límites de 360 solicitudes totales, 24 URLs IG por ejecución con **mínimo cuatro segundos de separación** y tope interno de 24 minutos por corrida; se registra 429 sin intentar eludirlo.
+[Plan de estabilización (prioridad actual)](docs/PLAN_ESTABILIZACION_RADAR_20261028.md) · [Contrato de datos y aislamiento](docs/RADAR_DEFINITIVO_20261028.md) · [Programa](src/radar_definitivo.py) · [Pruebas](tests/test_radar_definitivo.py).
 
-**Neon:** se creó `neondb.radar_definitivo` con las fuentes y antecedentes candidatos, sin afectar la API ni los eventos aceptados. El destino **NO se activa automáticamente hasta guardar en GitHub el secreto `NEON_RADAR_OPERATIONAL_DATABASE_URL`** con la cadena de `neondb`/rol `poraca_definitivo_ingest`. Mientras tanto, Github seguirá escribiendo solamente en `poraca_explorador.radar_definitivo`. Los resultados son observaciones sin verificar: no se publican ni alimentan el Motor por defecto.
+**Fase actual: paridad de agendas, no ampliar a ciegas.** `public.radar_agenda_events` tiene 159 registros, 51 con fecha desde el 28/10. La comparación inicial estricta `radar_definitivo.agenda_baseline_coverage_v1` registra 0 coincidencias fecha+título, 1 URL recuperada sin coincidencia y 50 no recuperadas: brecha de extracción/comparación a resolver con adaptadores específicos de Genda, Alternativa Teatral, teatros y agendas; no afirmar ausencia de esos 50 eventos. La última FULL recuperó 27 fuentes, dejó 29 páginas `index_only` y 7 errores.
 
-**QA actual:** [suite unitaria más reciente](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/workflows/radar-definitivo-ci.yml). La evidencia final de cutover será un run GitHub con `target=operational_neondb_staging` y lectura independiente de nuevas corridas en `neondb`.
+**Inventario y destino:** 225 fuentes catalogadas, 63 webs activas, 39 en revisión y 123 perfiles IG como inventario de descubrimiento indirecto. Escritura **operativa** en DB `neondb`, esquema aislado `radar_definitivo`, mediante secreto dedicado `NEON_RADAR_OPERATIONAL_DATABASE_URL` ya probado. Candidatos/ocurrencias/entidades permanecen **no verificados**: ningún evento se publica sin Motor y control editorial. Límites: 360 HTTP, 24 min de adquisición, hasta 24 posts IG exactos con 4 s entre accesos y parada al recibir 429.
 
 ---
 
@@ -18,9 +18,10 @@
 
 **Ya instalados:** programa `src/radar_parallel.py`, pruebas, [workflow Radar paralelo](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/workflows/radar-paralelo.yml) y base independiente `poraca_explorador` con 15 fuentes activas. El Radar original de ChatGPT sigue intacto.
 
-**Estado de puesta en marcha: funcionando en modo paralelo.** Primera escritura real a Neon verificada el 28/10: [run #40627651136](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/runs/40627651136), **6 fuentes consultadas, 5 accesibles, 6 candidatos nuevos y 6 controles guardados**. Se programaron tres corridas diarias a las 10:20, 16:20 y 22:20 ART; GitHub puede retrasar los disparos. [Contrato operativo y consultas de verificación](docs/RADAR_PARALELO_OPERACION.md).
+**Estado histórico: piloto archivado, sólo ejecución manual.** Primera escritura real a Neon verificada el 28/10: [run #40627651136](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/runs/40627651136), **6 fuentes consultadas, 5 accesibles, 6 candidatos nuevos y 6 controles guardados**. Los horarios que tuvo ese piloto fueron retirados al pasar a Radar Definitivo. [Contrato operativo y consultas de verificación](docs/RADAR_PARALELO_OPERACION.md).
 
-**Bootstrap amplio:** corrida automática excepcional programada para **28/10/2026, 00:50 ART**, con [cron controlado por fecha](.github/workflows/radar-paralelo.yml) y modo `full` (15 fuentes, hasta nueve detalles por fuente). Puede empezar tarde por la cola de GitHub. Luego siguen las tres corridas habituales de 10:20, 16:20 y 22:20 ART, en modo `incremental`, con fuentes vencidas y deduplicación por URL. [QA del barrido ampliado](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/runs/40628415819) pasó. La ejecución full programada **todavía no se ha confirmado como ocurrida**.
+**Bootstrap histórico del piloto:** se había previsto una ejecución excepcional para 00:50 ART, pero no se observó un disparo por horario de GitHub. El piloto dejó de tener programación automática.
+
 
 Los datos nuevos se guardarán siempre como `candidates.review_state='unverified'`: no se publican automáticamente ni se confunden con hechos aceptados.
 
