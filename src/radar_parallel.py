@@ -172,11 +172,21 @@ def structured_event(page: Parser) -> dict:
                 performer_data = node.get("performer") or node.get("performers") or []
                 if not isinstance(performer_data,list):
                     performer_data = [performer_data]
+                generic_role_placeholders = {
+                    "organization","person","musicgroup","performinggroup",
+                    "performingartist","performer","artist","group",
+                    "unknown","unspecified","null","na","tbd",
+                    "artista","organizacion",
+                }
                 for performer in performer_data[:12]:
                     value = name_of(performer)
-                    # Exact role supplied by event JSON-LD; still a LEAD,
-                    # not verified local identity or relationship.
-                    if 3 <= len(value) <= 180 and value not in performers:
+                    # Some ticketing pages misuse a schema TYPE token
+                    # (e.g. the literal "Organization") as performer.name.
+                    # It is not an artist and must never become a node lead.
+                    normalized = re.sub(r"[^a-z]","",value.casefold())
+                    if (3 <= len(value) <= 180
+                        and normalized not in generic_role_placeholders
+                        and value not in performers):
                         performers.append(value)
                 return {
                     "name": compact(str(node.get("name") or "")),
@@ -293,15 +303,20 @@ def make_candidate(url: str, source_id: str, label: str, detail: Parser | None,
         "announced_only": True,
     }
     if event:
-        # Passive, source-attributed leads. This key is stored in the
-        # existing JSONB evidence field; no entities or new tables.
-        evidence["cultural_signals_v1"] = {
-            "status": "lead_unverified",
-            "origin": "schema_org_event_on_opened_original",
-            "artists": event.get("performers",[]),
-            "organizers": [event["organizer"]] if event.get("organizer") else [],
-            "venues": [event["venue"]] if event.get("venue") else [],
-        }
+        # These are explicit JSON-LD ROLE labels, not inferred from title,
+        # locality, a venue's page or popularity. Some sites assert no
+        # cultural role at all; do not manufacture an empty "lead".
+        signal_artists = event.get("performers",[])
+        signal_organizers = [event["organizer"]] if event.get("organizer") else []
+        signal_venues = [event["venue"]] if event.get("venue") else []
+        if signal_artists or signal_organizers or signal_venues:
+            evidence["cultural_signals_v1"] = {
+                "status": "lead_unverified",
+                "origin": "schema_org_event_on_opened_page",
+                "artists": signal_artists,
+                "organizers": signal_organizers,
+                "venues": signal_venues,
+            }
     return {
         "candidate_key": hashlib.sha256(url.encode("utf-8")).hexdigest(),
         "original_url": url, "kind": kind, "title": title or None,
