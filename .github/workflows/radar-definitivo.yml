@@ -61,8 +61,12 @@ jobs:
         run: |
           python3 -m compileall -q src
           python3 -m unittest discover -s tests -v
-      - name: Cliente Neon
-        run: python3 -m pip install --disable-pip-version-check "psycopg[binary]>=3.2,<4"
+      - name: Cliente Neon y navegador para agenda Genda
+        run: |
+          python3 -m pip install --disable-pip-version-check "psycopg[binary]>=3.2,<4"
+          # ubuntu-latest ya incluye Chrome; el adaptador usa channel="chrome".
+          # Si Playwright no instala, Radar conserva extracción HTTP sin bloquearse.
+          python3 -m pip install --disable-pip-version-check "playwright>=1.45,<2" || echo "::warning::Genda sin fallback de navegador"
       - name: Exigir secreto operativo
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
