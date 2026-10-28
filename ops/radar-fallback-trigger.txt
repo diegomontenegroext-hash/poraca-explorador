@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Validación de fuentes oficiales Teatro Metro, Argentino y Lumen; ninguna promoción.
+# Revalidación controlada de fuentes oficiales Teatro Argentino y Lumen en Neon staging.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=incremental
-trigger_reason=official_theatre_adapters_tanda3
+trigger_reason=official_argentino_lumen_html_regression_tanda3
