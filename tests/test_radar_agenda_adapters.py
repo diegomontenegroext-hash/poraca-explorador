@@ -11,6 +11,57 @@ import radar_agenda_adapters as ad
 import radar_definitivo as rd
 
 class CulturalAgendaAdapterTests(unittest.TestCase):
+    def test_alpedo_rendered_dated_cards_are_secondary_and_individual(self):
+        day=date.today()+timedelta(days=1)
+        month=next(k for k,v in ad.MONTHS.items() if v==day.month)
+        raw=(f'<p>{month.capitalize()} {day.year}</p>'
+             '<h6>Parque Ecológico</h6><p>07:00 a 19:00</p>'
+             '<p>Parque Ecológico</p>'
+             '<h6>Taller de hongos comestibles</h6>'
+             '<p>16:00</p><p><i></i>Facultad de Ciencias Naturales - UNLP</p>'
+             '<h6>Mugre + Terrores Nocturnos</h6>'
+             '<p>20:00</p><p><i></i>Ciudad de Gatos</p>'
+             '<h6>Kevin - Liniers: Eternotour</h6>'
+             '<p>20:00</p><p>Teatro Metro</p>'
+             '<h6>República de los Niños</h6>'
+             '<p>07:00 / 22:00</p><p>República de los Niños</p>')
+        url="https://alpedo.ar/?fecha="+day.isoformat()
+        items=ad.extract_listings(raw,url)
+        self.assertEqual(len(items),3)
+        self.assertEqual({x["title"] for x in items},{
+            "Taller de hongos comestibles",
+            "Mugre + Terrores Nocturnos",
+            "Kevin - Liniers: Eternotour"})
+        self.assertTrue(all(x["event_date"]==day.isoformat() for x in items))
+        self.assertTrue(all(x["evidence_tier"]=="secondary_agenda" for x in items))
+        self.assertEqual(next(x for x in items if x["title"].startswith("Mugre"))["venue"],
+                         "Ciudad de Gatos")
+
+    def test_alpedo_rejects_stale_date_or_unscoped_root(self):
+        day=date.today()+timedelta(days=1)
+        wrongmonth=next(k for k,v in ad.MONTHS.items()
+                        if v==(day.month%12)+1)
+        raw=f"<p>{wrongmonth} {day.year}</p><h6>Concierto</h6><p>21:00</p><p>Club</p>"
+        url="https://alpedo.ar/?fecha="+day.isoformat()
+        self.assertEqual(ad.extract_listings(raw,url),[])
+        self.assertEqual(ad.extract_listings(raw,"https://alpedo.ar/"),[])
+        self.assertEqual(ad.extract_listings(raw,
+            "https://alpedo.ar/?cinema=1&fecha="+day.isoformat()),[])
+        self.assertEqual(ad.extract_listings(raw,
+            "https://evil.example/?fecha="+day.isoformat()),[])
+
+    def test_alpedo_skip_finalized_or_undated_spa_index(self):
+        day=date.today()+timedelta(days=2)
+        month=next(k for k,v in ad.MONTHS.items() if v==day.month)
+        raw=(f'<p>{month} {day.year}</p>'
+             '<h6>Evento futuro</h6><p>19:00</p><p>Centro Cultural</p>'
+             '<div>Finalizadas</div>'
+             '<h6>Actividad ya realizada</h6><p>18:00</p><p>Otra sede</p>')
+        names=[x["title"] for x in ad.extract_listings(raw,
+                           "https://alpedo.ar/?fecha="+day.isoformat())]
+        self.assertIn("Evento futuro",names)
+        self.assertNotIn("Actividad ya realizada",names)
+
     def test_alternativa_multiple_sessions_per_day(self):
         today=date.today()+timedelta(days=2)
         tomorrow=today+timedelta(days=1)
