@@ -260,6 +260,35 @@ Kevin - Liniers: Eternotour
         self.assertEqual(got[0]["event_time"],"18:00")
         self.assertEqual(got[0]["evidence_tier"],"primary_venue")
 
+    def test_argentino_nested_html_and_booking_windows(self):
+        d=date.today()+timedelta(days=7)
+        html=('<html><body><ul><li><p>Programación</p></li></ul>'
+              '<p>SALA Alberto Ginastera</p>'
+              '<p><span>Concierto | Horacio Lavandera y Cuarteto de la UNNOBA '
+              '| Martes 3/11 | 19:30</span></p>'
+              '<p>Inicio de adquisición 02/10/2026 11:00:00</p>'
+              '<div><p><strong>Fecha del evento</strong> '
+              +d.strftime("%d/%m/%Y")+' 19:30:00</p></div>'
+              '</body></html>')
+        got=ad.extract_listings(html,"https://teatroargentino.gba.gob.ar/meet/97")
+        self.assertEqual(len(got),1)
+        self.assertEqual(got[0]["title"],"Horacio Lavandera y Cuarteto de la UNNOBA")
+        self.assertIn("Ginastera",got[0]["venue"])
+
+    def test_lumen_nav_paragraph_before_real_article(self):
+        d=date.today()+timedelta(days=5)
+        month=next(k for k,v in ad.MONTHS.items() if v==d.month)
+        html=('<html><head><title>El dúo de La Africana – Teatro de Cámara</title></head>'
+              '<body><p>Asociate y contactanos</p><nav><p>Programación</p></nav>'
+              '<article><p>El <strong>domingo '+str(d.day)+' de '+month+
+              ' a las 18 h</strong>, el Teatro recibirá a Novo Ensamble, '
+              'que presentará <em>El dúo de La Africana</em>, una zarzuela.</p>'
+              '</article></body></html>')
+        got=ad.extract_listings(html,"https://lumenartis.org/?p=2907&post_type=funcion")
+        self.assertEqual(len(got),1)
+        self.assertEqual(got[0]["title"],"El dúo de La Africana")
+        self.assertEqual(got[0]["event_date"],d.isoformat())
+
     def test_lumen_no_date_or_no_emphasis_not_a_structured_event(self):
         html='<article><p>Una presentación de nuestra asociación cultural.</p></article>'
         self.assertEqual(ad.extract_listings(html,
