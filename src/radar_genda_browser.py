@@ -119,3 +119,74 @@ def render_argentino_event_pages(urls,max_seconds=55):
     except Exception as ex:
         return result,"BROWSER_RENDER_FAILED:"+type(ex).__name__
     return result,None
+
+
+def validated_alpedo_date_pages(urls,today=None):
+    """Only this known agenda's concrete dates, without arbitrary links."""
+    today=today or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires")).date()
+    result=[]
+    for url in urls[:8]:
+        try:p=urlsplit(url)
+        except ValueError:continue
+        if (p.scheme!="https" or p.hostname not in ("alpedo.ar","www.alpedo.ar")
+            or p.path!="/" or p.port is not None or p.fragment or p.username or p.password):
+            continue
+        q=parse_qs(p.query)
+        if set(q)!={"fecha"} or len(q["fecha"])!=1:continue
+        try:d=date.fromisoformat(q["fecha"][0])
+        except (ValueError,TypeError):continue
+        if today<=d<=today+timedelta(days=4) and url not in result:
+            result.append(url)
+        if len(result)>=3:break
+    return result
+
+
+def render_alpedo_date_pages(urls,max_seconds=65):
+    """Render at most 3 date URLs using the existing bounded browser pattern.
+
+    Does not open Instagram, follow links or create entities; returns DOM
+    text+tags only to the secondary-evidence parser.
+    """
+    valid=validated_alpedo_date_pages(urls)
+    if not valid:return {},None
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return {},"BROWSER_PACKAGE_UNAVAILABLE"
+    result={}
+    start=time.monotonic()
+    try:
+        with sync_playwright() as p:
+            browser=p.chromium.launch(channel="chrome",headless=True,
+                args=["--no-sandbox","--disable-dev-shm-usage"])
+            context=browser.new_context(locale="es-AR",
+                timezone_id="America/Argentina/Buenos_Aires")
+            context.set_default_timeout(5500)
+            context.route("**/*",lambda route:
+                route.abort() if route.request.resource_type in ("image","font","media")
+                else route.continue_())
+            page=context.new_page()
+            for url in valid:
+                if time.monotonic()-start>max_seconds-8:break
+                try:
+                    resp=page.goto(url,wait_until="domcontentloaded",timeout=11000)
+                    if resp and resp.status==429:break
+                    if resp and resp.status>=400:continue
+                    try:
+                        page.wait_for_function(
+                            "() => document.querySelectorAll('h6').length >= 5",
+                            timeout=6500)
+                    except Exception:
+                        pass
+                    # Keep h6 and card siblings together in the HTML so the
+                    # parser can associate ONE clock and ONE venue per card.
+                    markup=page.content()[:450_000]
+                    if "<h6" in markup.lower():
+                        result[url]=markup
+                except Exception:
+                    continue
+            context.close()
+            browser.close()
+    except Exception as exc:
+        return result,"BROWSER_RENDER_FAILED:"+type(exc).__name__
+    return result,None
