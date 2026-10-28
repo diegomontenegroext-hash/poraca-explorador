@@ -207,7 +207,7 @@ def alpedo_dated_sessions(raw,url):
     # "Finalizadas" begins an archive of earlier activities. It marks
     # upcoming sections by position, rather than invalidating the last
     # legitimate future card immediately before that heading.
-    archive=re.search(r">\s*Finalizadas\s*<",raw[:450_000],re.I)
+    archive=re.search(r"<[^>]+>\s*Finalizadas\s*</[^>]+>",raw[:450_000],re.I)
     out=[]
     for i,m in enumerate(cards[:100]):
         if archive and m.start()>archive.start():
