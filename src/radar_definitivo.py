@@ -18,13 +18,14 @@ import sys
 import time
 import uuid
 from urllib.parse import urlparse, urljoin, urlsplit, urlunsplit, quote, parse_qsl, urlencode
+from zoneinfo import ZoneInfo
 
 from radar_parallel import (
     clean_link, compact, discover_links, WORDS, LOCAL_DETAIL,
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
 )
 from radar_agenda_adapters import extract_listings, special_links
-from radar_genda_browser import render_date_pages, validated_date_pages, render_argentino_event_pages
+from radar_genda_browser import render_date_pages, validated_date_pages, render_argentino_event_pages, render_alpedo_date_pages
 
 SCHEMA = "radar_definitivo"
 EXPECTED_LAB_DB = "poraca_explorador"
@@ -370,6 +371,34 @@ def scan_source(source,budget,mode):
                                              content,re.I)) for content in rendered.values()),
                  "sessions":len(check["_listings"]),
                  "error":reason}),flush=True)
+    # Alpedó serves an HTML shell to plain HTTP clients: source_checks
+    # consistently show index_only:200 and 0 links. A bounded Chromium
+    # session reads date pages already supported by the official web UI.
+    # Unlike Genda, Alpedó has many museum opening-hour ranges; the parser
+    # deliberately excludes those and all data stays SECONDARY.
+    if (urlparse(root).hostname in ("alpedo.ar","www.alpedo.ar")
+        and urlparse(root).path=="/" and check["status"]=="index_only"
+        and budget.remaining()>55 and budget.total+3<=MAX_REQUESTS):
+        day=datetime.now(timezone.utc).astimezone(
+            ZoneInfo("America/Argentina/Buenos_Aires")).date()
+        count=3 if mode=="full" else 2
+        date_urls=["https://alpedo.ar/?fecha="+(day+timedelta(days=i)).isoformat()
+                   for i in range(count)]
+        rendered,reason=render_alpedo_date_pages(
+            date_urls,max_seconds=min(70,budget.remaining()-8))
+        budget.total+=len(rendered)
+        budget.by_host["alpedo.ar"]+=len(rendered)
+        for u,markup in rendered.items():
+            check["_listings"].extend(extract_listings(markup,u))
+        check["details_opened"]+=len(rendered)
+        check["_alpedo_render_pages"]=len(rendered)
+        if check["_listings"]:
+            check["status"]="ok"
+        elif reason:
+            check["error_type"]=reason
+        print(json.dumps({"source":source["source_id"],"adapter":"alpedo_browser",
+            "pages":len(rendered),"secondary_sessions":len(check["_listings"]),
+            "error":reason}),flush=True)
     return check,candidates
 
 
