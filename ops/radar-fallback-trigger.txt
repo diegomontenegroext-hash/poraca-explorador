@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Validación controlada del parser corregido Teatro Argentino, sólo staging.
+# Validación editorial final de títulos Argentino sin navegación ni publicación.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=incremental
-trigger_reason=argentino_caption_div_parser_retest_v3
+trigger_reason=argentino_clean_titles_and_reconciliation_20261028
