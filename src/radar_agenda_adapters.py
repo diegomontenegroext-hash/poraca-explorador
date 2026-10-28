@@ -373,7 +373,9 @@ def extract_listings(raw,url):
                     rec=make_record(title,d,m.group(2).zfill(5),venue,url,
                                     "alternativa_explicit_date_no_ticket_label",
                                     "primary_ticket_listing")
-                    if rec:out.append(rec)
+                    if rec and not any(x["title"]==rec["title"] and x["event_date"]==rec["event_date"]
+                                       and x["event_time"]==rec["event_time"] for x in out):
+                        out.append(rec)
     elif "casametro.com.ar" in host and "/evento/" in path:
         title=next((t for tag,t in blocks.headings if tag=="h1"),None)
         plain=tidy(" ".join(blocks.text))
