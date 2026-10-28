@@ -24,6 +24,7 @@ from radar_parallel import (
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
 )
 from radar_agenda_adapters import extract_listings, special_links
+from radar_genda_browser import render_date_pages, validated_date_pages
 
 SCHEMA = "radar_definitivo"
 EXPECTED_LAB_DB = "poraca_explorador"
@@ -290,6 +291,24 @@ def scan_source(source,budget,mode):
                 known.add(post)
                 if pstat==429:
                     break
+    # Genda may return only a JS shell to the HTTP client. Use one bounded
+    # browser session solely for missing Genda date-page observations.
+    if urlparse(root).hostname in ("agendalaplata.ar","www.agendalaplata.ar"):
+        selected=validated_date_pages([u for u,_ in links])
+        observed={item["proof_url"] for item in check["_listings"]
+                  if item.get("method")=="genda_dated_listing"}
+        missing=[u for u in selected if u not in observed and budget.can_fetch(u)]
+        if missing and budget.remaining()>50:
+            budget.total+=len(missing)
+            budget.by_host[urlparse(root).hostname]+=len(missing)
+            rendered,reason=render_date_pages(missing,max_seconds=min(65,budget.remaining()-8))
+            for u,markup in rendered.items():
+                check["_listings"].extend(extract_listings(markup,u))
+            check["_genda_render_pages"]=len(rendered)
+            if reason and not check["_listings"]:
+                check["error_type"]=reason
+            if not check["_listings"]:
+                check["status"]="index_only"
     return check,candidates
 
 
