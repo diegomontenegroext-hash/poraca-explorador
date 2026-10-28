@@ -335,6 +335,7 @@ def extract_listings(raw,url):
     if "alternativateatral.com" in host and re.match(r"/obra\d+",path):
         title=next((t for tag,t in blocks.headings if tag=="h1"),None)
         if title:
+            text=tidy(" ".join(blocks.text))
             # Organizer lists its VENUE in a <p> before a real address. This
             # is evidence from current HTML, never inherited baseline venue.
             mvenue=re.search(
@@ -352,7 +353,6 @@ def extract_listings(raw,url):
                 if known_room:venue=tidy(known_room.group(1))
             if not venue and "av. 51 entre 9 y 10" in text.casefold():
                 venue="Teatro Argentino"
-            text=tidy(" ".join(blocks.text))
             # 'Entrada:' can contain several clocks before a printed date.
             for m in re.finditer(r"Entrada:\s*.{0,220}?\b([0-3]?\d/[01]?\d/20\d{2})",text,re.I):
                 d=parse_dmy(m.group(1))
