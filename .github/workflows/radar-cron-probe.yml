@@ -1,13 +1,10 @@
 name: Por Aca - Prueba autonoma de cron (sin GPT)
-# No invoca Radar ni modifica eventos. 28 y 29 octubre 2026.
+# Diagnóstico terminado: cron y push desactivados tras corroborar
+# un schedule real con recibo en Neon el 28/10/2026.
+# Disponible sólo por workflow_dispatch si se necesita repetir el diagnóstico.
+# No invoca Radar ni modifica eventos.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/radar-cron-probe.yml'
   workflow_dispatch:
-  schedule:
-    - cron: '13,43 12-17 28,29 10 *'
 permissions:
   contents: read
 concurrency:
