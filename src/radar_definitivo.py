@@ -163,18 +163,22 @@ def choose_sources(conn, mode):
                 )
                 if not patterns: continue
                 cur.execute("""WITH watchlist AS (
-                         SELECT event_payload->>'source_url' AS url,
-                                min(event_date) AS next_date
-                         FROM radar_definitivo.canonical_baseline_snapshots
-                         WHERE snapshot_id='baseline-20261028-v1'
-                           AND event_date>=current_date-interval '7 days'
+                         SELECT baseline_url AS url, min(event_date) next_date,
+                                min(CASE
+                                   WHEN parity_state='original_date_time_match_venue_hold' THEN 0
+                                   WHEN parity_state='not_recovered' THEN 1
+                                   WHEN parity_state='source_date_match_time_hold' THEN 2
+                                   ELSE 3 END) gap_priority
+                         FROM radar_definitivo.baseline_event_parity_checked_v3
+                         WHERE event_date>=current_date-interval '7 days'
                            AND event_date<=current_date+interval '80 days'
-                           AND event_payload->>'source_url' LIKE ANY(%s)
-                         GROUP BY event_payload->>'source_url'
+                           AND baseline_url LIKE ANY(%s)
+                         GROUP BY baseline_url
                        )
                        SELECT w.url FROM watchlist w
                        LEFT JOIN radar_definitivo.candidates c ON c.url=w.url
-                       ORDER BY c.last_seen_at ASC NULLS FIRST,
+                       ORDER BY w.gap_priority ASC,
+                                c.last_seen_at ASC NULLS FIRST,
                                 w.next_date ASC,w.url ASC LIMIT %s""",
                      (patterns,MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL))
                 src["seed_urls"]=[row[0] for row in cur.fetchall() if row[0]]
