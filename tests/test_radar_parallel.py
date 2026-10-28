@@ -38,6 +38,12 @@ class RadarParallelTests(unittest.TestCase):
                     "https://laplatatango.com.ar/agenda/lista/")]
         self.assertFalse(any("/categoria/" in u for u in urls))
         self.assertIn("https://laplatatango.com.ar/agenda/evento/milonga-cultural/", urls)
+        page2 = ('<a href="/agenda/recintos/categor%C3%ADa/abtipoplazabuenpiso/">Lugar</a>'
+                 '<a href="/agenda/recintos/categoría/otro-lugar/">Otra categoría</a>')
+        more = radar.discover_links(page2, radar.parse_html(page2),
+                                    "https://laplatatango.com.ar/agenda/lista/")
+        self.assertEqual(more, [])
+
 
     def test_percent_encode_non_ascii_source_links(self):
         url = radar.clean_link("/agenda/evento/música-y-teatro/", "https://laplatatango.com.ar/")
