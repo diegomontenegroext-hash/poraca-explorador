@@ -79,8 +79,10 @@ class InstagramSeedTests(unittest.TestCase):
         source = dict(source_id="rd-ig-lutitravelguide", url="https://www.instagram.com/lutitravelguide/",
                       source_role="curadora", account="lutitravelguide", seed_only=True,
                       seed_urls=[self.URL])
+        caption = "miércoles de Piano Bar en Casa Tomada\\n" + ("más planes culturales\\n" * 40)
         html = ('<meta property="og:title" content="Luti planes La Plata">'
-                '<meta name="description" content="miércoles de Piano Bar en Casa Tomada">'
+                '<meta name="description" content="' + caption + '">'
+                '<meta property="og:url" content="https://www.instagram.com/lutitravelguide/reel/DfDGyw_SkDA/">'
                 '<meta property="og:image" content="https://example.org/flyer.jpg">')
         budget = DummyBudget({self.URL: (200, html, None)})
         check, candidates = radar.scan_source(source, budget, "incremental")
@@ -94,6 +96,9 @@ class InstagramSeedTests(unittest.TestCase):
         self.assertTrue(evidence["profile_not_scanned"])
         self.assertTrue(evidence["seeded_permalink"])
         self.assertIn("Piano Bar", evidence["public_caption_text"])
+        self.assertGreater(len(evidence["public_caption_text"]), 500)
+        self.assertEqual(evidence["public_caption_extraction"], "html_meta_full_v2")
+        self.assertEqual(evidence["attribution_status"], "public_url_account_matched")
         self.assertEqual(evidence["og_image_url"], "https://example.org/flyer.jpg")
         self.assertIsNone(candidates[0]["event_date"])
 
