@@ -159,6 +159,30 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
             "https://alpedo.ar/?fecha=2026-10-29",
             "https://alpedo.ar/?fecha=2026-10-31"])
 
+    def test_alpedo_fallback_keeps_running_if_root_gains_generic_links(self):
+        today=rd.datetime.now(rd.timezone.utc).astimezone(
+            rd.ZoneInfo("America/Argentina/Buenos_Aires")).date()
+        month=next(k for k,v in ad.MONTHS.items() if v==today.month)
+        dated="https://alpedo.ar/?fecha="+today.isoformat()
+        markup=(f"<p>{month} {today.year}</p>"
+                "<h6>Reunión cultural</h6><p>19:30</p>"
+                "<p>Centro Cultural Local</p>")
+        budget=rd.Budget(seconds=100)
+        budget.request=lambda url:(200,"<html><p>Menu visible</p></html>",None)
+        src={"source_id":"rd-web-cb094233",
+             "source_role":"secondary_agenda","url":"https://alpedo.ar/"}
+        # An irrelevant menu item is not an event, and should not
+        # suppress reading the date-specific calendar.
+        with patch.object(rd,"links_from_page",
+                          return_value=[("https://alpedo.ar/informacion/","Menu")]):
+            with patch.object(rd,"render_alpedo_date_pages",
+                              return_value=({dated:markup},None)) as browser:
+                check,candidates=rd.scan_source(src,budget,"full")
+        browser.assert_called_once()
+        self.assertEqual(check["status"],"ok")
+        self.assertEqual(len(check["_listings"]),1)
+        self.assertEqual(check["_listings"][0]["title"],"Reunión cultural")
+
     def test_alpedo_browser_recovery_after_index_only_http(self):
         today=rd.datetime.now(rd.timezone.utc).astimezone(
             rd.ZoneInfo("America/Argentina/Buenos_Aires")).date()
