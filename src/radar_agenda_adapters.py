@@ -226,7 +226,11 @@ def alpedo_dated_sessions(raw,url):
         if archive and m.end()<=archive.start()<end:
             end=archive.start()
         tail=raw[m.end():min(end,m.end()+1800)]
-        card_text=tidy(re.sub(r"<[^>]+>"," ",tail))
+        # HTML may end MID-TAG at this bounded slice (image gallery
+        # markup is long). Regex removing only COMPLETE tags leaks
+        # literal '<div class="img...' into the venue. The existing
+        # HTMLParser ignores incomplete tags, scripts and styling.
+        card_text=tidy(" ".join(visible_blocks(tail).text))
         clocks=CLOCK.findall(card_text)
         # "07:00 a 19:00" is museum opening hours, not a dated show.
         if len(clocks)!=1:
@@ -237,7 +241,10 @@ def alpedo_dated_sessions(raw,url):
         venue=card_text[match.end():].strip(" |·–—:-")
         venue=re.split(r"\b(?:Más información|Detalles|Inscribite|Compartir)\b",
                        venue,maxsplit=1,flags=re.I)[0].strip()
-        if not 4<=len(venue)<=130:
+        # Defensive boundary: a venue must be human-visible text, not
+        # a partial tag, JS initializer or residual browser widget.
+        if (not 4<=len(venue)<=130 or "<" in venue or ">" in venue
+            or re.search(r"\\b(?:class=|document\\.|var tooltipTriggerList)\\b",venue,re.I)):
             continue
         rec=make_record(title,day,clocks[0].zfill(5),venue,url,
                         "alpedo_dated_card_rendered","secondary_agenda")
