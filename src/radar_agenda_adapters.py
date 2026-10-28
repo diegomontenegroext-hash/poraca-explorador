@@ -21,7 +21,9 @@ DMY=re.compile(r"\b([0-3]?\d)/([01]?\d)/(20\d{2})\b")
 SCOPED_HOSTS={"agendalaplata.ar","www.agendalaplata.ar",
               "www.alternativateatral.com","alternativateatral.com",
               "casametro.com.ar","www.casametro.com.ar",
-              "operalp.com.ar","www.operalp.com.ar"}
+              "operalp.com.ar","www.operalp.com.ar",
+              "teatrometrolp.com.ar","www.teatrometrolp.com.ar",
+              "teatroargentino.gba.gob.ar","lumenartis.org","www.lumenartis.org"}
 def tidy(s):
     return re.sub(r"\s+"," ",html.unescape(s or "")).strip()
 
@@ -145,6 +147,102 @@ def structured_sessions(raw,url):
                 if r:out.append(r)
     return out
 
+def spanish_day_month_year(value):
+    """Requires an explicit YEAR for ticket listings."""
+    m=re.search(r"\b([0-3]?\d)\s+de\s+([a-záéíóúñ]+)\s+de\s+(20\d{2})\b",value,re.I)
+    if not m: return None
+    month=MONTHS.get(m.group(2).casefold())
+    if not month: return None
+    try:return date(int(m.group(3)),month,int(m.group(1)))
+    except ValueError:return None
+
+def lumen_unyearred_date(value,now=None):
+    """Lumen sometimes writes only 'domingo 1 de noviembre'; constrain to near-term."""
+    now=now or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires")).date()
+    m=re.search(r"\b([0-3]?\d)\s+de\s+([a-záéíóúñ]+)\b",value,re.I)
+    if not m:return None
+    month=MONTHS.get(m.group(2).casefold())
+    if not month:return None
+    possibilities=[]
+    for year in (now.year,now.year+1):
+        try:day=date(year,month,int(m.group(1)))
+        except ValueError:continue
+        if now-timedelta(days=14)<=day<=now+timedelta(days=90):
+            possibilities.append(day)
+    return min(possibilities) if len(possibilities)==1 else None
+
+def source_specific_sessions(raw,url,blocks):
+    """Four known official layouts; no extrapolation of recurrences."""
+    host,path=scope(url)
+    visible=tidy(" ".join(blocks.text))
+    records=[]
+    if host.endswith("teatrometrolp.com.ar"):
+        venue="Teatro Metro"
+        if re.fullmatch(r"/entrada/[^/]+/?",path):
+            title=next((t for tname,t in blocks.headings if tname in ("h1","h2")),None)
+            # Only the actual 'Día/s y horario/s' ticket field, not opening hours
+            # of the theatre or presale windows.
+            m=re.search(r"Día/s\s+y\s+horario/s\s*:\s*(.{0,650})",visible,re.I)
+            if title and m:
+                for found in re.finditer(
+                    r"([0-3]?\d\s+de\s+[a-záéíóúñ]+\s+de\s+20\d{2})"
+                    r"\s*[.,-]?\s*((?:[01]?\d|2[0-3]):[0-5]\d)\s*hs",m.group(1),re.I):
+                    d=spanish_day_month_year(found.group(1))
+                    tm=found.group(2).zfill(5)
+                    rec=make_record(title,d,tm,venue,url,"metro_official_ticket_date","primary_venue")
+                    if rec:records.append(rec)
+        elif path.rstrip("/")=="/entradas/cartelera":
+            # Index is organization-owned; individual ticket pages have
+            # higher evidentiary value and arrive via watchlist or anchor.
+            titles=list(re.finditer(r"<h3\b[^>]*>(.*?)</h3\s*>",raw,re.I|re.S))
+            for i,m in enumerate(titles[:80]):
+                end=titles[i+1].start() if i+1<len(titles) else len(raw)
+                segment=raw[m.end():min(end,m.end()+2500)]
+                title=tidy(re.sub(r"<[^>]+>"," ",m.group(1)))
+                dated=re.search(r"([0-3]?\d/[01]?\d/20\d{2})\s*-\s*"
+                    r"((?:[01]?\d|2[0-3]):[0-5]\d)\s*hs",tidy(re.sub(r"<[^>]+>"," ",segment)),re.I)
+                if dated:
+                    rec=make_record(title,parse_dmy(dated.group(1)),dated.group(2).zfill(5),venue,url,
+                        "metro_official_cartelera","primary_program")
+                    if rec:records.append(rec)
+    elif host=="teatroargentino.gba.gob.ar" and re.match(r"/meet/\d+/?$",path):
+        exact=re.search(r"\bFecha\s+del\s+evento\s+([0-3]?\d/[01]?\d/20\d{2})\s+"
+                        r"((?:[01]?\d|2[0-3]):[0-5]\d)(?::[0-5]\d)?\b",visible,re.I)
+        if exact:
+            # The event title is the first card caption, not generic <title>.
+            caption=next((t for name,t in blocks.chunks
+                if name=="p" and "|" in t and
+                re.search(r"obra|concierto|clase|funci[oó]n|teatro|masterclass",t,re.I)),None)
+            title=tidy(caption.split("|")[0]) if caption else None
+            room=next((t for name,t in blocks.chunks
+                if name=="p" and re.match(r"\s*SALA\s+\w+",t,re.I)),None)
+            venue=("Teatro Argentino — "+room if room else "Teatro Argentino")
+            if title:
+                rec=make_record(title,parse_dmy(exact.group(1)),exact.group(2).zfill(5),venue,url,
+                                "argentino_official_fecha_evento","primary_venue")
+                if rec:records.append(rec)
+    elif host.endswith("lumenartis.org") and (path=="/" and parse_qs(urlsplit(url).query).get("post_type")==["funcion"]):
+        # A WordPress detail article frequently shows "domingo 1 de noviembre
+        # a las 18 h", without printing the year. Do not copy baseline dates.
+        first=re.search(r"<p\b[^>]*>(.*?)</p\s*>",raw,re.I|re.S)
+        first_html=first.group(1) if first else ""
+        lead=tidy(re.sub(r"<[^>]+>"," ",first_html))
+        when=re.search(r"\b(?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)\s+"
+            r"([0-3]?\d\s+de\s+[a-záéíóúñ]+)\s+a\s+las\s+"
+            r"((?:[01]?\d|2[0-3])(?::[0-5]\d)?)\s*h\b",lead,re.I)
+        if when:
+            d=lumen_unyearred_date(when.group(1))
+            clock=when.group(2)
+            clock=(clock+":00" if ":" not in clock else clock).zfill(5)
+            # Prefer a concrete work title emphasized in the original text.
+            em=re.search(r"<em\b[^>]*>(.*?)</em>",first_html,re.I|re.S)
+            title=tidy(re.sub(r"<[^>]+>"," ",em.group(1))) if em else None
+            if title and d:
+                rec=make_record(title,d,clock,"Lumen Artis / Teatro de Cámara de City Bell",
+                                url,"lumen_official_prose_date","primary_venue")
+                if rec:records.append(rec)
+    return records
+
 def extract_listings(raw,url):
     """Returns individual session observations; never returns verified status."""
     host,path=scope(url)
@@ -152,6 +250,7 @@ def extract_listings(raw,url):
         return []
     blocks=visible_blocks(raw)
     out=structured_sessions(raw,url)
+    out.extend(source_specific_sessions(raw,url,blocks))
     if "alternativateatral.com" in host and re.match(r"/obra\d+",path):
         title=next((t for tag,t in blocks.headings if tag=="h1"),None)
         if title:
