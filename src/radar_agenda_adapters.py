@@ -347,8 +347,8 @@ def extract_listings(raw,url):
                 # Match only a concrete printed ROOM label. No names are
                 # inferred from the baseline or the venue's URL.
                 known_room=re.search(
-                    r"\\b(TEATRO ESTUDIO DE LAS ARTES|ESPACIO 44|"
-                    r"EN ESO ESTAMOS|ESCENARIO[- ]?40)\\b",text,re.I)
+                    r"\b(TEATRO ESTUDIO DE LAS ARTES|ESPACIO 44|"
+                    r"EN ESO ESTAMOS|ESCENARIO[- ]?40)\b",text,re.I)
                 if known_room:venue=tidy(known_room.group(1))
             if not venue and "av. 51 entre 9 y 10" in text.casefold():
                 venue="Teatro Argentino"
