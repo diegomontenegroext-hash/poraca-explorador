@@ -147,10 +147,21 @@ def choose_sources(conn, mode):
         if os.getenv("NEON_RADAR_OPERATIONAL_DATABASE_URL"):
             for src in sources:
                 host=urlparse(src["url"]).hostname or ""
-                target_host=("www.alternativateatral.com" if "alternativateatral.com" in host
-                             else "casametro.com.ar" if "casametro.com.ar" in host
-                             else None)
-                if not target_host: continue
+                root=src["url"]
+                # Avoid duplicate watches of mirrored organizer URLs.
+                if "lumenartis.org" in host and "/proximos-eventos" not in root:
+                    continue
+                if "teatrometrolp.com.ar" in host and "/entradas/cartelera/" not in root:
+                    continue
+                patterns=(
+                    ["https://www.alternativateatral.com/obra%"] if "alternativateatral.com" in host else
+                    ["https://casametro.com.ar/evento/%"] if "casametro.com.ar" in host else
+                    ["https://www.teatrometrolp.com.ar/entrada/%"] if "teatrometrolp.com.ar" in host else
+                    ["https://teatroargentino.gba.gob.ar/meet/%"] if "teatroargentino.gba.gob.ar" in host else
+                    ["https://lumenartis.org/?p=%"] if "lumenartis.org" in host else
+                    []
+                )
+                if not patterns: continue
                 cur.execute("""WITH watchlist AS (
                          SELECT event_payload->>'source_url' AS url,
                                 min(event_date) AS next_date
@@ -158,15 +169,14 @@ def choose_sources(conn, mode):
                          WHERE snapshot_id='baseline-20261028-v1'
                            AND event_date>=current_date-interval '7 days'
                            AND event_date<=current_date+interval '80 days'
-                           AND event_payload->>'source_url' LIKE %s
+                           AND event_payload->>'source_url' LIKE ANY(%s)
                          GROUP BY event_payload->>'source_url'
                        )
                        SELECT w.url FROM watchlist w
                        LEFT JOIN radar_definitivo.candidates c ON c.url=w.url
                        ORDER BY c.last_seen_at ASC NULLS FIRST,
                                 w.next_date ASC,w.url ASC LIMIT %s""",
-                     ("https://"+target_host+("/obra%" if "alternativa" in host else "/evento/%"),
-                      MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL))
+                     (patterns,MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL))
                 src["seed_urls"]=[row[0] for row in cur.fetchall() if row[0]]
         return sources
 
