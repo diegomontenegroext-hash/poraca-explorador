@@ -321,6 +321,19 @@ def scan_source(source,budget,mode):
                 missed,max_seconds=min(65,budget.remaining()-8))
             for u,markup in pages.items():
                 check["_listings"].extend(extract_listings(markup,u))
+            for u,markup in pages.items():
+                plain=re.sub(r"\s+"," ",re.sub(r"<[^>]*>"," ",markup))
+                m=re.search(r"Fecha\s+del\s+evento",plain,re.I)
+                sample=plain[m.start():m.start()+140] if m else ""
+                print(json.dumps({"adapter":"argentino_date_diagnostic",
+                    "url_id":u.rsplit("/",1)[-1],
+                    "date_fragment":sample,
+                    "date_regex_match":bool(re.search(
+                      r"Fecha\s+del\s+evento\s+[0-3]?\d/[01]?\d/20\d{2}\s+\d\d:\d\d",
+                      plain,re.I)),
+                    "caption_p_tags":sum("|" in t for t in
+                       re.findall(r"<p\b[^>]*>(.*?)</p\s*>",markup,re.I|re.S))},
+                    ensure_ascii=False),flush=True)
             print(json.dumps({"source":source["source_id"],
                   "adapter":"argentino_browser",
                   "pages":len(pages),"sessions":len(check["_listings"]),
