@@ -1,5 +1,8 @@
 # POR ACÁ — RADAR DEFINITIVO V0.2 · TRASPASO CONTROLADO DEL 28/10/2026
 
+> **ACTUALIZACIÓN PRIORITARIA 28/10/2026:** este documento conserva el contrato técnico e hitos históricos del cutover. **Los horarios, el secreto y el estado operativo descritos más abajo ya quedaron superados.** La versión vigente es [Plan de estabilización 1.0](PLAN_ESTABILIZACION_RADAR_20261028.md): única tarea GPT programada a 05:00 FULL / 13:00 y 21:00 incrementales ART; GitHub no usa su `schedule`, ejecuta por cambio de `ops/radar-fallback-trigger.txt`. La credencial `NEON_RADAR_OPERATIONAL_DATABASE_URL` YA está instalada y validada, con escritura confirmada en `neondb.radar_definitivo` por GitHub. Prueba de flujo incremental [#40682506769](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/runs/40682506769) SUCCESS. Prioridad: paridad de 51 eventos futuros de agenda antes de ampliar fuentes.
+
+
 ## Decisión y estado real
 
 El usuario autorizó reemplazar la tarea ChatGPT por el Radar Definitivo de GitHub Actions. Se comprobó mediante el conector de Automations que `Por Acá — Sistema cultural Chat V1` (ID `6adf39eef92481918c559fdc8838e316`) quedó `is_enabled=false`; el Semáforo financiero no se tocó. `radar-paralelo.yml` es un piloto archivado (ejecución manual solamente); **el único Radar cultural de GitHub programado es `radar-definitivo.yml`.**
