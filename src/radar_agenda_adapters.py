@@ -221,6 +221,28 @@ def source_specific_sessions(raw,url,blocks):
                 re.search(r"obra|concierto|masterclass|teatro|funci[oó]n",t,re.I)]
             captions += [t for name,t in blocks.chunks if name=="p" and "|" in t]
             caption=next((t for t in captions if len(t)>10),None)
+            if not caption:
+                # Actual public pages sometimes render the caption in <div>
+                # rather than <p>. Only take captions that contain a weekday,
+                # explicit day/month and clock; do not take a promotional
+                # sentence, a book/ticket deadline, or the baseline title.
+                body_text=tidy(" ".join(blocks.text))
+                headline=re.search(
+                    r"\b((?:Obra teatral|Concierto|Masterclass|Charlas? Magistrales|"
+                    r"Clase magistral|Espect[aá]culo|Ballet|Teatro)"
+                    r".{8,235}?)\s*\|\s*"
+                    r"(lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)"
+                    r"\s+([0-3]?\d)/([01]?\d)\s*\|\s*"
+                    r"((?:[01]?\d|2[0-3]):[0-5]\d)\b",
+                    body_text,re.I)
+                if headline:
+                    exact_day=parse_dmy(exact.group(1))
+                    # If the header and the official date field disagree,
+                    # return no record and retain the original for review.
+                    if (exact_day and int(headline.group(3))==exact_day.day and
+                        int(headline.group(4))==exact_day.month and
+                        headline.group(5)==exact.group(2).zfill(5)):
+                        caption=headline.group(1)
             pieces=[tidy(x) for x in caption.split("|")] if caption else []
             title=(pieces[1] if len(pieces)>1 and
                    pieces[0].casefold() in ("concierto","teatro","masterclass","obra teatral")
@@ -229,6 +251,11 @@ def source_specific_sessions(raw,url,blocks):
             if not room:
                 room=next((t for name,t in blocks.chunks
                     if name=="p" and re.match(r"^SALA\s+[a-záéíóúñ]+",t,re.I)),None)
+            if not room:
+                found_room=re.search(
+                    r"\bSALA\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+\s+"
+                    r"[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)\b",visible)
+                if found_room:room="SALA "+found_room.group(1)
             venue=("Teatro Argentino — "+room if room else "Teatro Argentino")
             if title:
                 rec=make_record(title,parse_dmy(exact.group(1)),exact.group(2).zfill(5),venue,url,
