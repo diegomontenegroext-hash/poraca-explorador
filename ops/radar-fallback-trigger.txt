@@ -1,6 +1,6 @@
-# POR ACA RADAR DEFINITIVO
-# Revalidar evidencia original Doble-T con correccion auditable de candidate.event_time
+# POR ACA - RADAR DEFINITIVO
+# Disparo por Guardia GPT - orquestador principal.
 trigger_date=2026-10-28
-trigger_slot=bootstrap
+trigger_slot=13
 trigger_mode=incremental
-trigger_reason=doblet_utc_candidate_time_correction_preserve_prior
+trigger_reason=gpt_primary_scheduler
