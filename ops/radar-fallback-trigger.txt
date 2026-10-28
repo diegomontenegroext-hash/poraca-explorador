@@ -1,6 +1,5 @@
 # POR ACA - RADAR DEFINITIVO
 # Sentinel para Guardia GPT 05:00 ART.
-# Un nuevo commit a este archivo activa una corrida FULL via GitHub push.
-# No contiene credenciales ni evidencia cultural.
-fallback_date=none
-fallback_reason=ready
+# Solo una activacion por fecha local.
+fallback_date=2026-10-28
+fallback_reason=missing_or_failed_scheduled_full
