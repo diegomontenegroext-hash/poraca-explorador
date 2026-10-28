@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Ensayo incremental acotado de Genda, fuente vencida explicitamente y sin publicar.
+# Validación de fuentes oficiales Teatro Metro, Argentino y Lumen; ninguna promoción.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=incremental
-trigger_reason=genda_browser_visible_text_targeted_validation
+trigger_reason=official_theatre_adapters_tanda3
