@@ -109,6 +109,34 @@ class RadarParallelTests(unittest.TestCase):
         self.assertEqual(signal["organizers"],["Productora invitada"])
         self.assertEqual(signal["venues"],["Sala local"])
 
+    def test_schema_role_type_token_is_not_an_artist(self):
+        # Live FULL 28/10: 6 candidate records incorrectly contained
+        # artists:["Organization"] from ticketing JSON-LD placeholders.
+        html=('<script type="application/ld+json">'
+              '{"@type":"MusicEvent","name":"Clases de tango",'
+              '"startDate":"2026-11-07T21:00:00-03:00",'
+              '"performer":"Organization","organizer":{"name":"Paula Morales"},'
+              '"location":{"name":"La Ferretería"}}'
+              '</script>')
+        item=radar.make_candidate("https://example.org/evento/tango",
+            "src", "Clases de tango", radar.parse_html(html),200)
+        s=item["evidence"]["cultural_signals_v1"]
+        self.assertEqual(s["artists"],[])
+        self.assertEqual(s["organizers"],["Paula Morales"])
+        self.assertEqual(s["venues"],["La Ferretería"])
+        self.assertEqual(s["origin"],"schema_org_event_on_opened_page")
+
+    def test_empty_jsonld_event_roles_produce_no_cultural_lead(self):
+        html=('<script type="application/ld+json">'
+              '{"@type":"Event","name":"Festival",'
+              '"startDate":"2026-11-07","performer":{"@type":"Organization","name":"Organization"}}'
+              '</script>')
+        item=radar.make_candidate("https://example.org/evento/festival",
+            "src", "Festival", radar.parse_html(html),200)
+        self.assertTrue(item["evidence"]["structured_event_found"])
+        self.assertNotIn("cultural_signals_v1",item["evidence"])
+        self.assertEqual(item["event_date"],"2026-11-07")
+
     def test_not_infer_artist_or_entities_from_title(self):
         html='<title>Artista visitante en La Plata</title>'
         candidate=radar.make_candidate("https://site.example.org/evento/artista/",
