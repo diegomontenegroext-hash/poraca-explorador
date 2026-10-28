@@ -219,18 +219,20 @@ def extract_listings(raw,url):
             if not any(r["method"]=="genda_dated_listing" for r in out):
                 lines=[tidy(x) for x in "".join(blocks.text).splitlines() if tidy(x)]
                 for i,line in enumerate(lines):
-                    m=re.search(r"\b((?:[01]?\d|2[0-3]):[0-5]\d)\s*hs?\s*\|\s*(.{3,160})",line,re.I)
+                    m=re.search(r"\b((?:[01]?\d|2[0-3]):[0-5]\d)\s*hs?\s*\|\s*(.{3,160})",
+                                " ".join(lines[i:i+3]),re.I)
                     if not m or i<1:continue
                     title=lines[i-1]
                     if (len(title)<6 or len(title)>180 or
                         re.search(r"avisame|con qui[eé]n|buscar evento|publicar|recib[ií]",
                                   title,re.I)):
                         continue
-                    category=" ".join(lines[max(0,i-4):i-1])
+                    category=" ".join(lines[max(0,i-7):i-1])
                     if not re.search(r"Cine|Teatro|Música|Muestra|Expo|Taller|Ciencia|Danza|Literatura|Actividad|Fiesta",
                                      category,re.I):
                         continue
-                    r=make_record(title,day,m.group(1).zfill(5),m.group(2),url,
+                    venue=re.split(r"\+\s*Info|Avisame!|¿Con quién",m.group(2),maxsplit=1,flags=re.I)[0].strip()
+                    r=make_record(title,day,m.group(1).zfill(5),venue,url,
                                   "genda_dated_listing","secondary_agenda")
                     if r:out.append(r)
     seen=set()
