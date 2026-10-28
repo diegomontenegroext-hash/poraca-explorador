@@ -1,6 +1,7 @@
 # POR ACA - RADAR DEFINITIVO
-# Disparo por Guardia GPT - orquestador principal.
+# Disparo bootstrap puntual solicitado desde Chat para validacion P0 de Alpedo.
+# No cambia el horario de Guardia GPT; solo fuente staging Neon.
 trigger_date=2026-10-28
-trigger_slot=13
-trigger_mode=incremental
-trigger_reason=gpt_primary_scheduler
+trigger_slot=bootstrap
+trigger_mode=full
+trigger_reason=chat_manual_bootstrap_alpedo_readback_20261028
