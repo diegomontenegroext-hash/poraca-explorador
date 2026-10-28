@@ -1,5 +1,5 @@
-name: Por Aca - Radar Definitivo (operativo por etapas)
-# Cutover gradual: usa neondb SOLO al existir el secret de produccion; mientras tanto ingesta experimental.
+name: Por Aca - Radar Definitivo (Neon operativo)
+# Cutover confirmado por usuario: exigir credencial operativa; nunca caer en laboratorio.
 
 on:
   push:
@@ -42,9 +42,18 @@ jobs:
           python3 -m unittest discover -s tests -v
       - name: Cliente de Neon
         run: python3 -m pip install --disable-pip-version-check "psycopg[binary]>=3.2,<4"
-      - name: Ejecutar Radar Definitivo (operativo al registrar secret especifico)
+      - name: Verificar presencia del secreto operativo
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
-          NEON_EXPLORADOR_DATABASE_URL: ${{ secrets.NEON_EXPLORADOR_DATABASE_URL }}
+        shell: bash
+        run: |
+          if [ -z "$NEON_RADAR_OPERATIONAL_DATABASE_URL" ]; then
+            echo "::error::Falta NEON_RADAR_OPERATIONAL_DATABASE_URL. Nunca usar laboratorio en sustitucion."
+            exit 1
+          fi
+      - name: Ejecutar Radar Definitivo en Neon operativa
+        env:
+          NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
+          RADAR_REQUIRE_OPERATIONAL: "true"
           RADAR_SCOPE: ${{ github.event_name == 'push' && 'full' || github.event.schedule == '17 6 * * *' && 'full' || inputs.mode || 'incremental' }}
         run: python3 src/radar_definitivo.py --mode "$RADAR_SCOPE"
