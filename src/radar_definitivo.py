@@ -23,6 +23,7 @@ from radar_parallel import (
     clean_link, compact, discover_links, WORDS, LOCAL_DETAIL,
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
 )
+from radar_agenda_adapters import extract_listings, special_links
 
 SCHEMA = "radar_definitivo"
 EXPECTED_LAB_DB = "poraca_explorador"
@@ -136,9 +137,30 @@ def choose_sources(conn, mode):
                         WHERE {where}
                         ORDER BY last_checked_at ASC NULLS FIRST, priority DESC,source_id
                         LIMIT %s""", (MAX_SOURCES_FULL if mode=="full" else MAX_SOURCES_INCREMENTAL,))
-        return [dict(source_id=a,name=b,url=c,source_role=d,priority=e,
-                     cadence_hours=f,consecutive_failures=g)
-                for a,b,c,d,e,f,g in cur.fetchall()]
+        sources=[dict(source_id=a,name=b,url=c,source_role=d,priority=e,
+                     cadence_hours=f,consecutive_failures=g,seed_urls=[])
+                 for a,b,c,d,e,f,g in cur.fetchall()]
+        # The frozen canonical baseline is used as a WATCHLIST of ORIGINAL URLs
+        # only. It is never copied into observations and cannot make a match.
+        # The actual original page must still be opened by this run.
+        if os.getenv("NEON_RADAR_OPERATIONAL_DATABASE_URL"):
+            for src in sources:
+                host=urlparse(src["url"]).hostname or ""
+                target_host=("www.alternativateatral.com" if "alternativateatral.com" in host
+                             else "casametro.com.ar" if "casametro.com.ar" in host
+                             else None)
+                if not target_host: continue
+                cur.execute("""SELECT DISTINCT event_payload->>'source_url' AS url
+                     FROM radar_definitivo.canonical_baseline_snapshots
+                     WHERE snapshot_id='baseline-20261028-v1'
+                     AND event_date>=current_date-interval '7 days'
+                     AND event_date<=current_date+interval '80 days'
+                     AND event_payload->>'source_url' LIKE %s
+                     ORDER BY url LIMIT %s""",
+                     ("https://"+target_host+("/obra%" if "alternativa" in host else "/evento/%"),
+                      MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL))
+                src["seed_urls"]=[row[0] for row in cur.fetchall() if row[0]]
+        return sources
 
 
 def safe_public_link(raw,base):
@@ -154,7 +176,7 @@ def safe_public_link(raw,base):
             return None
         path=quote(p.path or "/",safe="/%:@+~,-")
         q=[(k,v) for k,v in parse_qsl(p.query,keep_blank_values=True)
-            if k in {"fecha","date","month","year"} and len(v)<=16]
+            if k in {"fecha","date","month","year","p","post_type"} and len(v)<=16]
         canonical=urlunsplit(("https",p.hostname.lower(),path,urlencode(q),""))
         return canonical if len(canonical)<=1400 else None
     except (ValueError,UnicodeError):
@@ -203,9 +225,13 @@ def scan_source(source,budget,mode):
     if body is None:
         return check,[]
     page=parse_html(body)
-    links=links_from_page(body,page,root)
+    # Source-specific evidence, including multiple sessions per theatre work.
+    check["_listings"]=extract_listings(body,root)
+    links=special_links(root,page)+[(u,"baseline_watchlist_original") for u in source.get("seed_urls",[])]
+    links+=links_from_page(body,page,root)
+    links=list(dict(((u,lab),None) for u,lab in links).keys())
     check["links_found"]=len(links)
-    if not links:
+    if not links and not check["_listings"]:
         check["status"]="index_only"
     max_details=MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL
     candidates=[]
@@ -217,9 +243,11 @@ def scan_source(source,budget,mode):
         detail=parse_html(data) if data else None
         if detail:
             check["details_opened"]+=1
+            check["_listings"].extend(extract_listings(data,url))
         record=make_candidate(url,source["source_id"],label,detail,stat)
         record["evidence"]["radar"]="definitivo"
         record["evidence"]["source_root"]=root
+        record["evidence"]["baseline_watchlist"]=label=="baseline_watchlist_original"
         record["evidence"]["linked_from"]=root
         if data:
             image_url=extract_og_image(data,url)
@@ -328,6 +356,23 @@ def save_source_result(conn,run_id,source,check,candidates):
     new_candidates=0
     entity_new=0
     with conn.cursor() as cur:
+        # Each listing item is a separate event session, even when a daily
+        # agenda has no per-event permalink. No invented source URLs.
+        for item in check.get("_listings",[]):
+            signature="|".join((source["source_id"],item["title"].casefold(),
+                     item["event_date"],item.get("event_time") or "",
+                     (item.get("venue") or "").casefold(),item["proof_url"]))
+            listing_key=hashlib.sha256(signature.encode("utf-8")).hexdigest()
+            cur.execute("""INSERT INTO radar_definitivo.listing_occurrences(
+              listing_key,source_id,title,event_date,event_time,venue,
+              proof_url,proof_method,evidence_tier,first_run_id,last_run_id)
+              VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+              ON CONFLICT(listing_key) DO UPDATE SET
+                 last_seen_at=now(),seen_count=radar_definitivo.listing_occurrences.seen_count+1,
+                 last_run_id=EXCLUDED.last_run_id""",
+                 (listing_key,source["source_id"],item["title"],
+                  item["event_date"],item.get("event_time"),item.get("venue"),
+                  item["proof_url"],item["method"],item["evidence_tier"],run_id,run_id))
         for c in candidates:
             cur.execute(
                 """INSERT INTO radar_definitivo.candidates
@@ -433,7 +478,7 @@ def main():
         return 2
     budget=Budget()
     run_id="definitivo-"+datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")+"-"+uuid.uuid4().hex[:6]
-    stats=dict(selected=0,checked=0,success=0,index_only=0,urls=0,candidates=0,new=0,entities=0)
+    stats=dict(selected=0,checked=0,success=0,index_only=0,urls=0,candidates=0,new=0,entities=0,listings=0)
     try:
         sources=choose_sources(conn,args.mode)
         stats["selected"]=len(sources)
@@ -472,6 +517,7 @@ def main():
             stats["candidates"]+=len(candidates)
             stats["new"]+=new
             stats["entities"]+=entities
+            stats["listings"]+=len(check.get("_listings",[]))
             # Live persisted acknowledgement after EVERY source, including index-only/errors.
             with conn.cursor() as cur:
                 cur.execute("""UPDATE radar_definitivo.runs SET
@@ -489,7 +535,8 @@ def main():
             print(json.dumps({"source":source["source_id"],"status":check["status"],
                               "http":check["http_status"],"links":check["links_found"],
                               "candidates":len(candidates),"new":new,
-                              "details":check["details_opened"],"error":check["error_type"]},
+                              "details":check["details_opened"],"listings":len(check.get("_listings",[])),
+                              "error":check["error_type"]},
                              ensure_ascii=False),flush=True)
         state=("complete" if stats["checked"]==stats["selected"] and
                stats["checked"]==stats["success"] else "partial")
