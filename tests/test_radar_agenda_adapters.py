@@ -381,6 +381,51 @@ Kevin - Liniers: Eternotour
         self.assertEqual(len(ec),2)
         self.assertTrue(all(x["venue"]=="Cine Ecoselect (Espacio INCAA)" for x in ec))
 
+    def test_alternativa_original_venue_from_real_page(self):
+        # Source HTML published with a room followed by street address.
+        url="https://www.alternativateatral.com/obra102155-cuadrilateros-6-teatro-breve-reunido"
+        html=('<h1>Cuadriláteros 6, teatro breve reunido</h1>'
+              '<p>Clasificaciones: Teatro, Presencial, Adultos</p>'
+              '<p>TEATRO ESTUDIO DE LAS ARTES<br/>Calle 3 N 386 e/ 39 y 40 (mapa)<br/>'
+              'La Plata - Buenos Aires - Argentina<br/>'
+              'Entrada: $ 20.000,00 - Viernes - 22:30 hs - 30/10/2026</p>')
+        with patch.object(ad,"active_date",return_value=True):
+            records=ad.extract_listings(html,url)
+        self.assertEqual(len(records),1)
+        self.assertEqual(records[0]["venue"],"TEATRO ESTUDIO DE LAS ARTES")
+        self.assertEqual(records[0]["event_date"],"2026-10-30")
+
+    def test_alternativa_hasta_day_does_not_invent_recurring_sessions(self):
+        url="https://www.alternativateatral.com/obra103415-el-animo"
+        html=('<h1>El Ánimo</h1><p>EN ESO ESTAMOS<br/>Calle 62 No. 274 e/ 1 y 115'
+              '<br/>Domingo - 21:00 hs - Hasta el 01/11/2026<br/>'
+              'Viernes - 21:00 hs - Hasta el 06/11/2026 y 27/11/2026</p>')
+        with patch.object(ad,"active_date",return_value=True):
+            got=ad.extract_listings(html,url)
+        self.assertEqual({x["event_date"] for x in got},
+                         {"2026-11-01","2026-11-06","2026-11-27"})
+        self.assertTrue(all(x["venue"]=="EN ESO ESTAMOS" for x in got))
+        self.assertTrue(all(x["event_time"]=="21:00" for x in got))
+        self.assertFalse(any(x["event_date"]=="2026-11-13" for x in got))
+
+    def test_alternativa_explict_date_without_entrada(self):
+        html=('<h1>Epifanía</h1>'
+              '<p>ESCENARIO-40<br/>Calle 40 #1180 (mapa)<br/>'
+              'Viernes - 21:30 hs - 30/10/2026</p>')
+        with patch.object(ad,"active_date",return_value=True):
+            got=ad.extract_listings(html,
+                "https://www.alternativateatral.com/obra102876-epifania")
+        self.assertEqual(len(got),1)
+        self.assertEqual(got[0]["venue"],"ESCENARIO-40")
+        self.assertEqual(got[0]["event_date"],"2026-10-30")
+
+    def test_alternativa_no_recurring_expansion_for_bad_weekday(self):
+        html=('<h1>Evento</h1><p>SALA DE TEATRO<br/>Calle 30 No 800<br/>'
+              'Lunes - 19:00 hs - Hasta el 30/10/2026</p>')
+        with patch.object(ad,"active_date",return_value=True):
+            self.assertEqual(ad.extract_listings(html,
+                "https://www.alternativateatral.com/obra10001-evento"),[])
+    
     def test_stale_event_is_not_accepted_as_listing(self):
         got=ad.extract_listings(
             '<h1>Obra</h1><p>Entrada: $ 2.000,00 - Viernes - 19:30 hs - 12/10/2024</p>',
