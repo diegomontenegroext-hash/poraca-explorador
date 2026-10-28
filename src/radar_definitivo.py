@@ -571,6 +571,12 @@ def main():
                               "details":check["details_opened"],"listings":len(check.get("_listings",[])),
                               "error":check["error_type"]},
                              ensure_ascii=False),flush=True)
+        # Separate new records created BY THIS run from repeated sightings.
+        # Do not confuse previously harvested URLs/occurrences with new work.
+        with conn.cursor() as cur:
+            cur.execute("""SELECT count(*) FROM radar_definitivo.listing_occurrences
+                           WHERE first_run_id=%s""",(run_id,))
+            stats["new_listings"]=cur.fetchone()[0]
         state=("complete" if stats["checked"]==stats["selected"] and
                stats["checked"]==stats["success"] else "partial")
         info=dict(**stats,mode=args.mode,
@@ -592,10 +598,10 @@ def main():
         if out:
             with open(out,"a",encoding="utf-8") as f:
                 f.write("# Radar Definitivo - "+args.mode+"\n\n")
-                f.write("| Fuentes seleccionadas | Revisadas | Accesibles | Enlaces hallados | Candidatos nuevos | IG exactos consultados |\n"
-                        "|---:|---:|---:|---:|---:|---:|\n")
+                f.write("| Fuentes seleccionadas | Revisadas | Accesibles | Funciones leídas | Funciones **nuevas** | Enlaces hallados | Candidatos URL nuevos | IG exactos consultados |\n"
+                        "|---:|---:|---:|---:|---:|---:|---:|---:|\n")
                 f.write(f"| {stats['selected']} | {stats['checked']} | {stats['success']} | "
-                        f"{stats['urls']} | {stats['new']} | {budget.instagram} |\n\n")
+                        f"{stats['listings']} | {stats['new_listings']} | {stats['urls']} | {stats['new']} | {budget.instagram} |\n\n")
                 f.write("Las fuentes IG catalogadas NO se consultan por perfil. Todos los candidatos quedan pendientes.\n")
         return 0 if (stats["checked"]>0 or not sources) else 1
     except Exception as exc:
