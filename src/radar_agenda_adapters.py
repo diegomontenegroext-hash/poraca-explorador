@@ -24,7 +24,8 @@ SCOPED_HOSTS={"agendalaplata.ar","www.agendalaplata.ar",
               "operalp.com.ar","www.operalp.com.ar",
               "teatrometrolp.com.ar","www.teatrometrolp.com.ar",
               "teatroargentino.gba.gob.ar","lumenartis.org","www.lumenartis.org",
-              "agendadecine.com","www.agendadecine.com"}
+              "agendadecine.com","www.agendadecine.com",
+              "feriaedita.com.ar","www.feriaedita.com.ar"}
 def tidy(s):
     return re.sub(r"\s+"," ",html.unescape(s or "")).strip()
 
@@ -322,6 +323,22 @@ def source_specific_sessions(raw,url,blocks):
             rec=make_record(title,d,m.group(2),venue,url,
                             "agendadecine_monthly_screening","secondary_cinema_agenda")
             if rec:records.append(rec)
+    elif host.endswith("feriaedita.com.ar") and path in ("","/"):
+        # Official 2026 homepage advertises "EDITA: 5 y 6 de diciembre",
+        # with #EDITA2026 printed elsewhere. This establishes TWO dates but
+        # never an opening hour; both remain unverified/without clock.
+        if re.search(r"#EDITA\s*2026\b",visible,re.I):
+            m=re.search(r"\bEDITA\s*:\s*([0-3]?\d)\s+y\s+([0-3]?\d)"
+                        r"\s+de\s+diciembre\b",visible,re.I)
+            if m and ("Museo" in visible or "La Plata" in visible):
+                for val in (m.group(1),m.group(2)):
+                    try:day=date(2026,12,int(val))
+                    except ValueError:continue
+                    rec=make_record(
+                        "EDITA 10 años · Feria de Editoriales Independientes",
+                        day,None,"Avenida 51 entre 5 y 6, frente al Museo Emilio Pettoruti",
+                        url,"edita_official_explicit_dates","primary_program")
+                    if rec:records.append(rec)
     return records
 
 def extract_listings(raw,url):
