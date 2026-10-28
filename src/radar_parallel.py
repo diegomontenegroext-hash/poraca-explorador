@@ -1,0 +1,405 @@
+#!/usr/bin/env python3
+"""Por Acá: Radar paralelo V0.1.
+
+Recolecta sólo páginas públicas; escribe pistas NO verificadas en la
+base Neon poraca_explorador. Nunca accede a neondb ni a la web privada.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import html
+import json
+import os
+import re
+import sys
+import uuid
+from datetime import datetime, timedelta, timezone
+from html.parser import HTMLParser
+from urllib.error import HTTPError, URLError
+from urllib.parse import urljoin, urlparse
+from urllib.request import Request, urlopen
+
+DB_NAME = "poraca_explorador"
+DB_ROLE = "poraca_explorador_writer"
+MAX_BODY = 450_000
+REQUEST_TIMEOUT = 10
+MAX_SOURCES = 6
+MAX_DETAILS = 3
+USER_AGENT = "PorAcaExplorador/0.1 (+public noncommercial cultural links; contact via repository)"
+INSTAGRAM = re.compile(
+    r"^/(?:[A-Za-z0-9_.]+/)?(p|reel)/([A-Za-z0-9_-]+)/?$",
+    re.IGNORECASE,
+)
+WORDS = re.compile(
+    r"concierto|festival|recital|estreno|funci[oó]n|muestra|taller|evento|"
+    r"feria|cartelera|exposici[oó]n|milonga|programaci[oó]n|cine|teatro|"
+    r"cultural|presenta|funciones|agenda",
+    re.IGNORECASE,
+)
+LOCAL_DETAIL = re.compile(r"/(?:evento/[^/]+|eventos/[^/]+|"
+    r"que-hago/[^/]+-n\d+|la-plata/[^/]+-n\d+|"
+    r"agenda/[^/?]+/[^/?]+|espectaculos/[^/]+|cartelera/[^/]+)", re.IGNORECASE)
+FALLBACK = [
+    {"source_id": "src-0221", "url": "https://www.0221.com.ar/que-hago", "kind": "media"},
+    {"source_id": "src-genda", "url": "https://agendalaplata.ar/", "kind": "agenda"},
+    {"source_id": "src-alpedo", "url": "https://alpedo.ar/", "kind": "agenda"},
+    {"source_id": "src-casa-metro", "url": "https://casametro.com.ar/cartelera/", "kind": "organizer"},
+    {"source_id": "src-vive-la-plata", "url": "https://vivelaplata.com.ar/", "kind": "media"},
+    {"source_id": "src-la-plata-tango", "url": "https://laplatatango.com.ar/agenda/lista/", "kind": "organizer"},
+]
+
+
+def compact(text: str, limit: int = 180) -> str:
+    return re.sub(r"\s+", " ", html.unescape(text or "")).strip()[:limit]
+
+
+def exact_instagram(url: str) -> bool:
+    p = urlparse(url)
+    return (p.scheme == "https" and p.hostname in ("www.instagram.com", "instagram.com")
+            and bool(INSTAGRAM.fullmatch(p.path)))
+
+
+def clean_link(href: str, base_url: str) -> str | None:
+    try:
+        u = urlparse(urljoin(base_url, html.unescape(href).replace("\\/", "/")))
+        if u.scheme != "https" or not u.hostname or u.username or u.password:
+            return None
+        return f"{u.scheme}://{u.netloc.lower()}{u.path.rstrip('/')}/"
+    except ValueError:
+        return None
+
+
+class Parser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.title = ""
+        self.meta: dict[str, str] = {}
+        self.links: list[tuple[str, str]] = []
+        self.jsonld: list[str] = []
+        self._field = None
+        self._text: list[str] = []
+        self._anchor_href = None
+        self._anchor: list[str] = []
+        self._ld = False
+        self._json: list[str] = []
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if tag == "meta":
+            key = a.get("property") or a.get("name")
+            if key in {"og:title", "og:description", "description", "article:published_time"}:
+                self.meta[key] = compact(a.get("content") or "", 500)
+        elif tag == "title":
+            self._field = "title"
+            self._text = []
+        elif tag == "a":
+            self._anchor_href = a.get("href")
+            self._anchor = []
+        elif tag == "script" and a.get("type") == "application/ld+json":
+            self._ld = True
+            self._json = []
+
+    def handle_data(self, text):
+        if self._field:
+            self._text.append(text)
+        if self._anchor_href:
+            self._anchor.append(text)
+        if self._ld:
+            self._json.append(text)
+
+    def handle_endtag(self, tag):
+        if tag == "title" and self._field == "title":
+            self.title = compact(" ".join(self._text))
+            self._field = None
+        if tag == "a":
+            if self._anchor_href:
+                self.links.append((self._anchor_href, compact(" ".join(self._anchor))))
+            self._anchor_href = None
+            self._anchor = []
+        if tag == "script" and self._ld:
+            self.jsonld.append("".join(self._json)[:100_000])
+            self._ld = False
+
+def parse_html(body: str) -> Parser:
+    p = Parser()
+    p.feed(body)
+    return p
+
+
+def structured_event(page: Parser) -> dict:
+    for script in page.jsonld[:10]:
+        try:
+            item = json.loads(script)
+        except (json.JSONDecodeError, ValueError):
+            continue
+        queue = item if isinstance(item, list) else [item]
+        while queue:
+            node = queue.pop(0)
+            if not isinstance(node, dict):
+                continue
+            typ = node.get("@type", "")
+            if isinstance(typ, list):
+                has_event = "Event" in typ
+            else:
+                has_event = typ == "Event"
+            if has_event:
+                date = node.get("startDate", "")
+                loc = node.get("location")
+                org = node.get("organizer")
+                if isinstance(loc, list):
+                    loc = next((n for n in loc if isinstance(n, dict)), {})
+                if isinstance(org, list):
+                    org = next((n for n in org if isinstance(n, dict)), {})
+                return {
+                    "name": compact(str(node.get("name") or "")),
+                    "date": str(date)[:40] if date else None,
+                    "venue": compact((loc or {}).get("name", "")) if isinstance(loc, dict) else None,
+                    "organizer": compact((org or {}).get("name", "")) if isinstance(org, dict) else None,
+                }
+            graph = node.get("@graph")
+            if isinstance(graph, list):
+                queue.extend(graph[:30])
+    return {}
+
+
+def iso_event_fields(date_value: str | None) -> tuple[str | None, str | None]:
+    if not isinstance(date_value, str):
+        return None, None
+    match = re.match(r"^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}))?", date_value)
+    if not match:
+        return None, None
+    try:
+        datetime.strptime(match.group(1), "%Y-%m-%d")
+    except ValueError:
+        return None, None
+    return match.group(1), match.group(2)
+
+
+def fetch(url: str) -> tuple[int | None, str | None, str | None]:
+    req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"})
+    try:
+        with urlopen(req, timeout=REQUEST_TIMEOUT) as response:
+            if "html" not in response.headers.get("Content-Type", "").lower():
+                return response.status, None, "NON_HTML"
+            data = response.read(MAX_BODY)
+            return response.status, data.decode("utf-8", errors="replace"), None
+    except HTTPError as err:
+        return err.code, None, "RATE_LIMIT" if err.code == 429 else "HTTP_ERROR"
+    except (URLError, TimeoutError, OSError) as err:
+        return None, None, type(err).__name__
+
+
+def discover_links(body: str, page: Parser, base_url: str) -> list[tuple[str, str]]:
+    host = urlparse(base_url).hostname
+    results: dict[str, str] = {}
+    raw = html.unescape(body).replace("\\/", "/")
+    permalink = re.compile(
+        r"https?://(?:www\.)?instagram\.com/(?:[A-Za-z0-9_.]+/)?(?:p|reel)/[A-Za-z0-9_-]+/?",
+        re.IGNORECASE,
+    )
+    for match in permalink.findall(raw)[:20]:
+        cleaned = clean_link(match.replace("http://", "https://"), base_url)
+        if cleaned and exact_instagram(cleaned):
+            results[cleaned] = "instagram permalink"
+    for href, title in page.links[:400]:
+        u = clean_link(href, base_url)
+        if not u or u in results or u.rstrip("/") == base_url.rstrip("/"):
+            continue
+        parsed = urlparse(u)
+        if exact_instagram(u):
+            results[u] = title
+        elif parsed.hostname == host and (LOCAL_DETAIL.search(parsed.path) or
+                                           (WORDS.search(title) and
+                                            len(parsed.path.strip("/").split("/")) >= 2)):
+            if "/wp-content/" in parsed.path or parsed.path.lower().endswith((".png/", ".jpg/", ".webp/", ".pdf/")):
+                continue
+            results[u] = title
+        if len(results) >= 30:
+            break
+    return list(results.items())[:18]
+
+
+def make_candidate(url: str, source_id: str, label: str, detail: Parser | None,
+                   http_status: int | None) -> dict:
+    inst = exact_instagram(url)
+    kind = ("instagram_reel" if "/reel/" in url else "instagram_post") if inst else (
+        "news_article" if "/que-hago/" in url or "/la-plata/" in url else "event_detail"
+    )
+    event = structured_event(detail) if detail else {}
+    date, time = iso_event_fields(event.get("date"))
+    title = compact(event.get("name") or ((detail.meta.get("og:title") or detail.title) if detail else label))
+    summary = compact((detail.meta.get("og:description") or detail.meta.get("description") or "")
+                      if detail else "", 380)
+    evidence = {
+        "method": "public_html_read_only",
+        "source_id": source_id,
+        "detail_http": http_status,
+        "detail_opened": detail is not None,
+        "structured_event_found": bool(event),
+        "metadata_keys": sorted(detail.meta) if detail else [],
+        "announced_only": True,
+    }
+    return {
+        "candidate_key": hashlib.sha256(url.encode("utf-8")).hexdigest(),
+        "original_url": url, "kind": kind, "title": title or None,
+        "summary": summary or None, "event_date": date, "event_time": time,
+        "organizer": event.get("organizer"), "venue": event.get("venue"),
+        "source_id": source_id, "evidence": evidence,
+    }
+
+
+def scan_source(source: dict) -> tuple[dict, list[dict]]:
+    source_id, url = source["source_id"], source["url"]
+    status, body, error = fetch(url)
+    check = {"source_id": source_id, "http_status": status, "error_type": error,
+             "pages_opened": 1 if body is not None else 0, "status": "ok" if body else "failed"}
+    if body is None:
+        check["discovered_links"] = 0
+        return check, []
+    parsed = parse_html(body)
+    links = discover_links(body, parsed, url)
+    candidates = []
+    for link, label in links[:MAX_DETAILS]:
+        detail_status, detail_body, detail_err = fetch(link)
+        detail = parse_html(detail_body) if detail_body else None
+        if detail:
+            check["pages_opened"] += 1
+        candidate = make_candidate(link, source_id, label, detail, detail_status)
+        if detail_err:
+            candidate["evidence"]["detail_error"] = detail_err
+        candidates.append(candidate)
+        if detail_status == 429:
+            break
+    check["discovered_links"] = len(links)
+    return check, candidates
+
+
+def save_check(conn, run_id: str, source: dict, check: dict, candidates: list[dict]) -> int:
+    new_count = 0
+    with conn.cursor() as cur:
+        for c in candidates:
+            cur.execute(
+                """INSERT INTO candidates(candidate_key,original_url,kind,title,summary,event_date,event_time,
+                       organizer,venue,evidence,first_source_id)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s)
+                   ON CONFLICT(original_url) DO NOTHING RETURNING candidate_key""",
+                (c["candidate_key"],c["original_url"],c["kind"],c["title"],c["summary"],
+                 c["event_date"],c["event_time"],c["organizer"],c["venue"],
+                 json.dumps(c["evidence"]),c["source_id"]),
+            )
+            if cur.fetchone():
+                new_count += 1
+            else:
+                cur.execute("""UPDATE candidates SET last_seen_at=now(),seen_count=seen_count+1
+                               WHERE original_url=%s""",(c["original_url"],))
+        cur.execute(
+            """INSERT INTO source_checks(run_id,source_id,status,http_status,pages_opened,
+                discovered_links,error_type) VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+            (run_id,source["source_id"],check["status"],check["http_status"],
+             check["pages_opened"],check["discovered_links"],check["error_type"]),
+        )
+        cadence = source["cadence_hours"] if check["status"] == "ok" else min(6,source["cadence_hours"])
+        cur.execute(
+            """UPDATE sources SET last_checked_at=now(),next_due_at=now()+(%s*interval '1 hour'),
+                last_access_result=%s WHERE source_id=%s""",
+            (cadence,check["status"]+((":"+str(check["http_status"])) if check["http_status"] else ""),
+             source["source_id"]),
+        )
+    conn.commit()
+    return new_count
+
+
+def db_connect():
+    url = os.environ.get("NEON_EXPLORADOR_DATABASE_URL", "")
+    if not url:
+        raise RuntimeError("NEON_EXPLORADOR_DATABASE_URL missing: add GitHub Actions repository secret")
+    try:
+        import psycopg
+    except ImportError as exc:
+        raise RuntimeError("Install dependency psycopg[binary] for database writes") from exc
+    conn = psycopg.connect(url, connect_timeout=12)
+    with conn.cursor() as cur:
+        cur.execute("SELECT current_database(),current_user")
+        database_name, role_name = cur.fetchone()
+    if database_name != DB_NAME or role_name != DB_ROLE:
+        conn.close()
+        raise RuntimeError("Connection refused: database/role is not isolated Radar parallel target")
+    return conn
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--mode", choices=["dry-run", "write"], default="dry-run")
+    args = parser.parse_args()
+    run_id = "explorador-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:6]
+    conn = None
+    if args.mode == "write":
+        try:
+            conn = db_connect()
+        except Exception as exc:
+            print("CONFIG_ERROR: "+str(exc), file=sys.stderr)
+            return 2
+        with conn.cursor() as cur:
+            cur.execute("""SELECT source_id,url,kind,cadence_hours FROM sources
+                           WHERE enabled AND next_due_at<=now()
+                           ORDER BY next_due_at,source_id LIMIT %s""",(MAX_SOURCES,))
+            rowset = cur.fetchall()
+            sources = [dict(source_id=a,url=b,kind=c,cadence_hours=d) for a,b,c,d in rowset]
+            cur.execute("INSERT INTO radar_runs(run_id) VALUES (%s)",(run_id,))
+        conn.commit()
+    else:
+        sources = [dict(source_id=s["source_id"],url=s["url"],kind=s["kind"],
+                        cadence_hours=24) for s in FALLBACK]
+    count, good, seen, new = 0, 0, 0, 0
+    try:
+        for source in sources:
+            check, candidates = scan_source(source)
+            count += 1
+            good += int(check["status"] == "ok")
+            seen += len(candidates)
+            if conn:
+                new += save_check(conn,run_id,source,check,candidates)
+            print(json.dumps({"source":source["source_id"], "http":check["http_status"],
+                              "status":check["status"],"pages":check["pages_opened"],
+                              "links_found":check["discovered_links"],
+                              "candidates":len(candidates),"sample_urls":[x["original_url"] for x in candidates[:2]]},
+                             ensure_ascii=False))
+        status = "completed" if good == count else "partial"
+        if conn:
+            with conn.cursor() as cur:
+                cur.execute("""UPDATE radar_runs SET finished_at=now(),status=%s,sources_attempted=%s,
+                    sources_success=%s,candidates_seen=%s,candidates_new=%s,note=%s
+                    WHERE run_id=%s""",
+                    (status,count,good,seen,new,
+                     "No sources due" if count == 0 else "Candidates are unverified, not accepted events",run_id))
+            conn.commit()
+        result = {"run_id":run_id,"mode":args.mode,"status":status,"sources_attempted":count,
+                  "sources_success":good,"candidates_seen":seen,"candidates_new":new,
+                  "database_written":bool(conn)}
+        print("RADAR_RESULT "+json.dumps(result,ensure_ascii=False))
+        summary = os.getenv("GITHUB_STEP_SUMMARY")
+        if summary:
+            with open(summary,"a",encoding="utf-8") as f:
+                f.write("# Radar paralelo · "+run_id+"\n\n")
+                f.write("| Modo | Estado | Fuentes | Accesibles | Candidatos vistos | Nuevos en Neon |\n"
+                        "|---|---|---:|---:|---:|---:|\n")
+                f.write(f"| {args.mode} | {status} | {count} | {good} | {seen} | {new} |\n\n")
+                f.write("Los candidatos no son eventos verificados ni datos publicados en la web.\n")
+        return 0 if (not sources or good) else 1
+    except Exception as exc:
+        if conn:
+            conn.rollback()
+            with conn.cursor() as cur:
+                cur.execute("""UPDATE radar_runs SET finished_at=now(),status='error',note=%s
+                               WHERE run_id=%s""",(type(exc).__name__,run_id))
+            conn.commit()
+        print("RADAR_ERROR "+type(exc).__name__,file=sys.stderr)
+        return 1
+    finally:
+        if conn:
+            conn.close()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
