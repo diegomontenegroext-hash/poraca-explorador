@@ -1,6 +1,7 @@
 import importlib.util
 import pathlib
 import unittest
+from unittest.mock import patch
 
 path = pathlib.Path(__file__).resolve().parents[1] / "src" / "radar_parallel.py"
 spec = importlib.util.spec_from_file_location("radar_parallel", path)
@@ -44,6 +45,29 @@ class RadarParallelTests(unittest.TestCase):
                                     "https://laplatatango.com.ar/agenda/lista/")
         self.assertEqual(more, [])
 
+
+    def test_full_breadth_and_embedded_instagram_permalinks(self):
+        self.assertGreaterEqual(radar.MAX_SOURCES, 15)
+        self.assertGreater(radar.MAX_DETAILS_FULL, radar.MAX_DETAILS_INCREMENTAL)
+        base = "https://www.0221.com.ar/que-hago"
+        article = "https://www.0221.com.ar/que-hago/teatro-platense-n123/"
+        post = "https://www.instagram.com/p/DeHOPiJRwNi/"
+        def mocked_fetch(url):
+            if url == base:
+                return 200, '<a href="/que-hago/teatro-platense-n123/">Teatro platense</a>', None
+            if url == article:
+                return 200, '<a href="' + post + '">Instagram original</a>', None
+            if url == post:
+                return 200, '<meta property="og:title" content="Una obra en La Plata">', None
+            raise AssertionError("Unexpected URL " + url)
+        with patch.object(radar, "fetch", side_effect=mocked_fetch):
+            check, candidates = radar.scan_source(
+                {"source_id": "src-0221", "url": base},
+                max_details=radar.MAX_DETAILS_FULL)
+        self.assertEqual(check["status"], "ok")
+        self.assertIn(article, [c["original_url"] for c in candidates])
+        self.assertIn(post, [c["original_url"] for c in candidates])
+        self.assertTrue(all(c["evidence"]["announced_only"] for c in candidates))
 
     def test_percent_encode_non_ascii_source_links(self):
         url = radar.clean_link("/agenda/evento/música-y-teatro/", "https://laplatatango.com.ar/")
