@@ -219,6 +219,10 @@ def extract_listings(raw,url):
             if not any(r["method"]=="genda_dated_listing" for r in out):
                 lines=[tidy(x) for x in "".join(blocks.text).splitlines() if tidy(x)]
                 for i,line in enumerate(lines):
+                    # Only the row beginning with a clock can start a card.
+                    # Otherwise look-ahead would duplicate its parent/title.
+                    if not re.match(r"^\s*(?:[01]?\d|2[0-3]):[0-5]\d\s*hs?\b",line,re.I):
+                        continue
                     m=re.search(r"\b((?:[01]?\d|2[0-3]):[0-5]\d)\s*hs?\s*\|\s*(.{3,160})",
                                 " ".join(lines[i:i+3]),re.I)
                     if not m or i<1:continue
