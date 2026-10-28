@@ -1,5 +1,6 @@
 name: Por Aca - Radar Definitivo (Neon operativo)
 # Cutover confirmado por usuario: exigir credencial operativa; nunca caer en laboratorio.
+# Segundo ensayo controlado: validar commit con casts JSONB y persistencia por fuente.
 
 on:
   push:
