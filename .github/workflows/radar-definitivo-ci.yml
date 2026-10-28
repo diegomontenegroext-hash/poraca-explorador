@@ -3,6 +3,9 @@ on:
   push:
     paths:
       - 'src/radar_definitivo.py'
+      - 'src/instagram_seed_inbox.py'
+      - 'ops/instagram-exact-seeds.json'
+      - 'tests/test_instagram_seed_inbox.py'
       - 'src/radar_parallel.py'
       - 'src/radar_agenda_adapters.py'
       - 'src/radar_genda_browser.py'
