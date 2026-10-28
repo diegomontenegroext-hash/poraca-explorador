@@ -2,9 +2,11 @@
 
 ## Nuevo: Radar paralelo 0.1 · base Neon aislada
 
-**Ya instalados:** programa `src/radar_parallel.py`, pruebas, [workflow Radar paralelo](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/workflows/radar-paralelo.yml) y base independiente `poraca_explorador` con 13 fuentes. El Radar original de ChatGPT sigue intacto.
+**Ya instalados:** programa `src/radar_parallel.py`, pruebas, [workflow Radar paralelo](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/workflows/radar-paralelo.yml) y base independiente `poraca_explorador` con 15 fuentes activas. El Radar original de ChatGPT sigue intacto.
 
 **Estado de puesta en marcha: funcionando en modo paralelo.** Primera escritura real a Neon verificada el 28/10: [run #40627651136](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/runs/40627651136), **6 fuentes consultadas, 5 accesibles, 6 candidatos nuevos y 6 controles guardados**. Se programaron tres corridas diarias a las 10:20, 16:20 y 22:20 ART; GitHub puede retrasar los disparos. [Contrato operativo y consultas de verificación](docs/RADAR_PARALELO_OPERACION.md).
+
+**Bootstrap amplio:** corrida automática excepcional programada para **28/10/2026, 00:50 ART**, con [cron controlado por fecha](.github/workflows/radar-paralelo.yml) y modo `full` (15 fuentes, hasta nueve detalles por fuente). Puede empezar tarde por la cola de GitHub. Luego siguen las tres corridas habituales de 10:20, 16:20 y 22:20 ART, en modo `incremental`, con fuentes vencidas y deduplicación por URL. [QA del barrido ampliado](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/runs/40628415819) pasó. La ejecución full programada **todavía no se ha confirmado como ocurrida**.
 
 Los datos nuevos se guardarán siempre como `candidates.review_state='unverified'`: no se publican automáticamente ni se confunden con hechos aceptados.
 
