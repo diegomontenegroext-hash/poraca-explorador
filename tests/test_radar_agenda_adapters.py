@@ -177,6 +177,13 @@ Kevin - Liniers: Eternotour
         self.assertEqual(got[1]["venue"],"Cine Select (Espacio INCAA)")
         self.assertEqual(got[2]["event_time"],"20:00")
 
+    def test_genda_venue_split_across_visible_lines(self):
+        when=date.today()+timedelta(days=2)
+        visible="Teatro\nPlay, de Samuel Beckett\n19:30 hs\n|\nTeatro Argentino\n+ Info\n"
+        records=ad.extract_listings(visible,"https://agendalaplata.ar/?fecha="+when.isoformat())
+        self.assertEqual(len(records),1)
+        self.assertEqual(records[0]["venue"],"Teatro Argentino")
+
     def test_browser_scope_rejects_unknown_urls_and_future_dates(self):
         from radar_genda_browser import validated_date_pages
         d=date.today()+timedelta(days=1)
