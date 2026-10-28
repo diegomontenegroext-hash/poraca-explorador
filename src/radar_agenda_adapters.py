@@ -206,40 +206,60 @@ def source_specific_sessions(raw,url,blocks):
                         "metro_official_cartelera","primary_program")
                     if rec:records.append(rec)
     elif host=="teatroargentino.gba.gob.ar" and re.match(r"/meet/\d+/?$",path):
+        # The raw source uses nested tags and sometimes invalid nested <p>.
+        # Extract the explicit event date; booking windows are distinct.
+        raw_plain=tidy(re.sub(r"<[^>]*>"," ",raw))
         exact=re.search(r"\bFecha\s+del\s+evento\s+([0-3]?\d/[01]?\d/20\d{2})\s+"
-                        r"((?:[01]?\d|2[0-3]):[0-5]\d)(?::[0-5]\d)?\b",visible,re.I)
+                        r"((?:[01]?\d|2[0-3]):[0-5]\d)(?::[0-5]\d)?\b",
+                        raw_plain,re.I)
         if exact:
-            # The event title is the first card caption, not generic <title>.
-            caption=next((t for name,t in blocks.chunks
-                if name=="p" and "|" in t and
-                re.search(r"obra|concierto|clase|funci[oó]n|teatro|masterclass",t,re.I)),None)
+            paras=[tidy(re.sub(r"<[^>]*>"," ",item))
+                for item in re.findall(r"<p\b[^>]*>(.*?)</p\s*>",raw,re.I|re.S)]
+            # A caption can contain pipes: "Concierto | Horacio ... | Martes".
+            captions=[t for t in paras if "|" in t and
+                re.search(r"obra|concierto|masterclass|teatro|funci[oó]n",t,re.I)]
+            captions += [t for name,t in blocks.chunks if name=="p" and "|" in t]
+            caption=next((t for t in captions if len(t)>10),None)
             pieces=[tidy(x) for x in caption.split("|")] if caption else []
             title=(pieces[1] if len(pieces)>1 and
                    pieces[0].casefold() in ("concierto","teatro","masterclass","obra teatral")
                    else pieces[0] if pieces else None)
-            room=next((t for name,t in blocks.chunks
-                if name=="p" and re.match(r"\s*SALA\s+\w+",t,re.I)),None)
+            room=next((t for t in paras if re.match(r"^SALA\s+[a-záéíóúñ]+",t,re.I)),None)
+            if not room:
+                room=next((t for name,t in blocks.chunks
+                    if name=="p" and re.match(r"^SALA\s+[a-záéíóúñ]+",t,re.I)),None)
             venue=("Teatro Argentino — "+room if room else "Teatro Argentino")
             if title:
                 rec=make_record(title,parse_dmy(exact.group(1)),exact.group(2).zfill(5),venue,url,
                                 "argentino_official_fecha_evento","primary_venue")
                 if rec:records.append(rec)
     elif host.endswith("lumenartis.org") and (path=="/" and parse_qs(urlsplit(url).query).get("post_type")==["funcion"]):
-        # A WordPress detail article frequently shows "domingo 1 de noviembre
-        # a las 18 h", without printing the year. Do not copy baseline dates.
-        first=re.search(r"<p\b[^>]*>(.*?)</p\s*>",raw,re.I|re.S)
-        first_html=first.group(1) if first else ""
-        lead=tidy(re.sub(r"<[^>]+>"," ",first_html))
-        when=re.search(r"\b(?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)\s+"
-            r"([0-3]?\d\s+de\s+[a-záéíóúñ]+)\s+a\s+las\s+"
-            r"((?:[01]?\d|2[0-3])(?::[0-5]\d)?)\s*h\b",lead,re.I)
+        # WordPress can insert navigation paragraphs before the event article.
+        # Prefer the original paragraph containing a concrete near-term date.
+        paras=re.findall(r"<p\b[^>]*>(.*?)</p\s*>",raw,re.I|re.S)
+        when=None
+        event_para=None
+        for paragraph in paras[:120]:
+            text=tidy(re.sub(r"<[^>]*>"," ",paragraph))
+            candidate=re.search(r"\b(?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)\s+"
+                r"([0-3]?\d\s+de\s+[a-záéíóúñ]+)\s+a\s+las\s+"
+                r"((?:[01]?\d|2[0-3])(?::[0-5]\d)?)\s*h\b",text,re.I)
+            if candidate:
+                when=candidate;event_para=paragraph;break
         if when:
             d=lumen_unyearred_date(when.group(1))
             clock=when.group(2)
             clock=(clock+":00" if ":" not in clock else clock).zfill(5)
-            # Prefer a concrete work title emphasized in the original text.
-            em=re.search(r"<em\b[^>]*>(.*?)</em>",first_html,re.I|re.S)
-            title=tidy(re.sub(r"<[^>]+>"," ",em.group(1))) if em else None
+            # Work title in the event paragraph; fallback to a real page title,
+            # never to the unverified historical baseline name.
+            em=re.search(r"<em\b[^>]*>(.*?)</em>",event_para,re.I|re.S)
+            title=tidy(re.sub(r"<[^>]*>"," ",em.group(1))) if em else None
+            if not title:
+                head=next((t for tag,t in blocks.headings if tag=="h1"),None)
+                if head: title=head
+            if not title:
+                head=re.search(r"<title\b[^>]*>(.*?)</title\s*>",raw,re.I|re.S)
+                if head: title=tidy(re.sub(r"<[^>]*>"," ",head.group(1))).split(" – Teatro de Cámara")[0]
             if title and d:
                 rec=make_record(title,d,clock,"Lumen Artis / Teatro de Cámara de City Bell",
                                 url,"lumen_official_prose_date","primary_venue")
