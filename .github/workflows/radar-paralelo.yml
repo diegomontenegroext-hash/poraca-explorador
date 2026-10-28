@@ -1,0 +1,47 @@
+name: Por Aca - Radar paralelo en Neon
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry-run no graba; write requiere secret Neon"
+        type: choice
+        required: true
+        default: dry-run
+        options:
+          - dry-run
+          - write
+  push:
+    paths:
+      - 'src/radar_parallel.py'
+      - 'tests/test_radar_parallel.py'
+      - '.github/workflows/radar-paralelo.yml'
+
+# La frecuencia se habilita SOLO despues del primer readback real en Neon.
+# schedule:
+#   - cron: '20 1,13,19 * * *' # 22:20,10:20,16:20 ART (UTC-3)
+
+permissions:
+  contents: read
+
+concurrency:
+  group: poraca-radar-paralelo
+  cancel-in-progress: false
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Obtener el explorador
+        uses: actions/checkout@v4
+      - name: Probar las reglas sin red
+        run: python3 -m unittest discover -s tests -v
+      - name: Preparar cliente Neon solo para modo write
+        if: ${{ inputs.mode == 'write' }}
+        run: python3 -m pip install --disable-pip-version-check "psycopg[binary]>=3.2,<4"
+      - name: Recolectar fuentes culturales
+        env:
+          NEON_EXPLORADOR_DATABASE_URL: ${{ secrets.NEON_EXPLORADOR_DATABASE_URL }}
+          RADAR_MODE: ${{ inputs.mode || 'dry-run' }}
+        run: python3 src/radar_parallel.py --mode "$RADAR_MODE"
