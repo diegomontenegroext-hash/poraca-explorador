@@ -141,6 +141,26 @@ def validated_alpedo_date_pages(urls,today=None):
     return result
 
 
+
+def matches_alpedo_date_response(requested_url,final_url):
+    """A redirected/cached calendar may NOT be attributed to requested day."""
+    try:
+        requested=urlsplit(requested_url)
+        actual=urlsplit(final_url)
+        if (requested.scheme!="https" or actual.scheme!="https" or
+            actual.hostname not in ("alpedo.ar","www.alpedo.ar") or
+            actual.path!="/" or actual.port is not None or actual.fragment or
+            actual.username or actual.password):
+            return False
+        requested_q=parse_qs(requested.query)
+        actual_q=parse_qs(actual.query)
+        return (set(requested_q)=={"fecha"} and set(actual_q)=={"fecha"}
+                and len(requested_q["fecha"])==1 and len(actual_q["fecha"])==1
+                and requested_q["fecha"]==actual_q["fecha"])
+    except ValueError:
+        return False
+
+
 def render_alpedo_date_pages(urls,max_seconds=65):
     """Render at most 3 date URLs using the existing bounded browser pattern.
 
@@ -172,6 +192,10 @@ def render_alpedo_date_pages(urls,max_seconds=65):
                     resp=page.goto(url,wait_until="domcontentloaded",timeout=11000)
                     if resp and resp.status==429:break
                     if resp and resp.status>=400:continue
+                    # Reject a fallback redirect to / or another date. The
+                    # visual page may show the same month for multiple days.
+                    if not matches_alpedo_date_response(url,page.url):
+                        continue
                     try:
                         page.wait_for_function(
                             "() => document.querySelectorAll('h6').length >= 5",
