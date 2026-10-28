@@ -35,6 +35,15 @@ Se migraron exclusivamente **nombres/URLs públicas y papeles de fuente** desde 
 
 ## Verificación operativa en Neon
 
+La vista `radar_definitivo.run_live_progress` muestra progreso mientras el workflow sigue funcionando, sin esperar a que actualice el resumen final de `runs`.
+
+```sql
+SELECT * FROM radar_definitivo.run_live_progress
+ORDER BY started_at DESC LIMIT 5;
+```
+
+Consultas de detalle:
+
 ```sql
 SELECT run_id,mode,started_at,finished_at,status,sources_selected,
        sources_checked,sources_success,urls_discovered,candidates_new,
