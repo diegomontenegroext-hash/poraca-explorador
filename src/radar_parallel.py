@@ -17,7 +17,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from html.parser import HTMLParser
 from urllib.error import HTTPError, URLError
-from urllib.parse import urljoin, urlparse
+from urllib.parse import quote, urljoin, urlparse
 from urllib.request import Request, urlopen
 
 DB_NAME = "poraca_explorador"
@@ -65,7 +65,7 @@ def clean_link(href: str, base_url: str) -> str | None:
         u = urlparse(urljoin(base_url, html.unescape(href).replace("\\/", "/")))
         if u.scheme != "https" or not u.hostname or u.username or u.password:
             return None
-        return f"{u.scheme}://{u.netloc.lower()}{u.path.rstrip('/')}/"
+        return f"{u.scheme}://{u.netloc.lower()}{quote(u.path.rstrip('/') + '/', safe='/%:@+~')}"
     except ValueError:
         return None
 
@@ -186,7 +186,7 @@ def fetch(url: str) -> tuple[int | None, str | None, str | None]:
             return response.status, data.decode("utf-8", errors="replace"), None
     except HTTPError as err:
         return err.code, None, "RATE_LIMIT" if err.code == 429 else "HTTP_ERROR"
-    except (URLError, TimeoutError, OSError) as err:
+    except (URLError, TimeoutError, OSError, UnicodeError, ValueError) as err:
         return None, None, type(err).__name__
 
 
