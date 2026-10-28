@@ -21,8 +21,8 @@ jobs:
     steps:
       - name: Mostrar tipo de evento y horas
         env:
-          EVENT_TYPE: \${{ github.event_name }}
-          SCHEDULE_EXPR: \${{ github.event.schedule }}
+          EVENT_TYPE: ${{ github.event_name }}
+          SCHEDULE_EXPR: ${{ github.event.schedule }}
         run: |
           echo "EVENT=$EVENT_TYPE SCHEDULE=$SCHEDULE_EXPR"
           echo "UTC=$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
@@ -30,7 +30,7 @@ jobs:
       - name: Comprobar dias experimentales
         id: gate
         env:
-          EVENT_TYPE: \${{ github.event_name }}
+          EVENT_TYPE: ${{ github.event_name }}
         run: |
           today="$(date -u +%Y-%m-%d)"
           if [[ "$EVENT_TYPE" == "schedule" && "$today" != "2026-10-28" && "$today" != "2026-10-29" ]]; then
@@ -44,12 +44,12 @@ jobs:
       - name: Grabar prueba sin tocar datos culturales
         if: steps.gate.outputs.enabled == 'true'
         env:
-          NEON_RADAR_OPERATIONAL_DATABASE_URL: \${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
-          EVENT_TYPE: \${{ github.event_name }}
-          SCHEDULE_EXPR: \${{ github.event.schedule }}
-          GH_RUN_ID: \${{ github.run_id }}
-          GH_SHA: \${{ github.sha }}
-          GH_WORKFLOW_REF: \${{ github.workflow_ref }}
+          NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
+          EVENT_TYPE: ${{ github.event_name }}
+          SCHEDULE_EXPR: ${{ github.event.schedule }}
+          GH_RUN_ID: ${{ github.run_id }}
+          GH_SHA: ${{ github.sha }}
+          GH_WORKFLOW_REF: ${{ github.workflow_ref }}
         run: |
           python3 - <<'PY'
           import os
@@ -80,6 +80,6 @@ jobs:
       - name: Resumen
         if: steps.gate.outputs.enabled == 'true'
         env:
-          EVENT_TYPE: \${{ github.event_name }}
-          GH_RUN_ID: \${{ github.run_id }}
+          EVENT_TYPE: ${{ github.event_name }}
+          GH_RUN_ID: ${{ github.run_id }}
         run: echo "Cron Probe (sin GPT) event=$EVENT_TYPE run=$GH_RUN_ID"
