@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Solo diagnóstico de marca de fecha presente en las fichas Argentino; staging.
+# Identificar formato público de fecha de Teatro Argentino; diagnóstico de solo lectura.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=incremental
-trigger_reason=argentino_html_date_presence_v2
+trigger_reason=argentino_format_event_date_debug_20261028
