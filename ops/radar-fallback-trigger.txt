@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Revalidación controlada de fuentes oficiales Teatro Argentino y Lumen en Neon staging.
+# Control de sesiones Select y EcoSelect desde agenda de cine, solo staging.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=incremental
-trigger_reason=official_argentino_lumen_html_regression_tanda3
+trigger_reason=cinema_select_ecoselect_monthly_20261028
