@@ -39,6 +39,10 @@ class RadarParallelTests(unittest.TestCase):
         self.assertFalse(any("/categoria/" in u for u in urls))
         self.assertIn("https://laplatatango.com.ar/agenda/evento/milonga-cultural/", urls)
 
+    def test_percent_encode_non_ascii_source_links(self):
+        url = radar.clean_link("/agenda/evento/música-y-teatro/", "https://laplatatango.com.ar/")
+        self.assertEqual(url, "https://laplatatango.com.ar/agenda/evento/m%C3%BAsica-y-teatro/")
+
     def test_schema_event_date_from_jsonld(self):
         raw = ('<script type="application/ld+json">'
                '{"@type":"Event","name":"Feria cultural","startDate":"2026-11-01T18:30:00-03:00",'
