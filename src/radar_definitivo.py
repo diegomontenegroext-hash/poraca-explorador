@@ -473,21 +473,40 @@ def save_source_result(conn,run_id,source,check,candidates):
             if cur.fetchone():
                 new_candidates+=1
             else:
+                # Previously COALESCE(event_time,new_time) permanently froze
+                # the FIRST JSON-LD clock (including UTC misread as ART).
+                # Only a newly OPENED structured original can revise it.
+                # Keep the prior date/time in evidence for audit; never
+                # overwrite with a label, snippet or secondary guess.
+                clock_from_original=bool(
+                    c["evidence"].get("structured_event_found")
+                    and c["evidence"].get("detail_opened")
+                    and c.get("event_date") and c.get("event_time"))
                 cur.execute("""UPDATE radar_definitivo.candidates
                   SET seen_count=seen_count+1,last_seen_at=now(),
                       title=CASE WHEN %s::text IS NOT NULL AND %s::text<>'' THEN %s ELSE title END,
                       summary=CASE WHEN %s::text IS NOT NULL AND %s::text<>'' THEN %s ELSE summary END,
-                      event_date=COALESCE(event_date,%s::date),
-                      event_time=COALESCE(event_time,%s::text),
+                      event_date=CASE WHEN %s::boolean THEN %s::date
+                                      ELSE COALESCE(event_date,%s::date) END,
+                      event_time=CASE WHEN %s::boolean THEN %s::text
+                                      ELSE COALESCE(event_time,%s::text) END,
                       venue=COALESCE(venue,%s::text),
                       organizer=COALESCE(organizer,%s::text),
-                      evidence=CASE WHEN %s::boolean
-                         THEN evidence || %s::jsonb ELSE evidence END
+                      evidence=CASE WHEN %s::boolean THEN
+                        coalesce(evidence,'{}'::jsonb) ||
+                        (CASE WHEN %s::boolean AND event_time IS DISTINCT FROM %s::text
+                          THEN jsonb_build_object('previousEventTime',event_time,
+                            'previousEventDate',event_date,'eventTimeRecheckedAt',now())
+                          ELSE '{}'::jsonb END) || %s::jsonb
+                        ELSE evidence END
                   WHERE url=%s""",
                     (c["title"],c["title"],c["title"],
                      c["summary"],c["summary"],c["summary"],
-                     c["event_date"],c["event_time"],c["venue"],c["organizer"],
+                     clock_from_original,c["event_date"],c["event_date"],
+                     clock_from_original,c["event_time"],c["event_time"],
+                     c["venue"],c["organizer"],
                      bool(c["evidence"].get("detail_opened")),
+                     clock_from_original,c["event_time"],
                      json.dumps(c["evidence"]),c["original_url"]))
             source_page=c["evidence"].get("linked_from") or source["url"]
             edge_key=hashlib.sha256((source["source_id"]+"|"+source_page+"|"+c["original_url"]).encode("utf-8")).hexdigest()
