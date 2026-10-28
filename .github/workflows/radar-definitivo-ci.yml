@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'src/radar_definitivo.py'
+      - 'src/radar_parallel.py'
       - 'src/radar_agenda_adapters.py'
       - 'src/radar_genda_browser.py'
       - 'tests/test_radar_definitivo.py'
