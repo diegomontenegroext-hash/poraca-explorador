@@ -294,6 +294,23 @@ Kevin - Liniers: Eternotour
         self.assertEqual(ad.extract_listings(html,
            "https://lumenartis.org/?p=2907&post_type=funcion"),[])
 
+    @unittest.skipUnless(date.today().month==10,"October monthly screening regression")
+    def test_select_ecoselect_monthly_secondary_screenings(self):
+        html=('<h1>Octubre en Cine Select</h1>'
+              '<p>Jueves 29 de octubre 18:30 — Espacio INCAA (entrada $5000): '
+              'Éramos tan flacos / Dir. Carlos Castro / Argentina / 2025</p>'
+              '<p>Jueves 29 de octubre 20:30 — Misa Nocturna (entrada $5000): Scream / Dir. Wes Craven</p>'
+              '<p>Viernes 12 de septiembre 20:00 — archivo fuera del mes</p>')
+        got=ad.extract_listings(html,"https://agendadecine.com/ciclos-y-festivales/octubre-en-cine-select")
+        self.assertEqual(len(got),2)
+        self.assertEqual({x["event_time"] for x in got},{"18:30","20:30"})
+        self.assertTrue(all(x["venue"]=="Cine Select (Espacio INCAA)" for x in got))
+        self.assertTrue(all(x["evidence_tier"]=="secondary_cinema_agenda" for x in got))
+        ec=ad.extract_listings(html.replace("Cine Select","Cine Ecoselect"),
+                              "https://agendadecine.com/ciclos-y-festivales/octubre-en-cine-ecoselect")
+        self.assertEqual(len(ec),2)
+        self.assertTrue(all(x["venue"]=="Cine Ecoselect (Espacio INCAA)" for x in ec))
+
     def test_stale_event_is_not_accepted_as_listing(self):
         got=ad.extract_listings(
             '<h1>Obra</h1><p>Entrada: $ 2.000,00 - Viernes - 19:30 hs - 12/10/2024</p>',
