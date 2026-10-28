@@ -3,7 +3,9 @@ on:
   push:
     paths:
       - 'src/radar_definitivo.py'
+      - 'src/radar_agenda_adapters.py'
       - 'tests/test_radar_definitivo.py'
+      - 'tests/test_radar_agenda_adapters.py'
       - '.github/workflows/radar-definitivo-ci.yml'
   workflow_dispatch:
 
