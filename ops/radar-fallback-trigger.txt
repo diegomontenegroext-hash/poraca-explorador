@@ -1,9 +1,7 @@
 # POR ACA - RADAR DEFINITIVO
-# Corrida manual EXTRAORDINARIA para validar limpieza Alpedo + fuentes,
-# tras ultimo FULL anterior a correcciones de parser y roles.
-# Staging Neon; NO publicar, NO Motor, NO fichas automáticas.
-# No cambia los slots automáticos 05/13/21 de Guardia GPT.
+# Validacion extraordinaria de permalink exacto de Luti, sin alterar la Guardia.
+# Neon staging solamente; no publica ni ejecuta Motor/Puente.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
-trigger_mode=full
-trigger_reason=chat_manual_full_postfix_sync_readback_20261028_1848_art
+trigger_mode=incremental
+trigger_reason=luti_exact_reel_provenance_qa_20261028_2000_art
