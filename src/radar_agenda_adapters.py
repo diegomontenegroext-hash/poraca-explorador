@@ -25,7 +25,8 @@ SCOPED_HOSTS={"agendalaplata.ar","www.agendalaplata.ar",
               "teatrometrolp.com.ar","www.teatrometrolp.com.ar",
               "teatroargentino.gba.gob.ar","lumenartis.org","www.lumenartis.org",
               "agendadecine.com","www.agendadecine.com",
-              "feriaedita.com.ar","www.feriaedita.com.ar"}
+              "feriaedita.com.ar","www.feriaedita.com.ar",
+              "gritos.planetario.unlp.edu.ar"}
 def tidy(s):
     return re.sub(r"\s+"," ",html.unescape(s or "")).strip()
 
@@ -323,6 +324,28 @@ def source_specific_sessions(raw,url,blocks):
             rec=make_record(title,d,m.group(2),venue,url,
                             "agendadecine_monthly_screening","secondary_cinema_agenda")
             if rec:records.append(rec)
+    elif host=="gritos.planetario.unlp.edu.ar" and path=="/2026/index.html":
+        # This official festival page states a RANGE, not a timetable.
+        # Capture one umbrella programme at its start; never invent
+        # screenings on each date or missing clocks.
+        if (re.search(r"\bFestival Internacional de Cine de Horror\b",visible,re.I)
+                and re.search(r"\bV Edici[oó]n\s*-\s*2026\b",visible,re.I)
+                and re.search(r"\bPlanetario\b",visible,re.I)):
+            dates=re.search(
+                r"\bDel\s+([0-3]?\d)\s*/\s*OCT\s+al\s+([0-3]?\d)\s*/\s*NOV\s+2026\b",
+                visible,re.I)
+            if dates:
+                try:
+                    start=date(2026,10,int(dates.group(1)))
+                    end=date(2026,11,int(dates.group(2)))
+                except ValueError:
+                    start=end=None
+                if start and end and 1<=(end-start).days<=7:
+                    rec=make_record(
+                        "Gritos en el Planetario · Festival Internacional de Cine de Horror",
+                        start,None,"Planetario UNLP · Paseo del Bosque",
+                        url,"gritos_festival_official_date_range_start","primary_program")
+                    if rec:records.append(rec)
     elif host.endswith("feriaedita.com.ar") and path in ("","/"):
         # Official 2026 homepage advertises "EDITA: 5 y 6 de diciembre",
         # with #EDITA2026 printed elsewhere. This establishes TWO dates but
