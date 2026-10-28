@@ -11,12 +11,6 @@ on:
         options:
           - dry-run
           - write
-  push:
-    paths:
-      - 'src/radar_parallel.py'
-      - 'tests/test_radar_parallel.py'
-      - '.github/workflows/radar-paralelo.yml'
-
 # La frecuencia se habilita SOLO despues del primer readback real en Neon.
 # schedule:
 #   - cron: '20 1,13,19 * * *' # 22:20,10:20,16:20 ART (UTC-3)
