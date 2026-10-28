@@ -62,6 +62,21 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertIn("Evento futuro",names)
         self.assertNotIn("Actividad ya realizada",names)
 
+    def test_alpedo_jsonld_mirror_never_becomes_primary(self):
+        day=date.today()+timedelta(days=1)
+        month=next(k for k,v in ad.MONTHS.items() if v==day.month)
+        raw=(f'<p>{month} {day.year}</p>'
+             '<script type="application/ld+json">'
+             '{"@type":"MusicEvent","name":"Festival ajeno",'
+             '"startDate":"'+day.isoformat()+'T20:00:00-03:00",'
+             '"location":{"name":"Sala declarada por tercero"}}'
+             '</script>')
+        url="https://alpedo.ar/?fecha="+day.isoformat()
+        res=ad.extract_listings(raw,url)
+        self.assertEqual(len(res),1)
+        self.assertEqual(res[0]["evidence_tier"],"secondary_agenda")
+        self.assertEqual(res[0]["review_state"],"observed_unverified")
+
     def test_alpedo_realistic_last_session_before_finalizadas(self):
         # Shape from the real dated agenda: a one-clock upcoming card
         # is immediately followed by the archive header and older clocks.
