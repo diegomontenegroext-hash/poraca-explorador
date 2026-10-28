@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "dry-run no graba; write requiere secret Neon"
+        description: "dry-run no graba; write usa el secreto Neon aislado"
         type: choice
         required: true
         default: dry-run
         options:
           - dry-run
           - write
-# La frecuencia se habilita SOLO despues del primer readback real en Neon.
-# schedule:
-#   - cron: '20 1,13,19 * * *' # 22:20,10:20,16:20 ART (UTC-3)
+  schedule:
+    # UTC-3 Argentina: 22:20, 10:20, 16:20
+    - cron: '20 1,13,19 * * *'
 
 permissions:
   contents: read
@@ -31,11 +31,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Probar las reglas sin red
         run: python3 -m unittest discover -s tests -v
-      - name: Preparar cliente Neon solo para modo write
-        if: ${{ inputs.mode == 'write' }}
+      - name: Preparar cliente Neon en modo escritura
+        if: ${{ github.event_name == 'schedule' || inputs.mode == 'write' }}
         run: python3 -m pip install --disable-pip-version-check "psycopg[binary]>=3.2,<4"
-      - name: Recolectar fuentes culturales
+      - name: Recolectar fuentes culturales y guardar candidatos aislados
         env:
           NEON_EXPLORADOR_DATABASE_URL: ${{ secrets.NEON_EXPLORADOR_DATABASE_URL }}
-          RADAR_MODE: ${{ inputs.mode || 'dry-run' }}
+          RADAR_MODE: ${{ github.event_name == 'schedule' && 'write' || inputs.mode || 'dry-run' }}
         run: python3 src/radar_parallel.py --mode "$RADAR_MODE"
