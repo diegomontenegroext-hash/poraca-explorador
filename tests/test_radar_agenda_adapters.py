@@ -71,6 +71,45 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         opera=rd.parse_html('<a href="https://livepass.com.ar/events/carmen-en-opera">Comprar</a>')
         self.assertEqual(len(ad.special_links("https://operalp.com.ar/agenda/",opera)),1)
 
+    def test_casa_metro_detail_discovery_prioritizes_and_rotates(self):
+        base="https://casametro.com.ar/categoria-producto/casa-metro/"
+        links="".join(
+            '<a href="https://casametro.com.ar/evento/show-'+str(i)+'/">'
+            'Evento '+str(i)+'</a>' for i in range(1,13))
+        links += (
+            '<a href="https://evil.example/evento/stolen/">Malicioso</a>'
+            '<a href="https://casametro.com.ar/evento/show-1/">Duplicado</a>'
+            '<a href="https://casametro.com.ar/mi-cuenta">No es evento</a>'
+            '<a href="https://casametro.com.ar/evento/show-1/?bad=1">Con query</a>')
+        page=rd.parse_html(links)
+        d=date(2026,10,28)
+        run1=ad.special_links(base,page,at=datetime(2026,10,28,5))
+        run2=ad.special_links(base,page,at=datetime(2026,10,28,13))
+        self.assertEqual(len(run1),6)
+        self.assertEqual(len({u for u,_ in run1}),6)
+        self.assertEqual([u for u,_ in run1[:3]],
+            ['https://casametro.com.ar/evento/show-'+str(i)+'/'
+             for i in range(1,4)])
+        self.assertEqual([u for u,_ in run1[:3]],
+                         [u for u,_ in run2[:3]])
+        self.assertNotEqual([u for u,_ in run1[3:]],
+                            [u for u,_ in run2[3:]])
+        self.assertTrue(all(u.startswith("https://casametro.com.ar/evento/")
+                            and "?" not in u for u,_ in run1))
+        self.assertEqual(ad.special_links("https://example.com/",page),[])
+
+    def test_casa_metro_discovery_short_cardset_no_duplicates(self):
+        base="https://casametro.com.ar/categoria-producto/casa-metro/"
+        page=rd.parse_html(
+            '<a href="/evento/primero/">Uno</a>'
+            '<a href="/evento/segundo/">Dos</a>'
+            '<a href="/evento/primero/">Uno de nuevo</a>'
+            '<a href="//evil.example/evento/third/">Ignorar</a>')
+        got=ad.special_links(base,page,at=datetime(2026,10,28,9))
+        self.assertEqual([u for u,_ in got],
+            ["https://casametro.com.ar/evento/primero/",
+             "https://casametro.com.ar/evento/segundo/"])
+
     def test_genda_rotates_distant_days_without_missing_near_days(self):
         day=date.today()
         dates=[day+timedelta(days=i) for i in range(20)]
