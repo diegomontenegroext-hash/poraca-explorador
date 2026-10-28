@@ -101,8 +101,12 @@ def scope(url):
 
 def structured_sessions(raw,url):
     """All schema.org Events, not only the first one in a JSON-LD graph."""
-    tier=("secondary_agenda" if "agendalaplata.ar" in scope(url)[0]
-          else "primary_structured_page")
+    # The SAME structured Event may be mirrored by a secondary agenda.
+    # A schema.org label never upgrades its source into the organizer.
+    host=scope(url)[0]
+    tier=("secondary_agenda" if host in (
+          "agendalaplata.ar","www.agendalaplata.ar",
+          "alpedo.ar","www.alpedo.ar") else "primary_structured_page")
     out=[]
     scripts=re.findall(r"<script\b(?=[^>]*\btype\s*=\s*['\"]application/ld\+json['\"])[^>]*>(.*?)</script\s*>",
                        raw[:700_000],re.I|re.S)
