@@ -102,6 +102,46 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertEqual(events[-1]["venue"],
             "Teatro Bar Cultural La Ferretería")
 
+    def test_alpedo_browser_redirect_must_preserve_exact_day(self):
+        from radar_genda_browser import matches_alpedo_date_response
+        target="https://alpedo.ar/?fecha=2026-10-29"
+        self.assertTrue(matches_alpedo_date_response(
+            target,"https://www.alpedo.ar/?fecha=2026-10-29"))
+        for wrong in (
+            "https://alpedo.ar/",
+            "https://alpedo.ar/?fecha=2026-10-28",
+            "https://alpedo.ar/?fecha=2026-10-29&utm_source=cache",
+            "http://alpedo.ar/?fecha=2026-10-29",
+            "https://evil.example/?fecha=2026-10-29",
+            "https://alpedo.ar:8443/?fecha=2026-10-29",
+            "https://alpedo.ar/eventos/?fecha=2026-10-29",
+        ):
+            with self.subTest(wrong=wrong):
+                self.assertFalse(matches_alpedo_date_response(target,wrong))
+
+    def test_alpedo_real_rendered_dom_has_p_wrapped_title_and_clock_after_p(self):
+        when=date.today()+timedelta(days=1)
+        month=next(k for k,v in ad.MONTHS.items() if v==when.month)
+        # The real dated HTML has title nested inside P, clock in a raw
+        # text sibling, then a venue P containing an icon, not a table.
+        raw=(f"<body><p>{month.capitalize()} {when.year}</p>"
+             "<p><h6>Parque Ecológico</h6></p>"
+             "07:00     a 19:00"
+             "<p><i></i> Parque Ecológico</p>"
+             "<p><h6>HAMLET...No quiero morir</h6></p>"
+             "15:00"
+             "<p><i></i> Escuela de Teatro La Plata</p>"
+             "<p><h6>Mugre + Terrores Nocturnos</h6></p>"
+             "20:00"
+             "<p><i></i> Ciudad de Gatos</p>"
+             "</body>")
+        url="https://alpedo.ar/?fecha="+when.isoformat()
+        rows=ad.extract_listings(raw,url)
+        self.assertEqual([(x["title"],x["event_time"],x["venue"]) for x in rows],[
+            ("HAMLET...No quiero morir","15:00","Escuela de Teatro La Plata"),
+            ("Mugre + Terrores Nocturnos","20:00","Ciudad de Gatos")])
+        self.assertTrue(all(x["evidence_tier"]=="secondary_agenda" for x in rows))
+
     def test_alpedo_browser_dates_allow_only_same_site_and_four_day_horizon(self):
         from radar_genda_browser import validated_alpedo_date_pages
         today=date(2026,10,28)
