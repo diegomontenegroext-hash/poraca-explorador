@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Validación editorial final de títulos Argentino sin navegación ni publicación.
+# Prueba incremental focalizada: sedes originales de Alternativa, no aceptar ni publicar.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=incremental
-trigger_reason=argentino_clean_titles_and_reconciliation_20261028
+trigger_reason=alternativa_venue_original_recovery_and_date_semantics_20261028
