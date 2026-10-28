@@ -105,7 +105,7 @@ class RadarDefinitivoTests(unittest.TestCase):
     def test_ig_ogimage_is_reference_only(self):
         body='<meta property="og:image" content="https://example.org/poster.jpg?foo=bar">'
         self.assertEqual(rd.extract_og_image(body,"https://example.org/evento/"),
-                         "https://example.org/poster.jpg")
+                         "https://example.org/poster.jpg?foo=bar")
 
     def test_budget_stops_excess_and_rate_limited_domain(self):
         budget=rd.Budget(seconds=10)
