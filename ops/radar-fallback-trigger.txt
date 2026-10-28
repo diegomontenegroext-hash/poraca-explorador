@@ -1,6 +1,6 @@
 # POR ACA RADAR DEFINITIVO
-# Revalidacion puntual: JSON-LD con UTC convertido a Argentina, Doble-T; staging unicamente
+# Revalidar evidencia original Doble-T con correccion auditable de candidate.event_time
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=incremental
-trigger_reason=doblet_jsonld_timezone_local_correctness
+trigger_reason=doblet_utc_candidate_time_correction_preserve_prior
