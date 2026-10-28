@@ -241,12 +241,13 @@ def extract_listings(raw,url):
             seen.add(key);unique.append(r)
     return unique[:100]
 
-def special_links(url,page):
-    """Verified family navigation: dates for Genda; tickets for Ópera."""
+def special_links(url,page,at=None):
+    """Source-discovered Genda dates rotated by slot; official Opera ticket URLs."""
     host,path=scope(url)
     if host.endswith("agendalaplata.ar") and path=="/":
-        links=[]
-        now=datetime.now(ZoneInfo("America/Argentina/Buenos_Aires")).date()
+        now=at or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
+        today=now.date()
+        date_links={}
         for raw,label in page.links:
             if not raw.startswith("https://") and not raw.startswith("/?") and not raw.startswith("?"):
                 continue
@@ -255,11 +256,21 @@ def special_links(url,page):
             if h not in ("agendalaplata.ar","www.agendalaplata.ar") or p!="/":
                 continue
             d=(parse_qs(urlsplit(absolute).query).get("fecha") or [None])[0]
-            try:day=date.fromisoformat(d) if d else None
-            except ValueError:day=None
-            if day and now <= day <= now+timedelta(days=4):
-                links.append((absolute,"agenda por fecha"))
-        return links[:5]
+            try: day=date.fromisoformat(d) if d else None
+            except ValueError: day=None
+            if day and today<=day<=today+timedelta(days=60):
+                date_links[day]=absolute
+        ordered=sorted(date_links)
+        # Preserve near-term coverage; rotate the remaining three slots so
+        # the distant concert/cinema dates are not starved by daily restarts.
+        near=[d for d in ordered if d<=today+timedelta(days=1)][:2]
+        later=[d for d in ordered if d not in near]
+        selected=list(near)
+        if later:
+            offset=(today.toordinal()*3+now.hour//8)%len(later)
+            for i in range(min(5-len(selected),len(later))):
+                selected.append(later[(offset+i)%len(later)])
+        return [(date_links[day],"agenda por fecha") for day in selected[:5]]
     if host.endswith("operalp.com.ar") and path.rstrip("/")=="/agenda":
         return [(href,"ticketera oficial enlazada")
                 for href,label in page.links
