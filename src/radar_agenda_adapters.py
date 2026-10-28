@@ -26,7 +26,8 @@ SCOPED_HOSTS={"agendalaplata.ar","www.agendalaplata.ar",
               "teatroargentino.gba.gob.ar","lumenartis.org","www.lumenartis.org",
               "agendadecine.com","www.agendadecine.com",
               "feriaedita.com.ar","www.feriaedita.com.ar",
-              "gritos.planetario.unlp.edu.ar"}
+              "gritos.planetario.unlp.edu.ar",
+              "www.fcnym.unlp.edu.ar"}
 def tidy(s):
     return re.sub(r"\s+"," ",html.unescape(s or "")).strip()
 
@@ -324,6 +325,39 @@ def source_specific_sessions(raw,url,blocks):
             rec=make_record(title,d,m.group(2),venue,url,
                             "agendadecine_monthly_screening","secondary_cinema_agenda")
             if rec:records.append(rec)
+    elif (host=="www.fcnym.unlp.edu.ar" and
+          path=="/novedades/leccion-magistral-emilio-custodio-sobre-aguas-subterraneas-en-fcnym/"):
+        # FCNyM publishes this event in a prose article, not a ticket
+        # calendar. The body omits the year, so require an ORIGINAL
+        # publication date from page metadata and agreement of weekday.
+        # An unrelated '2026' in asset URLs or copyright is NOT evidence.
+        published=re.search(
+            r"""(?:["']datePublished["']\s*:\s*["']|"""
+            r"""article:published_time[^>]*content\s*=\s*["']|"""
+            r"""<time\b[^>]*datetime\s*=\s*["'])"""
+            r"""(20\d{2}-[01]\d-[0-3]\d)""",
+            raw[:150_000],re.I)
+        heading=next((name for tag,name in blocks.headings if tag=="h1"),None)
+        details=re.search(
+            r"\bmi[eé]rcoles\s+([0-3]?\d)\s+de\s+noviembre\s+"
+            r"a\s+las\s+((?:[01]?\d|2[0-3]))\s+horas?\s+"
+            r"en\s+el\s+Auditorio\s+de\s+Planta\s+Baja\s+"
+            r"de\s+la\s+Facultad\s+de\s+Ciencias\s+Naturales\s+y\s+Museo\b",
+            visible,re.I)
+        if published and heading and details and re.search(
+                r"Lecci[oó]n Magistral Emilio Custodio",heading,re.I):
+            try:
+                publication=date.fromisoformat(published.group(1))
+                day=date(publication.year,11,int(details.group(1)))
+            except ValueError:
+                publication=day=None
+            if (publication and day and day.weekday()==2 and
+                    0 <= (day-publication).days <= 90):
+                record=make_record(
+                    heading,day,details.group(2).zfill(2)+":00",
+                    "Auditorio de Planta Baja · Facultad de Ciencias Naturales y Museo",
+                    url,"fcnym_unlp_official_article_date_time","primary_organizer")
+                if record: records.append(record)
     elif host=="gritos.planetario.unlp.edu.ar" and path=="/2026/index.html":
         # This official festival page states a RANGE, not a timetable.
         # Capture one umbrella programme at its start; never invent
