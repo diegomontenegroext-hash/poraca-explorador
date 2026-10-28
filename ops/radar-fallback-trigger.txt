@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Validar salas Alternativa con HTML aplanado y sin publicar ni promover registros.
+# FULL comparativa de brechas: Alternativa sin Entrada, salas, Teatro Metro, fuentes existentes.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
-trigger_mode=incremental
-trigger_reason=alternativa_venue_flat_html_fix_v2
+trigger_mode=full
+trigger_reason=source_gap_priority_20261028_full_after_parser_qa
