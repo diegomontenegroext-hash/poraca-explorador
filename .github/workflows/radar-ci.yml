@@ -1,0 +1,22 @@
+name: Por Aca - QA de Radar sin escrituras
+on:
+  push:
+    paths:
+      - 'src/radar_parallel.py'
+      - 'tests/test_radar_parallel.py'
+      - '.github/workflows/radar-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compilar codigo Python
+        run: python3 -m compileall -q src
+      - name: Ejecutar tests sin Neon y sin red
+        run: python3 -m unittest discover -s tests -v
