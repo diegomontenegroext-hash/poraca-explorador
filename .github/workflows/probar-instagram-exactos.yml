@@ -1,0 +1,28 @@
+name: Por Aca - Instagram URL exacta
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'src/instagram_exact_probe.py'
+      - 'tests/test_instagram_exact_probe.py'
+      - '.github/workflows/probar-instagram-exactos.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: poraca-instagram-url-exacta
+  cancel-in-progress: false
+
+jobs:
+  comparar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Obtener repositorio
+        uses: actions/checkout@v4
+      - name: Validar codigo sin acceso externo
+        run: python3 -m unittest discover -s tests -v
+      - name: Comparar enlaces exactos historicos de Instagram
+        run: python3 src/instagram_exact_probe.py
