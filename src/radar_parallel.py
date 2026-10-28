@@ -16,6 +16,7 @@ import sys
 import time
 import uuid
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 from html.parser import HTMLParser
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, unquote, urljoin, urlparse
@@ -167,16 +168,30 @@ def structured_event(page: Parser) -> dict:
 
 
 def iso_event_fields(date_value: str | None) -> tuple[str | None, str | None]:
-    if not isinstance(date_value, str):
-        return None, None
-    match = re.match(r"^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}))?", date_value)
-    if not match:
-        return None, None
+    """Convert absolute schema.org timestamps to LOCAL Argentina event time.
+
+    Date-only starts retain unknown hours. Offset-naive timestamps remain
+    wall-clock values and require independent confirmation; Z/+HH:MM inputs
+    represent instants and must be converted to America/Argentina/Buenos_Aires.
+    Never parse by truncating at 'T' as that makes UTC 23:30 look like 23:30 ART.
+    """
+    if not isinstance(date_value,str):
+        return None,None
+    raw=date_value.strip()
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}",raw):
+        try:return datetime.strptime(raw,"%Y-%m-%d").date().isoformat(),None
+        except ValueError:return None,None
+    if not re.fullmatch(
+        r"\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}"
+        r"(?::\d{2}(?:\.\d{1,6})?)?(?:Z|[+-]\d{2}:?\d{2})?",raw,re.I):
+        return None,None
     try:
-        datetime.strptime(match.group(1), "%Y-%m-%d")
+        parsed=datetime.fromisoformat(raw.replace("Z","+00:00").replace("z","+00:00"))
+        if parsed.tzinfo is not None:
+            parsed=parsed.astimezone(ZoneInfo("America/Argentina/Buenos_Aires"))
     except ValueError:
-        return None, None
-    return match.group(1), match.group(2)
+        return None,None
+    return parsed.date().isoformat(),parsed.strftime("%H:%M")
 
 
 def fetch(url: str) -> tuple[int | None, str | None, str | None]:
