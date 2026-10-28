@@ -1,4 +1,4 @@
-name: Por Aca - Radar Definitivo (experimental)
+name: Por Aca - Radar Definitivo (operativo por etapas)
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "FULL: barrido por lotes; incremental: fuentes vencidas"
+        description: "FULL diario o incremental; se graba en schema staging sin publicar"
         required: true
         type: choice
         default: incremental
@@ -16,10 +16,9 @@ on:
           - incremental
           - full
   schedule:
-    # Tres incrementales por dia. Argentina UTC-3: 23:27, 07:27, 15:27.
-    - cron: '27 2,10,18 * * *'
-    # Reexploracion FULL una vez por semana: domingos 02:42 ART.
-    - cron: '42 5 * * 0'
+    # America/Argentina/Buenos_Aires (UTC-3). GitHub puede retrasar.
+    - cron: '17 6 * * *'       # FULL 03:17 ART diario
+    - cron: '17 14,22 * * *'   # incrementales 11:17 / 19:17 ART
 
 permissions:
   contents: read
@@ -30,20 +29,21 @@ concurrency:
 
 jobs:
   definitivo:
-    name: Fuentes, conexiones, entidades y memoria en Neon experimental
+    name: Descubrir, deduplicar y registrar en staging Neon
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 38
     steps:
       - name: Obtener codigo
         uses: actions/checkout@v4
-      - name: QA de reglas sin acceder a Neon
+      - name: QA local obligatorio
         run: |
           python3 -m compileall -q src
           python3 -m unittest discover -s tests -v
       - name: Cliente de Neon
         run: python3 -m pip install --disable-pip-version-check "psycopg[binary]>=3.2,<4"
-      - name: Ejecutar Radar Definitivo
+      - name: Ejecutar Radar Definitivo (operativo al registrar secret especifico)
         env:
+          NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
           NEON_EXPLORADOR_DATABASE_URL: ${{ secrets.NEON_EXPLORADOR_DATABASE_URL }}
-          RADAR_SCOPE: ${{ github.event_name == 'push' && 'full' || github.event.schedule == '42 5 * * 0' && 'full' || inputs.mode || 'incremental' }}
+          RADAR_SCOPE: ${{ github.event_name == 'push' && 'full' || github.event.schedule == '17 6 * * *' && 'full' || inputs.mode || 'incremental' }}
         run: python3 src/radar_definitivo.py --mode "$RADAR_SCOPE"
