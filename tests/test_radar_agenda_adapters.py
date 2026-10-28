@@ -102,6 +102,36 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertEqual(events[-1]["venue"],
             "Teatro Bar Cultural La Ferretería")
 
+    def test_alpedo_never_leaks_partial_img_div_into_venue(self):
+        day=date.today()+timedelta(days=1)
+        month=next(k for k,v in ad.MONTHS.items() if v==day.month)
+        # Regression from actual first FULL, where 49 of 70 venues
+        # ended in '<div class="img-thumb-container ...' because the
+        # old regex could remove complete tags but not partial ones.
+        raw=(f"<p>{month} {day.year}</p>"
+             '<h6>La marcha sobre Roma (Dir. Dino Risi)</h6>'
+             '<p>17:30</p><p><i></i>Teatro Bar Cultural La Ferretería</p>'
+             '<div class="img-thumb-container '+('rounded '*300)
+             +'<h6>¿Sueñan las plantas con poemas?</h6>'
+             '<p>18:00</p><p><i></i>Museo Almafuerte</p>')
+        rows=ad.extract_listings(raw,"https://alpedo.ar/?fecha="+day.isoformat())
+        self.assertEqual(len(rows),2)
+        self.assertEqual(rows[0]["venue"],"Teatro Bar Cultural La Ferretería")
+        self.assertEqual(rows[1]["venue"],"Museo Almafuerte")
+        self.assertTrue(all("<" not in x["venue"] for x in rows))
+
+    def test_alpedo_ignores_inline_javascript_after_last_venue(self):
+        day=date.today()+timedelta(days=1)
+        month=next(k for k,v in ad.MONTHS.items() if v==day.month)
+        raw=(f"<p>{month} {day.year}</p>"
+             '<h6>Cantamos fatal</h6><p>21:00</p>'
+             '<p><i></i>Ciudad de Gatos</p>'
+             '<script>var tooltipTriggerList = [].slice.call(document.querySelectorAll("a"));</script>'
+             '</body>')
+        res=ad.extract_listings(raw,"https://alpedo.ar/?fecha="+day.isoformat())
+        self.assertEqual(len(res),1)
+        self.assertEqual(res[0]["venue"],"Ciudad de Gatos")
+
     def test_alpedo_browser_redirect_must_preserve_exact_day(self):
         from radar_genda_browser import matches_alpedo_date_response
         target="https://alpedo.ar/?fecha=2026-10-29"
