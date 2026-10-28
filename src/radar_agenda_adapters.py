@@ -275,7 +275,7 @@ def source_specific_sessions(raw,url,blocks):
                     tm=found.group(2).zfill(5)
                     rec=make_record(title,d,tm,venue,url,"metro_official_ticket_date","primary_venue")
                     if rec:records.append(rec)
-        elif path.rstrip("/")=="/entradas/cartelera":
+        elif re.fullmatch(r"/entradas/cartelera(?:/[1-3])?/?",path):
             # Index is organization-owned; individual ticket pages have
             # higher evidentiary value and arrive via watchlist or anchor.
             titles=list(re.finditer(r"<h3\b[^>]*>(.*?)</h3\s*>",raw,re.I|re.S))
@@ -675,6 +675,40 @@ def extract_listings(raw,url):
 def special_links(url,page,at=None):
     """Verified source-specific discovery with near-date priority and rotation."""
     host,path=scope(url)
+    if host in ("teatrometrolp.com.ar","www.teatrometrolp.com.ar") and (
+            path.rstrip("/")=="/entradas/cartelera"):
+        # La cartelera oficial del Teatro Metro está paginada. La segunda
+        # página no era recorrida: el lector de índice sólo procesaba /cartelera.
+        # Solo seguir paginación enlazada EXPLÍCITAMENTE en HTML original,
+        # mismo dominio HTTPS, índice acotado y parámetros vacíos de filtros.
+        # Esto usa un slot de detalle ya presupuestado; sin crawler ni cron.
+        discovered={}
+        for href,label in page.links:
+            raw=(href or "").strip()
+            if not raw or raw.startswith("//"):
+                continue
+            if raw.startswith("/"):
+                absolute="https://"+host+raw
+            elif raw.startswith("https://"):
+                absolute=raw
+            else:
+                continue
+            p=urlsplit(absolute)
+            if (p.scheme!="https" or p.hostname not in (
+                    "teatrometrolp.com.ar","www.teatrometrolp.com.ar")
+                or p.username or p.password or p.port not in (None,443)
+                or p.fragment or not re.fullmatch(
+                    r"/entradas/cartelera/([1-3])/?",p.path,re.I)):
+                continue
+            if p.query and (not re.fullmatch(
+                    r"(?:anio=&mes=|mes=&anio=)",p.query)):
+                continue
+            page_number=int(re.search(r"/([1-3])/?$",p.path).group(1))
+            discovered[page_number]=("https://"+p.hostname+
+                                    "/entradas/cartelera/"+str(page_number)+"/",
+                                    "cartelera oficial, pagina "+str(page_number))
+        # Una única página adicional por FULL, sin recursión/paginación infinita.
+        return [discovered[min(discovered)]] if discovered else []
     if host in ("casametro.com.ar","www.casametro.com.ar") and (
             path in ("/","/cartelera/","/categoria-producto/casa-metro/")):
         # casa_metro_dated_links_rotating: the original category is ordered
