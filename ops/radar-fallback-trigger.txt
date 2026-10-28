@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Control de sesiones Select y EcoSelect desde agenda de cine, solo staging.
+# Fallback Chrome exclusivo del Teatro Argentino, escribir solo staging Neon.
 trigger_date=2026-10-28
 trigger_slot=bootstrap
 trigger_mode=incremental
-trigger_reason=cinema_select_ecoselect_monthly_20261028
+trigger_reason=argentino_official_browser_smoke_20261028
