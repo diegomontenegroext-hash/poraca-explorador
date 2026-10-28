@@ -1,5 +1,15 @@
 # Por Acá · Explorador cultural
 
+## Nuevo: Radar paralelo 0.1 · base Neon aislada
+
+**Ya instalados:** programa `src/radar_parallel.py`, pruebas, [workflow Radar paralelo](https://github.com/diegomontenegroext-hash/poraca-explorador/actions/workflows/radar-paralelo.yml) y base independiente `poraca_explorador` con 13 fuentes. El Radar original de ChatGPT sigue intacto.
+
+**Estado de puesta en marcha:** modo `dry-run` verificado; escritura real pendiente de configurar un secreto de conexión de Neon una sola vez. [Pasos exactos y consulta SQL de control](docs/RADAR_PARALELO_OPERACION.md).
+
+Los datos nuevos se guardarán siempre como `candidates.review_state='unverified'`: no se publican automáticamente ni se confunden con hechos aceptados.
+
+---
+
 Experimento de adquisición cultural de La Plata, gratuito, autónomo y separado del proyecto privado **Por Acá**.
 
 **Estado:** tres pruebas read-only completadas: webs, permalinks exactos y descubrimiento de enlaces desde agendas. Aún no es un Radar completo. Nueve fuentes (6 webs / 3 perfiles Instagram); intenta leer HTML y registrar pistas **no verificadas**.
