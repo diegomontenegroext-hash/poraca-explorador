@@ -13,6 +13,7 @@ import json
 import os
 import re
 import sys
+import time
 import uuid
 from datetime import datetime, timedelta, timezone
 from html.parser import HTMLParser
@@ -24,8 +25,10 @@ DB_NAME = "poraca_explorador"
 DB_ROLE = "poraca_explorador_writer"
 MAX_BODY = 450_000
 REQUEST_TIMEOUT = 10
-MAX_SOURCES = 6
-MAX_DETAILS = 3
+MAX_SOURCES = 13
+MAX_DETAILS_FULL = 9
+MAX_DETAILS_INCREMENTAL = 4
+MAX_RUNTIME_SECONDS = 18 * 60
 USER_AGENT = "PorAcaExplorador/0.1 (+public noncommercial cultural links; contact via repository)"
 INSTAGRAM = re.compile(
     r"^/(?:[A-Za-z0-9_.]+/)?(p|reel)/([A-Za-z0-9_-]+)/?$",
@@ -258,7 +261,8 @@ def make_candidate(url: str, source_id: str, label: str, detail: Parser | None,
     }
 
 
-def scan_source(source: dict) -> tuple[dict, list[dict]]:
+def scan_source(source: dict, max_details: int = MAX_DETAILS_INCREMENTAL,
+                deadline: float | None = None) -> tuple[dict, list[dict]]:
     source_id, url = source["source_id"], source["url"]
     status, body, error = fetch(url)
     check = {"source_id": source_id, "http_status": status, "error_type": error,
@@ -269,7 +273,11 @@ def scan_source(source: dict) -> tuple[dict, list[dict]]:
     parsed = parse_html(body)
     links = discover_links(body, parsed, url)
     candidates = []
-    for link, label in links[:MAX_DETAILS]:
+    # El primer nivel privilegia posts exactos e ítems, nunca categorías.
+    ordered = sorted(links, key=lambda item: (not exact_instagram(item[0]),))
+    for link, label in ordered[:max_details]:
+        if deadline is not None and time.monotonic() >= deadline:
+            break
         detail_status, detail_body, detail_err = fetch(link)
         detail = parse_html(detail_body) if detail_body else None
         if detail:
@@ -279,6 +287,26 @@ def scan_source(source: dict) -> tuple[dict, list[dict]]:
             candidate["evidence"]["detail_error"] = detail_err
         candidates.append(candidate)
         if detail_status == 429:
+            break
+        # Segundo nivel: posts exactos publicados dentro de notas/carteleras.
+        # No se accede al feed, y se limita a dos enlaces por nota.
+        if detail_body and not exact_instagram(link) and len(candidates) < max_details + 3:
+            embedded = [x for x, _ in discover_links(detail_body, detail, link) if exact_instagram(x)]
+            for permalink in embedded[:2]:
+                if deadline is not None and time.monotonic() >= deadline:
+                    break
+                if any(existing["original_url"] == permalink for existing in candidates):
+                    continue
+                post_status, post_body, post_error = fetch(permalink)
+                post_page = parse_html(post_body) if post_body else None
+                post = make_candidate(permalink, source_id, "Enlace exacto desde la nota", post_page, post_status)
+                post["evidence"]["linked_from"] = link
+                if post_error:
+                    post["evidence"]["detail_error"] = post_error
+                candidates.append(post)
+                if post_status == 429:
+                    break
+        if len(candidates) >= max_details + 3:
             break
     check["discovered_links"] = len(links)
     return check, candidates
@@ -300,8 +328,16 @@ def save_check(conn, run_id: str, source: dict, check: dict, candidates: list[di
             if cur.fetchone():
                 new_count += 1
             else:
-                cur.execute("""UPDATE candidates SET last_seen_at=now(),seen_count=seen_count+1
-                               WHERE original_url=%s""",(c["original_url"],))
+                cur.execute("""UPDATE candidates SET last_seen_at=now(), seen_count=seen_count+1,
+                        title=CASE WHEN %s IS NOT NULL AND %s <> '' THEN %s ELSE title END,
+                        summary=CASE WHEN %s IS NOT NULL AND %s <> '' THEN %s ELSE summary END,
+                        event_date=COALESCE(event_date,%s), event_time=COALESCE(event_time,%s),
+                        organizer=COALESCE(organizer,%s),venue=COALESCE(venue,%s),
+                        evidence=CASE WHEN %s THEN evidence || %s::jsonb ELSE evidence END
+                        WHERE original_url=%s""",
+                    (c["title"],c["title"],c["title"],c["summary"],c["summary"],c["summary"],
+                     c["event_date"],c["event_time"],c["organizer"],c["venue"],
+                     bool(c["evidence"].get("detail_opened")),json.dumps(c["evidence"]),c["original_url"]))
         cur.execute(
             """INSERT INTO source_checks(run_id,source_id,status,http_status,pages_opened,
                 discovered_links,error_type) VALUES (%s,%s,%s,%s,%s,%s,%s)""",
@@ -340,7 +376,10 @@ def db_connect():
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=["dry-run", "write"], default="dry-run")
+    parser.add_argument("--scope", choices=["full", "incremental"], default="incremental")
     args = parser.parse_args()
+    deadline = time.monotonic() + MAX_RUNTIME_SECONDS
+    max_details = MAX_DETAILS_FULL if args.scope == "full" else MAX_DETAILS_INCREMENTAL
     run_id = "explorador-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:6]
     conn = None
     if args.mode == "write":
@@ -350,9 +389,16 @@ def main() -> int:
             print("CONFIG_ERROR: "+str(exc), file=sys.stderr)
             return 2
         with conn.cursor() as cur:
-            cur.execute("""SELECT source_id,url,kind,cadence_hours FROM sources
-                           WHERE enabled AND next_due_at<=now()
-                           ORDER BY next_due_at,source_id LIMIT %s""",(MAX_SOURCES,))
+            if args.scope == "full":
+                cur.execute("""SELECT source_id,url,kind,cadence_hours FROM sources
+                               WHERE enabled
+                               ORDER BY last_checked_at NULLS FIRST, source_id LIMIT %s""",
+                            (MAX_SOURCES,))
+            else:
+                cur.execute("""SELECT source_id,url,kind,cadence_hours FROM sources
+                               WHERE enabled AND next_due_at<=now()
+                               ORDER BY next_due_at,source_id LIMIT %s""",
+                            (MAX_SOURCES,))
             rowset = cur.fetchall()
             sources = [dict(source_id=a,url=b,kind=c,cadence_hours=d) for a,b,c,d in rowset]
             cur.execute("INSERT INTO radar_runs(run_id) VALUES (%s)",(run_id,))
@@ -363,7 +409,10 @@ def main() -> int:
     count, good, seen, new = 0, 0, 0, 0
     try:
         for source in sources:
-            check, candidates = scan_source(source)
+            if time.monotonic() >= deadline:
+                print("RUN_BUDGET_EXHAUSTED: remaining sources remain due", file=sys.stderr)
+                break
+            check, candidates = scan_source(source,max_details=max_details,deadline=deadline)
             count += 1
             good += int(check["status"] == "ok")
             seen += len(candidates)
@@ -375,16 +424,18 @@ def main() -> int:
                               "error_type":check["error_type"],
                               "candidates":len(candidates),"sample_urls":[x["original_url"] for x in candidates[:2]]},
                              ensure_ascii=False))
-        status = "completed" if good == count else "partial"
+        status = "completed" if good == count and count == len(sources) else "partial"
         if conn:
             with conn.cursor() as cur:
                 cur.execute("""UPDATE radar_runs SET finished_at=now(),status=%s,sources_attempted=%s,
                     sources_success=%s,candidates_seen=%s,candidates_new=%s,note=%s
                     WHERE run_id=%s""",
                     (status,count,good,seen,new,
-                     "No sources due" if count == 0 else "Candidates are unverified, not accepted events",run_id))
+                     ("NO_SOURCES_DUE:" if count == 0 else "SCOPE_"+args.scope.upper()+":")
+                     + " Candidates remain unverified, not accepted events",run_id))
             conn.commit()
-        result = {"run_id":run_id,"mode":args.mode,"status":status,"sources_attempted":count,
+        result = {"run_id":run_id,"mode":args.mode,"scope":args.scope,"status":status,
+                  "sources_selected":len(sources),"sources_attempted":count,
                   "sources_success":good,"candidates_seen":seen,"candidates_new":new,
                   "database_written":bool(conn)}
         print("RADAR_RESULT "+json.dumps(result,ensure_ascii=False))
@@ -394,7 +445,7 @@ def main() -> int:
                 f.write("# Radar paralelo · "+run_id+"\n\n")
                 f.write("| Modo | Estado | Fuentes | Accesibles | Candidatos vistos | Nuevos en Neon |\n"
                         "|---|---|---:|---:|---:|---:|\n")
-                f.write(f"| {args.mode} | {status} | {count} | {good} | {seen} | {new} |\n\n")
+                f.write(f"| {args.mode}/{args.scope} | {status} | {count} | {good} | {seen} | {new} |\n\n")
                 f.write("Los candidatos no son eventos verificados ni datos publicados en la web.\n")
         return 0 if (not sources or good) else 1
     except Exception as exc:
