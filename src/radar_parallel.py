@@ -329,9 +329,9 @@ def save_check(conn, run_id: str, source: dict, check: dict, candidates: list[di
                 new_count += 1
             else:
                 cur.execute("""UPDATE candidates SET last_seen_at=now(), seen_count=seen_count+1,
-                        title=CASE WHEN %s IS NOT NULL AND %s <> '' THEN %s ELSE title END,
-                        summary=CASE WHEN %s IS NOT NULL AND %s <> '' THEN %s ELSE summary END,
-                        event_date=COALESCE(event_date,%s), event_time=COALESCE(event_time,%s),
+                        title=CASE WHEN %s::text IS NOT NULL AND %s::text <> '' THEN %s::text ELSE title END,
+                        summary=CASE WHEN %s::text IS NOT NULL AND %s::text <> '' THEN %s::text ELSE summary END,
+                        event_date=COALESCE(event_date,%s::date), event_time=COALESCE(event_time,%s::text),
                         organizer=COALESCE(organizer,%s),venue=COALESCE(venue,%s),
                         evidence=CASE WHEN %s THEN evidence || %s::jsonb ELSE evidence END
                         WHERE original_url=%s""",
