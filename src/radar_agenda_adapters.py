@@ -677,12 +677,13 @@ def special_links(url,page,at=None):
     host,path=scope(url)
     if host in ("teatrometrolp.com.ar","www.teatrometrolp.com.ar") and (
             path.rstrip("/")=="/entradas/cartelera"):
-        # La cartelera oficial del Teatro Metro está paginada. La segunda
-        # página no era recorrida: el lector de índice sólo procesaba /cartelera.
-        # Solo seguir paginación enlazada EXPLÍCITAMENTE en HTML original,
-        # mismo dominio HTTPS, índice acotado y parámetros vacíos de filtros.
-        # Esto usa un slot de detalle ya presupuestado; sin crawler ni cron.
+        # La cartelera del Teatro Metro tiene a la vez indices paginados
+        # y fichas /entrada/<slug>. Antes solo se leía la segunda página:
+        # faltaban los originales de funciones próximas y se perdía el
+        # primer E2E de Las Hijas 08/11 (dos funciones separadas).
+        # Aperturas DENTRO de MAX_DETAILS_FULL=6, nunca cron adicional.
         discovered={}
+        tickets={}
         for href,label in page.links:
             raw=(href or "").strip()
             if not raw or raw.startswith("//"):
@@ -697,34 +698,40 @@ def special_links(url,page,at=None):
             if (p.scheme!="https" or p.hostname not in (
                     "teatrometrolp.com.ar","www.teatrometrolp.com.ar")
                 or p.username or p.password or p.port not in (None,443)
-                or p.fragment or not re.fullmatch(
-                    r"/entradas/cartelera/([1-3])/?",p.path,re.I)):
+                or p.fragment):
                 continue
-            if p.query and (not re.fullmatch(
-                    r"(?:anio=&mes=|mes=&anio=)",p.query)):
-                continue
-            page_number=int(re.search(r"/([1-3])/?$",p.path).group(1))
-            discovered[page_number]=("https://"+p.hostname+
-                                    "/entradas/cartelera/"+str(page_number)+"/",
-                                    "cartelera oficial, pagina "+str(page_number))
-        # Una única página adicional por FULL, sin recursión/paginación infinita.
-        if discovered:
-            return [discovered[min(discovered)]]
-        # Original verificado 28/10/2026: /entradas/cartelera/1/
-        # devuelve HTTP 200 y funciones posteriores incluso cuando la portada
-        # carece de enlace siguiente. Sólo usarlo como un detalle acotado si la
-        # portada contiene fichas de funciones originales /entrada/.
-        # Nunca construir índices arbitrarios ni seguir fuera del dominio.
-        for href,label in page.links:
-            p=urlsplit((href or "").strip())
-            if (p.scheme=="https"
-                and p.hostname in ("teatrometrolp.com.ar",
-                                   "www.teatrometrolp.com.ar")
-                and re.fullmatch(r"/entrada/[a-z0-9_.-]+/?",p.path,re.I)
-                and not p.query and not p.fragment):
-                return [("https://"+host+"/entradas/cartelera/1/",
-                         "cartelera oficial verificada, pagina 1")]
-        return []
+            if re.fullmatch(r"/entradas/cartelera/([1-3])/?",p.path,re.I):
+                if p.query and not re.fullmatch(
+                        r"(?:anio=&mes=|mes=&anio=)",p.query):
+                    continue
+                number=int(re.search(r"/([1-3])/?$",p.path).group(1))
+                discovered.setdefault(number,("https://"+p.hostname+
+                                    "/entradas/cartelera/"+str(number)+"/",
+                                    "cartelera oficial, pagina "+str(number)))
+            elif (not p.query and re.fullmatch(
+                    r"/entrada/[a-z0-9_.-]+/?",p.path,re.I)):
+                # Sólo fichas realmente enlazadas DESDE la cartelera
+                # oficial, nunca construir un slug desde el título.
+                normalized="https://"+p.hostname+p.path.rstrip("/")
+                tickets.setdefault(normalized,(normalized,"detalle oficial"))
+        page_link=[discovered[min(discovered)]] if discovered else []
+        if not page_link and tickets:
+            # El original devuelve HTTP200 en /1/ pero no siempre ofrece
+            # 'Siguiente'. Una apertura adicional sólo si hay fichas
+            # /entrada/ en la portada (no generar paginación sin señal).
+            page_link=[("https://"+host+"/entradas/cartelera/1/",
+                        "cartelera oficial verificada, pagina 1")]
+        ordered=list(tickets.values())   # Orden de cartelera, fechas próximas.
+        slots=max(0,6-len(page_link))
+        fixed=ordered[:min(2,slots)]
+        later=ordered[len(fixed):]
+        chosen=list(page_link)+fixed
+        if later and len(chosen)<6:
+            now=at or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
+            offset=(now.date().toordinal()*3+now.hour//8)%len(later)
+            chosen.extend(later[(offset+i)%len(later)]
+                          for i in range(min(6-len(chosen),len(later))))
+        return chosen[:6]
     if host in ("casametro.com.ar","www.casametro.com.ar") and (
             path in ("/","/cartelera/","/categoria-producto/casa-metro/")):
         # casa_metro_dated_links_rotating: the original category is ordered
