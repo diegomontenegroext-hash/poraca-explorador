@@ -102,7 +102,7 @@ def extract_listings(raw,url):
         if title:
             # Several clock times may appear before ONE printed performance date.
             text=tidy(" ".join(blocks.text))
-            for m in re.finditer(r"Entrada:\s*[^.]{0,220}?\b([0-3]?\d/[01]?\d/20\d{2})",text,re.I):
+            for m in re.finditer(r"Entrada:\s*.{0,220}?\b([0-3]?\d/[01]?\d/20\d{2})",text,re.I):
                 d=parse_dmy(m.group(1))
                 times=list(dict.fromkeys(CLOCK.findall(m.group(0))))
                 for tm in times[:6]:
@@ -167,9 +167,9 @@ def special_links(url,page):
         links=[]
         now=datetime.now().date()
         for raw,label in page.links:
-            if not raw.startswith("https://") and not raw.startswith("/?"):
+            if not raw.startswith("https://") and not raw.startswith("/?") and not raw.startswith("?"):
                 continue
-            absolute=raw if raw.startswith("https://") else "https://agendalaplata.ar"+raw
+            absolute=raw if raw.startswith("https://") else "https://agendalaplata.ar"+(raw if raw.startswith("/") else "/"+raw)
             h,p=scope(absolute)
             if h not in ("agendalaplata.ar","www.agendalaplata.ar") or p!="/":
                 continue
