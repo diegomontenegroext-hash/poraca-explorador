@@ -227,22 +227,26 @@ def source_specific_sessions(raw,url,blocks):
                 # explicit day/month and clock; do not take a promotional
                 # sentence, a book/ticket deadline, or the baseline title.
                 body_text=tidy(" ".join(blocks.text))
-                headline=re.search(
-                    r"\b((?:Obra teatral|Concierto|Masterclass|Charlas? Magistrales|"
-                    r"Clase magistral|Espect[aá]culo|Ballet|Teatro)"
-                    r".{8,235}?)\s*\|\s*"
-                    r"(lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)"
-                    r"\s+([0-3]?\d)/([01]?\d)\s*\|\s*"
-                    r"((?:[01]?\d|2[0-3]):[0-5]\d)\b",
+                # Anchor on the printed weekday/date/hour pair, then find the
+                # *nearest explicit event type*. This prevents navigation like
+                # "teatro Historia Salas TEMPORADA..." from leaking into titles.
+                header=re.search(
+                    r"\|\s*(?:lunes|martes|mi[eé]rcoles|jueves|viernes|"
+                    r"s[aá]bado|domingo)\s+([0-3]?\d)/([01]?\d)"
+                    r"\s*\|\s*((?:[01]?\d|2[0-3]):[0-5]\d)\b",
                     body_text,re.I)
-                if headline:
-                    exact_day=parse_dmy(exact.group(1))
-                    # If the header and the official date field disagree,
-                    # return no record and retain the original for review.
-                    if (exact_day and int(headline.group(3))==exact_day.day and
-                        int(headline.group(4))==exact_day.month and
-                        headline.group(5)==exact.group(2).zfill(5)):
-                        caption=headline.group(1)
+                if header:
+                    official_date=parse_dmy(exact.group(1))
+                    if (official_date and int(header.group(1))==official_date.day
+                        and int(header.group(2))==official_date.month
+                        and header.group(3)==exact.group(2).zfill(5)):
+                        before=body_text[max(0,header.start()-260):header.start()]
+                        labels=list(re.finditer(
+                            r"\b(?:Obra teatral|Concierto|Masterclass|"
+                            r"Clase magistral|Charlas Magistrales|Espect[aá]culo|"
+                            r"Ballet|Danza)\b",before,re.I))
+                        if labels:
+                            caption=before[labels[-1].start():].strip()
             pieces=[tidy(x) for x in caption.split("|")] if caption else []
             title=(pieces[1] if len(pieces)>1 and
                    pieces[0].casefold() in ("concierto","teatro","masterclass","obra teatral")
