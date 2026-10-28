@@ -150,13 +150,20 @@ def choose_sources(conn, mode):
                              else "casametro.com.ar" if "casametro.com.ar" in host
                              else None)
                 if not target_host: continue
-                cur.execute("""SELECT DISTINCT event_payload->>'source_url' AS url
-                     FROM radar_definitivo.canonical_baseline_snapshots
-                     WHERE snapshot_id='baseline-20261028-v1'
-                     AND event_date>=current_date-interval '7 days'
-                     AND event_date<=current_date+interval '80 days'
-                     AND event_payload->>'source_url' LIKE %s
-                     ORDER BY url LIMIT %s""",
+                cur.execute("""WITH watchlist AS (
+                         SELECT event_payload->>'source_url' AS url,
+                                min(event_date) AS next_date
+                         FROM radar_definitivo.canonical_baseline_snapshots
+                         WHERE snapshot_id='baseline-20261028-v1'
+                           AND event_date>=current_date-interval '7 days'
+                           AND event_date<=current_date+interval '80 days'
+                           AND event_payload->>'source_url' LIKE %s
+                         GROUP BY event_payload->>'source_url'
+                       )
+                       SELECT w.url FROM watchlist w
+                       LEFT JOIN radar_definitivo.candidates c ON c.url=w.url
+                       ORDER BY c.last_seen_at ASC NULLS FIRST,
+                                w.next_date ASC,w.url ASC LIMIT %s""",
                      ("https://"+target_host+("/obra%" if "alternativa" in host else "/evento/%"),
                       MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL))
                 src["seed_urls"]=[row[0] for row in cur.fetchall() if row[0]]
