@@ -26,6 +26,7 @@ from radar_parallel import (
 )
 from radar_agenda_adapters import extract_listings, special_links, tidy
 from radar_evidence_quality import summarize as summarize_evidence_quality
+from radar_gate_alias_preflight import SQL as SHADOW_ALIAS_SQL, summarize as summarize_aliases
 from instagram_seed_inbox import choose_seed_sources, public_instagram_metadata
 from radar_genda_browser import render_date_pages, validated_date_pages, render_argentino_event_pages, render_alpedo_date_pages
 
@@ -810,6 +811,19 @@ def main():
             conn.rollback()
             stats["evidence_quality"]={"status":"unavailable",
                                        "reason":type(exc).__name__}
+        # Shadow collision check: not a replacement for the ingestion gate.
+        # Source-specific category and detail URLs can refer to ONE existing
+        # public observation, despite an exact-URL count of zero.
+        try:
+            with conn.cursor() as cur:
+                cur.execute(SHADOW_ALIAS_SQL)
+                aliases=cur.fetchall()
+            stats["evidence_quality"]["public_observation_aliases"]=summarize_aliases(aliases)
+        except Exception as exc:
+            conn.rollback()
+            stats["evidence_quality"]["public_observation_aliases"]={
+                "status":"unavailable","reason":type(exc).__name__,
+                "authorized_to_write":False}
         state=("complete" if stats["checked"]==stats["selected"] and
                stats["checked"]==stats["success"] else "partial")
         info=dict(**stats,mode=args.mode,
