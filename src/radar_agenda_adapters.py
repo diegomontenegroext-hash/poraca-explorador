@@ -82,6 +82,10 @@ def active_date(d,at=None):
 def make_record(title,when,time,venue,url,method,tier):
     title=tidy(title)[:180]
     venue=tidy(venue)[:180]
+    # Fail closed on residual/incomplete markup from bounded agenda HTML.
+    # Existing historical rows remain untouched and must be audited read-only.
+    if re.search(r"<|>|\\b(?:class=|document\\.|javascript:|<script)\\b",venue,re.I):
+        venue=""
     if len(title)<4 or not active_date(when):
         return None
     if time is not None and not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d",time):

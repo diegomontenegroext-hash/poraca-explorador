@@ -102,6 +102,20 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertEqual(events[-1]["venue"],
             "Teatro Bar Cultural La Ferretería")
 
+    def test_all_agenda_adapters_quarantine_truncated_markup_venue(self):
+        when=date.today()+timedelta(days=1)
+        url="https://agendalaplata.ar/?fecha="+when.isoformat()
+        broken=ad.make_record("Exposición documental",when,"18:00",
+             'Centro Cultural Estación Provincial <div class="img-thum',
+             url,"genda_dated_listing","secondary_agenda")
+        self.assertIsNotNone(broken)
+        self.assertIsNone(broken["venue"],"Sede contaminada debe quedar sin acreditar")
+        safe=ad.make_record("Exposición documental",when,"18:00",
+             "Centro Cultural Estación Provincial",url,
+             "genda_dated_listing","secondary_agenda")
+        self.assertEqual(safe["venue"],"Centro Cultural Estación Provincial")
+        self.assertEqual(broken["review_state"],"observed_unverified")
+
     def test_alpedo_never_leaks_partial_img_div_into_venue(self):
         day=date.today()+timedelta(days=1)
         month=next(k for k,v in ad.MONTHS.items() if v==day.month)
