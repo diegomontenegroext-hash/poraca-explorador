@@ -29,6 +29,28 @@ class RadarDefinitivoTests(unittest.TestCase):
         self.assertEqual(rd.EXPECTED_OPERATIVE_DB,"neondb")
         self.assertEqual(rd.EXPECTED_OPERATIVE_SCOPE,"poraca_definitivo_scope")
 
+    def test_legacy_category_pistas_are_nonbinding_and_public_vocabulary(self):
+        # Es una pista de staging, jamás una clasificación aprobada.
+        cases={
+            "Exposición de fotografía platense":"artes",
+            "Muestra de esculturas en el museo":"artes",
+            "Taller de cerámica para principiantes":"ceramica",
+            "Clase de yoga para adultos":"yoga",
+            "Ciclo de cine árabe":"cine",
+            "Obra de teatro experimental":"teatro",
+            "Concierto de música contemporánea":"musica",
+            "Milonga y tango en vivo":"danza",
+            "Taller comunitario de oficios":None,
+            "Casa Tomada reabre sus puertas":None,
+            "Fábrica CITA":None
+        }
+        for title,expected in cases.items():
+            with self.subTest(title=title):
+                self.assertEqual(rd.classify_category(title),expected)
+        self.assertNotIn("arte",{x for x in cases.values() if x})
+        self.assertNotIn("formacion",{x for x in cases.values() if x})
+        self.assertEqual(rd.classify_category(None),None)
+
     def test_instagram_profiles_are_not_fetched_as_posts(self):
         b=rd.Budget(seconds=100)
         self.assertTrue(b.can_fetch("https://www.instagram.com/malisialibros/p/DeHOPiJRwNi/"))

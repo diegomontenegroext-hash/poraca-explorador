@@ -500,16 +500,26 @@ def credible_occurrence(candidate):
 
 
 def classify_category(title):
+    """Pista de disciplina de un anuncio, NO género ni estado editorial.
+
+    staging.category es nullable: un título genérico no prueba «comunidad».
+    «Taller/curso» son FORMATO, no disciplina; el contrato de publicación
+    decide luego las facetas del evento y la identidad por fuente original.
+    Vocabulario compatible con Por Acá (semantic-boundary-contract-v1).
+    """
     t=(title or "").casefold()
+    # La disciplina explícita gana sobre «taller» o «clase» del mismo título.
     for cat,words in [("cine",("cine","película","film","proyección")),
+                      ("ceramica",("cerámica","ceramica","alfarería","alfareria")),
+                      ("yoga",("yoga",)),
                       ("teatro",("teatro","obra","función","escena")),
                       ("musica",("recital","concierto","música","show","banda")),
                       ("danza",("danza","milonga","tango","baile")),
-                      ("arte",("exposición","muestra","galería")),
-                      ("formacion",("taller","curso","cerámica","clase","yoga"))]:
+                      ("artes",("exposición","muestra","galería"))]:
         if any(w in t for w in words):
             return cat
-    return "comunidad"
+    # No volver a emitir «arte»/«formacion» heredados ni asumir comunidad.
+    return None
 
 
 def entity_for(source_id,name,entity_type,url,origin):
