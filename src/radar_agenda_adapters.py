@@ -529,8 +529,8 @@ def alternativa_schedule_room(current_text,position,fallback):
     """
     prefix=current_text[:position]
     cities=list(re.finditer(
-        r"\\b([A-Za-zÁÉÍÓÚÜÑáéíóúüñ .]{2,48}?)\\s*-\\s*"
-        r"Buenos Aires\\s*-\\s*Argentina\\b",prefix,re.I))
+        r"\b([A-Za-zÁÉÍÓÚÜÑáéíóúüñ .]{2,48}?)\s*-\s*"
+        r"Buenos Aires\s*-\s*Argentina\b",prefix,re.I))
     if not cities:
         return fallback,False
     last=cities[-1]
@@ -539,9 +539,9 @@ def alternativa_schedule_room(current_text,position,fallback):
         return None,True
     segment=prefix[max(0,last.start()-320):last.start()]
     names=list(re.finditer(
-        r"\\b(TEATRO ESTUDIO DE LAS ARTES|ESPACIO 44|EN ESO ESTAMOS|"
+        r"\b(TEATRO ESTUDIO DE LAS ARTES|ESPACIO 44|EN ESO ESTAMOS|"
         r"ESCENARIO[- ]?40|CENTRO CULTURAL VIEJO ALMACEN EL OBRERO|"
-        r"SALA 420|TEATRO ARGENTINO|CASA METRO)\\b",segment,re.I))
+        r"SALA 420|TEATRO ARGENTINO|CASA METRO)\b",segment,re.I))
     if names:
         return tidy(names[-1].group(1)),False
     return fallback,False
