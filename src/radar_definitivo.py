@@ -24,7 +24,7 @@ from radar_parallel import (
     clean_link, compact, discover_links, WORDS, LOCAL_DETAIL,
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
 )
-from radar_agenda_adapters import extract_listings, special_links
+from radar_agenda_adapters import extract_listings, special_links, tidy
 from instagram_seed_inbox import choose_seed_sources, public_instagram_metadata
 from radar_genda_browser import render_date_pages, validated_date_pages, render_argentino_event_pages, render_alpedo_date_pages
 
