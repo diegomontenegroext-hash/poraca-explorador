@@ -1,7 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Segunda validacion extraordinaria de parser caption completo Luti.
-# Staging Neon; no modifica slots programados, no Motor, no Puente.
-trigger_date=2026-10-28
-trigger_slot=bootstrap
-trigger_mode=incremental
-trigger_reason=luti_reel_full_caption_v2_readback_20261028_2010_art
+# Disparo por Guardia GPT - orquestador principal.
+trigger_date=2026-10-29
+trigger_slot=05
+trigger_mode=full
+trigger_reason=gpt_primary_scheduler
