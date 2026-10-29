@@ -27,6 +27,7 @@ from radar_parallel import (
 from radar_agenda_adapters import extract_listings, special_links, tidy
 from radar_evidence_quality import summarize as summarize_evidence_quality
 from radar_gate_alias_preflight import SQL as SHADOW_ALIAS_SQL, summarize as summarize_aliases
+from radar_function_gate_review import query as function_review_sql, summarize as summarize_function_review
 from instagram_seed_inbox import choose_seed_sources, public_instagram_metadata
 from radar_genda_browser import render_date_pages, validated_date_pages, render_argentino_event_pages, render_alpedo_date_pages
 
@@ -822,6 +823,18 @@ def main():
         except Exception as exc:
             conn.rollback()
             stats["evidence_quality"]["public_observation_aliases"]={
+                "status":"unavailable","reason":type(exc).__name__,
+                "authorized_to_write":False}
+        # P0 function identity v2: a third bounded read-only preflight.
+        # Never applies an admission, even when a candidate has one original.
+        try:
+            with conn.cursor() as cur:
+                cur.execute(function_review_sql())
+                review_rows=cur.fetchall()
+            stats["evidence_quality"]["function_gate_v2"]=summarize_function_review(review_rows)
+        except Exception as exc:
+            conn.rollback()
+            stats["evidence_quality"]["function_gate_v2"]={
                 "status":"unavailable","reason":type(exc).__name__,
                 "authorized_to_write":False}
         state=("complete" if stats["checked"]==stats["selected"] and
