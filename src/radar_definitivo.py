@@ -240,6 +240,45 @@ def links_from_page(body, page, url):
     return sorted(out,key=lambda item:(not exact_instagram(item[0]),item[0]))
 
 
+def curator_multi_plan_preview(caption):
+    """Non-canonical line-level leads from a curated multi-plan caption.
+
+    A curator may mention venues, artists and menus in one reel. This only
+    records literal fragments and account handles. It never proposes an
+    approved event, a parsed date/time, venue identity or organizer role.
+    """
+    if not isinstance(caption,str) or len(caption)>40000:
+        return None
+    weekdays=r"(?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)"
+    plans=[]
+    anchor_days=set()
+    for raw_line in caption.splitlines()[:120]:
+        line=tidy(raw_line).strip('"')
+        if len(line)<12 or len(line)>800:
+            continue
+        handles=list(dict.fromkeys(re.findall(r"@([A-Za-z0-9._]{2,40})",line)))
+        if not handles:
+            continue
+        # No interpretation of roles, format or implied calendar date.
+        literal=re.match(r"^"+weekdays+r"\b",line,re.I)
+        if literal:
+            anchor_days.add(literal.group(0).casefold())
+        plans.append({"position":len(plans)+1,"fragment":line,
+                      "mentioned_accounts":handles,
+                      "literal_weekday":literal.group(0).casefold() if literal else None})
+        if len(plans)>=25:
+            break
+    # Reject a normal post with collaborator tags rather than a multi-day agenda.
+    if len(plans)<3 or len(anchor_days)<2:
+        return None
+    return {"state":"review_only","classification":"curatorial_multiplan_caption",
+            "plan_lead_count":len(plans),"event_count":0,
+            "original_confirmation_required":True,
+            "source_not_organizer":True,
+            "date_or_venue_inferred":False,
+            "leads":plans}
+
+
 def scan_exact_instagram_seeds(source, budget):
     """Leer exclusivamente permalinks aportados, NUNCA el perfil de origen."""
     check = dict(source_id=source["source_id"], http_status=None, status="failed",
@@ -271,6 +310,10 @@ def scan_exact_instagram_seeds(source, budget):
         caption = full_meta.get("description") or full_meta.get("og:description") or ""
         if caption:
             candidate["evidence"]["public_caption_text"] = caption
+            if source.get("source_role")=="curadora":
+                multi=curator_multi_plan_preview(caption)
+                if multi:
+                    candidate["evidence"]["multi_plan_review"] = multi
         candidate["evidence"]["public_caption_extraction"] = "html_meta_full_v2"
         claimed_url = full_meta.get("og:url") or full_meta.get("canonical_url")
         candidate["evidence"]["metadata_source_url"] = claimed_url

@@ -30,3 +30,7 @@ El original de [Muerde](https://www.alternativateatral.com/obra72170-muerde) con
 - **#16 maestro**: índice de criterios y falsos positivos.
 
 No se crea esquema de Neon, cron ni Motor paralelo; no se ejecuta SQL de escritura ni publicación Vercel por cambio Radar. Mantener QA del workflow GitHub y confirmar próximo uso en una corrida programada, sin forzar recolección extra.
+
+## Ajuste complementario: fuentes curadoras con varios planes en una leyenda
+
+Se agregó `curator_multi_plan_preview()` en el Radar Definitivo. Para un permalink exacto de Instagram cuya fuente esté expresamente registrada con rol `curadora`, y solo si la leyenda trae 3+ líneas con cuentas mencionadas y al menos dos días de semana distintos, añade a `candidate.evidence.multi_plan_review` una lista acotada de **fragmentos literales y @cuentas**. El ejemplo de Luti produce 12 fragmentos **solo para revisión**. No infiere fechas, horas, sedes, roles de los participantes ni disciplinas, ni crea eventos o nuevas entidades. Esto funciona con el JSONB `evidence` existente, sin columnas ni ejecutores nuevos. Solo se aplica al capturar por enlace público exacto: no habilita recorrer perfiles de Instagram ni evade limitaciones de acceso. La prueba evita convertir un post con tres cuentas etiquetadas en tres funciones.

@@ -102,6 +102,58 @@ class InstagramSeedTests(unittest.TestCase):
         self.assertEqual(evidence["og_image_url"], "https://example.org/flyer.jpg")
         self.assertIsNone(candidates[0]["event_date"])
 
+    def test_multiplan_curator_caption_preserves_twelve_distinct_review_leads(self):
+        caption = """planes recomendados en La Plata
+miércoles de Perritos calientes en @veredita.bar
+miércoles de chori en @mirafloreslp
+miércoles de Piano Bar en @casatomadawinehouse
+jueves todo el día menú en @radici.lp con @alcachofasplatenses
+jueves en la fábrica de @vermu_interferencia con @oldiesbutgoldies.lp y @mirafloreslp
+y si querés 29 con ñoquis en @cretino8y61
+viernes cumple del Diego en @mirafloreslp
+y abre @destileriamoreira con @desobediente.sr
+sábado aniversario de @aurelius.yes
+y a la noche fiesta Gateo en @ciudaddegatos con @zoemeier__
+domingo presentación Charly absoluto en @veredita.bar con @repmiguel
+y antidomingo de DJs y VJs de @radiociudad933
+"""
+        got=radar.curator_multi_plan_preview(caption)
+        self.assertEqual(got["classification"],"curatorial_multiplan_caption")
+        self.assertEqual(got["state"],"review_only")
+        self.assertEqual(got["plan_lead_count"],12)
+        self.assertEqual(got["event_count"],0)
+        self.assertTrue(got["original_confirmation_required"])
+        self.assertFalse(got["date_or_venue_inferred"])
+        self.assertEqual(got["leads"][0]["mentioned_accounts"],["veredita.bar"])
+        self.assertEqual(got["leads"][3]["mentioned_accounts"],
+                         ["radici.lp","alcachofasplatenses"])
+        self.assertIsNone(got["leads"][-1]["literal_weekday"])
+        self.assertFalse(any("event_date" in lead or "venue_id" in lead or
+                         "organized_by" in lead for lead in got["leads"]))
+        source=dict(source_id="rd-ig-lutitravelguide",
+                    url="https://www.instagram.com/lutitravelguide/",
+                    source_role="curadora",account="lutitravelguide",
+                    seed_only=True,seed_urls=[self.URL])
+        import html as stdhtml
+        markup=('<meta name="description" content="'+
+                stdhtml.escape(caption,quote=True)+'">'+
+                '<meta property="og:url" content="'+
+                'https://www.instagram.com/lutitravelguide/reel/DfDGyw_SkDA/">')
+        check,candidates=radar.scan_source(
+            source,DummyBudget({self.URL:(200,markup,None)}),"incremental")
+        self.assertEqual(check["status"],"ok")
+        self.assertEqual(len(candidates),1)
+        self.assertEqual(candidates[0]["evidence"]["multi_plan_review"]["plan_lead_count"],12)
+        self.assertIsNone(candidates[0]["event_date"])
+        self.assertIsNone(candidates[0]["venue"])
+
+    def test_multiplan_does_not_invent_events_from_single_promotional_post(self):
+        self.assertIsNone(radar.curator_multi_plan_preview(
+            "sábado gran show en @ciudaddegatos con @dj.ana @dj.mario"))
+        self.assertIsNone(radar.curator_multi_plan_preview(
+            "martes @lugar1\\nmartes @lugar2\\nmartes @lugar3"))
+        self.assertIsNone(radar.curator_multi_plan_preview(None))
+
     def test_does_not_fetch_profile_when_reel_blocked(self):
         source = dict(source_id="rd-ig-lutitravelguide", url="https://www.instagram.com/lutitravelguide/",
                       source_role="curadora", account="lutitravelguide", seed_only=True,
