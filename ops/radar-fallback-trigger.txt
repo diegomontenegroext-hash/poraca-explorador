@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
 # Disparo por Guardia GPT - orquestador principal.
 trigger_date=2026-10-29
-trigger_slot=13
+trigger_slot=21
 trigger_mode=incremental
 trigger_reason=gpt_primary_scheduler
