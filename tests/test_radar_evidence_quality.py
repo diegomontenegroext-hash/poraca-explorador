@@ -19,7 +19,7 @@ class CrossSourceEvidenceQualityTests(unittest.TestCase):
         ]
         result=qa.summarize(rows)
         self.assertEqual(result["shared_genda_alpedo_functions"],2)
-        self.assertEqual(result["secondary_keys_with_primary_tier_match"],0)
+        self.assertEqual(result["secondary_keys_with_specific_primary_detail"],0)
         self.assertEqual(result["auto_accepted"],0)
 
     def test_dirty_venues_not_joined_and_primary_match_is_only_review(self):
@@ -39,10 +39,29 @@ class CrossSourceEvidenceQualityTests(unittest.TestCase):
         self.assertEqual(result["malformed_venue_rows"],1)
         self.assertEqual(result["missing_venue_rows"],1)
         self.assertEqual(result["shared_genda_alpedo_functions"],0)
-        self.assertEqual(result["secondary_keys_with_primary_tier_match"],1)
+        self.assertEqual(result["secondary_keys_with_specific_primary_detail"],0)
+        self.assertFalse(qa.specific_original("https://example.org/original"))
+        self.assertFalse(qa.specific_original("https://www.teatrometrolp.com.ar/entradas/cartelera"))
+        self.assertTrue(qa.specific_original("https://www.teatrometrolp.com.ar/entrada/juli-bellese-100781"))
         self.assertFalse(qa.contaminated("Centro Cultural Estación Provincial"))
         self.assertTrue(qa.contaminated("Casa <div class"))
         self.assertTrue(qa.contaminated("document.querySelector()"))
+
+    def test_primary_ticket_detail_but_not_index_counts_for_review(self):
+        label=("Juli Bellese","2026-10-30","21:00","Teatro Metro")
+        rows=[
+            (qa.AGENDA_G,*label,"https://agendalaplata.ar/?fecha=2026-10-30","secondary_agenda"),
+            ("metro",*label,"https://www.teatrometrolp.com.ar/entradas/cartelera/","primary_venue")
+        ]
+        self.assertEqual(qa.summarize(rows)["secondary_keys_with_specific_primary_detail"],0)
+        rows.append(("metro",*label,
+            "https://www.teatrometrolp.com.ar/entrada/juli-bellese-100781",
+            "primary_venue"))
+        self.assertEqual(qa.summarize(rows)["secondary_keys_with_specific_primary_detail"],1)
+        rows.append(("metro-copy",*label,
+            "https://www.teatrometrolp.com.ar/entrada/juli-bellese-100781",
+            "primary_ticket_listing"))
+        self.assertEqual(qa.summarize(rows)["secondary_keys_with_specific_primary_detail"],1)
 
     def test_different_date_time_or_venue_is_different_session(self):
         title="Obra viajera"
