@@ -25,6 +25,7 @@ from radar_parallel import (
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
 )
 from radar_agenda_adapters import extract_listings, special_links, tidy
+from radar_evidence_quality import summarize as summarize_evidence_quality
 from instagram_seed_inbox import choose_seed_sources, public_instagram_metadata
 from radar_genda_browser import render_date_pages, validated_date_pages, render_argentino_event_pages, render_alpedo_date_pages
 
@@ -795,6 +796,20 @@ def main():
             cur.execute("""SELECT count(*) FROM radar_definitivo.listing_occurrences
                            WHERE first_run_id=%s""",(run_id,))
             stats["new_listings"]=cur.fetchone()[0]
+        # Existing rows only: one bounded read to expose duplicates and unsafe
+        # historical venues after each normal run; not an ingest or a new task.
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""SELECT source_id,title,event_date::text,event_time,
+                                     venue,proof_url,evidence_tier
+                               FROM radar_definitivo.listing_occurrences
+                               ORDER BY last_seen_at DESC LIMIT 5000""")
+                qa_rows=cur.fetchall()
+            stats["evidence_quality"]=summarize_evidence_quality(qa_rows)
+        except Exception as exc:
+            conn.rollback()
+            stats["evidence_quality"]={"status":"unavailable",
+                                       "reason":type(exc).__name__}
         state=("complete" if stats["checked"]==stats["selected"] and
                stats["checked"]==stats["success"] else "partial")
         info=dict(**stats,mode=args.mode,
@@ -820,6 +835,8 @@ def main():
                         "|---:|---:|---:|---:|---:|---:|---:|---:|\n")
                 f.write(f"| {stats['selected']} | {stats['checked']} | {stats['success']} | "
                         f"{stats['listings']} | {stats['new_listings']} | {stats['urls']} | {stats['new']} | {budget.instagram} |\n\n")
+                f.write("Diagnóstico de duplicaciones y sedes (solo lectura): "
+                        +json.dumps(stats.get("evidence_quality",{}),ensure_ascii=False)+"\\n\\n")
                 f.write(f"Permalinks IG exactos: {stats['seed_accounts']} cuentas en buzon; "
                         "NO equivale a revisar feeds. Candidatos sin aceptar.\\n")
         return 0 if (stats["checked"]>0 or not sources) else 1
