@@ -5,7 +5,7 @@ SQL_FILE = Path(__file__).resolve().parents[1] / "sql" / "20261029_function_iden
 
 def query():
     sql=SQL_FILE.read_text(encoding="utf-8")
-    if not sql.lstrip().startswith("-- Por Acá · P0-B admission function identity v2"):
+    if not sql.lstrip().startswith("-- P0 gate function-level preview v2. READ ONLY.") or "WITH raw AS (" not in sql:
         raise ValueError("unexpected SQL contract")
     return sql
 
