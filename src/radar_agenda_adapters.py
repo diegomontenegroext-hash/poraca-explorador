@@ -519,6 +519,33 @@ def source_specific_sessions(raw,url,blocks):
                     if rec:records.append(rec)
     return records
 
+def alternativa_schedule_room(current_text,position,fallback):
+    """Match ONE performance to its nearest printed locality and room.
+
+    A theatre work page can advertise La Plata, Muñiz and past venues together.
+    Never carry the venue of a later show to an earlier performance. An explicit
+    out-of-La-Plata municipality on a La Plata-scoped feed is excluded, while
+    an unknown room stays null for editorial review.
+    """
+    prefix=current_text[:position]
+    cities=list(re.finditer(
+        r"\\b([A-Za-zÁÉÍÓÚÜÑáéíóúüñ .]{2,48}?)\\s*-\\s*"
+        r"Buenos Aires\\s*-\\s*Argentina\\b",prefix,re.I))
+    if not cities:
+        return fallback,False
+    last=cities[-1]
+    city=tidy(last.group(1)).casefold()
+    if city!="la plata":
+        return None,True
+    segment=prefix[max(0,last.start()-320):last.start()]
+    names=list(re.finditer(
+        r"\\b(TEATRO ESTUDIO DE LAS ARTES|ESPACIO 44|EN ESO ESTAMOS|"
+        r"ESCENARIO[- ]?40|CENTRO CULTURAL VIEJO ALMACEN EL OBRERO|"
+        r"SALA 420|TEATRO ARGENTINO|CASA METRO)\\b",segment,re.I))
+    if names:
+        return tidy(names[-1].group(1)),False
+    return fallback,False
+
 def extract_listings(raw,url):
     """Returns individual session observations; never returns verified status."""
     host,path=scope(url)
@@ -561,8 +588,11 @@ def extract_listings(raw,url):
             for m in re.finditer(r"Entrada:\s*.{0,220}?\b([0-3]?\d/[01]?\d/20\d{2})",current_text,re.I):
                 d=parse_dmy(m.group(1))
                 times=list(dict.fromkeys(CLOCK.findall(m.group(0))))
+                room,other_city=alternativa_schedule_room(current_text,m.start(),venue)
+                if other_city:
+                    continue
                 for tm in times[:6]:
-                    rec=make_record(title,d,tm,venue,url,
+                    rec=make_record(title,d,tm,room,url,
                                     "alternativa_obra_funcion_text","primary_ticket_listing")
                     if rec:out.append(rec)
             # Other works advertise explicit individual dates *without* an
@@ -583,7 +613,10 @@ def extract_listings(raw,url):
                     d=parse_dmy(value)
                     if not d or d.weekday()!=weekdays[m.group(1).casefold()]:
                         continue
-                    rec=make_record(title,d,m.group(2).zfill(5),venue,url,
+                    room,other_city=alternativa_schedule_room(current_text,m.start(),venue)
+                    if other_city:
+                        continue
+                    rec=make_record(title,d,m.group(2).zfill(5),room,url,
                                     "alternativa_explicit_date_no_ticket_label",
                                     "primary_ticket_listing")
                     if rec and not any(x["title"]==rec["title"] and x["event_date"]==rec["event_date"]

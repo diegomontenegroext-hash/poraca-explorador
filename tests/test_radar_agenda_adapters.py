@@ -250,6 +250,42 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertEqual({x["event_date"] for x in out},{today.isoformat(),tomorrow.isoformat()})
         self.assertTrue(all(x["review_state"]=="observed_unverified" for x in out))
 
+    def test_alternativa_multicity_work_binds_each_session_only_to_own_venue(self):
+        # Reduced real public Muerde page: the 30 Oct function is in Muñiz,
+        # while 01 Nov is in La Plata, Sala 420. Both share the same obra URL.
+        html=('''<h1>Muerde</h1><p>Clasificaciones: Adultos</p>
+            <p>Avenida León Gallardo 699 (mapa)</p>
+            <p>Muñiz - Buenos Aires - Argentina</p>
+            <p>Entrada: $ 30.000,00 - Viernes - 21:00 hs - 30/10/2026</p>
+            <p>SALA 420</p><p>Calle 42 N° 571 entre 6 y 7 (mapa)</p>
+            <p>La Plata - Buenos Aires - Argentina</p>
+            <p>Domingo - 19:00 hs - 01/11/2026</p>
+            <div>Histórico de funciones</div>
+            <p>EN ESO ESTAMOS - Viernes - 21:00 hs - 02/11/2026</p>''')
+        with patch.object(ad,"active_date",return_value=True):
+            rows=ad.extract_listings(html,
+                     "https://www.alternativateatral.com/obra72170-muerde")
+        self.assertEqual(len(rows),1,rows)
+        self.assertEqual(rows[0]["event_date"],"2026-11-01")
+        self.assertEqual(rows[0]["event_time"],"19:00")
+        self.assertEqual(rows[0]["venue"],"SALA 420")
+        self.assertEqual(rows[0]["evidence_tier"],"primary_ticket_listing")
+
+    def test_alternativa_city_scope_never_inherits_later_sala(self):
+        text=("Muñiz - Buenos Aires - Argentina "
+              "Entrada: $ 100 - Viernes - 21:00 hs - 30/10/2026 "
+              "SALA 420 Calle 42 N 571 "
+              "La Plata - Buenos Aires - Argentina "
+              "Domingo - 19:00 hs - 01/11/2026")
+        first=text.index("Entrada:")
+        second=text.index("Domingo")
+        self.assertEqual(ad.alternativa_schedule_room(text,first,None),
+                         (None,True))
+        self.assertEqual(ad.alternativa_schedule_room(text,second,None),
+                         ("SALA 420",False))
+        self.assertEqual(ad.alternativa_schedule_room("Viernes 20:00",0,None),
+                         (None,False))
+
     def test_alternativa_current_venue_not_historical_venue(self):
         # Regression: the original page can carry the 2026 current
         # room followed by "Histórico de funciones" with a PAST room and
