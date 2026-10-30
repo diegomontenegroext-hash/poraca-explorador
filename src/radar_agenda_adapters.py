@@ -831,7 +831,7 @@ def special_links(url,page,at=None):
                 continue
             stamp = int(matched.group(1))
             # Id is merely a link-recency hint, NOT evidence of an event date.
-            if (now.timestamp()-9*86400 <= stamp <= now.timestamp()+3600):
+            if (now.timestamp()-4*86400 <= stamp <= now.timestamp()+3600):
                 links.append((stamp, raw_link))
         links.sort(reverse=True)
         return [(u, "nota real de agenda semanal El Dia") for _, u in
