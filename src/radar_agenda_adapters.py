@@ -269,7 +269,7 @@ def source_specific_sessions(raw,url,blocks):
             r"(20\d{2})\s*-\s*"
             r"(Lun|Mar|Mi[eé]|Jue|Vie|S[aá]b|Dom)\s+"
             r"((?:[01]?\d|2[0-3]):[0-5]\d)\s+"
-            r"(.{4,145}?)\s+C\\.\s*23\s*565\b")
+            r"(.{4,145}?)\s+C\.\s*23\s*565\b")
         for match in re.finditer(index_pattern,visible,re.I):
             try:
                 day=date(int(match.group(3)),MONTHS[match.group(2).lower()],
