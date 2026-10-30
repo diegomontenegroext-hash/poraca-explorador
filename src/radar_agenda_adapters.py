@@ -615,8 +615,8 @@ def el_dia_editorial_agenda(raw, url, blocks=None, at=None):
         # ("43 Nº 632") or background prose ("24 años de trayectoria").
         tm = re.search(
             r"^(?:A\s+las?|Desde\s+las?|De)\s+"
-            r"((?:[01]?\d|2[0-3]))(?:[.:]([0-5]\d))?"
-            r"(?:\s+y\s+((?:[01]?\d|2[0-3]))(?:[.:]([0-5]\d))?)?",
+            r"((?:2[0-3]|1\d|0?\d))(?!\d)(?:[.:]([0-5]\d))?"
+            r"(?:\s+y\s+((?:2[0-3]|1\d|0?\d))(?!\d)(?:[.:]([0-5]\d))?)?",
             detail, re.I)
         clocks = []
         if tm:
