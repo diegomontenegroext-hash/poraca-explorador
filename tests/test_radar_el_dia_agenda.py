@@ -86,8 +86,8 @@ class EditorialPressTests(unittest.TestCase):
                 '<a href="/espectaculos/noticia-irrelevante_1793338233">no</a>'
                 '<a href="https://example.net/espectaculos/agenda-espectaculos_1793338233">ajeno</a>')
         links=adapter.special_links(ROOT,parallel.parse_html(html),at=now)
-        self.assertEqual([x[0] for x in links],[PUBLISHED_URL,
-            "https://www.eldia.com/espectaculos/agenda-espectaculos_1792734839"])
+        self.assertEqual([x[0] for x in links],[PUBLISHED_URL])
+        # Old weekly articles must not displace the latest date slot.
         self.assertTrue(all("agenda semanal" in x[1] for x in links))
 
     def test_collector_reuses_budget_and_keeps_secondary_tier(self):
@@ -119,6 +119,26 @@ class EditorialPressTests(unittest.TestCase):
         self.assertTrue(all(x["evidence_tier"]=="secondary_press_agenda"
                             for x in check["_listings"]))
         self.assertLessEqual(len(budget.calls),1+radar.MAX_DETAILS_FULL)
+
+
+    def test_stale_press_tag_is_index_only_not_fake_cultural_coverage(self):
+        html='<a href="https://www.eldia.com/espectaculos/agenda-espectaculos_1792130350">vieja</a>'
+        class Budget:
+            def request(self,url):
+                if url != ROOT:
+                    raise AssertionError("Must not request stale article")
+                return (200,html,None)
+            def can_fetch(self,url):return True
+        with patch.object(adapter,"datetime") as mocked_datetime:
+            mocked_datetime.now.return_value=datetime(2026,10,30,12,0,
+                tzinfo=ZoneInfo("America/Argentina/Buenos_Aires"))
+            check,candidates=radar.scan_source(
+                {"source_id":"rd-eldia","source_role":"local_press",
+                 "url":ROOT,"seed_urls":[]},Budget(),"full")
+        self.assertEqual(check["status"],"index_only")
+        self.assertEqual(check["details_opened"],0)
+        self.assertEqual(check["_listings"],[])
+        self.assertEqual(candidates,[])
 
 if __name__=="__main__":
     unittest.main()
