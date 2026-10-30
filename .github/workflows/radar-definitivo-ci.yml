@@ -3,6 +3,9 @@ on:
   push:
     paths:
       - 'src/radar_definitivo.py'
+      - 'src/radar_category_pulse.py'
+      - 'tests/test_radar_category_pulse.py'
+      - '.github/workflows/radar-definitivo.yml'
       - 'src/instagram_seed_inbox.py'
       - 'ops/instagram-exact-seeds.json'
       - 'tests/test_instagram_seed_inbox.py'
