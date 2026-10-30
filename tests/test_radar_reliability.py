@@ -105,6 +105,8 @@ class OperationalHealth(unittest.TestCase):
                'Sindicato Argentino de Boleros','2026-11-04','21:00','index','original',
                'Casa Metro','HOLD_EDITORIAL_DO_NOT_APPROVE')]
         result=aliases(rows)
+        rows=[('old-'+str(i),'HOLD_SECONDARY_SOURCE','old-obs-'+str(i),'Old secondary record','2026-10-01','21:00','index','old') for i in range(20)]+rows
+        result=aliases(rows)
         self.assertEqual(result['editorial_holds'],1)
         self.assertEqual(result['samples'][0]['safe_next_step'],'HOLD_EDITORIAL_DO_NOT_APPROVE')
         self.assertFalse(result['authorized_to_write'])

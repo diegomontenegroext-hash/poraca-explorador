@@ -52,7 +52,11 @@ def summarize(rows):
     observed=set()
     groups={}
     samples=[]
-    for row in rows:
+    # Material editorial holds take precedence over historical secondary matches.
+    prioritized=sorted(rows,key=lambda r:(
+        not (len(r)>9 and r[9]=="HOLD_EDITORIAL_DO_NOT_APPROVE"),
+        r[1]!="REVIEW_ORIGINAL_BEFORE_ANY_INSERT"))
+    for row in prioritized:
         candidate,decision,public_id,title,day,hour,*urls=row[:8]
         observed.add(public_id)
         groups.setdefault(decision,set()).add(candidate)
