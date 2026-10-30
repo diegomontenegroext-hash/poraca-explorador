@@ -40,12 +40,54 @@ class PulseCategoryTest(unittest.TestCase):
         self.assertEqual(len({x["rubro"] for x in result["categories"]}),14)
         self.assertTrue(all(x["confirmedNext15"]==0 for x in result["categories"]))
 
+    def test_original_review_queue_never_approves_and_deduplicates(self):
+        from datetime import date
+        sample=("Música","Fito Páez",date(2026,10,31),"21:00",
+                "Hipódromo de La Plata","https://www.fitopaezoficial.com/event/la-plata/",
+                "src-original-fito")
+        rows=[
+            sample,
+            ("musica",)+sample[1:],
+            ("Danza","Muestra M.G.",date(2026,11,9),"20:30",
+             "Doble-T","https://teatrodoblet.com.ar/event/167089-muestra-de-taller-de-montaje-mg",
+             "src-original-doblet"),
+            ("Danza","Fake page",date(2026,11,10),"20:30",
+             "Doble-T","http://example.com/unsafe","fake"),
+            ("musica","Bad URL",date(2026,11,9),"20:30",
+             "Hipódromo","https://username:password@example.org/event","bad"),
+            ("musica","Unsafe text",date(2026,11,10),"21:00",
+             "Venue","https://example.org/e?<script>","bad")]
+        out=pulse.review_queue(rows)
+        self.assertEqual(len(out),2)
+        self.assertEqual(set(x["category"] for x in out),{"musica","danza"})
+        self.assertTrue(all(x["publicationApproved"] is False for x in out))
+        self.assertTrue(all(x["reviewState"]=="UNAPPROVED_ORIGINAL_DETAIL_REVIEW"
+                            for x in out))
+        self.assertEqual(out[0]["date"],"2026-10-31")
+        self.assertEqual(out[0]["time"],"21:00")
+
+    def test_source_modes_are_last_check_only(self):
+        rows=[("fetch",65,7,9),("discover_only",123,0,0),("review",39,0,0)]
+        counts=pulse.source_mode_counts(rows)
+        self.assertEqual(sum(x["enabled"] for x in counts.values()),227)
+        self.assertEqual(counts["fetch"]["lastIndexOnly"],7)
+        self.assertEqual(counts["fetch"]["lastFailed"],9)
+
+    def test_markdown_safety(self):
+        self.assertNotIn("|",pulse.safe_cell("abc|def"))
+        self.assertNotIn("\\n",pulse.safe_cell("line\\nsecond"))
+        self.assertEqual(pulse.review_queue([(
+             "Música","No year","yesterday","20:00","venue",
+             "https://example.org/event","s")]),[])
+
     def test_runtime_queries_are_select_only(self):
         self.assertTrue(pulse.CANONICAL_SQL.lstrip().startswith("SELECT "))
         self.assertTrue(pulse.OBS_SQL.lstrip().startswith("SELECT "))
         self.assertIn("matched_event_key IS NULL",pulse.OBS_SQL)
         self.assertIn("verification='confirmed'",pulse.CANONICAL_SQL)
         self.assertIn("first_seen_at",pulse.CANONICAL_SQL)
+        self.assertIn("matched_event_key IS NULL",pulse.REVIEW_QUEUE_SQL)
+        self.assertIn("enabled=true",pulse.SOURCE_MODES_SQL)
 
 if __name__=="__main__":
     unittest.main()
