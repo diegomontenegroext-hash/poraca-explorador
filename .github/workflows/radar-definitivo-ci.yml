@@ -18,6 +18,7 @@ on:
       - 'src/radar_genda_browser.py'
       - 'tests/test_radar_definitivo.py'
       - 'tests/test_radar_agenda_adapters.py'
+      - 'tests/test_radar_el_dia_agenda.py'
       - '.github/workflows/radar-definitivo-ci.yml'
   workflow_dispatch:
 
