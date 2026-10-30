@@ -28,7 +28,8 @@ SCOPED_HOSTS={"agendalaplata.ar","www.agendalaplata.ar",
               "feriaedita.com.ar","www.feriaedita.com.ar",
               "gritos.planetario.unlp.edu.ar",
               "www.fcnym.unlp.edu.ar",
-              "alpedo.ar","www.alpedo.ar"}
+              "alpedo.ar","www.alpedo.ar",
+              "www.eldia.com","eldia.com"}
 def tidy(s):
     return re.sub(r"\s+"," ",html.unescape(s or "")).strip()
 
@@ -550,6 +551,104 @@ def alternativa_schedule_room(current_text,position,fallback):
         return tidy(names[-1].group(1)),False
     return fallback,False
 
+
+def el_dia_editorial_agenda(raw, url, blocks=None, at=None):
+    """Parse the dated paragraphs of one *specific* El Dia agenda article.
+
+    A newspaper programme is SECONDARY evidence. Rows are proposed sessions,
+    never independent original confirmation, venue accreditation or release.
+    Do not read headings/advertisements as events, and never invent a date
+    from the article URL or a guessed recurring weekday.
+    """
+    host, path = scope(url)
+    if host not in ("www.eldia.com", "eldia.com") or not re.fullmatch(
+            r"/espectaculos/agenda-espectaculos_\d{10}/?", path):
+        return []
+    published = re.search(
+        r"<time\b[^>]*>[^<]{0,180}?\b([0-3]?\d)\s+de\s+"
+        r"([a-záéíóúñ]+)\s+de\s+(20\d{2})\b", raw[:120_000],
+        re.I | re.S)
+    if not published:
+        return []
+    month = MONTHS.get(published.group(2).lower())
+    try:
+        origin = date(int(published.group(3)), month, int(published.group(1))) if month else None
+    except ValueError:
+        origin = None
+    if not origin or not active_date(origin, at):
+        return []
+
+    blocks = blocks or visible_blocks(raw)
+    day = None
+    out = []
+    weekdays = {"lunes": 0, "martes": 1, "miercoles": 2,
+                "miércoles": 2, "jueves": 3, "viernes": 4,
+                "sabado": 5, "sábado": 5, "domingo": 6}
+    for tag, value in blocks.chunks:
+        if tag != "p":
+            continue
+        line = tidy(value)
+        heading = line.casefold().strip(" .:")
+        if heading == "hoy":
+            day = origin
+            continue
+        if heading in ("mañana", "manana"):
+            day = origin + timedelta(days=1)
+            continue
+        if heading in weekdays:
+            days_ahead = (weekdays[heading] - origin.weekday()) % 7
+            # A named weekday beyond the 6-day publication horizon is not
+            # safe to infer: keep date unassigned rather than fabricate.
+            day = origin + timedelta(days=days_ahead)
+            continue
+        if heading in ("pasado mañana", "pasado manana"):
+            day = origin + timedelta(days=2)
+            continue
+        if not day or not active_date(day, at):
+            continue
+        match = re.fullmatch(r"(.{4,150}?)\.\s*-\s*(.{5,})", line)
+        if not match:
+            continue
+        title = match.group(1).strip(" .:-")
+        detail = match.group(2)
+        # Only leading explicit time phrases; never infer time from address
+        # ("43 Nº 632") or background prose ("24 años de trayectoria").
+        tm = re.search(
+            r"^(?:A\s+las?|Desde\s+las?|De)\s+"
+            r"((?:[01]?\d|2[0-3]))(?:[.:]([0-5]\d))?"
+            r"(?:\s+y\s+((?:[01]?\d|2[0-3]))(?:[.:]([0-5]\d))?)?",
+            detail, re.I)
+        clocks = []
+        if tm:
+            clocks.append(f"{int(tm.group(1)):02d}:{tm.group(2) or '00'}")
+            if tm.group(3):
+                clocks.append(f"{int(tm.group(3)):02d}:{tm.group(4) or '00'}")
+        else:
+            # This is a valid historical notice with time unknown,
+            # not a reason to fabricate 20:00 or discard the entire item.
+            clocks = [None]
+        # Venue is an attributed phrase from the press announcement only.
+        # A complete address or a known entity ID is *not* inferred here.
+        venue_match = re.search(
+            r"\ben\s+(?:(?:el|la|los|las)\s+)?"
+            r"([^,.;]{4,112})", detail[:210], re.I)
+        venue = tidy(venue_match.group(1)) if venue_match else None
+        for clock in dict.fromkeys(clocks):
+            record = make_record(title, day, clock, venue, url,
+                                 "eldia_editorial_agenda_paragraph",
+                                 "secondary_press_agenda")
+            if record:
+                out.append(record)
+    seen = set()
+    unique = []
+    for record in out:
+        key = (record["title"].casefold(), record["event_date"],
+               record["event_time"], (record["venue"] or "").casefold())
+        if key not in seen:
+            seen.add(key)
+            unique.append(record)
+    return unique[:100]
+
 def extract_listings(raw,url):
     """Returns individual session observations; never returns verified status."""
     host,path=scope(url)
@@ -558,6 +657,7 @@ def extract_listings(raw,url):
     blocks=visible_blocks(raw)
     out=structured_sessions(raw,url)
     out.extend(source_specific_sessions(raw,url,blocks))
+    out.extend(el_dia_editorial_agenda(raw,url,blocks))
     if "alternativateatral.com" in host and re.match(r"/obra\d+",path):
         title=next((t for tag,t in blocks.headings if tag=="h1"),None)
         if title:
@@ -712,6 +812,30 @@ def extract_listings(raw,url):
 def special_links(url,page,at=None):
     """Verified source-specific discovery with near-date priority and rotation."""
     host,path=scope(url)
+    if host in ("www.eldia.com", "eldia.com") and path.rstrip("/") in (
+            "/ttags/espectaculos", "/espectaculos"):
+        # Reuse existing max_details budget. The tag page links weekly
+        # agenda articles but the generic URL sorter starves recent ones.
+        # Prioritize the two newest REAL anchors, no synthesized slugs.
+        now = at or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
+        links = []
+        for href, label in page.links:
+            raw_link = (href or "").strip()
+            if raw_link.startswith("/"):
+                raw_link = "https://" + host + raw_link
+            p = urlsplit(raw_link)
+            matched = re.fullmatch(r"/espectaculos/agenda-espectaculos_(\d{10})/?", p.path)
+            if (not matched or p.scheme != "https" or p.hostname not in
+                ("www.eldia.com", "eldia.com") or p.username or p.password or
+                p.port not in (None, 443) or p.query or p.fragment):
+                continue
+            stamp = int(matched.group(1))
+            # Id is merely a link-recency hint, NOT evidence of an event date.
+            if (now.timestamp()-9*86400 <= stamp <= now.timestamp()+3600):
+                links.append((stamp, raw_link))
+        links.sort(reverse=True)
+        return [(u, "nota real de agenda semanal El Dia") for _, u in
+                list(dict((u,(stamp,u)) for stamp,u in links).values())[:2]]
     if host in ("teatrometrolp.com.ar","www.teatrometrolp.com.ar") and (
             path.rstrip("/")=="/entradas/cartelera"):
         # La cartelera del Teatro Metro tiene a la vez indices paginados
