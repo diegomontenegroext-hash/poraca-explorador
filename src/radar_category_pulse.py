@@ -79,7 +79,7 @@ def review_queue(rows, max_total=14, max_per_category=2):
             continue
         if not isinstance(title,str) or not 3<=len(title.strip())<=240:
             continue
-        if not isinstance(url,str) or len(url)>1500 or re.search(r"[\\s<>]",url):
+        if not isinstance(url,str) or len(url)>1500 or re.search(r"[\s<>]",url):
             continue
         try:
             link=urlsplit(url)
@@ -88,7 +88,7 @@ def review_queue(rows, max_total=14, max_per_category=2):
         except ValueError:
             continue
         value=day.isoformat() if hasattr(day,"isoformat") else str(day)[:10]
-        if not re.fullmatch(r"20\\d{2}-\\d{2}-\\d{2}",value):
+        if not re.fullmatch(r"20\d{2}-\d{2}-\d{2}",value):
             continue
         key=(rubro,value,str(clock or ""),title.strip().casefold(),url)
         if key in seen:
@@ -109,7 +109,7 @@ def source_mode_counts(rows):
 
 def safe_cell(value):
     import re
-    return re.sub(r"[\\r\\n|<>\\[\\]]"," ",str(value or "")).strip()[:180]
+    return re.sub(r"[\r\n|<>\[\]]"," ",str(value or "")).strip()[:180]
 
 def category_of(value):
     if not isinstance(value,str):return "otras"
