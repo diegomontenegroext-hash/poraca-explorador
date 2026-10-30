@@ -18,12 +18,13 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         month=lambda d:next(k.upper() for k,v in ad.MONTHS.items() if v==d.month)
         weekday=lambda d:["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"][d.weekday()]
         first,second=dates
+        wrong_weekday="Lun" if second.weekday()!=0 else "Mar"
         raw=(f'<div>{first.day:02d} {month(first)} {first.year} -{weekday(first)} '
              '20:00 Salsa y No LLores! C. 23 565</div>'
              '<p>Desde el 6 de noviembre Viva el Ciclo C. 23 565</p>'
              f'<div>{second.day:02d} {month(second)} {second.year} -{weekday(second)} '
              '20:30 Muestra de Taller M.G. C. 23 565</div>'
-             f'<div>{second.day:02d} {month(second)} {second.year} -Vie '
+             f'<div>{second.day:02d} {month(second)} {second.year} -{wrong_weekday} '
              '21:00 Falsa función con día discordante C. 23 565</div>')
         source="https://teatrodoblet.com.ar/"
         res=ad.extract_listings(raw,source)
