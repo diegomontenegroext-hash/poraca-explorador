@@ -24,6 +24,7 @@ SCOPED_HOSTS={"agendalaplata.ar","www.agendalaplata.ar",
               "casametro.com.ar","www.casametro.com.ar",
               "operalp.com.ar","www.operalp.com.ar",
               "teatrometrolp.com.ar","www.teatrometrolp.com.ar",
+              "teatrodoblet.com.ar","www.teatrodoblet.com.ar",
               "teatroargentino.gba.gob.ar","lumenartis.org","www.lumenartis.org",
               "agendadecine.com","www.agendadecine.com",
               "feriaedita.com.ar","www.feriaedita.com.ar",
@@ -243,7 +244,7 @@ def alpedo_dated_sessions(raw,url):
         # Defensive boundary: a venue must be human-visible text, not
         # a partial tag, JS initializer or residual browser widget.
         if (not 4<=len(venue)<=130 or "<" in venue or ">" in venue
-            or re.search(r"\\b(?:class=|document\\.|var tooltipTriggerList)\\b",venue,re.I)):
+            or re.search(r"\b(?:class=|document\\.|var tooltipTriggerList)\b",venue,re.I)):
             continue
         rec=make_record(title,day,clocks[0].zfill(5),venue,url,
                         "alpedo_dated_card_rendered","secondary_agenda")
@@ -257,6 +258,37 @@ def source_specific_sessions(raw,url,blocks):
     host,path=scope(url)
     visible=tidy(" ".join(blocks.text))
     records=[]
+    if host in ("teatrodoblet.com.ar","www.teatrodoblet.com.ar") and path in ("","/"):
+        # The venue's OWN index prints discrete DD MONTH YYYY -weekday HH:MM
+        # performances. 'Desde el' rows are cycles with unspecified sessions
+        # and MUST NOT become a synthetic recurrence.
+        weekdays={"lun":0,"mar":1,"mie":2,"jue":3,"vie":4,"sab":5,"dom":6}
+        index_pattern=(r"\b([0-3]?\d)\s+"
+            r"(enero|febrero|marzo|abril|mayo|junio|julio|agosto|"
+            r"septiembre|setiembre|octubre|noviembre|diciembre)\s+"
+            r"(20\d{2})\s*-\s*"
+            r"(Lun|Mar|Mi[eé]|Jue|Vie|S[aá]b|Dom)\s+"
+            r"((?:[01]?\d|2[0-3]):[0-5]\d)\s+"
+            r"(.{4,145}?)\s+C\\.\s*23\s*565\b")
+        for match in re.finditer(index_pattern,visible,re.I):
+            try:
+                day=date(int(match.group(3)),MONTHS[match.group(2).lower()],
+                         int(match.group(1)))
+            except ValueError:
+                continue
+            wd={"mié":"mie","sáb":"sab"}.get(match.group(4).lower(),
+                match.group(4).lower())
+            if day.weekday()!=weekdays.get(wd,-1):
+                continue
+            title=tidy(match.group(6))
+            if re.search(r"\bdesde el\b",title,re.I):
+                continue
+            rec=make_record(title,day,match.group(5).zfill(5),
+                 "Espacio Doble-T",url,
+                 "doblet_official_index_explicit_function",
+                 "primary_venue_program_index")
+            if rec:records.append(rec)
+        return records
     if host in ("alpedo.ar","www.alpedo.ar"):
         return alpedo_dated_sessions(raw,url)
     if host.endswith("teatrometrolp.com.ar"):
@@ -806,6 +838,38 @@ def extract_listings(raw,url):
 def special_links(url,page,at=None):
     """Verified source-specific discovery with near-date priority and rotation."""
     host,path=scope(url)
+    if host in ("teatrodoblet.com.ar","www.teatrodoblet.com.ar") and path in ("","/"):
+        # Only actual links in the ORIGINAL program; no slugs guessed from
+        # titles or dates and no off-host ticketing/tracking URLs.
+        found={}
+        for href,label in page.links:
+            raw=(href or "").strip()
+            if raw.startswith("/") and not raw.startswith("//"):
+                absolute="https://"+host+raw
+            elif raw.startswith("https://"):
+                absolute=raw
+            else:
+                continue
+            target=urlsplit(absolute)
+            if target.scheme!="https" or target.hostname not in (
+                "teatrodoblet.com.ar","www.teatrodoblet.com.ar"):
+                continue
+            if target.username or target.password or target.port not in (None,443) or target.query or target.fragment:
+                continue
+            if not re.fullmatch(r"/event/\d+-[a-z0-9-]+/?",target.path,re.I):
+                continue
+            clean_url="https://"+target.hostname+target.path.rstrip("/")
+            found.setdefault(clean_url,(clean_url,"Doble-T, ficha original enlazada"))
+            if len(found)>=90:break
+        ordered=list(found.values())
+        first=ordered[:2]
+        rest=ordered[2:]
+        if rest:
+            now=at or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
+            offset=(now.date().toordinal()*3+now.hour//8)%len(rest)
+            first.extend(rest[(offset+i)%len(rest)] for i in
+                range(min(4,len(rest))))
+        return first[:6]
     if host in ("www.eldia.com", "eldia.com") and path.rstrip("/") in (
             "/ttags/espectaculos", "/espectaculos"):
         # Reuse existing max_details budget. The tag page links weekly
