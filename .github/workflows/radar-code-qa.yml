@@ -1,0 +1,33 @@
+name: Por Aca - QA de codigo Radar (sin ingesta)
+
+# Validacion automatica del codigo y adaptadores. NO lee secretos Neon,
+# NO dispara Radar, NO escribe en staging ni publica datos.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '.github/workflows/radar-code-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: poraca-radar-code-qa-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Sintaxis y pruebas unitarias sin accesos externos
+        run: |
+          python -m compileall -q src
+          python -m unittest discover -s tests -v
