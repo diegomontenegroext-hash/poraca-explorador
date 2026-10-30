@@ -351,7 +351,12 @@ def scan_source(source,budget,mode):
     # Source-specific evidence, including multiple sessions per theatre work.
     check["_listings"]=extract_listings(body,root)
     links=special_links(root,page)+[(u,"baseline_watchlist_original") for u in source.get("seed_urls",[])]
-    links+=links_from_page(body,page,root)
+    # El Dia's tag index can expose dozens of stale weekly pages. Use only
+    # genuinely linked and RECENT magazine agendas for this one source;
+    # an outdated index must show index_only, not fake current coverage.
+    if not (urlparse(root).hostname in ("www.eldia.com","eldia.com")
+            and urlparse(root).path.rstrip("/") in ("/ttags/espectaculos","/espectaculos")):
+        links+=links_from_page(body,page,root)
     links=list(dict(((u,lab),None) for u,lab in links).keys())
     check["links_found"]=len(links)
     if not links and not check["_listings"]:
