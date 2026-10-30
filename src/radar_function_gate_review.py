@@ -16,7 +16,7 @@ def summarize(rows):
           "room_labels","detail_urls","v1_gate_states","canonical_by_original",
           "observation_by_original","canonical_by_identity","observation_by_identity",
           "other_hosts_same_original","canonical_same_host_clock","v2_preflight",
-          "authorized_to_write"]
+          "authorized_to_write","observation_other_clock","canonical_other_clock"]
     counts={}
     samples=[]
     for record in rows:

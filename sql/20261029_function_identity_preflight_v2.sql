@@ -88,7 +88,17 @@ WITH raw AS (
                      WHEN lower(coalesce(p.venue,'')) LIKE '%en eso estamos%' THEN 'en-eso-estamos'
                      ELSE lower(regexp_replace(translate(coalesce(p.venue,''),
                      'ÁÉÍÓÚÜÑáéíóúüñ','AEIOUUNaeiouun'),'[^a-zA-Z0-9]+','','g')) END)=g.host_key
-        ) AS canonical_same_host_clock
+        ) AS canonical_same_host_clock,
+        (SELECT count(*) FROM public.radar_v3_source_observations p
+         WHERE p.observed_date=g.observed_date
+           AND p.source_event_url=ANY(g.detail_urls)
+           AND left(p.observed_time,5) IS DISTINCT FROM left(g.observed_time,5)
+        ) AS observation_other_clock,
+        (SELECT count(*) FROM public.radar_agenda_events p
+         WHERE p.event_date=g.observed_date
+           AND p.source_url=ANY(g.detail_urls)
+           AND left(p.event_time,5) IS DISTINCT FROM left(g.observed_time,5)
+        ) AS canonical_other_clock
  FROM grouped g
 )
 SELECT title,observed_date,observed_time,mapped_public_source_id,host_key,
@@ -102,8 +112,9 @@ SELECT title,observed_date,observed_time,mapped_public_source_id,host_key,
             WHEN unique_detail_urls>1 THEN 'HOLD_MULTIPLE_INDIVIDUAL_ORIGINALS'
             WHEN canonical_by_original>0 OR canonical_by_identity>0 THEN 'HOLD_CANONICAL_ALREADY_EXISTS'
             WHEN observation_by_original>0 OR observation_by_identity>0 THEN 'HOLD_PUBLIC_OBSERVATION_ALREADY_EXISTS'
+            WHEN observation_other_clock>0 OR canonical_other_clock>0 THEN 'HOLD_EXISTING_ORIGINAL_OTHER_CLOCK_REVIEW_SESSION'
             WHEN canonical_same_host_clock>0 THEN 'REVIEW_TITLE_VARIANT_OR_SHARED_VENUE'
             ELSE 'REVIEW_ONE_FUNCTION_PENDING_GATE_AUTHORIZATION' END AS v2_preflight,
-       false AS authorized_to_write
+       false AS authorized_to_write,observation_other_clock,canonical_other_clock
 FROM checks
 ORDER BY observed_date,observed_time,title;
