@@ -81,3 +81,8 @@ jobs:
           RADAR_REQUIRE_OPERATIONAL: "true"
           RADAR_SCOPE: ${{ steps.alcance.outputs.mode }}
         run: python3 src/radar_definitivo.py --mode "$RADAR_SCOPE"
+      - name: Medir renovación por rubro sin admitir eventos
+        if: success()
+        env:
+          NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
+        run: python3 src/radar_category_pulse.py
