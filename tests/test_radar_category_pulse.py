@@ -75,7 +75,7 @@ class PulseCategoryTest(unittest.TestCase):
 
     def test_markdown_safety(self):
         self.assertNotIn("|",pulse.safe_cell("abc|def"))
-        self.assertNotIn("\\n",pulse.safe_cell("line\\nsecond"))
+        self.assertNotIn(chr(10),pulse.safe_cell("line"+chr(10)+"second"))
         self.assertEqual(pulse.review_queue([(
              "Música","No year","yesterday","20:00","venue",
              "https://example.org/event","s")]),[])
