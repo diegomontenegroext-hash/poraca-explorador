@@ -26,11 +26,13 @@ class GateAliasTests(unittest.TestCase):
     def test_sql_must_use_same_source_date_time_title_and_compatible_venue(self):
         s=gate.SQL
         self.assertTrue(s.lstrip().startswith("WITH candidates"))
-        self.assertIn("c.mapped_public_source_id=e.origin_source_id",s)
+        self.assertNotIn("c.mapped_public_source_id=e.origin_source_id",s)
         self.assertIn("c.observed_date=e.observed_date",s)
         self.assertIn("left(c.observed_time,5)=left(e.observed_time,5)",s)
         self.assertIn("c.title_key=e.title_key",s)
         self.assertIn("c.venue_key=e.venue_key",s)
+        self.assertIn("HOLD_EDITORIAL_DO_NOT_APPROVE",s)
+        self.assertIn("HOLD_VENUE_OR_ROOM_IDENTITY_REVIEW",s)
         self.assertIn("m.existing_observation_count=0",s)
         self.assertNotRegex(s,r"(?i)\b(?:INSERT|UPDATE|DELETE|ALTER|CREATE|DROP|CALL)\s+")
         self.assertEqual(gate.summarize([])["matched_gate_rows"],0)

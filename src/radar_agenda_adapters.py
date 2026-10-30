@@ -12,6 +12,7 @@ import json
 import html
 import re
 from urllib.parse import urlsplit, parse_qs
+from radar_parallel import iso_event_fields
 
 MONTHS={"enero":1,"febrero":2,"marzo":3,"abril":4,"mayo":5,"junio":6,
         "julio":7,"agosto":8,"septiembre":9,"setiembre":9,"octubre":10,
@@ -85,7 +86,7 @@ def make_record(title,when,time,venue,url,method,tier):
     venue=tidy(venue)[:180]
     # Fail closed on residual/incomplete markup from bounded agenda HTML.
     # Existing historical rows remain untouched and must be audited read-only.
-    if re.search(r"<|>|\\b(?:class=|document\\.|javascript:|<script)\\b",venue,re.I):
+    if re.search(r"<|>|\b(?:class\s*=|document\.|javascript:|<script)",venue,re.I):
         venue=""
     if len(title)<4 or not active_date(when):
         return None
@@ -146,16 +147,9 @@ def structured_sessions(raw,url):
             venue=loc.get("name") if isinstance(loc,dict) else loc if isinstance(loc,str) else None
             for value in starts[:20]:
                 if not isinstance(value,str):continue
-                try:
-                    if len(value)==10:
-                        d=date.fromisoformat(value)
-                        clock=None
-                    else:
-                        dt=datetime.fromisoformat(value.replace("Z","+00:00"))
-                        if dt.tzinfo:dt=dt.astimezone(ZoneInfo("America/Argentina/Buenos_Aires"))
-                        d=dt.date()
-                        clock=dt.strftime("%H:%M")
-                except ValueError:continue
+                day,clock=iso_event_fields(value)
+                if day is None:continue
+                d=date.fromisoformat(day)
                 r=make_record(title,d,clock,venue,url,
                               "schema_org_event_sessions",tier)
                 if r:out.append(r)

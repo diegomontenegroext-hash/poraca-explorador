@@ -28,6 +28,8 @@ from radar_agenda_adapters import extract_listings, special_links, tidy
 from radar_evidence_quality import summarize as summarize_evidence_quality
 from radar_gate_alias_preflight import SQL as SHADOW_ALIAS_SQL, summarize as summarize_aliases
 from radar_function_gate_review import query as function_review_sql, summarize as summarize_function_review
+from radar_url_clock_review import SQL as URL_CLOCK_SQL, summarize as summarize_url_clocks
+from radar_health import assess as assess_health, stability
 from instagram_seed_inbox import choose_seed_sources, public_instagram_metadata
 from radar_genda_browser import render_date_pages, validated_date_pages, render_argentino_event_pages, render_alpedo_date_pages
 
@@ -128,6 +130,18 @@ def isolated_connection():
             if scoped_role != EXPECTED_OPERATIVE_SCOPE or can_publish:
                 conn.close()
                 raise RuntimeError("Scope guard: operational role has unexpected publish privileges")
+            cur.execute("""SELECT
+                bool_and(has_table_privilege(current_user,t.name,'SELECT')),
+                bool_or(has_table_privilege(current_user,t.name,'INSERT,UPDATE,DELETE,TRUNCATE'))
+                FROM (VALUES ('public.radar_agenda_events'),
+                             ('public.radar_v3_source_observations')) t(name)""")
+            can_read,can_mutate=cur.fetchone()
+            if can_mutate:
+                conn.close()
+                raise RuntimeError("Scope guard: operational role can mutate editorial tables")
+            if not can_read:
+                # Keep acquisition available, but never conceal failed preflights.
+                print("::warning::Operational scope lacks editorial SELECT; integrity checks will be blocked",flush=True)
     conn.commit()
     print("TARGET "+("OPERATIONAL_STAGING_NEONDB" if operational else
                      "EXPERIMENTAL_PORACA_EXPLORADOR"),flush=True)
@@ -734,6 +748,7 @@ def main():
     budget=Budget()
     run_id="definitivo-"+datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")+"-"+uuid.uuid4().hex[:6]
     stats=dict(selected=0,checked=0,success=0,index_only=0,urls=0,candidates=0,new=0,entities=0,listings=0)
+    source_outcomes=[]
     try:
         sources=choose_sources(conn,args.mode)
         # Buzon pequeño de permalinks exactos: no implica monitorizar perfiles.
@@ -776,6 +791,10 @@ def main():
             stats["new"]+=new
             stats["entities"]+=entities
             stats["listings"]+=len(check.get("_listings",[]))
+            source_outcomes.append(dict(source_id=source["source_id"],name=source["name"],
+                status=check["status"],details_opened=check["details_opened"],
+                observed_sessions=len(check.get("_listings",[])),new_candidate_urls=new,
+                error=check["error_type"],exact_permalink_only=bool(check.get("_seed_only"))))
             # Live persisted acknowledgement after EVERY source, including index-only/errors.
             with conn.cursor() as cur:
                 cur.execute("""UPDATE radar_definitivo.runs SET
@@ -842,9 +861,52 @@ def main():
             stats["evidence_quality"]["function_gate_v2"]={
                 "status":"unavailable","reason":type(exc).__name__,
                 "authorized_to_write":False}
-        state=("complete" if stats["checked"]==stats["selected"] and
-               stats["checked"]==stats["success"] else "partial")
-        info=dict(**stats,mode=args.mode,
+        try:
+            with conn.cursor() as cur:
+                cur.execute(URL_CLOCK_SQL)
+                stats["evidence_quality"]["url_clock_aliases"]=summarize_url_clocks(cur.fetchall())
+        except Exception as exc:
+            conn.rollback()
+            stats["evidence_quality"]["url_clock_aliases"]={
+                "status":"unavailable","reason":type(exc).__name__,"authorized_to_write":False}
+        stats["health"]=assess_health(stats)
+        # Each denominator is explicit: these are inventoried sources, not
+        # a census of cultural activity in La Plata. Mirror families stay one.
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""SELECT coalesce(nullif(circuit,''),'unclassified'),monitoring_mode,
+                    count(*),count(*) FILTER(WHERE last_checked_at IS NOT NULL)
+                    FROM radar_definitivo.sources WHERE enabled
+                    GROUP BY circuit,monitoring_mode ORDER BY circuit,monitoring_mode""")
+                stats["source_coverage"]={"denominator":"enabled_inventoried_sources",
+                    "city_activity_coverage":"not_measured",
+                    "groups":[dict(circuit=r[0],mode=r[1],registered=r[2],attempted=r[3]) for r in cur.fetchall()],
+                    "mirror_families":{"genda_alpedo":"one_secondary_evidence_family"}}
+                cur.execute("""SELECT
+                    (SELECT count(*) FROM public.radar_v3_source_observations
+                     WHERE coalesce(original_evidence::text,'') LIKE '%DO_NOT_APPROVE%'),
+                    (SELECT count(*) FROM radar_definitivo.candidates
+                     WHERE evidence ? 'eventTimeRecheckedAt')""")
+                held,rechecked=cur.fetchone()
+                stats["correction_memory"]={"status":"read_only_existing_evidence",
+                    "editorial_holds":held,"clocks_with_previous_value":rechecked,
+                    "auto_promoted":0,"rule_version":"20261030-reliability-v1"}
+        except Exception as exc:
+            conn.rollback()
+            stats["source_coverage"]={"status":"unavailable","reason":type(exc).__name__}
+        # Successful HTTP requests cannot conceal failed integrity controls.
+        state=("complete" if stats["health"]["overall"]=="correcto" else "partial")
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""SELECT started_at,finished_at,status,summary
+                    FROM radar_definitivo.runs WHERE started_at>=now()-interval '8 days'
+                    AND run_id<>%s ORDER BY started_at DESC LIMIT 200""",(run_id,))
+                history=[dict(zip(("started_at","finished_at","status","summary"),r)) for r in cur.fetchall()]
+            stats["stability"]=stability(history)
+        except Exception as exc:
+            conn.rollback()
+            stats["stability"]={"status":"unavailable","reason":type(exc).__name__}
+        info=dict(**stats,source_outcomes=source_outcomes,mode=args.mode,
                   target="operational_neondb_staging" if os.getenv("NEON_RADAR_OPERATIONAL_DATABASE_URL")
                   else "experimental_poraca_explorador",
                   requests=budget.total,instagram_requests=budget.instagram,
@@ -859,18 +921,25 @@ def main():
                          json.dumps(info),run_id))
         conn.commit()
         print("DEFINITIVO_RESULT "+json.dumps({"run_id":run_id,"status":state,**info},ensure_ascii=False),flush=True)
+        if state!="complete":
+            print("::warning title=Por Acá — Radar parcial::"+
+                  "Adquisición="+stats["health"]["acquisition"]+
+                  "; controles="+stats["health"]["controls"]+
+                  ". GitHub success no acredita admisión ni publicación.",flush=True)
         out=os.getenv("GITHUB_STEP_SUMMARY")
         if out:
             with open(out,"a",encoding="utf-8") as f:
                 f.write("# Radar Definitivo - "+args.mode+"\n\n")
+                f.write("Estado: **"+state+"** · salud: **"+stats["health"]["overall"]+"**\n\n")
                 f.write("| Fuentes seleccionadas | Revisadas | Accesibles | Funciones leídas | Funciones **nuevas** | Enlaces hallados | Candidatos URL nuevos | IG exactos consultados |\n"
                         "|---:|---:|---:|---:|---:|---:|---:|---:|\n")
                 f.write(f"| {stats['selected']} | {stats['checked']} | {stats['success']} | "
                         f"{stats['listings']} | {stats['new_listings']} | {stats['urls']} | {stats['new']} | {budget.instagram} |\n\n")
                 f.write("Diagnóstico de duplicaciones y sedes (solo lectura): "
-                        +json.dumps(stats.get("evidence_quality",{}),ensure_ascii=False)+"\\n\\n")
+                        +json.dumps(stats.get("evidence_quality",{}),ensure_ascii=False)+"\n\n")
                 f.write(f"Permalinks IG exactos: {stats['seed_accounts']} cuentas en buzon; "
-                        "NO equivale a revisar feeds. Candidatos sin aceptar.\\n")
+                        "NO equivale a revisar feeds. Candidatos sin aceptar.\n")
+                f.write("Estabilidad observada: "+json.dumps(stats["stability"],ensure_ascii=False)+"\n")
         return 0 if (stats["checked"]>0 or not sources) else 1
     except Exception as exc:
         conn.rollback()
