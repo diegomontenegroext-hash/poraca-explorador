@@ -11,6 +11,74 @@ import radar_agenda_adapters as ad
 import radar_definitivo as rd
 
 class CulturalAgendaAdapterTests(unittest.TestCase):
+    def test_doblet_original_index_only_explicit_dated_sessions(self):
+        from datetime import timedelta
+        dates=[date.today()+timedelta(days=2),
+               date.today()+timedelta(days=5)]
+        month=lambda d:next(k.upper() for k,v in ad.MONTHS.items() if v==d.month)
+        weekday=lambda d:["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"][d.weekday()]
+        first,second=dates
+        raw=(f'<div>{first.day:02d} {month(first)} {first.year} -{weekday(first)} '
+             '20:00 Salsa y No LLores! C. 23 565</div>'
+             '<p>Desde el 6 de noviembre Viva el Ciclo C. 23 565</p>'
+             f'<div>{second.day:02d} {month(second)} {second.year} -{weekday(second)} '
+             '20:30 Muestra de Taller M.G. C. 23 565</div>'
+             f'<div>{second.day:02d} {month(second)} {second.year} -Vie '
+             '21:00 Falsa función con día discordante C. 23 565</div>')
+        source="https://teatrodoblet.com.ar/"
+        res=ad.extract_listings(raw,source)
+        titles={x["title"] for x in res}
+        self.assertIn("Salsa y No LLores!",titles)
+        self.assertIn("Muestra de Taller M.G.",titles)
+        self.assertNotIn("Viva el Ciclo",titles)
+        self.assertNotIn("Falsa función con día discordante",titles)
+        self.assertEqual(len(res),2)
+        self.assertTrue(all(x["review_state"]=="observed_unverified" for x in res))
+        self.assertTrue(all(x["proof_url"]==source for x in res))
+        self.assertTrue(all(x["evidence_tier"]=="primary_venue_program_index" for x in res))
+
+    def test_doblet_details_only_from_real_page_or_structured_date(self):
+        from datetime import timedelta
+        d=date.today()+timedelta(days=3)
+        url="https://www.teatrodoblet.com.ar/event/167089-muestra-de-taller-de-montaje-mg"
+        no_date="<h1>Muestra de Taller M.G.</h1><p>20:30 Apertura a consultar</p>"
+        self.assertEqual(ad.extract_listings(no_date,url),[])
+        raw=('<h1>Muestra de Taller M.G.</h1>'
+             '<script type="application/ld+json">'
+             '{"@type":"TheaterEvent","name":"Muestra de Taller M.G.",'
+             '"startDate":"'+d.isoformat()+'T20:30:00-03:00",'
+             '"location":{"name":"Espacio Doble-T"}}</script>')
+        out=ad.extract_listings(raw,url)
+        self.assertEqual(len(out),1)
+        self.assertEqual(out[0]["event_date"],d.isoformat())
+        self.assertEqual(out[0]["event_time"],"20:30")
+        self.assertEqual(out[0]["proof_url"],url)
+        self.assertEqual(out[0]["review_state"],"observed_unverified")
+
+    def test_doblet_detail_discovery_never_guesses_slug(self):
+        from types import SimpleNamespace
+        from datetime import timedelta
+        now=datetime.now()
+        root="https://teatrodoblet.com.ar/"
+        urls=["/event/"+str(i)+"-obra-"+str(i) for i in range(101,112)]
+        links=[(x,"evento") for x in urls]+[
+           ("https://evil.example/event/999-malicioso","fuera"),
+           ("https://teatrodoblet.com.ar/event/123-x?ref=trk","utm"),
+           ("https://teatrodoblet.com.ar/event/124-x#promo","ancla"),
+           ("https://teatrodoblet.com.ar:8443/event/125-x","puerto"),
+           ("https://teatrodoblet.com.ar/event/nondated","sin id"),
+        ]
+        found=ad.special_links(root,SimpleNamespace(links=links),at=now)
+        self.assertGreaterEqual(len(found),2)
+        self.assertLessEqual(len(found),6)
+        self.assertEqual(found[0][0],"https://teatrodoblet.com.ar/event/101-obra-101")
+        self.assertEqual(found[1][0],"https://teatrodoblet.com.ar/event/102-obra-102")
+        self.assertTrue(all(url.startswith(root+"event/") and
+                            "?" not in url and "#" not in url and ":" not in url[8:]
+                            for url,_ in found))
+        self.assertEqual(ad.special_links("https://evil.example/",
+                         SimpleNamespace(links=links),at=now),[])
+
     def test_alpedo_rendered_dated_cards_are_secondary_and_individual(self):
         day=date.today()+timedelta(days=1)
         month=next(k for k,v in ad.MONTHS.items() if v==day.month)
