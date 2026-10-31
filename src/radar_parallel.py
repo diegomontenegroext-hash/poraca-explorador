@@ -21,6 +21,7 @@ from html.parser import HTMLParser
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, unquote, urljoin, urlparse
 from urllib.request import Request, urlopen
+from radar_ical_agenda import FEED_URL as OFFICIAL_ICS_FEED_URL
 
 DB_NAME = "poraca_explorador"
 DB_ROLE = "poraca_explorador_writer"
@@ -230,13 +231,24 @@ def iso_event_fields(date_value: str | None) -> tuple[str | None, str | None]:
 
 
 def fetch(url: str) -> tuple[int | None, str | None, str | None]:
-    req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"})
+    official_calendar = url == OFFICIAL_ICS_FEED_URL
+    accept = ("text/calendar,application/octet-stream;q=0.8" if official_calendar
+              else "text/html,application/xhtml+xml")
+    req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": accept})
     try:
         with urlopen(req, timeout=REQUEST_TIMEOUT) as response:
-            if "html" not in response.headers.get("Content-Type", "").lower():
+            content_type = response.headers.get("Content-Type", "").lower()
+            if official_calendar:
+                if not any(x in content_type for x in ("text/calendar", "text/plain", "octet-stream")):
+                    return response.status, None, "NON_CALENDAR_CONTENT_TYPE"
+            elif "html" not in content_type:
                 return response.status, None, "NON_HTML"
             data = response.read(MAX_BODY)
-            return response.status, data.decode("utf-8", errors="replace"), None
+            body = data.decode("utf-8", errors="replace")
+            if official_calendar and not (body.lstrip().startswith("BEGIN:VCALENDAR") and
+                                          body.rstrip().endswith("END:VCALENDAR")):
+                return response.status, None, "INVALID_CALENDAR"
+            return response.status, body, None
     except HTTPError as err:
         return err.code, None, "RATE_LIMIT" if err.code == 429 else "HTTP_ERROR"
     except (URLError, TimeoutError, OSError, UnicodeError, ValueError) as err:
