@@ -22,6 +22,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, unquote, urljoin, urlparse
 from urllib.request import Request, urlopen
 from radar_ical_agenda import FEED_URL as OFFICIAL_ICS_FEED_URL
+from radar_ical_generic import is_calendar_url
 
 DB_NAME = "poraca_explorador"
 DB_ROLE = "poraca_explorador_writer"
@@ -231,7 +232,7 @@ def iso_event_fields(date_value: str | None) -> tuple[str | None, str | None]:
 
 
 def fetch(url: str) -> tuple[int | None, str | None, str | None]:
-    official_calendar = url == OFFICIAL_ICS_FEED_URL
+    official_calendar = is_calendar_url(url)
     accept = ("text/calendar,application/octet-stream;q=0.8" if official_calendar
               else "text/html,application/xhtml+xml")
     req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": accept})
@@ -239,7 +240,7 @@ def fetch(url: str) -> tuple[int | None, str | None, str | None]:
         with urlopen(req, timeout=REQUEST_TIMEOUT) as response:
             content_type = response.headers.get("Content-Type", "").lower()
             if official_calendar:
-                if not any(x in content_type for x in ("text/calendar", "text/plain", "octet-stream")):
+                if not any(x in content_type for x in ("text/calendar", "text/plain", "octet-stream", "application/ics", "text/x-vcalendar")):
                     return response.status, None, "NON_CALENDAR_CONTENT_TYPE"
             elif "html" not in content_type:
                 return response.status, None, "NON_HTML"
