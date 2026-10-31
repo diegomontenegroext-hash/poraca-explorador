@@ -93,7 +93,7 @@ def classify(facts):
             "Persisten asociaciones sospechosas sin certificar"),
        gate("source_recovery","NOT_TESTED","No hay prueba live de sustitución tras caída"),
        gate("source_drift","NOT_TESTED","No hay huella/versiones probadas de cambio de formato"),
-       gate("generic_ics","BLOCKED","El lector vigente de ICS es específico del organizador"),
+       gate("generic_ics","NOT_TESTED","Parser y descubrimiento genéricos con QA; falta feed real nuevo"),
        gate("multimodal_social","NOT_TESTED","No hay prueba de video, imagen y caption accesibles"),
        gate("sports_discovery","PASS" if n("active_sports_sources")>0 else "FAIL",
             "Existen canales deportivos activos" if n("active_sports_sources")>0
