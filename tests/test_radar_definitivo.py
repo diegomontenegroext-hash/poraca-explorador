@@ -18,6 +18,32 @@ class FakeBudget:
         return 999
 
 class RadarDefinitivoTests(unittest.TestCase):
+    def test_same_official_section_is_fetched_once_even_if_link_labels_differ(self):
+        root="https://www.casadionisio.com.ar/"
+        detail=root+"degustaciones"
+        pages={
+            root:(200,'<a href="/degustaciones">Degustaciones</a>',None),
+            detail:(200,'<h1>Degustaciones</h1><p>Sin fecha confirmada</p>',None),
+        }
+        class CountingBudget(FakeBudget):
+            def __init__(self,urls):
+                super().__init__(urls)
+                self.calls=[]
+            def request(self,url):
+                self.calls.append(url)
+                return super().request(url)
+        budget=CountingBudget(pages)
+        with patch.object(rd,"links_from_page",
+                          return_value=[(detail,"otra etiqueta para mismo URL")]):
+            check,candidates=rd.scan_source(
+                {"source_id":"src-dionisio","url":root},
+                budget,"full")
+        self.assertEqual(budget.calls,[root,detail])
+        self.assertEqual(check["links_found"],1)
+        self.assertEqual(check["details_opened"],1)
+        self.assertEqual(len(candidates),1)
+        self.assertEqual(check["_listings"],[])
+
     def test_doblet_prefers_exact_original_without_merging_sessions(self):
         root="https://teatrodoblet.com.ar/"
         detail="https://teatrodoblet.com.ar/event/131150-salsa-y-no-llores"
