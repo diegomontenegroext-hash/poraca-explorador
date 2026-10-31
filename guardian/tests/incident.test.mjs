@@ -1,0 +1,12 @@
+import test from "node:test";import assert from "node:assert/strict";
+import {eventSignal,assessSite,uniqueNewsCandidates} from "../policy.mjs";
+test("disolución potencial requiere confirmación",()=>{const x=eventSignal("Babasónicos anuncia su disolución tras 30 años");assert.equal(x.level,"URGENTE_VERIFICAR");assert.match(x.action,/Contrastar/);});
+test("desmentida no confirma una disolución",()=>assert.equal(eventSignal("Babasónicos no se separa: desmienten el rumor").kind,"rumor/desmentida"));
+test("acústico sí se detecta",()=>assert.equal(eventSignal("Babasónicos anuncia un show acústico en La Plata").kind,"actuación o audiovisual"));
+test("álbum nuevo requiere fuente",()=>assert.equal(eventSignal("Babasónicos lanza un nuevo álbum").kind,"lanzamiento discográfico"));
+test("tres fotografías rotas = ROJO",()=>assert.equal(assessSite({brokenImages:3}),"ROJO"));
+test("una imagen bloqueada = GRIS",()=>assert.equal(assessSite({blockedImages:1}),"GRIS"));
+test("enlace externo roto = AMARILLO",()=>assert.equal(assessSite({brokenExternalLinks:1}),"AMARILLO"));
+test("sin alguna comprobación no VERDE",()=>assert.equal(assessSite({missingChecks:1}),"GRIS"));
+test("fuente editorial caída = GRIS",()=>assert.equal(assessSite({sourceMissing:true}),"GRIS"));
+test("noticias duplicadas se eliminan y urgentes primero",()=>{const a=uniqueNewsCandidates([{title:"Babasónicos presenta un libro"},{title:"Babasónicos anuncia disolución"},{title:"Babasónicos presenta un libro"}]);assert.equal(a.length,2);assert.equal(a[0].signal.level,"URGENTE_VERIFICAR");});
