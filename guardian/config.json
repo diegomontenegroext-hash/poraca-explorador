@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "sites": [
+    {
+      "id": "babasonicos",
+      "enabled": true,
+      "url": "https://babasonicos-atlas.vercel.app",
+      "baseline": "guardian/baselines/babasonicos.urls.txt",
+      "expectedImagesAtLeast": 14,
+      "assetPaths": [
+        "/app.js",
+        "/styles.css",
+        "/ux-video-archive.css",
+        "/voices-anthology.css",
+        "/voices-anthology.js"
+      ],
+      "imageJsonPaths": [
+        "/covers.json",
+        "/atlas.json"
+      ],
+      "browserRoutes": [
+        "/",
+        "/catalogo",
+        "/canciones/rubi",
+        "/en/"
+      ],
+      "musicbrainzArtistId": "e6e1e76f-afee-4990-aad0-056199d94918",
+      "newsQuery": "Babasónicos"
+    }
+  ]
+}
