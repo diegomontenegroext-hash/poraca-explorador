@@ -16,14 +16,14 @@ ART = ZoneInfo("America/Argentina/Buenos_Aires")
 _DAY_NAMES = ("lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo")
 _EVENT_ANCHOR = re.compile(
     r"^https://festival[.]freezer[.]com[.]ar/2026/programacion/#"
-    r"(lunes|martes|miercoles|jueves|viernes|sabado|domingo)-(\\d{1,2})$",
+    r"(lunes|martes|miercoles|jueves|viernes|sabado|domingo)-(\d{1,2})$",
     re.I,
 )
 
 
 def _unescape(value):
     return re.sub(r"\\([nN,;\\])",
-                  lambda match: "\\n" if match.group(1).lower() == "n" else match.group(1),
+                  lambda match: "\n" if match.group(1).lower() == "n" else match.group(1),
                   value or "")
 
 
@@ -33,15 +33,15 @@ def _start_time(fields):
         return None
     name, value = item
     try:
-        if "VALUE=DATE" in name.upper() and re.fullmatch(r"20\\d{6}", value):
+        if "VALUE=DATE" in name.upper() and re.fullmatch(r"20\d{6}", value):
             return date.fromisoformat(value[0:4] + "-" + value[4:6] + "-" + value[6:8]), None
-        if re.fullmatch(r"20\\d{6}T\\d{6}Z", value):
+        if re.fullmatch(r"20\d{6}T\d{6}Z", value):
             instant = datetime.strptime(value, "%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc)
             local = instant.astimezone(ART)
             return local.date(), local.strftime("%H:%M")
         if ("TZID=AMERICA/ARGENTINA/BUENOS_AIRES" in name.upper() or
             "TZID=AMERICA/ARGENTINA/BUENOS\\_AIRES" in name.upper()):
-            if re.fullmatch(r"20\\d{6}T\\d{6}", value):
+            if re.fullmatch(r"20\d{6}T\d{6}", value):
                 local = datetime.strptime(value, "%Y%m%dT%H%M%S")
                 return local.date(), local.strftime("%H:%M")
     except ValueError:
@@ -81,7 +81,7 @@ def calendar_sessions(body, url):
         return []
     unfolded = []
     for line in raw.splitlines():
-        if line.startswith((" ", "\\t")) and unfolded:
+        if line.startswith((" ", "\t")) and unfolded:
             unfolded[-1] += line[1:]
         else:
             unfolded.append(line)
