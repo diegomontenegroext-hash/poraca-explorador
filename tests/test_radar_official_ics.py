@@ -228,7 +228,12 @@ class OfficialICalendarTests(unittest.TestCase):
             status,raw,error=net.fetch(FEED_URL)
             self.assertEqual((status,error),(200,None))
             self.assertTrue(raw.startswith("BEGIN:VCALENDAR"))
+            # An unfamiliar but explicit ICS endpoint is now a valid read.
+            # It does not inherit the Freezer festival's primary evidence.
             status,raw,error=net.fetch("https://not-pinned.example/calendar.ics")
+            self.assertEqual((status,error),(200,None))
+            self.assertTrue(raw.startswith("BEGIN:VCALENDAR"))
+            status,raw,error=net.fetch("https://not-pinned.example/data.json")
             self.assertEqual((status,raw,error),(200,None,"NON_HTML"))
 
 if __name__=="__main__":

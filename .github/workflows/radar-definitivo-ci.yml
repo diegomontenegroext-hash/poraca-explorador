@@ -25,6 +25,8 @@ on:
       - 'tests/test_instagram_seed_inbox.py'
       - 'src/radar_parallel.py'
       - 'src/radar_agenda_adapters.py'
+      - 'src/radar_ical_generic.py'
+      - 'tests/test_radar_generic_ical.py'
       - 'src/radar_ical_agenda.py'
       - 'tests/test_radar_official_ics.py'
       - 'src/radar_evidence_quality.py'
