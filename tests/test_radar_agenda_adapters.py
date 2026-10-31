@@ -718,6 +718,43 @@ Kevin - Liniers: Eternotour
                          "No agotar dos slots abriendo el índice y su paginación")
         self.assertEqual(sum("/entrada/" in u for u,_ in found),5)
 
+    def test_metro_full_filtered_root_opens_actual_show_pages(self):
+        # Regression from production: 4/4 future sessions lived on the
+        # long `?mes=&anio=` catalogue but no /entrada details were captured.
+        # The short root was repeatedly selecting an index + old tickets;
+        # a filtered page opened as a detail was never traversed.
+        full="https://www.teatrometrolp.com.ar/entradas/cartelera/?mes=&anio="
+        url_base="https://www.teatrometrolp.com.ar/entrada/"
+        tickets=[
+          "kevin-johanse-liniers-100884","juli-bellese-100781",
+          "pablo-fabregas-100961","pequeno-pez-100882",
+          "nico-de-tracy-purga-100764","las-hijas-100958",
+          "las-hijas-101000","la-biblioteca-perdida-100765",
+          "ni-media-palabra.-100920",
+        ]
+        html="".join('<a href="'+url_base+slug+'">ver más info</a>'
+                     for slug in tickets)
+        html+='<a href="/entradas/cartelera/1/">pagina 1</a>'
+        html+='<a href="https://evil.example/entrada/bad">bad</a>'
+        page=rd.parse_html(html)
+        first=ad.special_links(full,page,at=datetime(2026,10,30,5))
+        second=ad.special_links(full,page,at=datetime(2026,10,30,13))
+        third=ad.special_links(full,page,at=datetime(2026,10,30,21))
+        for batch in (first,second,third):
+            self.assertEqual(len(batch),6)
+            self.assertEqual(len({u for u,_ in batch}),6)
+            self.assertTrue(all(u.startswith(url_base) for u,_ in batch))
+            self.assertFalse(any("cartelera" in u or "evil" in u for u,_ in batch))
+        reached={u for batch in (first,second,third) for u,_ in batch}
+        self.assertTrue(all(url_base+slug in reached for slug in tickets))
+        self.assertIn(url_base+"las-hijas-100958",reached)
+        self.assertIn(url_base+"las-hijas-101000",reached)
+        self.assertIn(url_base+"la-biblioteca-perdida-100765",reached)
+        self.assertIn(url_base+"ni-media-palabra.-100920",reached)
+        # The exact root is approved, not a query with injected parameters.
+        self.assertEqual(ad.special_links(
+             full+"&redirect=https://evil.example",page),[])
+
     def test_metro_original_ticket_rotation_bounded_and_distinct_sessions(self):
         root="https://www.teatrometrolp.com.ar/entradas/cartelera/"
         first=["kevin-johanse-100001","juli-bellese-100002",
