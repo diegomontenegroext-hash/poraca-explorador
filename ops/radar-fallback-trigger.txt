@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Disparo por Guardia GPT - orquestador principal.
+# Bootstrap unico del nuevo corpus tras archivo productivo verificado.
 trigger_date=2026-10-31
-trigger_slot=05
+trigger_slot=bootstrap
 trigger_mode=full
-trigger_reason=gpt_primary_scheduler
+trigger_reason=adaptive_live_cutover_20261031
