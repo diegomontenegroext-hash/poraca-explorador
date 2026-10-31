@@ -954,13 +954,16 @@ def special_links(url,page,at=None):
                 # oficial, nunca construir un slug desde el título.
                 normalized="https://"+p.hostname+p.path.rstrip("/")
                 tickets.setdefault(normalized,(normalized,"detalle oficial"))
-        # La portada simple puede llevar a la cartelera filtrada *o* a
-        # paginación; abrir ambas desperdicia un slot de los mismos límites
-        # FULL/INCREMENTAL. Si existe la URL filtrada original, es preferente.
-        page_link=([filtered_root] if filtered_root else
+        # La URL oficial con filtros vacíos ya ES la cartelera completa.
+        # No abrir desde ella otra página de índice: hacerlo desperdicia
+        # el cupo y nunca devuelve al selector los detalles enlazados allí.
+        # El origen principal de Neon debe apuntar a esta URL completa.
+        complete_index=urlsplit(url).query in ("mes=&anio=","anio=&mes=")
+        page_link=([] if complete_index else
+                   [filtered_root] if filtered_root else
                    [discovered[min(discovered)]] if discovered else [])
-        if not page_link and tickets:
-            # Paginación real documentada, sólo si la portada enlaza fichas.
+        if not page_link and tickets and not complete_index:
+            # Sólo desde la portada resumida; nunca desde el índice completo.
             page_link=[("https://"+host+"/entradas/cartelera/1/",
                         "cartelera oficial verificada, pagina 1")]
         ordered=list(tickets.values())
