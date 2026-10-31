@@ -80,6 +80,13 @@ class PulseCategoryTest(unittest.TestCase):
              "Música","No year","yesterday","20:00","venue",
              "https://example.org/event","s")]),[])
 
+    def test_missing_canonical_links_make_e2e_control_fail_closed(self):
+        self.assertTrue(pulse.integrity_blocks_release({"orphanedCanonicalLinks":27}))
+        self.assertTrue(pulse.integrity_blocks_release({"orphanedCanonicalLinks":1}))
+        self.assertFalse(pulse.integrity_blocks_release({"orphanedCanonicalLinks":0}))
+        self.assertFalse(pulse.integrity_blocks_release({}))
+        self.assertFalse(pulse.integrity_blocks_release(None))
+
     def test_runtime_queries_are_select_only(self):
         self.assertTrue(pulse.CANONICAL_SQL.lstrip().startswith("SELECT "))
         self.assertTrue(pulse.OBS_SQL.lstrip().startswith("SELECT "))
