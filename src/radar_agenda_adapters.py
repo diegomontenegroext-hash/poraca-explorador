@@ -32,6 +32,8 @@ SCOPED_HOSTS={"agendalaplata.ar","www.agendalaplata.ar",
               "gritos.planetario.unlp.edu.ar",
               "www.fcnym.unlp.edu.ar",
               "alpedo.ar","www.alpedo.ar",
+              "www.centrodearte.unlp.edu.ar","centrodearte.unlp.edu.ar",
+              "www.casadionisio.com.ar","casadionisio.com.ar",
               "www.eldia.com","eldia.com"}
 def tidy(s):
     return re.sub(r"\s+"," ",html.unescape(s or "")).strip()
