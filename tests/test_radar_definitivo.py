@@ -120,8 +120,12 @@ class RadarDefinitivoTests(unittest.TestCase):
         # The live official home mixes visited older tickets with newly
         # discovered separate session permalinks. Priority must not be
         # swallowed by a fixed first-six carousel nor repeat stale links.
-        html="<html>"+ "".join(
-            '<a href="'+u+'">ver más info</a>' for u in
+        def original_anchor(u):
+            # Official Metro alternates apex and www for the same entry.
+            if u in new or u==old[0]:
+                u=u.replace("https://www.","https://")
+            return '<a href="'+u+'">ver más info</a>'
+        html="<html>"+ "".join(original_anchor(u) for u in
             old[:5]+new+old[5:])+"</html>"
         pages={root:(200,html,None)}
         for u in old+new:
@@ -138,6 +142,19 @@ class RadarDefinitivoTests(unittest.TestCase):
                         "Reserve one recheck for drift and cancellations")
         self.assertTrue(all(u.startswith(prefix) for u in opened))
         self.assertNotIn("approved",str(candidates).lower())
+
+    def test_metro_apex_www_mirrors_do_not_steal_detail_budget(self):
+        prefix="https://www.teatrometrolp.com.ar/entrada/"
+        first=prefix+"las-hijas-100958"
+        second=prefix+"las-hijas-101000"
+        older=prefix+"kevin-johanse-liniers-100884"
+        links=[(older,"previous ticket"),(first,"new official show"),
+               (second,"another original show")]
+        known=["https://teatrometrolp.com.ar/entrada/kevin-johanse-liniers-100884"]
+        prioritized=rd.prioritize_unseen_official_details(links,known,3)
+        self.assertEqual([u for u,_ in prioritized[:2]],[first,second])
+        self.assertEqual(prioritized[2][0],older)
+        self.assertEqual(len(prioritized),3)
 
     def test_gap_aware_official_detail_budget_preserves_rechecks(self):
         base="https://www.teatrometrolp.com.ar/entrada/"
