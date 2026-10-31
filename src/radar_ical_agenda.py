@@ -56,8 +56,14 @@ def _event(fields):
     proof = fields.get("URL", ("", ""))[1].strip()
     parsed = _start_time(fields)
     if (not uid.endswith("@festival.freezer.com.ar") or
-        not summary.startswith("Freezer · ") or not parsed or not location):
+        not summary.startswith("Freezer · ") or not parsed):
         return None
+    # Some festival entries have no public location or just 'dirección por inbox'.
+    # Preserve the session, but stage it with NULL venue for the editorial gate.
+    if not location or re.fullmatch(
+            r"(?:direcci[oó]n por inbox|sede a confirmar|lugar a confirmar|por confirmar)",
+            location, re.I):
+        location = None
     day, clock = parsed
     anchor = _EVENT_ANCHOR.fullmatch(proof)
     if not anchor or int(anchor.group(2)) != day.day or anchor.group(1).lower() != _DAY_NAMES[day.weekday()]:
