@@ -1,0 +1,8 @@
+import test from "node:test";import assert from "node:assert/strict";
+import {buildDigest} from "../digest-core.mjs";
+import {eventSignal,assessSite} from "../policy.mjs";
+function report({brokenImages=0,news=[]}={}){return {date:"2026-11-03T12:17:00Z",verdict:assessSite({brokenImages,candidates:news}),sites:[{id:"babasonicos",url:"https://babasonicos-atlas.vercel.app",verdict:assessSite({brokenImages,candidates:news}),coverage:{pages:{expected:570,ok:570},images:{expected:24,ok:24-brokenImages,broken:brokenImages}},browser:{expected:8,checks:Array(8).fill({status:"PASS"})},editorial:{candidates:news},externalLinks:{blocked:0},incidents:{images:Array.from({length:brokenImages},(_,i)=>({state:"ROTO",url:"https://ejemplo.test/foto-"+(i+1)+".jpg"})),links:[]}}]};}
+test("tres fotos rotas producen resumen ROJO con enlaces concretos",()=>{const d=buildDigest(report({brokenImages:3}));assert.match(d,/ROJO/);assert.match(d,/Revisar 3 fotografías rotas/);assert.match(d,/foto-1.jpg/);assert.match(d,/foto-3.jpg/);});
+test("posible disolución genera ALERTA URGENTE sin afirmar hecho",()=>{const item={title:"Babasónicos anuncia su disolución",signal:eventSignal("Babasónicos anuncia su disolución")};const d=buildDigest(report({news:[item]}));assert.match(d,/SEÑAL URGENTE A VERIFICAR/);assert.match(d,/titular no prueba el hecho/);});
+test("reporte mensual deja marcador idempotente",()=>{const d=buildDigest(report(),{eventName:"schedule",runId:"123"});assert.match(d,/guardian-monthly:2026-11/);assert.match(d,/actions\/runs\/123/);});
+test("prueba manual no escribe marcador mensual",()=>assert.doesNotMatch(buildDigest(report(),{eventName:"workflow_dispatch"}),/guardian-monthly:/));
