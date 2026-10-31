@@ -1,0 +1,171 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Freezer Festival//Original metadata fields only//ES
+BEGIN:VEVENT
+UID:85c1cfbb99060e4ebd16379f@festival.freezer.com.ar
+SUMMARY:Freezer · Inauguración de Exposiciones
+URL:https://festival.freezer.com.ar/2026/programacion/#jueves-5
+LOCATION:Pasaje Dardo Rocha
+DTSTART:20261105T200000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:877ed0dd6323f94747bbde0f@festival.freezer.com.ar
+SUMMARY:Freezer · Brindis de Inauguración Freezer Festival 2026
+URL:https://festival.freezer.com.ar/2026/programacion/#jueves-5
+LOCATION:Ciudad de gatos
+DTSTART:20261105T233000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:325ab6142fc837aa24439819@festival.freezer.com.ar
+SUMMARY:Freezer · Un Libro de (Naturaleza)
+URL:https://festival.freezer.com.ar/2026/programacion/#viernes-6
+LOCATION:Museo de La Plata (FCNyM\, UNLP)\, Paseo del Bosque s/n\, La Plata
+DTSTART:20261106T180000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:8f49c6e4ccebe162c8086f97@festival.freezer.com.ar
+SUMMARY:Freezer · Taller de Cianotipia con Graduados Fotografía FDA UNLP
+URL:https://festival.freezer.com.ar/2026/programacion/#domingo-8
+LOCATION:Beressia\, Berisso
+DTSTART:20261108T170000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:a588a90b8246786a252114f3@festival.freezer.com.ar
+SUMMARY:Freezer · Pre-Inauguración CDA
+URL:https://festival.freezer.com.ar/2026/programacion/#miercoles-11
+LOCATION:Centro de Arte · Edificio Karakachoff\, 48 entre 6 y 7\, La Plata
+DTSTART;VALUE=DATE:20261111
+END:VEVENT
+BEGIN:VEVENT
+UID:86ff3249c9978971956c03e3@festival.freezer.com.ar
+SUMMARY:Freezer · Programa de Proyectos Fotográficos 2026
+URL:https://festival.freezer.com.ar/2026/programacion/#jueves-12
+LOCATION:Casa 62\, 62 entre 9 y 10\, La Plata
+DTSTART:20261112T233000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:96c1eaad7d3c52ce164d4ac0@festival.freezer.com.ar
+SUMMARY:Freezer · Abre Centro de Arte
+URL:https://festival.freezer.com.ar/2026/programacion/#viernes-13
+LOCATION:Centro de Arte · Edificio Karakachoff\, 48 entre 6 y 7\, La Plata
+DTSTART:20261113T130000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:77d1a4ecea03a84e48fb08fb@festival.freezer.com.ar
+SUMMARY:Freezer · Fotografía de moda y procesos analógicos
+URL:https://festival.freezer.com.ar/2026/programacion/#viernes-13
+LOCATION:Espacio Dickinson · Edificio Karakachoff\, 48 entre 6 y 7\, La Pl
+DTSTART:20261113T130000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:40845c419a239fa8b7a2ee57@festival.freezer.com.ar
+SUMMARY:Freezer · Feria de fotografía y afines
+URL:https://festival.freezer.com.ar/2026/programacion/#viernes-13
+LOCATION:Espacio Dickinson · Edificio Karakachoff\, 48 entre 6 y 7\, La Pl
+DTSTART:20261113T170000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:3b2127318278c080fe3bef18@festival.freezer.com.ar
+SUMMARY:Freezer · La ciudad en la mirada drónica
+URL:https://festival.freezer.com.ar/2026/programacion/#viernes-13
+LOCATION:Espacio Dickinson · Edificio Karakachoff\, 48 entre 6 y 7\, La Pl
+DTSTART:20261113T200000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:cac135323213bc1bf87c16b6@festival.freezer.com.ar
+SUMMARY:Freezer · Turrxs con Mote + Luciana Demichelis
+URL:https://festival.freezer.com.ar/2026/programacion/#viernes-13
+LOCATION:Dirección por inbox
+DTSTART:20261113T230000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:aa0b8ce581a53cc5100ef1ec@festival.freezer.com.ar
+SUMMARY:Freezer · Taller con Proyecto Calle
+URL:https://festival.freezer.com.ar/2026/programacion/#sabado-14
+LOCATION:Sputnik Var\, 48 entre 11 y 12\, La Plata
+DTSTART:20261114T140000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:de88043604532632be88b6d4@festival.freezer.com.ar
+SUMMARY:Freezer · Ausencias
+URL:https://festival.freezer.com.ar/2026/programacion/#sabado-14
+LOCATION:Auditorio · Centro de Arte UNLP\, 48 entre 6 y 7\, La Plata
+DTSTART:20261114T173000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:a5f5a9fd0322581807666ffe@festival.freezer.com.ar
+SUMMARY:Freezer · Inauguración Selección Fotolibros + Exhibición 2026 +
+URL:https://festival.freezer.com.ar/2026/programacion/#sabado-14
+LOCATION:Centro de Arte · Edificio Karakachoff · Sala A\, 48 entre 6 y 7\
+DTSTART:20261114T180000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:e76559ca17c1eb06f737f12e@festival.freezer.com.ar
+SUMMARY:Freezer · Reapropiaciones fotográficas y memoria viva a 50 años
+URL:https://festival.freezer.com.ar/2026/programacion/#sabado-14
+LOCATION:Auditorio · Centro de Arte UNLP\, 48 entre 6 y 7\, La Plata
+DTSTART:20261114T193000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:4737d08bc36a75b68a016755@festival.freezer.com.ar
+SUMMARY:Freezer · Guardia de Cenizas
+URL:https://festival.freezer.com.ar/2026/programacion/#sabado-14
+LOCATION:Auditorio · Centro de Arte UNLP\, 48 entre 6 y 7\, La Plata
+DTSTART:20261114T220000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:e35997b4255c47a9ef8cd9a1@festival.freezer.com.ar
+SUMMARY:Freezer · Subterráneo Invade Freezer
+URL:https://festival.freezer.com.ar/2026/programacion/#sabado-14
+LOCATION:Espacio Vintage\, Diagonal 77 y 8\, La Plata
+DTSTART:20261114T233000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:b49bb2e4a6caf4db2c7d7bc7@festival.freezer.com.ar
+SUMMARY:Freezer · Feria de fotografía y afines
+URL:https://festival.freezer.com.ar/2026/programacion/#domingo-15
+LOCATION:Espacio Dickinson · Edificio Karakachoff\, 48 entre 6 y 7\, La Pl
+DTSTART:20261115T170000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:926e85450aafc226fa327b03@festival.freezer.com.ar
+SUMMARY:Freezer · Selección Fotolibros + Exhibición 2026
+URL:https://festival.freezer.com.ar/2026/programacion/#domingo-15
+LOCATION:Centro de Arte · Edificio Karakachoff · Sala A\, 48 entre 6 y 7\
+DTSTART:20261115T180000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:777c5b1b26e46f03242eff80@festival.freezer.com.ar
+SUMMARY:Freezer · Disparos\, imágenes y representaciones en la Argentina
+URL:https://festival.freezer.com.ar/2026/programacion/#domingo-15
+LOCATION:Auditorio · Centro de Arte UNLP\, 48 entre 6 y 7\, La Plata
+DTSTART:20261115T180000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:4164338056fa36e2f65ecc4c@festival.freezer.com.ar
+SUMMARY:Freezer · La fotografía es
+URL:https://festival.freezer.com.ar/2026/programacion/#domingo-15
+LOCATION:Auditorio · Centro de Arte UNLP\, 48 entre 6 y 7\, La Plata
+DTSTART:20261115T193000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:26355f67f60d38574017de00@festival.freezer.com.ar
+SUMMARY:Freezer · Carne de Cañón
+URL:https://festival.freezer.com.ar/2026/programacion/#domingo-15
+LOCATION:Auditorio · Centro de Arte UNLP\, 48 entre 6 y 7\, La Plata
+DTSTART:20261115T210000Z
+END:VEVENT
+BEGIN:VEVENT
+UID:6c7b28a42ce655bb7c99750d@festival.freezer.com.ar
+SUMMARY:Freezer · Cierre Festival
+URL:https://festival.freezer.com.ar/2026/programacion/#domingo-15
+DTSTART;VALUE=DATE:20261115
+END:VEVENT
+BEGIN:VEVENT
+UID:a9e171c5733949940aba1d61@festival.freezer.com.ar
+SUMMARY:Freezer · Fotógrafxs de Ensenada
+URL:https://festival.freezer.com.ar/2026/programacion/#martes-17
+LOCATION:Cine Teatro Municipal\, Ensenada
+DTSTART;VALUE=DATE:20261117
+END:VEVENT
+END:VCALENDAR
