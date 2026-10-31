@@ -193,6 +193,11 @@ def fetch(url):
     report["editorialPreview"]=editorial_preview
     return report
 
+def integrity_blocks_release(e2e):
+    """Fail closed on lost canonical identities, not on unapproved new leads."""
+    return int((e2e or {}).get("orphanedCanonicalLinks") or 0)>0
+
+
 def main():
     if not os.getenv("NEON_RADAR_OPERATIONAL_DATABASE_URL"):
         print("::error::PULSE_NEON_SECRET_MISSING",file=sys.stderr);return 1
@@ -328,6 +333,15 @@ def main():
                         safe_cell(item["time"]),safe_cell(item["title"]),item["url"]))
                 if not report["editorialReviewQueue"]:
                     out.write("Sin detalles originales pendientes en esta ventana.\n")
+        # A successful acquisition is NOT a successful end-to-end chain.
+        # The report was already emitted; fail this CONTROL step loudly
+        # when approved / linked canonical data has become inconsistent.
+        if integrity_blocks_release(report["endToEnd"]):
+            print("::error::PORACA_E2E_P0_CANONICAL_INTEGRITY "
+                  "orphaned_links={} (ingestion may still have succeeded; "
+                  "editorial/API certification is BLOCKED)".format(
+                    report["endToEnd"]["orphanedCanonicalLinks"]),file=sys.stderr,flush=True)
+            return 2
         return 0
     except Exception as exc:
         print("::error::RADAR_CATEGORY_PULSE_UNAVAILABLE "+type(exc).__name__,file=sys.stderr)
