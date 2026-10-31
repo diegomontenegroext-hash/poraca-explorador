@@ -86,6 +86,34 @@ class AdaptiveDiscoveryTests(unittest.TestCase):
         self.assertEqual(candidates,[])
         self.assertEqual(check["status"],"ok")
 
+    def test_calendar_menu_fallback_runs_even_with_unrelated_generic_links(self):
+        root="https://club-ejemplo.org/"
+        agenda=root+"programacion/"
+        article=root+"novedades/ensayo-1"
+        day=(date.today()+timedelta(days=7)).isoformat()
+        event=('<script type="application/ld+json">'
+               '{"@type":"Event","name":"Encuentro deportivo barrial",'
+               '"startDate":"'+day+'T18:00:00-03:00",'
+               '"location":{"name":"Club de barrio"}}'
+               '</script>')
+        class Budget:
+            def __init__(self):self.calls=[]
+            def can_fetch(self,u):return u in (root,agenda,article)
+            def request(self,u):
+                self.calls.append(u)
+                if u==root:
+                    return (200,'<a href="/novedades/ensayo-1">Taller de ensayo</a>'
+                                '<a href="/programacion/">Programación</a>',None)
+                return (200,event if u==agenda else '<h1>Artículo sin agenda</h1>',None)
+            def remaining(self):return 100
+        b=Budget()
+        result,candidates=rd.scan_source({"source_id":"club","url":root},b,"full")
+        self.assertEqual(b.calls[0:2],[root,agenda])
+        self.assertEqual(len(result["_listings"]),1)
+        self.assertEqual(result["_listings"][0]["review_state"],"observed_unverified")
+        self.assertEqual(result["status"],"ok")
+        self.assertTrue(all(c["original_url"]!=agenda for c in candidates))
+
     def test_index_without_event_is_not_successful_extraction(self):
         root="https://nueva-fuente.org/"
         page=root+"agenda/"
