@@ -27,6 +27,37 @@ DAY5 = "https://festival.freezer.com.ar/2026/programacion/#jueves-5"
 DAY11 = "https://festival.freezer.com.ar/2026/programacion/#miercoles-11"
 
 class OfficialICalendarTests(unittest.TestCase):
+    def test_replayed_official_2026_metadata_has_all_24_sessions(self):
+        # Source metadata captured from the organizer's 2026 iCalendar.
+        # No copyrighted event descriptions or manufactured future schedules.
+        fixture=pathlib.Path(__file__).parent / "fixtures/freezer_2026_official_metadata.ics"
+        body=fixture.read_text(encoding="utf-8")
+        rows=calendar_sessions(body,FEED_URL)
+        self.assertEqual(len(rows),24,"Never lose the festival's original sessions")
+        self.assertEqual(len({(a,b,c,d,e) for a,b,c,d,e in rows}),24)
+        self.assertEqual(sum(clock is None for _,_,clock,_,_ in rows),3,
+                         "Unknown showtime is not midnight")
+        self.assertEqual(sum(venue is None for _,_,_,venue,_ in rows),2,
+                         "Inbox-only and absent venue must remain null")
+        self.assertEqual(min(day for _,day,_,_,_ in rows),date(2026,11,5))
+        self.assertEqual(max(day for _,day,_,_,_ in rows),date(2026,11,17))
+        self.assertIn(("Freezer · Inauguración de Exposiciones",
+                       date(2026,11,5),"17:00","Pasaje Dardo Rocha",
+                       "https://festival.freezer.com.ar/2026/programacion/#jueves-5"),rows)
+        self.assertTrue(any(title.startswith("Freezer · Brindis") and
+                            day==date(2026,11,5) and clock=="20:30"
+                            and venue=="Ciudad de gatos"
+                            for title,day,clock,venue,_ in rows))
+        with patch.object(adapters,"active_date",return_value=True):
+            staged=adapters.extract_listings(body,FEED_URL)
+        self.assertEqual(len(staged),24)
+        self.assertTrue(all(event["review_state"]=="observed_unverified"
+                            and event["evidence_tier"]=="primary_program_ics"
+                            and event["method"]=="official_ics_explicit_session"
+                            for event in staged))
+        self.assertEqual(sum(item["venue"] is None for item in staged),2)
+        self.assertEqual(sum(item["event_time"] is None for item in staged),3)
+
     def test_utc_conversion_and_two_distinct_events_same_day(self):
         raw=feed(
             item("id1","Inauguración de Exposiciones","Pasaje Dardo Rocha",
