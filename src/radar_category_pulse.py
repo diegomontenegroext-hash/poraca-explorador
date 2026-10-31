@@ -289,6 +289,12 @@ def main():
                           "La recuperación deberá probarse contra fuentes originales.\n\n")
                 e=report["endToEnd"]
                 out.write("\n## Cadena punta a punta: semáforo de datos (solo lectura)\n\n")
+                if e.get("orphanedCanonicalLinks", 0):
+                    out.write("> **P0 INTEGRIDAD CANÓNICA**: {} observaciones enlazadas "
+                              "a eventos canónicos ausentes. NO declarar el circuito "
+                              "certificado ni reconstruir/autorizar eventos sin revisar "
+                              "las escrituras y el historial. Esta señal es READ ONLY.\n\n".format(
+                                  e["orphanedCanonicalLinks"]))
                 out.write("**{}** · siguiente puerta a verificar: **{}** · Radar {} de {} fuentes.\n\n".format(
                     safe_cell(e["status"]),safe_cell(e["nextBlockingGate"]),
                     e.get("sourcesChecked",0),e.get("sourcesSelected",0)))
