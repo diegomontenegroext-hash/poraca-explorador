@@ -14,6 +14,7 @@ LABELS={
     "arte_y_cultura":"Arte y cultura","artes":"Arte y cultura","vinos":"Vinos",
     "ceramica":"Cerámica","yoga":"Yoga","fiestas":"Fiestas","danza":"Danza",
     "cine":"Cine","literatura":"Literatura","talleres":"Talleres",
+    "festival":"Festivales","ciencia":"Ciencia y divulgación",
     "general":"Agenda general","unclassified":"Sin clasificar"
 }
 RUN_SQL="""
