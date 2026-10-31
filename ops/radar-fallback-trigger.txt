@@ -1,7 +1,6 @@
-# POR ACA — PRUEBA E2E AUTORIZADA 2026-10-30 ART
-# Única FULL manual. No vaciar Neon, no modificar tarea programada.
-# Solo adquisición a staging: admisión editorial separada y verificable.
-trigger_date=2026-10-30
+# POR ACA — Metro original-ticket recovery, one incremental after QA PASS
+# Home has dated first-party links for 08/11 19:30 and 21:30
+trigger_date=2026-10-31
 trigger_slot=bootstrap
-trigger_mode=full
-trigger_reason=user_explicitly_authorized_single_e2e_full_20261030_2351_art
+trigger_mode=incremental
+trigger_reason=metro_official_homepage_two_distinct_originals_after_qa_41163391682
