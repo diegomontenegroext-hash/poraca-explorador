@@ -460,8 +460,14 @@ def scan_source(source,budget,mode):
     # priority so one document cannot consume multiple detail slots.
     unique_links={}
     for u,lab in links:
-        unique_links.setdefault(u,lab)
-    links=list(unique_links.items())
+        # Same document with/without terminal slash is ONE detail slot.
+        # Retain the first original URL and its label; keep distinct
+        # date queries, anchors and paths separate.
+        parsed=urlsplit(u)
+        identity=(parsed.scheme,parsed.hostname,parsed.path.rstrip("/"),
+                  parsed.query,parsed.fragment)
+        unique_links.setdefault(identity,(u,lab))
+    links=list(unique_links.values())
     check["links_found"]=len(links)
     if not links and not check["_listings"]:
         check["status"]="index_only"
