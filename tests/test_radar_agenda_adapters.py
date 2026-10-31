@@ -45,6 +45,28 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
                             for _,label in found))
         self.assertEqual(ad.special_links(root+"degustaciones",rd.parse_html(raw)),[])
 
+    def test_official_section_requires_explicit_dated_event_not_undated_advertising(self):
+        from datetime import datetime
+        future=date.today()+timedelta(days=10)
+        raw=('''<h1>DEGUSTACIONES</h1>
+            <p>Viernes 12 de agosto desde las 20 hs</p>''')
+        self.assertEqual(ad.extract_listings(
+            raw,"https://www.casadionisio.com.ar/degustaciones"),[])
+        doc=('''<script type="application/ld+json">'''
+             + '{"@type":"Event","name":"Taller de cerámica y vino",'
+             + '"startDate":"'+future.isoformat()+'T19:00:00-03:00",'
+             + '"location":{"name":"Casa Dionisio"}}'
+             + '''</script>''')
+        rows=ad.extract_listings(doc,"https://www.casadionisio.com.ar/ferias")
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["title"],"Taller de cerámica y vino")
+        self.assertEqual(rows[0]["event_date"],future.isoformat())
+        self.assertEqual(rows[0]["event_time"],"19:00")
+        self.assertEqual(rows[0]["review_state"],"observed_unverified")
+        self.assertTrue(rows[0]["proof_url"].startswith("https://www.casadionisio.com.ar/"))
+        self.assertEqual(ad.extract_listings(
+            raw,"https://www.centrodearte.unlp.edu.ar/calendario-2/"),[])
+
     def test_doblet_original_index_only_explicit_dated_sessions(self):
         from datetime import timedelta
         dates=[date.today()+timedelta(days=2),
