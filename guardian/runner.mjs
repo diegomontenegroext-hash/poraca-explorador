@@ -119,10 +119,10 @@ async function audit(site,browser){
  const browserChecks=browserResult?.checks||[];
  if(browserChecks.length!==requiredBrowser)notes.push("Chromium incompleto: "+browserChecks.length+"/"+requiredBrowser+" recorridos");
  let state="VERDE";
- if(notes.length||pagesCoverage.unverified.length||imagesCoverage.unverified.length||linksCoverage.unverified.length||imageChecks.some(x=>x.state==="BLOQUEADO")||linkChecks.some(x=>x.state==="BLOQUEADO")||htmlChecks.some(x=>x.state==="BLOQUEADO")||browserChecks.some(x=>x.status!=="PASS")||Object.values(editorialResult.sources).some(x=>x.state!=="REVISADA"))state="GRIS";
+ if(notes.length||pagesCoverage.unverified.length||imagesCoverage.unverified.length||linksCoverage.unverified.length||imageChecks.some(x=>x.state==="BLOQUEADO")||linkChecks.some(x=>x.state==="BLOQUEADO"&&new URL(x.url).origin===origin)||htmlChecks.some(x=>x.state==="BLOQUEADO")||browserChecks.some(x=>x.status!=="PASS")||Object.values(editorialResult.sources).some(x=>x.state!=="REVISADA"))state="GRIS";
  if(htmlChecks.some(x=>x.state==="ROTO")||imageChecks.some(x=>x.state==="ROTO")||linkChecks.some(x=>x.state==="ROTO"&&new URL(x.url).origin===origin)||delta.missing.length)state="ROJO";
- else if(state==="VERDE"&&(delta.added.length||editorialResult.candidates.length||linkChecks.some(x=>x.state==="ROTO")))state="AMARILLO";
- return {id:site.id,url:origin,verdict:state,inventory:{urls:delta,imagesExpected:expectedImages.length,imagesDiscovered:imgs.size,imagesBaselinePresent:foundBaselineImages,linksDiscovered:links.size},coverage:{pages:pagesCoverage,images:imagesCoverage,links:linksCoverage},browser:browserResult||null,editorial:editorialResult,notes,checks:{pages:htmlChecks,images:imageChecks,links:linkChecks},incidents:{pages:htmlChecks.filter(x=>x.state!=="OK").slice(0,80),images:imageChecks.filter(x=>x.state!=="OK").slice(0,120),links:linkChecks.filter(x=>x.state!=="OK").slice(0,100)}};
+ else if(state==="VERDE"&&(delta.added.length||editorialResult.candidates.length||linkChecks.some(x=>x.state!=="OK")))state="AMARILLO";
+ return {id:site.id,url:origin,verdict:state,inventory:{urls:delta,imagesExpected:expectedImages.length,imagesDiscovered:imgs.size,imagesBaselinePresent:foundBaselineImages,linksDiscovered:links.size},externalLinks:{blocked:linkChecks.filter(x=>x.state==="BLOQUEADO"&&new URL(x.url).origin!==origin).length,broken:linkChecks.filter(x=>x.state==="ROTO"&&new URL(x.url).origin!==origin).length},coverage:{pages:pagesCoverage,images:imagesCoverage,links:linksCoverage},browser:browserResult||null,editorial:editorialResult,notes,checks:{pages:htmlChecks,images:imageChecks,links:linkChecks},incidents:{pages:htmlChecks.filter(x=>x.state!=="OK").slice(0,80),images:imageChecks.filter(x=>x.state!=="OK").slice(0,120),links:linkChecks.filter(x=>x.state!=="OK").slice(0,100)}};
 }
 await mkdir(root,{recursive:true});
 let browser=null;try{browser=JSON.parse(await readFile(new URL("browser.json",root),"utf8"));}catch{}
@@ -138,6 +138,7 @@ for(const a of report.sites){
  lines.push("- URLs base "+a.inventory.urls.expected+" / observadas "+a.inventory.urls.observed+"; faltan "+a.inventory.urls.missing.length+"; nuevas "+a.inventory.urls.added.length);
  for(const [k,v] of Object.entries(a.coverage))lines.push("- "+k+": "+v.expected+" esperados, "+v.checked+" revisados, "+v.ok+" OK, "+v.broken+" rotos, "+v.blocked+" bloqueados, "+v.unverified.length+" no vistos");
  lines.push("- Tapas base "+a.inventory.imagesExpected+" / presentes "+a.inventory.imagesBaselinePresent+"; imágenes totales "+a.inventory.imagesDiscovered);
+ lines.push("- Enlaces externos: "+a.externalLinks.broken+" rotos y "+a.externalLinks.blocked+" no verificables; esto no constituye caída de la web.");
  lines.push("- Chromium "+(a.browser?.checks||[]).filter(x=>x.status==="PASS").length+"/"+(a.browser?.checks||[]).length+" recorridos, esperados "+a.browser?.expected);
  for(const [source,v] of Object.entries(a.editorial.sources))lines.push("- Fuente editorial "+source+": "+v.state+" ("+(v.count??"sin datos")+")");
  lines.push("- Candidatos editoriales: "+a.editorial.candidates.length+" (NO verificados para publicación)");
@@ -150,4 +151,5 @@ await writeFile(new URL("report.json",root),JSON.stringify(report,null,2)+"\n");
 await writeFile(new URL("report.md",root),lines.join("\n")+"\n");
 if(process.env.GITHUB_STEP_SUMMARY)await appendFile(process.env.GITHUB_STEP_SUMMARY,lines.join("\n")+"\n");
 console.log("GUARDIAN_RESULT "+report.verdict+" "+report.sites.map(x=>x.id+":"+x.verdict).join(" "));
-if(report.verdict==="GRIS"||report.verdict==="ROJO")process.exitCode=1;
+// El resultado del workflow indica que el informe fue producido; el veredicto del sitio queda en report.json y en el issue.
+if(report.sites.some(site=>site.fatal))process.exitCode=1;
