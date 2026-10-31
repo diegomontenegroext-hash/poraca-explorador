@@ -1,6 +1,6 @@
-# POR ACA — one manual targeted incremental for Metro URL mirror canonicalization
-# No change to scheduled ChatGPT radar task or editorial admission
+# POR ACA - RADAR DEFINITIVO
+# Disparo por Guardia GPT - orquestador principal.
 trigger_date=2026-10-31
-trigger_slot=bootstrap
-trigger_mode=incremental
-trigger_reason=metro_url_canonicalization_apex_www_single_incremental_qa_41163603844
+trigger_slot=05
+trigger_mode=full
+trigger_reason=gpt_primary_scheduler
