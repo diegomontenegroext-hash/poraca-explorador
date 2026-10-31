@@ -11,6 +11,62 @@ import radar_agenda_adapters as ad
 import radar_definitivo as rd
 
 class CulturalAgendaAdapterTests(unittest.TestCase):
+    def test_centro_arte_original_sections_from_real_homepage_anchors_only(self):
+        root="https://www.centrodearte.unlp.edu.ar/"
+        raw=('''<a href="/calendario-2/">Calendario</a>
+            <a href="/artes-visuales/">Artes Visuales</a>
+            <a href="/musica/">Música</a>
+            <a href="/autor/">Autores</a>
+            <a href="https://evil.example/calendario-2/">Calendario falso</a>
+            <a href="//evil.example/calendario-2/">Otra agenda</a>
+            <a href="/calendario-2/?year=2027">Parámetros inventados</a>
+            <a href="/calendario-2/">Calendario duplicado</a>''')
+        found=ad.special_links(root,rd.parse_html(raw))
+        self.assertEqual([u for u,label in found],[
+            root+"calendario-2/",root+"artes-visuales/",root+"musica/"])
+        self.assertTrue(all("original enlazada" in label for _,label in found))
+        self.assertEqual(ad.special_links(root,rd.parse_html("<p>Sin enlaces</p>")),[])
+
+    def test_dionisio_sections_not_unrelated_private_or_cross_domain_links(self):
+        root="https://www.casadionisio.com.ar/"
+        raw=('''<a href="/degustaciones">Degustaciones</a>
+            <a href="/ferias">Ferias</a>
+            <a href="escuela-eas-lp">Escuela</a>
+            <a href="https://www.casadionisio.com.ar/expoarte">Expoarte</a>
+            <a href="/eventos">Eventos privados</a>
+            <a href="https://www.casadionisio.com.ar:8443/ferias">Puerto raro</a>
+            <a href="https://casadionisio.com.ar/ferias#archivo">Archive</a>
+            <a href="/ferias?year=2028">Fecha arbitraria</a>''')
+        found=ad.special_links(root,rd.parse_html(raw))
+        self.assertEqual([u for u,label in found],[
+            root+"degustaciones",root+"ferias",root+"escuela-eas-lp",
+            root+"expoarte"])
+        self.assertTrue(all(label=="seccion institucional original enlazada"
+                            for _,label in found))
+        self.assertEqual(ad.special_links(root+"degustaciones",rd.parse_html(raw)),[])
+
+    def test_official_section_requires_explicit_dated_event_not_undated_advertising(self):
+        from datetime import datetime
+        future=date.today()+timedelta(days=10)
+        raw=('''<h1>DEGUSTACIONES</h1>
+            <p>Viernes 12 de agosto desde las 20 hs</p>''')
+        self.assertEqual(ad.extract_listings(
+            raw,"https://www.casadionisio.com.ar/degustaciones"),[])
+        doc=('''<script type="application/ld+json">'''
+             + '{"@type":"Event","name":"Taller de cerámica y vino",'
+             + '"startDate":"'+future.isoformat()+'T19:00:00-03:00",'
+             + '"location":{"name":"Casa Dionisio"}}'
+             + '''</script>''')
+        rows=ad.extract_listings(doc,"https://www.casadionisio.com.ar/ferias")
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["title"],"Taller de cerámica y vino")
+        self.assertEqual(rows[0]["event_date"],future.isoformat())
+        self.assertEqual(rows[0]["event_time"],"19:00")
+        self.assertEqual(rows[0]["review_state"],"observed_unverified")
+        self.assertTrue(rows[0]["proof_url"].startswith("https://www.casadionisio.com.ar/"))
+        self.assertEqual(ad.extract_listings(
+            raw,"https://www.centrodearte.unlp.edu.ar/calendario-2/"),[])
+
     def test_doblet_original_index_only_explicit_dated_sessions(self):
         from datetime import timedelta
         dates=[date.today()+timedelta(days=2),

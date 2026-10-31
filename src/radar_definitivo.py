@@ -419,7 +419,13 @@ def scan_source(source,budget,mode):
     if not (urlparse(root).hostname in ("www.eldia.com","eldia.com")
             and urlparse(root).path.rstrip("/") in ("/ttags/espectaculos","/espectaculos")):
         links+=links_from_page(body,page,root)
-    links=list(dict(((u,lab),None) for u,lab in links).keys())
+    # Exact URL-level dedupe: special_links and generic discovery can
+    # return the same original with different labels. Preserve first/official
+    # priority so one document cannot consume multiple detail slots.
+    unique_links={}
+    for u,lab in links:
+        unique_links.setdefault(u,lab)
+    links=list(unique_links.items())
     check["links_found"]=len(links)
     if not links and not check["_listings"]:
         check["status"]="index_only"
@@ -437,6 +443,11 @@ def scan_source(source,budget,mode):
         if detail:
             check["details_opened"]+=1
             check["_listings"].extend(extract_listings(data,url))
+        # Institution section indexes are *navigation*, not event details.
+        # Keep evidence from any explicit JSON-LD Event, but never store
+        # an undated "Degustaciones" / "Artes Visuales" as an event lead.
+        if label=="seccion institucional original enlazada":
+            continue
         record=make_candidate(url,source["source_id"],label,detail,stat)
         record["evidence"]["radar"]="definitivo"
         record["evidence"]["source_root"]=root
@@ -570,6 +581,11 @@ def scan_source(source,budget,mode):
         print(json.dumps({"source":source["source_id"],"adapter":"alpedo_browser",
             "pages":len(rendered),"secondary_sessions":len(check["_listings"]),
             "error":reason}),flush=True)
+    if urlparse(root).hostname in (
+            "centrodearte.unlp.edu.ar","www.centrodearte.unlp.edu.ar",
+            "casadionisio.com.ar","www.casadionisio.com.ar") and not check["_listings"]:
+        # HTTP success and indexed sections are NOT event acquisition success.
+        check["status"]="index_only"
     if urlparse(root).hostname in ("teatrodoblet.com.ar","www.teatrodoblet.com.ar"):
         before_count=len(check["_listings"])
         check["_listings"]=prefer_doblet_original_detail(check["_listings"])
