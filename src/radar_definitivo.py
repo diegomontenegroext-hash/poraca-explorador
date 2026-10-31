@@ -201,6 +201,15 @@ def choose_sources(conn, mode):
                                 w.next_date ASC,w.url ASC LIMIT %s""",
                      (patterns,MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL))
                 src["seed_urls"]=[row[0] for row in cur.fetchall() if row[0]]
+                # Materializar cobertura REAL de originales ya capturados
+                # sólo para la cartelera Metro. Los links nuevos se priorizan
+                # dentro del mismo presupuesto: nunca implica auto-admisión.
+                if "teatrometrolp.com.ar" in host and "/entradas/cartelera/" in root:
+                    cur.execute("""SELECT DISTINCT proof_url
+                       FROM radar_definitivo.listing_occurrences
+                       WHERE source_id=%s AND proof_method='metro_official_ticket_date'
+                       ORDER BY proof_url LIMIT 300""",(src["source_id"],))
+                    src["known_primary_details"]=[row[0] for row in cur.fetchall()]
         return sources
 
 
@@ -351,6 +360,26 @@ def scan_exact_instagram_seeds(source, budget):
     return check, candidates
 
 
+def prioritize_unseen_official_details(links, known, limit):
+    """Prefer never-captured official detail URLs but recheck one known ticket.
+
+    Pure, budget-neutral and deterministic given rotated links; not a trust
+    classifier or editorial approval. Only called for validated Metro roots.
+    """
+    known_set=set(known)
+    is_detail=lambda link: urlparse(link[0]).path.startswith("/entrada/")
+    unseen=[link for link in links if is_detail(link) and link[0] not in known_set]
+    rechecks=[link for link in links if link not in unseen]
+    if not unseen:
+        return links
+    # Reserve one slot for drift / cancellations when a known ticket exists.
+    has_known=any(is_detail(item) and item[0] in known_set for item in rechecks)
+    n=max(0,limit-1) if has_known and limit>1 else limit
+    selected=unseen[:n]
+    remainder=[link for link in rechecks if link not in selected]
+    return (selected+remainder+unseen[n:])[:len(links)]
+
+
 def scan_source(source,budget,mode):
     if source.get("seed_only"):
         return scan_exact_instagram_seeds(source,budget)
@@ -376,6 +405,9 @@ def scan_source(source,budget,mode):
     if not links and not check["_listings"]:
         check["status"]="index_only"
     max_details=MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL
+    if "known_primary_details" in source:
+        links=prioritize_unseen_official_details(
+            links,source["known_primary_details"],max_details)
     candidates=[]
     known=set()
     for url,label in links[:max_details]:
