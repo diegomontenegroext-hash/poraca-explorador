@@ -25,6 +25,7 @@ from radar_parallel import (
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
 )
 from radar_agenda_adapters import extract_listings, special_links, tidy
+from radar_adaptive_discovery import discover_sections
 from radar_evidence_quality import summarize as summarize_evidence_quality
 from radar_gate_alias_preflight import SQL as SHADOW_ALIAS_SQL, summarize as summarize_aliases
 from radar_function_gate_review import query as function_review_sql, summarize as summarize_function_review
@@ -419,6 +420,12 @@ def scan_source(source,budget,mode):
     if not (urlparse(root).hostname in ("www.eldia.com","eldia.com")
             and urlparse(root).path.rstrip("/") in ("/ttags/espectaculos","/espectaculos")):
         links+=links_from_page(body,page,root)
+    # Método adaptable: cuando el dominio no aporta detalles ni semillas,
+    # abrir hasta 3 secciones de agenda genuinamente enlazadas en su HTML.
+    # Si una institución cambia el nombre/ruta de su menú, no requiere
+    # editar una whitelist por host. La sección NO es un evento.
+    if not links and not check["_listings"]:
+        links+=discover_sections(root,page.links)
     # Exact URL-level dedupe: special_links and generic discovery can
     # return the same original with different labels. Preserve first/official
     # priority so one document cannot consume multiple detail slots.
@@ -446,7 +453,8 @@ def scan_source(source,budget,mode):
         # Institution section indexes are *navigation*, not event details.
         # Keep evidence from any explicit JSON-LD Event, but never store
         # an undated "Degustaciones" / "Artes Visuales" as an event lead.
-        if label=="seccion institucional original enlazada":
+        if label in ("seccion institucional original enlazada",
+                     "adaptive_section_link"):
             continue
         record=make_candidate(url,source["source_id"],label,detail,stat)
         record["evidence"]["radar"]="definitivo"
@@ -581,10 +589,11 @@ def scan_source(source,budget,mode):
         print(json.dumps({"source":source["source_id"],"adapter":"alpedo_browser",
             "pages":len(rendered),"secondary_sessions":len(check["_listings"]),
             "error":reason}),flush=True)
-    if urlparse(root).hostname in (
-            "centrodearte.unlp.edu.ar","www.centrodearte.unlp.edu.ar",
-            "casadionisio.com.ar","www.casadionisio.com.ar") and not check["_listings"]:
-        # HTTP success and indexed sections are NOT event acquisition success.
+    if (not check["_listings"] and
+        any(label in ("seccion institucional original enlazada",
+                      "adaptive_section_link") for _,label in links)):
+        # Navegación sin eventos fechados NO es adquisición exitosa,
+        # aunque se hayan abierto enlaces y devuelto HTTP 200.
         check["status"]="index_only"
     if urlparse(root).hostname in ("teatrodoblet.com.ar","www.teatrodoblet.com.ar"):
         before_count=len(check["_listings"])
