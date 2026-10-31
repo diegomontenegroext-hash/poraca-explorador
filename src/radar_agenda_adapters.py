@@ -11,7 +11,7 @@ from html.parser import HTMLParser
 import json
 import html
 import re
-from urllib.parse import urlsplit, parse_qs
+from urllib.parse import urlsplit, parse_qs, urljoin
 from radar_parallel import iso_event_fields
 from radar_ical_agenda import FEED_URL as OFFICIAL_ICS_FEED_URL, calendar_sessions
 
@@ -848,6 +848,36 @@ def extract_listings(raw,url):
 def special_links(url,page,at=None):
     """Verified source-specific discovery with near-date priority and rotation."""
     host,path=scope(url)
+    # These institutions expose a handful of genuine one-level section links.
+    # General discovery requires a two-level URL and was missing them.
+    # Open ONLY URLs present as anchors in the source's own homepage; do not
+    # synthesize section URLs or infer dates from pages lacking explicit years.
+    institutional_roots={
+        "centrodearte.unlp.edu.ar":(
+            "/calendario-2","/artes-visuales","/musica"),
+        "casadionisio.com.ar":(
+            "/degustaciones","/ferias","/escuela-eas-lp","/expoarte"),
+    }
+    bare_host=host.removeprefix("www.")
+    if path in ("","/") and bare_host in institutional_roots:
+        allowed=institutional_roots[bare_host]
+        found={}
+        for href,label in page.links[:900]:
+            raw=(href or "").strip()
+            if (not raw or raw.startswith("//") or raw.startswith("http://")
+                or raw.startswith("javascript:")):
+                continue
+            p=urlsplit(urljoin(url,raw))
+            if (p.scheme!="https" or p.hostname not in (bare_host,"www."+bare_host)
+                or p.username or p.password or p.port not in (None,443)
+                or p.query or p.fragment):
+                continue
+            key=p.path.lower().rstrip("/")
+            if key not in allowed:
+                continue
+            target="https://"+p.hostname+p.path
+            found.setdefault(key,(target,"seccion institucional original enlazada"))
+        return [found[k] for k in allowed if k in found]
     if host in ("teatrodoblet.com.ar","www.teatrodoblet.com.ar") and path in ("","/"):
         # Only actual links in the ORIGINAL program; no slugs guessed from
         # titles or dates and no off-host ticketing/tracking URLs.
