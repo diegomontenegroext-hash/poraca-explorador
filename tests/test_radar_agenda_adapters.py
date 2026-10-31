@@ -11,6 +11,40 @@ import radar_agenda_adapters as ad
 import radar_definitivo as rd
 
 class CulturalAgendaAdapterTests(unittest.TestCase):
+    def test_centro_arte_original_sections_from_real_homepage_anchors_only(self):
+        root="https://www.centrodearte.unlp.edu.ar/"
+        raw=('''<a href="/calendario-2/">Calendario</a>
+            <a href="/artes-visuales/">Artes Visuales</a>
+            <a href="/musica/">Música</a>
+            <a href="/autor/">Autores</a>
+            <a href="https://evil.example/calendario-2/">Calendario falso</a>
+            <a href="//evil.example/calendario-2/">Otra agenda</a>
+            <a href="/calendario-2/?year=2027">Parámetros inventados</a>
+            <a href="/calendario-2/">Calendario duplicado</a>''')
+        found=ad.special_links(root,rd.parse_html(raw))
+        self.assertEqual([u for u,label in found],[
+            root+"calendario-2/",root+"artes-visuales/",root+"musica/"])
+        self.assertTrue(all("original enlazada" in label for _,label in found))
+        self.assertEqual(ad.special_links(root,rd.parse_html("<p>Sin enlaces</p>")),[])
+
+    def test_dionisio_sections_not_unrelated_private_or_cross_domain_links(self):
+        root="https://www.casadionisio.com.ar/"
+        raw=('''<a href="/degustaciones">Degustaciones</a>
+            <a href="/ferias">Ferias</a>
+            <a href="escuela-eas-lp">Escuela</a>
+            <a href="https://www.casadionisio.com.ar/expoarte">Expoarte</a>
+            <a href="/eventos">Eventos privados</a>
+            <a href="https://www.casadionisio.com.ar:8443/ferias">Puerto raro</a>
+            <a href="https://casadionisio.com.ar/ferias#archivo">Archive</a>
+            <a href="/ferias?year=2028">Fecha arbitraria</a>''')
+        found=ad.special_links(root,rd.parse_html(raw))
+        self.assertEqual([u for u,label in found],[
+            root+"degustaciones",root+"ferias",root+"escuela-eas-lp",
+            root+"expoarte"])
+        self.assertTrue(all(label=="seccion institucional original enlazada"
+                            for _,label in found))
+        self.assertEqual(ad.special_links(root+"degustaciones",rd.parse_html(raw)),[])
+
     def test_doblet_original_index_only_explicit_dated_sessions(self):
         from datetime import timedelta
         dates=[date.today()+timedelta(days=2),
