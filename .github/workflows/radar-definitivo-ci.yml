@@ -4,6 +4,8 @@ on:
     paths:
       - 'src/radar_definitivo.py'
       - 'src/radar_category_pulse.py'
+      - 'src/radar_funnel_metrics.py'
+      - 'tests/test_radar_funnel_metrics.py'
       - 'tests/test_radar_category_pulse.py'
       - '.github/workflows/radar-definitivo.yml'
       - 'src/instagram_seed_inbox.py'
