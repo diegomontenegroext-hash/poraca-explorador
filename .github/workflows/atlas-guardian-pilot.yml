@@ -1,0 +1,51 @@
+name: Atlas Guardian · piloto público (solo lectura)
+on:
+  push:
+    branches:
+      - ops/guardian-babasonicos-piloto
+    paths:
+      - guardian/**
+      - .github/workflows/atlas-guardian-pilot.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: guardian-pilot-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    name: Auditoría Babasónicos (NO publica)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Tests de regresión de inventario
+        run: node --test guardian/tests/*.test.mjs
+      - name: Instalar navegador solo en este runner
+        run: |
+          npm install --prefix ./guardian --no-package-lock --no-save --ignore-scripts playwright@1.56.1
+          npx --prefix guardian playwright install --with-deps chromium
+      - name: Probar recorridos con Chromium
+        id: browser
+        continue-on-error: true
+        run: node guardian/browser.mjs
+      - name: Comprobar producción, corpus, medios y fuentes
+        id: audit
+        continue-on-error: true
+        run: node guardian/runner.mjs
+      - name: Conservar evidencia íntegra
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-guardian-pilot-evidence
+          path: guardian/out/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Calificar sin falsos verdes
+        if: always()
+        run: |
+          test "${{ steps.browser.outcome }}" = success
+          test "${{ steps.audit.outcome }}" = success
