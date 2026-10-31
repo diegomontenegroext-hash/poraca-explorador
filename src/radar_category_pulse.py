@@ -199,14 +199,18 @@ def integrity_blocks_release(e2e):
 
 
 def main():
+    # Manual/synthetic verification mode: strict SELECT; no funnel receipt writes.
+    verify_only = "--verify-only" in sys.argv[1:]
     if not os.getenv("NEON_RADAR_OPERATIONAL_DATABASE_URL"):
         print("::error::PULSE_NEON_SECRET_MISSING",file=sys.stderr);return 1
     try:
         report=fetch(os.environ["NEON_RADAR_OPERATIONAL_DATABASE_URL"])
         # Write only the completed Radar run's evidence snapshot, under the
         # existing scoped ingestion role. No canonical or entity permissions.
-        report["funnelStorage"]=persist_run_funnel(
-            os.environ["NEON_RADAR_OPERATIONAL_DATABASE_URL"],report["runFunnel"])
+        report["funnelStorage"]=("SKIPPED_VERIFY_ONLY" if verify_only else
+            persist_run_funnel(os.environ["NEON_RADAR_OPERATIONAL_DATABASE_URL"],
+                               report["runFunnel"]))
+        report["verificationOnly"]=verify_only
         print("RADAR_CATEGORY_PULSE "+json.dumps(report,ensure_ascii=False),flush=True)
         path=os.environ.get("GITHUB_STEP_SUMMARY")
         if path:
