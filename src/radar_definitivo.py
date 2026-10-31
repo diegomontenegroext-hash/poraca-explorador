@@ -26,6 +26,7 @@ from radar_parallel import (
 )
 from radar_agenda_adapters import extract_listings, special_links, tidy
 from radar_adaptive_discovery import discover_sections
+from radar_ical_generic import discover_calendar_links
 from radar_adaptive_cadence import cadence_hours as adaptive_cadence_hours
 from radar_evidence_quality import summarize as summarize_evidence_quality
 from radar_gate_alias_preflight import SQL as SHADOW_ALIAS_SQL, summarize as summarize_aliases
@@ -428,6 +429,10 @@ def scan_source(source,budget,mode):
     # Source-specific evidence, including multiple sessions per theatre work.
     check["_listings"]=extract_listings(body,root)
     links=special_links(root,page)+[(u,"baseline_watchlist_original") for u in source.get("seed_urls",[])]
+    if not check["_listings"]:
+        # A link to a calendar is evidence of a *strategy*, not an Event.
+        # Same-host, HTTPS, bounded and already present as an anchor.
+        links=discover_calendar_links(root,page.links)+links
     # El Dia's tag index can expose dozens of stale weekly pages. Use only
     # genuinely linked and RECENT magazine agendas for this one source;
     # an outdated index must show index_only, not fake current coverage.
@@ -469,7 +474,7 @@ def scan_source(source,budget,mode):
         # Keep evidence from any explicit JSON-LD Event, but never store
         # an undated "Degustaciones" / "Artes Visuales" as an event lead.
         if label in ("seccion institucional original enlazada",
-                     "adaptive_section_link"):
+                     "adaptive_section_link","adaptive_calendar_feed"):
             continue
         record=make_candidate(url,source["source_id"],label,detail,stat)
         record["evidence"]["radar"]="definitivo"
@@ -606,7 +611,8 @@ def scan_source(source,budget,mode):
             "error":reason}),flush=True)
     if (not check["_listings"] and
         any(label in ("seccion institucional original enlazada",
-                      "adaptive_section_link") for _,label in links)):
+                      "adaptive_section_link","adaptive_calendar_feed")
+            for _,label in links)):
         # Navegación sin eventos fechados NO es adquisición exitosa,
         # aunque se hayan abierto enlaces y devuelto HTTP 200.
         check["status"]="index_only"
