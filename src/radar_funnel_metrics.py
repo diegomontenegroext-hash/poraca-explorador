@@ -53,10 +53,10 @@ WHERE run_id=%s GROUP BY status
 """
 # One read-only, run-scoped source yield snapshot. No new collection.
 SOURCE_YIELD_SQL="""
-SELECT s.source_id,s.name,s.url,coalesce(nullif(s.circuit,''),'unclassified'),
+SELECT s.source_id,s.name,s.url,coalesce(nullif(s.circuit,''),'unclassified') AS circuit,
  s.source_role,s.priority,c.status,c.http_status,c.details_opened,
- c.links_found,c.error_type,count(l.listing_key)::int,
- count(l.listing_key) FILTER (WHERE l.first_run_id=%s)::int
+ c.links_found,c.error_type,count(l.listing_key)::int AS detected,
+ count(l.listing_key) FILTER (WHERE l.first_run_id=%s)::int AS new_entries
 FROM radar_definitivo.source_checks c
 JOIN radar_definitivo.sources s ON s.source_id=c.source_id
 LEFT JOIN radar_definitivo.listing_occurrences l
