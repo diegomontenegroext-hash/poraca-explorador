@@ -18,6 +18,40 @@ class FakeBudget:
         return 999
 
 class RadarDefinitivoTests(unittest.TestCase):
+    def test_event_detail_cannot_discover_unrelated_ticket_recommendations(self):
+        root="https://www.ticket-provider.example/eventos/concierto-local"
+        other="https://www.ticket-provider.example/eventos/otra-provincia"
+        from datetime import date,timedelta
+        day=(date.today()+timedelta(days=5)).isoformat()
+        event_markup=('<script type="application/ld+json">'
+            '{"@type":"Event","name":"Concierto de barrio",'
+            '"startDate":"'+day+'T21:00:00-03:00",'
+            '"location":{"name":"Sala Local"}}</script>'
+            '<a href="/eventos/otra-provincia">También te puede interesar</a>')
+        class Budget:
+            def __init__(self):self.calls=[]
+            def can_fetch(self,url):return True
+            def remaining(self):return 200
+            def request(self,url):
+                self.calls.append(url)
+                return (200,event_markup if url==root
+                        else '<h1>Evento de otra provincia</h1>',None)
+        budget=Budget()
+        check,candidates=rd.scan_source({"source_id":"single","url":root},budget,"full")
+        self.assertEqual(budget.calls,[root])
+        self.assertEqual(check["links_found"],0)
+        self.assertEqual(len(check["_listings"]),1)
+        self.assertEqual(check["_listings"][0]["evidence_tier"],"structured_origin_unverified")
+        self.assertEqual(candidates,[])
+        self.assertEqual(check["status"],"ok")
+
+    def test_single_event_shape_is_generic_not_passline_specific(self):
+        self.assertTrue(rd.is_single_event_source("https://ejemplo.org/evento/obra"))
+        self.assertTrue(rd.is_single_event_source("https://otro.org/eventos/obra-123"))
+        self.assertTrue(rd.is_single_event_source("https://tickets.org/entrada/slug"))
+        self.assertFalse(rd.is_single_event_source("https://otro.org/agenda/"))
+        self.assertFalse(rd.is_single_event_source("https://otro.org/"))
+
     def test_same_official_section_is_fetched_once_even_if_link_labels_differ(self):
         root="https://www.casadionisio.com.ar/"
         detail=root+"degustaciones"
