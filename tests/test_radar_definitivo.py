@@ -18,6 +18,33 @@ class FakeBudget:
         return 999
 
 class RadarDefinitivoTests(unittest.TestCase):
+    def test_doblet_prefers_exact_original_without_merging_sessions(self):
+        root="https://teatrodoblet.com.ar/"
+        detail="https://teatrodoblet.com.ar/event/131150-salsa-y-no-llores"
+        def record(method,url,title="Salsa y No LLores!",day="2026-11-05",clock="20:00"):
+            return {"method":method,"proof_url":url,"title":title,
+                    "event_date":day,"event_time":clock,
+                    "review_state":"observed_unverified"}
+        rows=[
+            record("doblet_official_index_explicit_function",root),
+            record("schema_org_event_sessions",detail),
+            record("doblet_official_index_explicit_function",root,
+                   day="2026-11-06"),
+            record("schema_org_event_sessions",detail,day="2026-11-06"),
+            record("schema_org_event_sessions",
+                   "https://teatrodoblet.com.ar/event/131151-another-same-title"),
+            record("doblet_official_index_explicit_function",root,
+                   title="Otra fiesta"),
+            record("secondary_agenda","https://alpedo.ar/?fecha=2026-11-05"),
+        ]
+        out=rd.prefer_doblet_original_detail(rows)
+        self.assertEqual(len(out),5)
+        self.assertTrue(all(r["review_state"]=="observed_unverified" for r in out))
+        self.assertEqual(sum(r["proof_url"]==root for r in out),1)
+        self.assertEqual(sum(r["proof_url"]==detail for r in out),2)
+        self.assertTrue(any(r["title"]=="Otra fiesta" for r in out))
+        self.assertTrue(any(r["proof_url"].startswith("https://alpedo.ar/") for r in out))
+
     def test_bounds_and_isolation(self):
         self.assertGreaterEqual(rd.MAX_SOURCES_FULL,60)
         self.assertLessEqual(rd.MAX_SOURCES_FULL,100)
