@@ -71,3 +71,16 @@ El inventario **completo y versionado** `CASES` está en `src/radar_certificatio
 - **P1**: incorporar reportes de fallas accionables por fuente: `UNAVAILABLE`, `FORMAT_CHANGED` sólo con huella comparada, `NO_DATED_SESSIONS`, `INSTITUTIONAL_REFERENCE`, `ALTERNATIVE_CHANNEL` verificado.
 
 **Criterio de salida:** todas las puertas críticas en PASS *real*, 0 publicación indebida, 0 atribución cruzada, fuente caída recuperada al menos una vez con método general, eventos futuros aprobados visibles en API+web SSO, y cobertura diversa demostrada sin depender de una sola agenda. Hoy NO se alcanza.
+
+
+## 7. Avance de certificación técnica — ICS nuevo sin dominio predefinido (31/10/2026)
+
+**Implementación real, sin nuevas corridas de ingesta:** `src/radar_ical_generic.py` detecta enlaces HTTPS existentes del mismo host cuyo path termina en `.ics` o `.ical` (máximo 2 por página, dentro del presupuesto de detalles actual); `radar_parallel.fetch` acepta explícitamente contenido iCalendar válido en URLs de feed, no archivos genéricos ni respuestas incongruentes; `radar_agenda_adapters.extract_listings` interpreta funciones fechadas en cualquier dominio con tier `structured_origin_unverified`, `review_state=observed_unverified`. `radar_definitivo.scan_source` prioriza estos feeds cuando la portada no aporta sesiones y evita registrarlos como candidatos de evento solo por ser enlaces de calendario.
+
+**Sin inventar información:** horas flotantes sin zona horaria se retienen como desconocidas; ubicación pendiente queda en NULL; VEVENT cancelados y RRULE sin expansión conocida no producen funciones; `URL` externo no se trata como permalink primario. Nunca publica ni eleva a canónico. No hay captura automática de perfil social, ni cambio de Scheduler/Neon.
+
+**Test de aceptación:** `tests/test_radar_generic_ical.py` verifica 11 casos: feed de club desconocido, dos funciones en la misma fecha, cancelación/repetición no inventada, hora flotante, sede por inbox, URL externa, enlaces genuinos, URL insegura, archivo inválido, descubrimiento desde la portada y calendario sin funciones. El parser Freezer de 24 funciones permanece con su caso y garantías anteriores. En `src/radar_certification_matrix.py` la puerta `generic_ics` deja de estar BLOCKED por ausencia de implementación, pero queda **NOT_TESTED en una fuente nueva viva**: una prueba de fixtures no constituye certificación real del ecosistema.
+
+**Siguiente prueba viva necesaria:** encontrar un calendario `.ics` auténtico de una institución o club nuevo de la ciudad; demostrar enlace desde su propia web → recuperación de VEVENT → registro en staging Neon → verificación de procedencia → recepción en cola editorial. Si el sitio no enlaza ICS, no fabricar su URL. Si no hay fuente real accesible en esta corrida, mantener NOT_TESTED.
+
+**No cambian los otros bloqueos:** 15 asociaciones de tickets antiguas sospechosas, 0 observaciones editoriales nuevas y 0 eventos futuros canónicos al último readback. El E2E total permanece NO CERTIFICADO.
