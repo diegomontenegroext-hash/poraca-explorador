@@ -70,9 +70,27 @@ class OfficialICalendarTests(unittest.TestCase):
         no_location=item("id3","Inauguración","",
                          "DTSTART:20261105T200000Z",DAY5)
         bad_uid=good.replace("id1@festival.freezer.com.ar","id1@other.org")
-        self.assertEqual(len(calendar_sessions(feed(good,wrongday,no_location,bad_uid),FEED_URL)),1)
+        # Unknown venue must remain a reviewable row, not be invented/dropped.
+        parsed=calendar_sessions(feed(good,wrongday,no_location,bad_uid),FEED_URL)
+        self.assertEqual(len(parsed),2)
+        self.assertIsNone(parsed[1][3])
         self.assertEqual(calendar_sessions(feed(good),"https://other.org/schedule.ics"),[])
         self.assertEqual(calendar_sessions(feed(good).replace("END:VCALENDAR",""),FEED_URL),[])
+
+    def test_inbox_location_is_staged_as_unknown_not_fabricated(self):
+        raw=feed(item("id5","Turrxs con Mote + Luciana Demichelis",
+                      "Dirección por inbox",
+                      "DTSTART:20261113T230000Z",
+                      "https://festival.freezer.com.ar/2026/programacion/#viernes-13"))
+        events=calendar_sessions(raw,FEED_URL)
+        self.assertEqual(len(events),1)
+        self.assertIsNone(events[0][3])
+        with patch.object(adapters,"active_date",return_value=True):
+            staged=adapters.extract_listings(raw,FEED_URL)
+        self.assertEqual(len(staged),1)
+        self.assertIsNone(staged[0]["venue"])
+        self.assertEqual(staged[0]["event_time"],"20:00")
+        self.assertEqual(staged[0]["review_state"],"observed_unverified")
 
     def test_existing_adapter_preserves_stage_only_and_proof(self):
         raw=feed(item("id1","Brindis de Inauguración","Ciudad de gatos",
