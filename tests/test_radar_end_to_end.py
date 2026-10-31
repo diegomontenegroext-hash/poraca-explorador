@@ -36,6 +36,20 @@ class RadarEndToEndReadinessTests(unittest.TestCase):
         self.assertEqual(r["apiHttp"],"NOT_CHECKED")
         self.assertEqual(r["webSso"],"NOT_CHECKED")
 
+    def test_orphaned_canonical_links_take_priority_over_green_acquisition(self):
+        r=assess(("run","complete",63,63,315,80,12,0,0,0,0,27))
+        self.assertEqual(r["nextBlockingGate"],"canonical_integrity")
+        self.assertEqual(r["status"],"DATA_CHAIN_BLOCKED")
+        self.assertEqual(r["orphanedCanonicalLinks"],27)
+        self.assertEqual(r["canonicalIntegrity"],"P0_MISSING_CANONICAL_REFERENCES")
+        self.assertFalse(r["publicationApprovedByRadar"])
+
+    def test_zero_orphans_preserves_current_gate_logic(self):
+        r=assess(("run","complete",63,63,315,80,12,0,0,0,0,0))
+        self.assertEqual(r["nextBlockingGate"],"editorial_admission")
+        self.assertEqual(r["orphanedCanonicalLinks"],0)
+        self.assertEqual(r["canonicalIntegrity"],"NO_ORPHANS_DETECTED")
+
     def test_no_radar_history_is_explicit(self):
         r=assess(None)
         self.assertEqual(r["status"],"NO_COMPLETED_RUN")
@@ -46,6 +60,8 @@ class RadarEndToEndReadinessTests(unittest.TestCase):
         self.assertIn("radar_definitivo.listing_occurrences",SQL)
         self.assertIn("public.radar_v3_source_observations",SQL)
         self.assertIn("public.radar_agenda_events",SQL)
+        self.assertIn("orphaned_canonical_links",SQL)
+        self.assertIn("e.event_key IS NULL",SQL)
         for statement in ("INSERT ","DELETE ","UPDATE ","TRUNCATE ","ALTER ","DROP "):
             self.assertNotIn(statement,SQL.upper())
         self.assertIn("America/Argentina/Buenos_Aires",SQL)
