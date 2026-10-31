@@ -1,5 +1,6 @@
 import {readFile,mkdir,writeFile,appendFile} from "node:fs/promises";
 import {url,sitemap,htmlResources,jsImages,jsonImages,verdict,reconcile,coverage} from "./lib.mjs";
+import {eventSignal,uniqueNewsCandidates,assessSite} from "./policy.mjs";
 const cfg=JSON.parse(await readFile(new URL("./config.json",import.meta.url),"utf8"));
 const root=new URL("./out/",import.meta.url);
 const started=new Date().toISOString();
@@ -62,14 +63,16 @@ async function editorial(site,notes){
     const title=(body.match(/<title>([\s\S]*?)<\/title>/i)||[])[1]||"";
     const link=(body.match(/<link>([^<]+)<\/link>/i)||[])[1]||"";
     const pub=(body.match(/<pubDate>([^<]+)<\/pubDate>/i)||[])[1]||"";
-    if(/disco|álbum|album|lanz|estren|entrevista|separ|disol|integrante|fallec|gira|libro|canci[oó]n|regres/i.test(title)&&Date.parse(pub)>=since){
-     candidates.push({type:"titular-por-verificar",title:title.replace(/<!\[CDATA\[|\]\]>/g,"").replace(/&amp;/g,"&"),date:new Date(pub).toISOString().slice(0,10),url:link.replace(/&amp;/g,"&"),source:"Google News RSS"});
+    if(Date.parse(pub)>=since){
+     const cleanTitle=title.replace(/<!\[CDATA\[|\]\]>/g,"").replace(/&amp;/g,"&");
+     const signal=eventSignal(cleanTitle);
+     if(signal)candidates.push({type:"titular-por-verificar",title:cleanTitle,date:new Date(pub).toISOString().slice(0,10),url:link.replace(/&amp;/g,"&"),source:"Google News RSS",signal});
     }
    }
    sources.news={state:"REVISADA",count};
   }catch(e){sources.news={state:"BLOQUEADA",detail:String(e.message||e)};}
  }
- return {sources,candidates:candidates.slice(0,40),note:"Señales de fuentes declaradas; no equivale a leer toda la prensa ni prueba ausencia absoluta de novedades"};
+ return {sources,candidates:uniqueNewsCandidates(candidates).slice(0,40),note:"Titulares candidatos, NO hechos confirmados ni cobertura total de Internet"};
 }
 async function audit(site,browser){
  const notes=[],origin=new URL(site.url).origin;
@@ -118,10 +121,20 @@ async function audit(site,browser){
  const browserResult=browser?.sites?.[site.id];
  const browserChecks=browserResult?.checks||[];
  if(browserChecks.length!==requiredBrowser)notes.push("Chromium incompleto: "+browserChecks.length+"/"+requiredBrowser+" recorridos");
- let state="VERDE";
- if(notes.length||pagesCoverage.unverified.length||imagesCoverage.unverified.length||linksCoverage.unverified.length||imageChecks.some(x=>x.state==="BLOQUEADO")||linkChecks.some(x=>x.state==="BLOQUEADO"&&new URL(x.url).origin===origin)||htmlChecks.some(x=>x.state==="BLOQUEADO")||browserChecks.some(x=>x.status!=="PASS")||Object.values(editorialResult.sources).some(x=>x.state!=="REVISADA"))state="GRIS";
- if(htmlChecks.some(x=>x.state==="ROTO")||imageChecks.some(x=>x.state==="ROTO")||linkChecks.some(x=>x.state==="ROTO"&&new URL(x.url).origin===origin)||delta.missing.length)state="ROJO";
- else if(state==="VERDE"&&(delta.added.length||editorialResult.candidates.length||linkChecks.some(x=>x.state!=="OK")))state="AMARILLO";
+ const state=assessSite({
+  missingUrls:delta.missing.length,
+  brokenPages:htmlChecks.filter(x=>x.state==="ROTO").length,
+  brokenImages:imageChecks.filter(x=>x.state==="ROTO").length,
+  brokenInternalLinks:linkChecks.filter(x=>x.state==="ROTO"&&new URL(x.url).origin===origin).length,
+  blockedImages:imageChecks.filter(x=>x.state==="BLOQUEADO").length,
+  blockedPages:htmlChecks.filter(x=>x.state==="BLOQUEADO").length,
+  missingChecks:notes.length+pagesCoverage.unverified.length+imagesCoverage.unverified.length+linksCoverage.unverified.length,
+  browserFails:browserChecks.filter(x=>x.status!=="PASS").length,
+  sourceMissing:Object.keys(editorialResult.sources).length===0||Object.values(editorialResult.sources).some(x=>x.state!=="REVISADA"),
+  brokenExternalLinks:linkChecks.filter(x=>x.state==="ROTO"&&new URL(x.url).origin!==origin).length,
+  blockedExternalLinks:linkChecks.filter(x=>x.state==="BLOQUEADO"&&new URL(x.url).origin!==origin).length,
+  candidates:editorialResult.candidates
+ });
  return {id:site.id,url:origin,verdict:state,inventory:{urls:delta,imagesExpected:expectedImages.length,imagesDiscovered:imgs.size,imagesBaselinePresent:foundBaselineImages,linksDiscovered:links.size},externalLinks:{blocked:linkChecks.filter(x=>x.state==="BLOQUEADO"&&new URL(x.url).origin!==origin).length,broken:linkChecks.filter(x=>x.state==="ROTO"&&new URL(x.url).origin!==origin).length},coverage:{pages:pagesCoverage,images:imagesCoverage,links:linksCoverage},browser:browserResult||null,editorial:editorialResult,notes,checks:{pages:htmlChecks,images:imageChecks,links:linkChecks},incidents:{pages:htmlChecks.filter(x=>x.state!=="OK").slice(0,80),images:imageChecks.filter(x=>x.state!=="OK").slice(0,120),links:linkChecks.filter(x=>x.state!=="OK").slice(0,100)}};
 }
 await mkdir(root,{recursive:true});
