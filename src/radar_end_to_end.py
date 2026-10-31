@@ -35,7 +35,12 @@ SELECT r.run_id,r.status,r.sources_selected,r.sources_checked,
  (SELECT count(*)::int FROM radar_definitivo.listing_occurrences l
   JOIN radar_definitivo.sources s USING(source_id)
   WHERE s.url ~* '^https://[^/]+/(event|events|evento|eventos|entrada|entradas|ticket|tickets)/[^/?#]+/?$'
-  AND l.proof_url <> s.url) AS suspect_ticket_crosslinks
+  AND l.proof_url <> s.url) AS suspect_ticket_crosslinks,
+ -- An observation linked to a vanished canonical is a data-integrity P0.
+ -- Independent from source acquisition, admission queues, or API availability.
+ (SELECT count(*)::int FROM public.radar_v3_source_observations o
+  LEFT JOIN public.radar_agenda_events e ON e.event_key=o.matched_event_key
+  WHERE o.matched_event_key IS NOT NULL AND e.event_key IS NULL) AS orphaned_canonical_links
 FROM last_run r
 """
 
@@ -51,19 +56,25 @@ def assess(row):
             "status": "NO_COMPLETED_RUN",
             "nextBlockingGate": "radar",
             "runId": None,
+            "orphanedCanonicalLinks": None,
+            "canonicalIntegrity": "NOT_CHECKED",
             "apiHttp": "NOT_CHECKED",
             "webSso": "NOT_CHECKED",
             "publicationApprovedByRadar": False,
         }
+    # One trailing field is optional for compatibility with older fixture rows.
     (run_id, run_status, selected, checked, radar_future, primary_future,
      editorial_since, canonical_future, confirmed_future, published_future,
-     suspect_crosslinks) = row
+     suspect_crosslinks, *integrity_fields) = row
+    orphaned_links = max(0, int(integrity_fields[0] or 0)) if integrity_fields else 0
     vals = [max(0, int(v or 0)) for v in (
         selected, checked, radar_future, primary_future, editorial_since,
         canonical_future, confirmed_future, published_future, suspect_crosslinks)]
     (selected, checked, radar_future, primary_future, editorial_since,
      canonical_future, confirmed_future, published_future, suspect_crosslinks) = vals
-    if selected != checked or run_status in ("error", "running"):
+    if orphaned_links > 0:
+        gate = "canonical_integrity"
+    elif selected != checked or run_status in ("error", "running"):
         gate = "radar_acquisition"
     elif radar_future == 0:
         gate = "discover_future_sessions"
@@ -85,6 +96,8 @@ def assess(row):
         "futureCanonical": canonical_future, "futureConfirmed": confirmed_future,
         "futurePublished": published_future,
         "suspectTicketCrosslinks": suspect_crosslinks,
+        "orphanedCanonicalLinks": orphaned_links,
+        "canonicalIntegrity": "P0_MISSING_CANONICAL_REFERENCES" if orphaned_links else "NO_ORPHANS_DETECTED",
         "apiHttp": "NOT_CHECKED", "webSso": "NOT_CHECKED",
         "publicationApprovedByRadar": False,
         "warning": "Radar staging, historical public observations, canonical editorial "
