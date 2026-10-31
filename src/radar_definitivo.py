@@ -170,7 +170,9 @@ def choose_sources(conn, mode):
                 # Avoid duplicate watches of mirrored organizer URLs.
                 if "lumenartis.org" in host and "/proximos-eventos" not in root:
                     continue
-                if "teatrometrolp.com.ar" in host and "/entradas/cartelera/" not in root:
+                if "teatrometrolp.com.ar" in host and not (
+                    "/entradas/cartelera/" in root or
+                    (urlparse(root).path in ("","/") and not urlparse(root).query)):
                     continue
                 patterns=(
                     ["https://www.alternativateatral.com/obra%"] if "alternativateatral.com" in host else
@@ -204,11 +206,21 @@ def choose_sources(conn, mode):
                 # Materializar cobertura REAL de originales ya capturados
                 # sólo para la cartelera Metro. Los links nuevos se priorizan
                 # dentro del mismo presupuesto: nunca implica auto-admisión.
-                if "teatrometrolp.com.ar" in host and "/entradas/cartelera/" in root:
-                    cur.execute("""SELECT DISTINCT proof_url
-                       FROM radar_definitivo.listing_occurrences
+                if "teatrometrolp.com.ar" in host and (
+                    "/entradas/cartelera/" in root or
+                    (urlparse(root).path in ("","/") and not urlparse(root).query)):
+                    # A detail already OPENED as a candidate must be counted as
+                    # visited, even if it produced no dated listing. Otherwise
+                    # six stale pages monopolize every future round forever.
+                    cur.execute("""SELECT url FROM (
+                       SELECT proof_url AS url FROM radar_definitivo.listing_occurrences
                        WHERE source_id=%s AND proof_method='metro_official_ticket_date'
-                       ORDER BY proof_url LIMIT 300""",(src["source_id"],))
+                       UNION
+                       SELECT url FROM radar_definitivo.candidates
+                       WHERE evidence->>'source_id'=%s AND kind='event_detail'
+                         AND url LIKE 'https://www.teatrometrolp.com.ar/entrada/%%'
+                      ) visited ORDER BY url LIMIT 300""",
+                      (src["source_id"],src["source_id"]))
                     src["known_primary_details"]=[row[0] for row in cur.fetchall()]
         return sources
 
