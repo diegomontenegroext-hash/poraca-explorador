@@ -14,6 +14,7 @@ import re
 from urllib.parse import urlsplit, parse_qs, urljoin
 from radar_parallel import iso_event_fields
 from radar_ical_agenda import FEED_URL as OFFICIAL_ICS_FEED_URL, calendar_sessions
+from radar_ical_generic import is_calendar_url, calendar_sessions as generic_ical_sessions
 
 MONTHS={"enero":1,"febrero":2,"marzo":3,"abril":4,"mayo":5,"junio":6,
         "julio":7,"agosto":8,"septiembre":9,"setiembre":9,"octubre":10,
@@ -689,6 +690,16 @@ def extract_listings(raw,url):
         for title,day,clock,venue,proof in calendar_sessions(raw,url):
             record=make_record(title,day,clock,venue,proof,
                                "official_ics_explicit_session","primary_program_ics")
+            if record:out.append(record)
+        return out
+    if is_calendar_url(url):
+        # Feed nuevo: puede ser espejo o índice, no fuente organizadora.
+        # Las funciones fechadas quedan siempre en revisión sin aprobación.
+        out=[]
+        for title,day,clock,venue,proof in generic_ical_sessions(raw,url):
+            record=make_record(title,day,clock,venue,proof,
+                               "generic_ics_explicit_session",
+                               "structured_origin_unverified")
             if record:out.append(record)
         return out
     host,path=scope(url)
