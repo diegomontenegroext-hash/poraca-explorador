@@ -934,12 +934,19 @@ def main():
         # a census of cultural activity in La Plata. Mirror families stay one.
         try:
             with conn.cursor() as cur:
-                cur.execute("""SELECT coalesce(nullif(circuit,''),'unclassified'),monitoring_mode,
-                    count(*),count(*) FILTER(WHERE last_checked_at IS NOT NULL)
-                    FROM radar_definitivo.sources WHERE enabled
-                    GROUP BY circuit,monitoring_mode ORDER BY circuit,monitoring_mode""")
+                cur.execute("""SELECT coalesce(nullif(s.circuit,''),'unclassified'),
+                    s.monitoring_mode,count(DISTINCT s.source_id),
+                    count(DISTINCT sc.source_id)
+                    FROM radar_definitivo.sources s
+                    LEFT JOIN radar_definitivo.source_checks sc
+                      ON sc.source_id=s.source_id AND sc.run_id=%s
+                    WHERE s.enabled
+                    GROUP BY s.circuit,s.monitoring_mode
+                    ORDER BY s.circuit,s.monitoring_mode""",(run_id,))
                 stats["source_coverage"]={"denominator":"enabled_inventoried_sources",
                     "city_activity_coverage":"not_measured",
+                    "attempted_semantics":"only source_checks from this run_id, not prior history",
+                    "run_id":run_id,
                     "groups":[dict(circuit=r[0],mode=r[1],registered=r[2],attempted=r[3]) for r in cur.fetchall()],
                     "mirror_families":{"genda_alpedo":"one_secondary_evidence_family"}}
                 cur.execute("""SELECT
