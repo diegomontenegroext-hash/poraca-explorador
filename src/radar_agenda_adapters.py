@@ -905,8 +905,9 @@ def special_links(url,page,at=None):
         return [(u, "nota real de agenda semanal El Dia") for _, u in
                 list(dict((u,(stamp,u)) for stamp,u in links).values())[:2]]
     if host in ("teatrometrolp.com.ar","www.teatrometrolp.com.ar") and (
-            path.rstrip("/")=="/entradas/cartelera"
-            and urlsplit(url).query in ("","mes=&anio=","anio=&mes=")):
+            (path.rstrip("/")=="/entradas/cartelera"
+             and urlsplit(url).query in ("","mes=&anio=","anio=&mes="))
+            or (path in ("","/") and not urlsplit(url).query)):
         # La cartelera del Teatro Metro tiene a la vez indices paginados
         # y fichas /entrada/<slug>. Antes solo se leía la segunda página:
         # faltaban los originales de funciones próximas y se perdía el
@@ -968,6 +969,14 @@ def special_links(url,page,at=None):
             page_link=[("https://"+host+"/entradas/cartelera/1/",
                         "cartelera oficial verificada, pagina 1")]
         ordered=list(tickets.values())
+        if path in ("","/"):
+            # The real venue homepage includes upcoming /entrada/ originals
+            # that its paginated 'cartelera' root can skip. Pass ALL linked
+            # originals through to the existing gap-aware selector. This is
+            # link discovery only; scan_source still opens <=6 FULL or <=4
+            # incremental details with one slot reserved for revalidation.
+            # No fabricated slug, no extra source/cron/requests.
+            return ordered[:60]
         slots=max(0,6-len(page_link))
         if len(ordered)<=slots:
             return (page_link+ordered)[:6]
