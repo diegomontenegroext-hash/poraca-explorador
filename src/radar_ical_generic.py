@@ -77,6 +77,21 @@ def _when(field):
     return None
 
 
+def _safe_event_proof(proof,calendar_url):
+    if not proof:
+        return calendar_url
+    try:
+        p=urlsplit(proof)
+        calendar=urlsplit(calendar_url)
+        if (p.scheme=="https" and p.hostname==calendar.hostname and
+            p.username is None and p.password is None and
+            p.port in (None,443)):
+            return proof
+    except ValueError:
+        pass
+    return calendar_url
+
+
 def calendar_sessions(body,url):
     """Yield individual (title, day, clock, venue, proof) observations.
 
@@ -109,13 +124,7 @@ def calendar_sessions(body,url):
                         if not venue or _UNCONFIRMED.fullmatch(venue):
                             venue=None
                         proof=fields.get("URL",("",""))[1].strip()
-                        if (not is_calendar_url(proof) and
-                            not (proof.startswith("https://") and
-                                 urlsplit(proof).hostname==urlsplit(url).hostname and
-                                 urlsplit(proof).username is None and
-                                 urlsplit(proof).password is None and
-                                 urlsplit(proof).port in (None,443))):
-                            proof=url
+                        proof=_safe_event_proof(proof,url)
                         d,clock=parsed
                         key=(uid,title,d,clock,venue,proof)
                         if key not in seen:
