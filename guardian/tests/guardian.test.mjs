@@ -11,3 +11,5 @@ test("Wikimedia: página de archivo no es imagen, archivo upload sí",()=>{
  const file=jsonImages({cover:"https://upload.wikimedia.org/wikipedia/commons/9/92/Babasonicosroger.jpg"},"https://atlas.example",true);
  assert.equal(page.length,0);assert.equal(file.length,1);
 });
+
+test("JS URL de Commons wiki es página fuente, no recurso imagen",()=>{const src=jsImages('const source="https://commons.wikimedia.org/wiki/File:Babasonicosroger.jpg"; const file="https://upload.wikimedia.org/wikipedia/commons/9/92/Babasonicosroger.jpg"',"https://atlas.example");assert.equal(src.length,1);assert.ok(src[0].startsWith("https://upload.wikimedia.org/"));});
