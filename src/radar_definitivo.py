@@ -433,6 +433,16 @@ def scan_source(source,budget,mode):
         # A link to a calendar is evidence of a *strategy*, not an Event.
         # Same-host, HTTPS, bounded and already present as an anchor.
         links=discover_calendar_links(root,page.links)+links
+    if not check["_listings"] and not is_single_event_source(root):
+        # A site may still have secondary links even when its program
+        # menu changed. Reserve at most 2 existing, same-host menu links
+        # within the original per-source budget; never synthesize URLs.
+        capacity=(MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL)
+        available=max(0,capacity-len(links))
+        if available:
+            nav=discover_sections(root,page.links,limit=min(2,available))
+            # Avoid moving special/seed URLs behind generic navigation.
+            links+=nav
     # El Dia's tag index can expose dozens of stale weekly pages. Use only
     # genuinely linked and RECENT magazine agendas for this one source;
     # an outdated index must show index_only, not fake current coverage.
@@ -444,8 +454,7 @@ def scan_source(source,budget,mode):
     # abrir hasta 3 secciones de agenda genuinamente enlazadas en su HTML.
     # Si una institución cambia el nombre/ruta de su menú, no requiere
     # editar una whitelist por host. La sección NO es un evento.
-    if not links and not check["_listings"]:
-        links+=discover_sections(root,page.links)
+
     # Exact URL-level dedupe: special_links and generic discovery can
     # return the same original with different labels. Preserve first/official
     # priority so one document cannot consume multiple detail slots.
