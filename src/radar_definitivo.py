@@ -247,6 +247,19 @@ def safe_public_link(raw,base):
         return None
 
 
+def is_single_event_source(url):
+    """One ticket/event detail URL is NOT a citywide discovery index.
+
+    Ticket platforms show unrelated nationwide recommendations; linking to
+    another ticket does not establish the source's organizers or geography.
+    This rule is by URL shape, not by a hardcoded provider hostname.
+    """
+    p=urlparse(url)
+    return bool(p.scheme=="https" and
+        re.fullmatch(r"/(?:event|events|evento|eventos|entrada|entradas|ticket|tickets)/[^/]+/?",
+                     p.path,re.I))
+
+
 def links_from_page(body, page, url):
     """Preserve links and date parameters; never treat profile roots as Instagram posts."""
     seen=set()
@@ -418,8 +431,9 @@ def scan_source(source,budget,mode):
     # El Dia's tag index can expose dozens of stale weekly pages. Use only
     # genuinely linked and RECENT magazine agendas for this one source;
     # an outdated index must show index_only, not fake current coverage.
-    if not (urlparse(root).hostname in ("www.eldia.com","eldia.com")
-            and urlparse(root).path.rstrip("/") in ("/ttags/espectaculos","/espectaculos")):
+    if (not is_single_event_source(root) and
+        not (urlparse(root).hostname in ("www.eldia.com","eldia.com")
+            and urlparse(root).path.rstrip("/") in ("/ttags/espectaculos","/espectaculos"))):
         links+=links_from_page(body,page,root)
     # Método adaptable: cuando el dominio no aporta detalles ni semillas,
     # abrir hasta 3 secciones de agenda genuinamente enlazadas en su HTML.
