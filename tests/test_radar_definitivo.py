@@ -41,8 +41,9 @@ class RadarDefinitivoTests(unittest.TestCase):
         self.assertEqual(budget.calls,[root,detail])
         self.assertEqual(check["links_found"],1)
         self.assertEqual(check["details_opened"],1)
-        self.assertEqual(len(candidates),1)
+        self.assertEqual(len(candidates),0)
         self.assertEqual(check["_listings"],[])
+        self.assertEqual(check["status"],"index_only")
 
     def test_doblet_prefers_exact_original_without_merging_sessions(self):
         root="https://teatrodoblet.com.ar/"
