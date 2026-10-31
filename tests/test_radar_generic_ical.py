@@ -73,6 +73,12 @@ class GenericIcalTests(unittest.TestCase):
         got=extract_listings(raw,self.ics)
         self.assertEqual(got[0]["proof_url"],self.ics)
 
+    def test_06b_malformed_event_url_does_not_crash_the_source(self):
+        raw=feed(event("invalid",self.today,proof="https://host.example:bad/venue"))
+        got=extract_listings(raw,self.ics)
+        self.assertEqual(len(got),1)
+        self.assertEqual(got[0]["proof_url"],self.ics)
+
     def test_07_ics_must_be_real_same_host_html_link(self):
         html=radar.parse_html(
             '<a href="/agenda.ics">Calendario</a>'
