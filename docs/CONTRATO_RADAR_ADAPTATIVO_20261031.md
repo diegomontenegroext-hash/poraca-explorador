@@ -1,5 +1,5 @@
 # Por Acá — contrato de Radar adaptativo y aprendizaje de fuentes
-**Decisión arquitectónica: 31/10/2026 · Estado: diseño aprobado para implementación incremental, NO funcionalidad desplegada.**
+**Propuesta arquitectónica registrada: 31/10/2026 · Estado: hoja de ruta para implementación y validación incremental, NO funcionalidad desplegada.**
 **Backlog dueño:** `diegomontenegroext-hash/poraca-lp#28` (Radar), relacionado con #16.
 **Ejecutor:** `poraca-explorador`, dentro de la arquitectura y orquestación existentes.
 
