@@ -702,6 +702,22 @@ Kevin - Liniers: Eternotour
              '<a href="https://www.teatrometrolp.com.ar/entradas/cartelera/'
              '?mes=11&anio=2026">No filtro libre</a>')),[])
 
+    def test_metro_filtered_index_avoids_duplicate_pagination_slot(self):
+        root="https://www.teatrometrolp.com.ar/entradas/cartelera/"
+        filtered="https://www.teatrometrolp.com.ar/entradas/cartelera/?mes=&anio="
+        html='<a href="'+filtered+'">Cartelera completa</a>'
+        html+='<a href="/entradas/cartelera/1/?anio=&mes=">Pagina 1</a>'
+        html+="".join('<a href="/entrada/show-'+str(i)+'">Entradas</a>'
+                       for i in range(1,8))
+        page=rd.parse_html(html)
+        found=ad.special_links(root,page,at=datetime(2026,10,28,5))
+        self.assertEqual(found[0][0],filtered)
+        self.assertEqual(len(found),6)
+        self.assertEqual(len({u for u,_ in found}),6)
+        self.assertEqual(sum("/entradas/cartelera" in u for u,_ in found),1,
+                         "No agotar dos slots abriendo el índice y su paginación")
+        self.assertEqual(sum("/entrada/" in u for u,_ in found),5)
+
     def test_metro_original_ticket_rotation_bounded_and_distinct_sessions(self):
         root="https://www.teatrometrolp.com.ar/entradas/cartelera/"
         first=["kevin-johanse-100001","juli-bellese-100002",
@@ -719,9 +735,20 @@ Kevin - Liniers: Eternotour
         self.assertEqual(len(a),6)
         self.assertEqual(len({u for u,_ in a}),6)
         self.assertTrue(a[0][0].endswith("/entradas/cartelera/1/"))
-        self.assertEqual([u for u,_ in a[1:3]],
-          ["https://www.teatrometrolp.com.ar/entrada/"+slug for slug in first[:2]])
-        self.assertNotEqual(a[3:],b[3:],"Rotation must change later candidates")
+        self.assertNotEqual(a[1:],b[1:],
+                            "Rotation must cover the whole catalogue, not pin old first two")
+        # Dos FULL ordinarios deben cubrir un catálogo de 8 originales sin
+        # reabrir invariablemente entradas ya vencidas.
+        covered={u for u,_ in a+b if "/entrada/" in u}
+        self.assertEqual(len(covered),len(first))
+        self.assertIn("https://www.teatrometrolp.com.ar/entrada/las-hijas-100958",covered)
+        self.assertIn("https://www.teatrometrolp.com.ar/entrada/las-hijas-101000",covered)
+        # En una incremental el truncamiento habitual [:3] debe rotar las
+        # fichas, en lugar de repetir siempre Kevin/Juli.
+        hourly=[ad.special_links(root,page,at=datetime(2026,10,28,h))[:3]
+                for h in (5,13,21)]
+        sampled={u for slot in hourly for u,_ in slot if "/entrada/" in u}
+        self.assertGreaterEqual(len(sampled),5)
         # Todos los demás se recorren con rotación, no sólo los primeros.
         reached={u for at in range(24) for u,_ in ad.special_links(
             root,page,at=datetime(2026,10,28+at%3,5+8*((at//3)%3)))
