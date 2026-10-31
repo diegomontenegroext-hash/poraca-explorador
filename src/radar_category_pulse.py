@@ -3,6 +3,7 @@
 import json, os, sys, unicodedata
 from pathlib import Path
 from radar_funnel_metrics import read as read_run_funnel, persist as persist_run_funnel
+from radar_end_to_end import SQL as END_TO_END_SQL, assess as assess_end_to_end
 
 SCHEMA="poraca-radar-category-pulse-v1"
 LABELS={"teatro":"Teatro","musica":"Música","cine":"Cine","artes":"Artes y exposiciones",
@@ -169,10 +170,14 @@ def fetch(url):
                 # This is one stage of the existing post-run report, not a
                 # second scheduler or an editorial publication process.
                 run_funnel=read_run_funnel(cur)
+                # Lectura de salud real de la cadena; no dispara Motor/API/SSO.
+                cur.execute(END_TO_END_SQL)
+                end_to_end=assess_end_to_end(cur.fetchone())
     report=summarize(canonical,observations,today)
     report["sourceModesPreviousCheck"]=source_mode_counts(source_rows)
     report["editorialReviewQueue"]=review_queue(candidate_rows)
     report["runFunnel"]=run_funnel
+    report["endToEnd"]=end_to_end
     return report
 
 def main():
@@ -225,6 +230,22 @@ def main():
                 for item in sy["topContributors"][:6]:
                     out.write("- {}: {} registros nuevos, {} detectados\n".format(
                         safe_cell(item["name"]),item["new"],item["detected"]))
+                e=report["endToEnd"]
+                out.write("\n## Cadena punta a punta: semáforo de datos (solo lectura)\n\n")
+                out.write("**{}** · siguiente puerta a verificar: **{}** · Radar {} de {} fuentes.\n\n".format(
+                    safe_cell(e["status"]),safe_cell(e["nextBlockingGate"]),
+                    e.get("sourcesChecked",0),e.get("sourcesSelected",0)))
+                out.write("| Futuras en Radar | Original con hora/sede | Observaciones editoriales tocadas desde Radar | Futuras canónicas | Confirmadas | Publicadas | Tickets cruzados sospechosos |\n")
+                out.write("|---:|---:|---:|---:|---:|---:|---:|\n")
+                out.write("| {} | {} | {} | {} | {} | {} | {} |\n\n".format(
+                    e.get("radarFutureObservations",0),
+                    e.get("futurePrimaryWithTimeVenue",0),
+                    e.get("editorialObservationsTouchedSinceRadarRun",0),
+                    e.get("futureCanonical",0),e.get("futureConfirmed",0),
+                    e.get("futurePublished",0),e.get("suspectTicketCrosslinks",0)))
+                out.write("**HTTP API: NO VERIFICADO · Web SSO: NO VERIFICADA.** "
+                    "No se infiere disponibilidad web por READY de despliegue ni por SQL. "
+                    "Ninguna admisión ni publicación automática se realizó desde Radar.\n\n")
                 out.write("\n## Por Acá: evolución por disciplina (lectura)\n\n")
                 out.write("Canónicos: **{}** · próximos confirmados ≤15 días: **{}** · observaciones pendientes ≤46 días: **{}**.\n\n".format(
                     report["totalCanonical"],report["totalConfirmedNext15"],report["totalPendingObservations46"]))
