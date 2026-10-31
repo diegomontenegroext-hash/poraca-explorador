@@ -73,7 +73,7 @@ class CertificationMatrixTests(unittest.TestCase):
         root="https://nuevo-centro.example/"
         for route in ("/agenda/","/programacion/","/cartelera/"):
             page=rd.parse_html('<a href="'+route+'">Agenda cultural</a>')
-            self.assertTrue(any(u==root+route
+            self.assertTrue(any(u==root+route.lstrip('/')
                                 for u,_ in discover_sections(root,page.links)))
 
     def test_08_unknown_host_does_not_follow_external_reference(self):
