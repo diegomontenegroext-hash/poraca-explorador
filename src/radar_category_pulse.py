@@ -2,6 +2,7 @@
 """Post-run category pulse, read-only: no new scheduler, ingestion, or approvals."""
 import json, os, sys, unicodedata
 from pathlib import Path
+from radar_funnel_metrics import read as read_run_funnel, persist as persist_run_funnel
 
 SCHEMA="poraca-radar-category-pulse-v1"
 LABELS={"teatro":"Teatro","musica":"Música","cine":"Cine","artes":"Artes y exposiciones",
@@ -165,9 +166,13 @@ def fetch(url):
                 cur.execute(OBS_SQL);observations=cur.fetchall()
                 cur.execute(SOURCE_MODES_SQL);source_rows=cur.fetchall()
                 cur.execute(REVIEW_QUEUE_SQL);candidate_rows=cur.fetchall()
+                # This is one stage of the existing post-run report, not a
+                # second scheduler or an editorial publication process.
+                run_funnel=read_run_funnel(cur)
     report=summarize(canonical,observations,today)
     report["sourceModesPreviousCheck"]=source_mode_counts(source_rows)
     report["editorialReviewQueue"]=review_queue(candidate_rows)
+    report["runFunnel"]=run_funnel
     return report
 
 def main():
@@ -175,10 +180,29 @@ def main():
         print("::error::PULSE_NEON_SECRET_MISSING",file=sys.stderr);return 1
     try:
         report=fetch(os.environ["NEON_RADAR_OPERATIONAL_DATABASE_URL"])
+        # Write only the completed Radar run's evidence snapshot, under the
+        # existing scoped ingestion role. No canonical or entity permissions.
+        report["funnelStorage"]=persist_run_funnel(
+            os.environ["NEON_RADAR_OPERATIONAL_DATABASE_URL"],report["runFunnel"])
         print("RADAR_CATEGORY_PULSE "+json.dumps(report,ensure_ascii=False),flush=True)
         path=os.environ.get("GITHUB_STEP_SUMMARY")
         if path:
             with Path(path).open("a",encoding="utf-8") as out:
+                funnel=report["runFunnel"]
+                fcounts=funnel["counts"]
+                out.write("\n## Embudo editorial por corrida — guardado en Neon\n\n")
+                out.write("Corrida **{}** · modo **{}** · almacenamiento **{}**.\n\n".format(
+                    safe_cell(funnel["runId"]),safe_cell(funnel["mode"]),
+                    safe_cell(report["funnelStorage"])))
+                out.write("| Lecturas de funciones | Distintas revisadas | Nuevas | Revisitadas | Posibles duplicados | Pendientes de edición | Evidencia primaria completa | Ya publicadas (vinculadas) | Lugares mencionados |\n")
+                out.write("|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n")
+                out.write("| {parsedListingReads} | {distinctDetected} | {new} | {seenAgain} | {possibleDuplicates} | {pendingEditorial} | {completePrimaryEvidence} | {matchedPublished} | {venueNamesMentioned} |\n\n".format(**fcounts))
+                out.write("| Rubro de la fuente | Distintas | Nuevas | Revisitadas | Posibles duplicados | Pendientes | Original completo | Ya publicadas | Lugares mencionados |\n")
+                out.write("|---|---:|---:|---:|---:|---:|---:|---:|---:|\n")
+                for row in funnel["byRubro"]:
+                    out.write("| {label} | {distinctDetected} | {new} | {seenAgain} | {possibleDuplicates} | {pendingEditorial} | {completePrimaryEvidence} | {matchedPublished} | {venueNamesMentioned} |\n".format(
+                        **{**row,"label":safe_cell(row["label"])}))
+                out.write("\n**Interpretación:** «revisitada» NO significa duplicada; «original completo» NO significa aprobada; «ya publicada» exige enlace comprobado al catálogo y NO es publicación nueva causada por Radar. Los lugares son nombres mencionados, no fichas nuevas aprobadas. Las detecciones sin circuito quedan «Sin clasificar».\n")
                 out.write("\n## Por Acá: evolución por disciplina (lectura)\n\n")
                 out.write("Canónicos: **{}** · próximos confirmados ≤15 días: **{}** · observaciones pendientes ≤46 días: **{}**.\n\n".format(
                     report["totalCanonical"],report["totalConfirmedNext15"],report["totalPendingObservations46"]))
