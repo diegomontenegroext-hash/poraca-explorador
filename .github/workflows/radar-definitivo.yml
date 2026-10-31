@@ -9,16 +9,18 @@ on:
     branches: [main]
     paths:
       - 'ops/radar-fallback-trigger.txt'
+      - 'ops/e2e-verification-trigger.txt'
   workflow_dispatch:
     inputs:
       mode:
-        description: "FULL o incremental; escritura operativa solo en staging Neon"
+        description: "FULL / incremental para Radar, o verify_only sin ingesta ni escrituras"
         required: true
         type: choice
         default: incremental
         options:
           - incremental
           - full
+          - verify_only
 
 permissions:
   contents: read
@@ -29,7 +31,7 @@ concurrency:
 
 jobs:
   definitivo:
-    name: Ingesta Neon desde Guardia GPT
+    name: Radar o certificacion puntual sin ingesta
     runs-on: ubuntu-latest
     timeout-minutes: 38
     steps:
@@ -44,16 +46,21 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "$EVENT_NAME" == "push" ]]; then
-            mode="$(sed -n 's/^trigger_mode=//p' ops/radar-fallback-trigger.txt | tail -1)"
-            slot="$(sed -n 's/^trigger_slot=//p' ops/radar-fallback-trigger.txt | tail -1)"
-            day="$(sed -n 's/^trigger_date=//p' ops/radar-fallback-trigger.txt | tail -1)"
-            [[ "$mode" == "full" || "$mode" == "incremental" ]] || { echo "::error::invalid trigger_mode"; exit 1; }
-            [[ "$slot" == "05" || "$slot" == "13" || "$slot" == "21" || "$slot" == "bootstrap" ]] || { echo "::error::invalid trigger_slot"; exit 1; }
-            [[ "$day" =~ ^20[0-9]{2}-[0-9]{2}-[0-9]{2}$ ]] || { echo "::error::invalid trigger_date"; exit 1; }
-            echo "Disparo GPT: $day $slot / $mode"
+            if git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" | grep -qx 'ops/e2e-verification-trigger.txt'; then
+              mode=verify_only
+              echo "Certificacion E2E solicitada: sin ingesta, sin escrituras Neon."
+            else
+              mode="$(sed -n 's/^trigger_mode=//p' ops/radar-fallback-trigger.txt | tail -1)"
+              slot="$(sed -n 's/^trigger_slot=//p' ops/radar-fallback-trigger.txt | tail -1)"
+              day="$(sed -n 's/^trigger_date=//p' ops/radar-fallback-trigger.txt | tail -1)"
+              [[ "$mode" == "full" || "$mode" == "incremental" ]] || { echo "::error::invalid trigger_mode"; exit 1; }
+              [[ "$slot" == "05" || "$slot" == "13" || "$slot" == "21" || "$slot" == "bootstrap" ]] || { echo "::error::invalid trigger_slot"; exit 1; }
+              [[ "$day" =~ ^20[0-9]{2}-[0-9]{2}-[0-9]{2}$ ]] || { echo "::error::invalid trigger_date"; exit 1; }
+              echo "Disparo GPT: $day $slot / $mode"
+            fi
           else
             mode="$MANUAL_MODE"
-            [[ "$mode" == "full" || "$mode" == "incremental" ]] || exit 1
+            [[ "$mode" == "full" || "$mode" == "incremental" || "$mode" == "verify_only" ]] || exit 1
             echo "Disparo manual: $mode"
           fi
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
@@ -67,7 +74,9 @@ jobs:
           python3 -m pip install --disable-pip-version-check "psycopg[binary]>=3.2,<4"
           # ubuntu-latest ya incluye Chrome; el adaptador usa channel="chrome".
           # Si Playwright no instala, Radar conserva extracción HTTP sin bloquearse.
-          python3 -m pip install --disable-pip-version-check "playwright>=1.45,<2" || echo "::warning::Genda sin fallback de navegador"
+          if [[ "${{ steps.alcance.outputs.mode }}" != "verify_only" ]]; then
+            python3 -m pip install --disable-pip-version-check "playwright>=1.45,<2" || echo "::warning::Genda sin fallback de navegador"
+          fi
       - name: Exigir secreto operativo
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
@@ -78,6 +87,7 @@ jobs:
           fi
       - name: Registrar en Neon operativa
         id: ingesta
+        if: steps.alcance.outputs.mode != 'verify_only'
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
           RADAR_REQUIRE_OPERATIONAL: "true"
@@ -85,10 +95,16 @@ jobs:
         run: python3 src/radar_definitivo.py --mode "$RADAR_SCOPE"
       - name: Medir renovación por rubro sin admitir eventos
         id: control
-        if: success()
+        if: success() && steps.alcance.outputs.mode != 'verify_only'
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
         run: python3 src/radar_category_pulse.py
+      - name: Certificar E2E en modo solo lectura (sin Radar)
+        id: verificar
+        if: success() && steps.alcance.outputs.mode == 'verify_only'
+        env:
+          NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
+        run: python3 src/radar_category_pulse.py --verify-only
       - name: Acta de cierre de ejecución, incluso ante fallos
         if: always()
         shell: bash
@@ -96,6 +112,7 @@ jobs:
           QA_OUTCOME: ${{ steps.qa.outcome }}
           INGEST_OUTCOME: ${{ steps.ingesta.outcome }}
           CONTROL_OUTCOME: ${{ steps.control.outcome }}
+          VERIFY_OUTCOME: ${{ steps.verificar.outcome }}
         run: |
           set -euo pipefail
           {
@@ -107,8 +124,15 @@ jobs:
             echo "| Pruebas QA | ${QA_OUTCOME:-unknown} |"
             echo "| Adquisición / escritura en staging | ${INGEST_OUTCOME:-unknown} |"
             echo "| Informe fuente, preadmisión y E2E | ${CONTROL_OUTCOME:-unknown} |"
+            echo "| Certificación read-only independiente | ${VERIFY_OUTCOME:-unknown} |"
             echo
-            if [[ "$INGEST_OUTCOME" != "success" ]]; then
+            if [[ "$VERIFY_OUTCOME" != "skipped" && "$VERIFY_OUTCOME" != "" ]]; then
+              if [[ "$VERIFY_OUTCOME" == "success" ]]; then
+                echo "**INTEGRIDAD DE DATOS CHECK PASS**. HTTP API y web SSO siguen siendo controles distintos."
+              else
+                echo "**P0: CERTIFICACIÓN E2E FALLIDA**. Ninguna ingesta fue ejecutada. Ver error en step verificar."
+              fi
+            elif [[ "$INGEST_OUTCOME" != "success" ]]; then
               echo "**INGESTA NO CERTIFICADA**: no atribuir a este run resultados previos."
             elif [[ "$CONTROL_OUTCOME" != "success" ]]; then
               echo "**CONTROL NO CERTIFICADO**: ingesta y reporte separados; revisar Neon en SELECT."
