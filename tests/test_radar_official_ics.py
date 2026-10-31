@@ -58,6 +58,61 @@ class OfficialICalendarTests(unittest.TestCase):
         self.assertEqual(sum(item["venue"] is None for item in staged),2)
         self.assertEqual(sum(item["event_time"] is None for item in staged),3)
 
+    def test_24_real_sessions_reach_existing_staging_insert_contract(self):
+        fixture=pathlib.Path(__file__).parent / "fixtures/freezer_2026_official_metadata.ics"
+        body=fixture.read_text(encoding="utf-8")
+        class Cursor:
+            def __init__(self,conn):self.conn=conn
+            def __enter__(self):return self
+            def __exit__(self,*args):return False
+            def execute(self,query,params):
+                self.conn.executed.append((query,params))
+        class Conn:
+            def __init__(self):
+                self.executed=[]
+                self.commits=0
+            def cursor(self):return Cursor(self)
+            def commit(self):self.commits+=1
+        source={"source_id":"rd-official-freezer-2026",
+                "url":FEED_URL,"source_role":"original_festival_calendar_ics",
+                "seed_urls":[],"consecutive_failures":0,"cadence_hours":24}
+        class Budget:
+            def __init__(self):self.requests=[]
+            def request(self,url):
+                self.requests.append(url)
+                return 200,body,None
+            def can_fetch(self,url):return False
+        budget=Budget()
+        with patch.object(adapters,"active_date",return_value=True):
+            check,candidates=radar.scan_source(source,budget,"full")
+        self.assertEqual(budget.requests,[FEED_URL])
+        self.assertEqual(len(check["_listings"]),24)
+        self.assertEqual(candidates,[])
+        conn=Conn()
+        self.assertEqual(radar.save_source_result(
+            conn,"test-run-1",source,check,candidates),(0,0))
+        inserts=[params for sql,params in conn.executed
+                 if "INSERT INTO radar_definitivo.listing_occurrences(" in sql]
+        self.assertEqual(len(inserts),24)
+        self.assertEqual(len(set(p[0] for p in inserts)),24)
+        self.assertEqual(sum(p[4] is None for p in inserts),3)
+        self.assertEqual(sum(p[5] is None for p in inserts),2)
+        self.assertTrue(all(p[1]=="rd-official-freezer-2026"
+                            and p[7]=="official_ics_explicit_session"
+                            and p[8]=="primary_program_ics"
+                            for p in inserts))
+        self.assertEqual(sum("INSERT INTO radar_definitivo.source_checks(" in query
+                             for query,_ in conn.executed),1)
+        self.assertEqual(sum("UPDATE radar_definitivo.sources" in query
+                             for query,_ in conn.executed),1)
+        conn2=Conn()
+        radar.save_source_result(conn2,"test-run-2",source,check,candidates)
+        keys2=[params[0] for query,params in conn2.executed
+               if "INSERT INTO radar_definitivo.listing_occurrences(" in query]
+        self.assertEqual([p[0] for p in inserts],keys2,
+                         "A second run must use the same 24 idempotent listing keys")
+        self.assertEqual((conn.commits,conn2.commits),(1,1))
+
     def test_utc_conversion_and_two_distinct_events_same_day(self):
         raw=feed(
             item("id1","Inauguración de Exposiciones","Pasaje Dardo Rocha",
