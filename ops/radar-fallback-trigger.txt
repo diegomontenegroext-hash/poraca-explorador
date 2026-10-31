@@ -1,7 +1,7 @@
-# POR ACA - RADAR DEFINITIVO
-# Auditoria integral autorizada: una incremental controlada para Teatro Metro.
-# El scheduler de ChatGPT 05/13/21 ART permanece sin cambios.
+# POR ACA — PRUEBA E2E AUTORIZADA 2026-10-30 ART
+# Única FULL manual. No vaciar Neon, no modificar tarea programada.
+# Solo adquisición a staging: admisión editorial separada y verificable.
 trigger_date=2026-10-30
 trigger_slot=bootstrap
-trigger_mode=incremental
-trigger_reason=user_authorized_e2e_audit_metro_single_due_20261030
+trigger_mode=full
+trigger_reason=user_explicitly_authorized_single_e2e_full_20261030_2351_art
