@@ -1,7 +1,7 @@
 # POR ACA - RADAR DEFINITIVO
-# Disparo manual excepcional pedido por usuario: QA de origen Freezer + Teatro Metro
-# Conservar cron ChatGPT 05/13/21 intacto; sin publicacion de candidatos.
+# Auditoria integral autorizada: una incremental controlada para Teatro Metro.
+# El scheduler de ChatGPT 05/13/21 ART permanece sin cambios.
 trigger_date=2026-10-30
 trigger_slot=bootstrap
-trigger_mode=full
-trigger_reason=user_authorized_single_manual_full_freezer_metro_20261030
+trigger_mode=incremental
+trigger_reason=user_authorized_e2e_audit_metro_single_due_20261030
