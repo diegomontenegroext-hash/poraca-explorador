@@ -954,7 +954,9 @@ def special_links(url,page,at=None):
                     r"/entrada/[a-z0-9_.-]+/?",p.path,re.I)):
                 # Sólo fichas realmente enlazadas DESDE la cartelera
                 # oficial, nunca construir un slug desde el título.
-                normalized="https://"+p.hostname+p.path.rstrip("/")
+                # Public official site mixes www / apex ticket anchors.
+                # Canonicalize the same original before dedup and budgeting.
+                normalized="https://www.teatrometrolp.com.ar"+p.path.rstrip("/")
                 tickets.setdefault(normalized,(normalized,"detalle oficial"))
         # La URL oficial con filtros vacíos ya ES la cartelera completa.
         # No abrir desde ella otra página de índice: hacerlo desperdicia
