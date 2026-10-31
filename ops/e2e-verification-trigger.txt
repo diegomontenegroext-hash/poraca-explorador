@@ -4,3 +4,6 @@
 verification_id=20261031-integridad-canonic-replay-01
 expected_result=P0_FAIL_IF_ORPHANS_PRESENT
 trigger_reason=prove_e2e_gate_independently_of_acquisition
+
+# Segundo intento: diff-tree con fetch-depth=2 validado por diseño (no toca trigger programado).
+verification_attempt=02
