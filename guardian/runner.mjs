@@ -84,14 +84,14 @@ async function audit(site,browser){
  if(delta.added.length)notes.push("Nuevas URL sin baseline aprobado: "+delta.added.length);
  if(actual.length>limit.pages)notes.push("Sitemap excede límite técnico de "+limit.pages);
  const pages=[...new Set([...expected,...actual])].slice(0,limit.pages);
- const imgs=new Set(),links=new Set(),scripts=new Set();
+ const imgs=new Set(),links=new Set(),scripts=new Set(),linkSources=new Map();
  const htmlChecks=await pool(pages,async uri=>{
   const r=await fetchRetry(uri),type=r.headers.get("content-type")||"";
   const state=verdict(r.status,"html",type);
   if(state!=="OK"){await r.body?.cancel();return {url:uri,state,http:r.status};}
   const body=await r.text();if(body.length>limit.content)return {url:uri,state:"BLOQUEADO",detail:"HTML demasiado grande"};
   const found=htmlResources(body,uri);
-  found.images.forEach(x=>imgs.add(x));found.links.forEach(x=>links.add(x));found.scripts.forEach(x=>scripts.add(x));
+  found.images.forEach(x=>imgs.add(x));found.links.forEach(x=>{links.add(x);if(!linkSources.has(x))linkSources.set(x,[]);if(linkSources.get(x).length<4)linkSources.get(x).push(uri);});found.scripts.forEach(x=>scripts.add(x));
   return {url:uri,state:"OK",http:r.status};
  });
  for(const name of site.assetPaths||[]){
@@ -108,6 +108,7 @@ async function audit(site,browser){
  if(linkList.length>limit.links)notes.push("Recorte de enlaces, total "+linkList.length+" > "+limit.links);
  const imageChecks=await pool(imageList.slice(0,limit.images),u=>check(u,"image"));
  const linkChecks=await pool(linkList.slice(0,limit.links),u=>check(u,"link"));
+ for(const item of linkChecks)item.foundAt=linkSources.get(item.url)||[];
  const imagesCoverage=coverage(imageList,imageChecks),linksCoverage=coverage(linkList,linkChecks),pagesCoverage=coverage(pages,htmlChecks);
  const foundBaselineImages=expectedImages.filter(u=>imgs.has(u)).length;
  if(foundBaselineImages!==expectedImages.length)notes.push('Imagen base no hallada en recursos de la versión actual: '+(expectedImages.length-foundBaselineImages));
@@ -119,8 +120,8 @@ async function audit(site,browser){
  if(browserChecks.length!==requiredBrowser)notes.push("Chromium incompleto: "+browserChecks.length+"/"+requiredBrowser+" recorridos");
  let state="VERDE";
  if(notes.length||pagesCoverage.unverified.length||imagesCoverage.unverified.length||linksCoverage.unverified.length||imageChecks.some(x=>x.state==="BLOQUEADO")||linkChecks.some(x=>x.state==="BLOQUEADO")||htmlChecks.some(x=>x.state==="BLOQUEADO")||browserChecks.some(x=>x.status!=="PASS")||Object.values(editorialResult.sources).some(x=>x.state!=="REVISADA"))state="GRIS";
- if(htmlChecks.some(x=>x.state==="ROTO")||imageChecks.some(x=>x.state==="ROTO")||linkChecks.some(x=>x.state==="ROTO")||delta.missing.length)state="ROJO";
- else if(state==="VERDE"&&(delta.added.length||editorialResult.candidates.length))state="AMARILLO";
+ if(htmlChecks.some(x=>x.state==="ROTO")||imageChecks.some(x=>x.state==="ROTO")||linkChecks.some(x=>x.state==="ROTO"&&new URL(x.url).origin===origin)||delta.missing.length)state="ROJO";
+ else if(state==="VERDE"&&(delta.added.length||editorialResult.candidates.length||linkChecks.some(x=>x.state==="ROTO")))state="AMARILLO";
  return {id:site.id,url:origin,verdict:state,inventory:{urls:delta,imagesExpected:expectedImages.length,imagesDiscovered:imgs.size,imagesBaselinePresent:foundBaselineImages,linksDiscovered:links.size},coverage:{pages:pagesCoverage,images:imagesCoverage,links:linksCoverage},browser:browserResult||null,editorial:editorialResult,notes,checks:{pages:htmlChecks,images:imageChecks,links:linkChecks},incidents:{pages:htmlChecks.filter(x=>x.state!=="OK").slice(0,80),images:imageChecks.filter(x=>x.state!=="OK").slice(0,120),links:linkChecks.filter(x=>x.state!=="OK").slice(0,100)}};
 }
 await mkdir(root,{recursive:true});
@@ -142,7 +143,7 @@ for(const a of report.sites){
  lines.push("- Candidatos editoriales: "+a.editorial.candidates.length+" (NO verificados para publicación)");
  for(const c of a.editorial.candidates.slice(0,8))lines.push("  - "+c.date+" "+c.title+" "+c.url);
  for(const n of a.notes.slice(0,20))lines.push("- Atención: "+n);
- for(const [k,items] of Object.entries(a.incidents))for(const x of items.slice(0,12))lines.push("- "+k+" "+x.state+": "+x.url+(x.http?" HTTP "+x.http:""));
+ for(const [k,items] of Object.entries(a.incidents))for(const x of items.slice(0,12))lines.push("- "+k+" "+x.state+": "+x.url+(x.http?" HTTP "+x.http:"")+(x.foundAt?.length?" [origen: "+x.foundAt.slice(0,2).join(", ")+"]":""));
 }
 lines.push("","Evidencia completa: artifact guardian-report en la ejecución GitHub. Grises o bloques NO equivalen a OK.","Correcciones: ninguna aplicada. Altas de otros Atlas: sumar configuración y baselines nuevos; mismo motor.");
 await writeFile(new URL("report.json",root),JSON.stringify(report,null,2)+"\n");
