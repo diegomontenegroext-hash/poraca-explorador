@@ -39,11 +39,14 @@ jobs:
         id: audit
         continue-on-error: true
         run: node guardian/runner.mjs
+      - name: Generar aviso breve y acciones
+        if: always() && hashFiles('guardian/out/report.json') != ''
+        run: node guardian/digest.mjs
       - name: Registrar informe verificable en Guardian #4
-        if: always() && github.ref == 'refs/heads/main' && hashFiles('guardian/out/report.md') != ''
+        if: always() && github.ref == 'refs/heads/main' && hashFiles('guardian/out/digest.md') != ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh issue comment 4 --repo diegomontenegroext-hash/poraca-explorador --body-file guardian/out/report.md
+        run: gh issue comment 4 --repo diegomontenegroext-hash/poraca-explorador --body-file guardian/out/digest.md
       - name: Correo directo mensual (si hay proveedor configurado)
         if: always() && vars.GUARDIAN_MAIL_MODE == 'resend' && hashFiles('guardian/out/report.json') != ''
         env:
