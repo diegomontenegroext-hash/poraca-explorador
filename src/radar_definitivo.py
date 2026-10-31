@@ -26,6 +26,7 @@ from radar_parallel import (
 )
 from radar_agenda_adapters import extract_listings, special_links, tidy
 from radar_adaptive_discovery import discover_sections
+from radar_adaptive_cadence import cadence_hours as adaptive_cadence_hours
 from radar_evidence_quality import summarize as summarize_evidence_quality
 from radar_gate_alias_preflight import SQL as SHADOW_ALIAS_SQL, summarize as summarize_aliases
 from radar_function_gate_review import query as function_review_sql, summarize as summarize_function_review
@@ -826,8 +827,16 @@ def save_source_result(conn,run_id,source,check,candidates):
            (run_id,source["source_id"],check["http_status"],
             check["status"],check["details_opened"],check["links_found"],check["error_type"]))
         fail=source["consecutive_failures"]+1 if check["status"]=="failed" else 0
-        cadence=(min(12,source["cadence_hours"]) if check["status"]=="index_only" else
-                 source["cadence_hours"] if not fail else min(48,2**min(5,fail)))
+        statuses=[]
+        if check["status"]=="index_only":
+            # Se consulta SOLO el histórico del source, con el check actual
+            # ya insertado. No se modifica el modo de monitoreo.
+            cur.execute("""SELECT status FROM radar_definitivo.source_checks
+                           WHERE source_id=%s ORDER BY checked_at DESC LIMIT 7""",
+                        (source["source_id"],))
+            statuses=[row[0] for row in cur.fetchall()]
+        cadence=adaptive_cadence_hours(
+            source["cadence_hours"],statuses,check["status"],fail)
         if not check.get("_seed_only"):
             cur.execute("""UPDATE radar_definitivo.sources
                SET last_checked_at=now(),last_status=%s,

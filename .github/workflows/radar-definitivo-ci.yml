@@ -2,6 +2,8 @@ name: Por Aca - QA Radar Definitivo
 on:
   push:
     paths:
+      - 'src/radar_adaptive_cadence.py'
+      - 'tests/test_radar_adaptive_cadence.py'
       - 'src/radar_adaptive_discovery.py'
       - 'tests/test_radar_adaptive_discovery.py'
       - 'src/radar_adaptive_shadow.py'
