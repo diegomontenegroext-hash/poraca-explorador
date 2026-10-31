@@ -116,7 +116,9 @@ def structured_sessions(raw,url):
     host=scope(url)[0]
     tier=("secondary_agenda" if host in (
           "agendalaplata.ar","www.agendalaplata.ar",
-          "alpedo.ar","www.alpedo.ar") else "primary_structured_page")
+          "alpedo.ar","www.alpedo.ar") else
+          "primary_structured_page" if host in SCOPED_HOSTS else
+          "structured_origin_unverified")
     out=[]
     scripts=re.findall(r"<script\b(?=[^>]*\btype\s*=\s*['\"]application/ld\+json['\"])[^>]*>(.*?)</script\s*>",
                        raw[:700_000],re.I|re.S)
@@ -691,7 +693,10 @@ def extract_listings(raw,url):
         return out
     host,path=scope(url)
     if host not in SCOPED_HOSTS:
-        return []
+        # Se aceptan sólo fechas explícitas de JSON-LD Event. El origen de
+        # un dominio nuevo NO se considera primario ni se autoaprueba.
+        return (structured_sessions(raw,url)[:100]
+                if urlsplit(url).scheme=="https" and host else [])
     blocks=visible_blocks(raw)
     out=structured_sessions(raw,url)
     out.extend(source_specific_sessions(raw,url,blocks))

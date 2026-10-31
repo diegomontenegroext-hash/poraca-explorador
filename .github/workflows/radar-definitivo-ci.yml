@@ -2,6 +2,8 @@ name: Por Aca - QA Radar Definitivo
 on:
   push:
     paths:
+      - 'src/radar_adaptive_discovery.py'
+      - 'tests/test_radar_adaptive_discovery.py'
       - 'src/radar_adaptive_shadow.py'
       - 'tests/test_radar_adaptive_shadow.py'
       - 'sql/20261031_radar_adaptive_shadow_readonly_v1.sql'
