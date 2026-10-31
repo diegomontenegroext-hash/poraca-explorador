@@ -10,6 +10,8 @@ on:
       - 'tests/test_radar_adaptive_shadow.py'
       - 'sql/20261031_radar_adaptive_shadow_readonly_v1.sql'
       - 'src/radar_definitivo.py'
+      - 'src/radar_end_to_end.py'
+      - 'tests/test_radar_end_to_end.py'
       - 'src/radar_category_pulse.py'
       - 'src/radar_funnel_metrics.py'
       - 'tests/test_radar_funnel_metrics.py'
