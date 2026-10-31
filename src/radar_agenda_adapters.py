@@ -954,26 +954,27 @@ def special_links(url,page,at=None):
                 # oficial, nunca construir un slug desde el título.
                 normalized="https://"+p.hostname+p.path.rstrip("/")
                 tickets.setdefault(normalized,(normalized,"detalle oficial"))
-        page_link=([filtered_root] if filtered_root else [])
-        if discovered:
-            page_link.append(discovered[min(discovered)])
+        # La portada simple puede llevar a la cartelera filtrada *o* a
+        # paginación; abrir ambas desperdicia un slot de los mismos límites
+        # FULL/INCREMENTAL. Si existe la URL filtrada original, es preferente.
+        page_link=([filtered_root] if filtered_root else
+                   [discovered[min(discovered)]] if discovered else [])
         if not page_link and tickets:
-            # El original devuelve HTTP200 en /1/ pero no siempre ofrece
-            # 'Siguiente'. Una apertura adicional sólo si hay fichas
-            # /entrada/ en la portada (no generar paginación sin señal).
+            # Paginación real documentada, sólo si la portada enlaza fichas.
             page_link=[("https://"+host+"/entradas/cartelera/1/",
                         "cartelera oficial verificada, pagina 1")]
-        ordered=list(tickets.values())   # Orden de cartelera, fechas próximas.
+        ordered=list(tickets.values())
         slots=max(0,6-len(page_link))
-        fixed=ordered[:min(2,slots)]
-        later=ordered[len(fixed):]
-        chosen=list(page_link)+fixed
-        if later and len(chosen)<6:
-            now=at or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
-            offset=(now.date().toordinal()*3+now.hour//8)%len(later)
-            chosen.extend(later[(offset+i)%len(later)]
-                          for i in range(min(6-len(chosen),len(later))))
-        return chosen[:6]
+        if len(ordered)<=slots:
+            return (page_link+ordered)[:6]
+        # NO fijar siempre las dos primeras entradas: en una cartelera larga
+        # quedan vencidas y consumen 2/3 aperturas de la incremental.
+        # Ventanas de 8 horas alternan los enlaces oficiales existentes;
+        # no inventar rutas, no ampliar presupuesto ni crear otro cron.
+        now=at or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
+        offset=(now.date().toordinal()*5+(now.hour//8)*3)%len(ordered)
+        rotated=ordered[offset:]+ordered[:offset]
+        return (page_link+rotated[:slots])[:6]
     if host in ("casametro.com.ar","www.casametro.com.ar") and (
             path in ("/","/cartelera/","/categoria-producto/casa-metro/")):
         # casa_metro_dated_links_rotating: the original category is ordered
