@@ -99,7 +99,6 @@ def calculate(run,rows,checks,snapshot):
             cross_venue.add(norm_venue)
     by=[]
     summary=blank_counts()
-    duplicate_global=set()
     published_global=set()
     for rubro in sorted(grouped):
         facts=grouped[rubro]
@@ -125,7 +124,7 @@ def calculate(run,rows,checks,snapshot):
                 # suspected duplicate, never automatically a merge approval.
                 collision=(norm_title,str(day),clock,norm_venue)
                 collisions[collision]+=1
-                duplicate_global.add((collision,key))
+
         counts["matchedPublished"]=len(pubs)
         counts["possibleDuplicates"]=sum(n-1 for n in collisions.values() if n>1)
         counts["venueNamesMentioned"]=len(unique_venues[rubro])
@@ -140,7 +139,7 @@ def calculate(run,rows,checks,snapshot):
     collisions=Counter()
     for facts in grouped.values():
         for row in facts:
-            norm_title,norm_venue=row[10],row[11]
+            norm_title,norm_venue=row[9],row[10]
             if norm_title and norm_venue and row[4]:
                 collisions[(norm_title,str(row[3]),row[4],norm_venue)]+=1
     summary["possibleDuplicates"]=sum(n-1 for n in collisions.values() if n>1)
@@ -172,7 +171,7 @@ def calculate(run,rows,checks,snapshot):
         "autoPublished":False}
     if summary["distinctDetected"]!=summary["new"]+summary["seenAgain"]:
         raise ValueError("FUNNEL_RUN_PARTITION_INVARIANT")
-    if summary["pendingEditorial"]+summary["matchedPublished"]>summary["distinctDetected"]+len(published_global):
+    if summary["pendingEditorial"]+summary["matchedPublished"]>summary["distinctDetected"]:
         raise ValueError("FUNNEL_PUBLICATION_INVARIANT")
     return report
 
