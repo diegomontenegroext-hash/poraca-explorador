@@ -1,8 +1,8 @@
-name: Atlas Guardian · piloto público (solo lectura)
+name: Atlas Guardian · mantenimiento mensual read-only
 on:
   push:
     branches:
-      - ops/guardian-babasonicos-piloto
+      - main
     paths:
       - guardian/**
       - .github/workflows/atlas-guardian-pilot.yml
@@ -44,6 +44,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh issue comment 4 --repo diegomontenegroext-hash/poraca-explorador --body-file guardian/out/report.md
+      - name: Correo directo mensual (si hay proveedor configurado)
+        if: always() && vars.GUARDIAN_MAIL_MODE == 'resend' && hashFiles('guardian/out/report.json') != ''
+        env:
+          GUARDIAN_RESEND_API_KEY: ${{ secrets.GUARDIAN_RESEND_API_KEY }}
+          GUARDIAN_MAIL_FROM: ${{ vars.GUARDIAN_MAIL_FROM }}
+          GUARDIAN_MAIL_TO: ${{ secrets.GUARDIAN_MAIL_TO }}
+        run: node guardian/send-email.mjs
+      - name: Latido externo (si hay watchdog configurado)
+        if: always() && vars.GUARDIAN_WATCHDOG_ENABLED == 'true' && steps.audit.outcome == 'success' && steps.browser.outcome == 'success'
+        env:
+          HEALTHCHECK_URL: ${{ secrets.GUARDIAN_HEALTHCHECK_URL }}
+        run: |
+          test -n "$HEALTHCHECK_URL"
+          curl -fsS --max-time 15 -X POST "$HEALTHCHECK_URL" -d "Atlas Guardian run $GITHUB_RUN_ID completed"
       - name: Conservar evidencia íntegra
         if: always()
         uses: actions/upload-artifact@v4
