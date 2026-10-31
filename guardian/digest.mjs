@@ -1,4 +1,5 @@
 import {readFile,writeFile} from "node:fs/promises";
+import {cycleMarker} from "./monthly.mjs";
 const folder=new URL("./out/",import.meta.url);
 const report=JSON.parse(await readFile(new URL("report.json",folder),"utf8"));
 if(!report.verdict||!Array.isArray(report.sites))throw new Error("Guardian report schema incomplete");
@@ -15,9 +16,11 @@ for(const site of report.sites){
  const blockedExternal=site.externalLinks?.blocked||0;
  const changes=[];
  for(const item of brokenExternal.slice(0,2))changes.push("Corregir o reemplazar enlace externo que devuelve "+(item.http||"error")+": "+item.url);
- if(images.broken)changes.push("Revisar "+images.broken+" imágenes con fallos de carga.");
+ if(images.broken){const img=(site.incidents?.images||[]).filter(x=>x.state==="ROTO").slice(0,3).map(x=>x.url);changes.push("Revisar "+images.broken+" imágenes rotas"+(img.length?": "+img.join(", "):"")+".");}
  if(images.blocked)changes.push("Revalidar "+images.blocked+" imágenes que no pudieron comprobarse.");
  const candidates=site.editorial?.candidates?.length||0;
+ const urgent=(site.editorial?.candidates||[]).filter(x=>x.signal?.level==="URGENTE_VERIFICAR");
+ if(urgent.length)changes.unshift("ALERTA POTENCIAL, AÚN NO CONFIRMADA: "+urgent.slice(0,2).map(x=>x.title).join("; ")+". Contrastar con comunicado oficial y prensa antes de afirmar el hecho.");
  if(candidates)changes.push("Filtrar "+candidates+" titulares candidatos y decidir si justifican actualización editorial (sin incorporar automáticamente).");
  if(blockedExternal)changes.push("Reintentar "+blockedExternal+" enlaces externos inconclusos; no contarlos como rotos.");
  if(!changes.length)changes.push("Sin acciones correctivas detectadas.");
@@ -27,5 +30,6 @@ for(const site of report.sites){
 }
 lines.push("Sin ediciones ni despliegues automáticos.");
 if(runUrl)lines.push("[Ver informe completo y evidencia de la ejecución]("+runUrl+")");
+if(process.env.GITHUB_EVENT_NAME==="schedule")lines.unshift(cycleMarker(report.date.slice(0,7)));
 await writeFile(new URL("digest.md",folder),lines.join("\n")+"\n");
 console.log("GUARDIAN_DIGEST_CREATED "+report.verdict);

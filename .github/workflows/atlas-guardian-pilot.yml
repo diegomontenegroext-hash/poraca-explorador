@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "17 12 3 * *"
+    - cron: "47 12 4 * *"
 permissions:
   contents: read
   issues: write
@@ -25,44 +26,55 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Comprobar si ya se informó el mes (reintento día 4)
+        id: cycle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node guardian/monthly-gate.mjs
       - name: Tests de regresión de inventario
+        if: steps.cycle.outputs.audit == 'true'
         run: node --test guardian/tests/*.test.mjs
       - name: Instalar navegador solo en este runner
+        if: steps.cycle.outputs.audit == 'true'
         run: |
           npm install --prefix ./guardian --no-package-lock --no-save --ignore-scripts playwright@1.56.1
           npx --prefix guardian playwright install --with-deps chromium
       - name: Probar recorridos con Chromium
+        if: steps.cycle.outputs.audit == 'true'
         id: browser
         continue-on-error: true
         run: node guardian/browser.mjs
       - name: Comprobar producción, corpus, medios y fuentes
+        if: steps.cycle.outputs.audit == 'true'
         id: audit
         continue-on-error: true
         run: node guardian/runner.mjs
       - name: Generar aviso breve y acciones
-        if: always() && hashFiles('guardian/out/report.json') != ''
+        if: steps.cycle.outputs.audit == 'true'
+        if: always() && steps.cycle.outputs.audit == 'true' && hashFiles('guardian/out/report.json') != ''
         run: node guardian/digest.mjs
       - name: Registrar informe verificable en Guardian #4
-        if: always() && github.ref == 'refs/heads/main' && hashFiles('guardian/out/digest.md') != ''
+        if: always() && steps.cycle.outputs.audit == 'true' && github.event_name != 'push' && hashFiles('guardian/out/digest.md') != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh issue comment 4 --repo diegomontenegroext-hash/poraca-explorador --body-file guardian/out/digest.md
       - name: Correo directo mensual (si hay proveedor configurado)
-        if: always() && vars.GUARDIAN_MAIL_MODE == 'resend' && hashFiles('guardian/out/report.json') != ''
+        if: always() && steps.cycle.outputs.audit == 'true' && github.event_name == 'schedule' && vars.GUARDIAN_MAIL_MODE == 'resend' && hashFiles('guardian/out/report.json') != ''
         env:
           GUARDIAN_RESEND_API_KEY: ${{ secrets.GUARDIAN_RESEND_API_KEY }}
           GUARDIAN_MAIL_FROM: ${{ vars.GUARDIAN_MAIL_FROM }}
           GUARDIAN_MAIL_TO: ${{ secrets.GUARDIAN_MAIL_TO }}
         run: node guardian/send-email.mjs
       - name: Latido externo (si hay watchdog configurado)
-        if: always() && vars.GUARDIAN_WATCHDOG_ENABLED == 'true' && steps.audit.outcome == 'success' && steps.browser.outcome == 'success'
+        if: always() && steps.cycle.outputs.audit == 'true' && vars.GUARDIAN_WATCHDOG_ENABLED == 'true' && steps.audit.outcome == 'success' && steps.browser.outcome == 'success'
         env:
           HEALTHCHECK_URL: ${{ secrets.GUARDIAN_HEALTHCHECK_URL }}
         run: |
           test -n "$HEALTHCHECK_URL"
           curl -fsS --max-time 15 -X POST "$HEALTHCHECK_URL" -d "Atlas Guardian run $GITHUB_RUN_ID completed"
       - name: Conservar evidencia íntegra
-        if: always()
+        if: steps.cycle.outputs.audit == 'true'
+        if: always() && steps.cycle.outputs.audit == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: atlas-guardian-pilot-evidence
@@ -70,7 +82,8 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
       - name: Calificar sin falsos verdes
-        if: always()
+        if: steps.cycle.outputs.audit == 'true'
+        if: always() && steps.cycle.outputs.audit == 'true'
         run: |
           test "${{ steps.browser.outcome }}" = success
           test "${{ steps.audit.outcome }}" = success
