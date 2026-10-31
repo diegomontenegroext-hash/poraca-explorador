@@ -1,0 +1,6 @@
+# Por Acá — verificación puntual E2E de solo lectura
+# No altera Radar, no modifica agenda ni Neon, no crea nuevas tareas.
+# El workflow existente detecta este archivo y usa verify_only.
+verification_id=20261031-integridad-canonic-replay-01
+expected_result=P0_FAIL_IF_ORPHANS_PRESENT
+trigger_reason=prove_e2e_gate_independently_of_acquisition
