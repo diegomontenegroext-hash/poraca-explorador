@@ -1,6 +1,7 @@
 # POR ACA - RADAR DEFINITIVO
-# Disparo por Guardia GPT - orquestador principal.
+# Disparo manual excepcional pedido por usuario: QA de origen Freezer + Teatro Metro
+# Conservar cron ChatGPT 05/13/21 intacto; sin publicacion de candidatos.
 trigger_date=2026-10-30
-trigger_slot=21
-trigger_mode=incremental
-trigger_reason=gpt_primary_scheduler
+trigger_slot=bootstrap
+trigger_mode=full
+trigger_reason=user_authorized_single_manual_full_freezer_metro_20261030
