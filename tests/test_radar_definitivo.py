@@ -112,6 +112,33 @@ class RadarDefinitivoTests(unittest.TestCase):
         self.assertNotIn("next_due_at<=now()",cursor.queries[1])
         self.assertIn("NULLS FIRST",cursor.queries[1])
 
+    def test_metro_homepage_exact_two_new_originals_before_old_rechecks(self):
+        root="https://www.teatrometrolp.com.ar/"
+        prefix=root+"entrada/"
+        old=[prefix+"old-"+str(i) for i in range(9)]
+        new=[prefix+"las-hijas-100958",prefix+"las-hijas-101000"]
+        # The live official home mixes visited older tickets with newly
+        # discovered separate session permalinks. Priority must not be
+        # swallowed by a fixed first-six carousel nor repeat stale links.
+        html="<html>"+ "".join(
+            '<a href="'+u+'">ver más info</a>' for u in
+            old[:5]+new+old[5:])+"</html>"
+        pages={root:(200,html,None)}
+        for u in old+new:
+            pages[u]=(200,'<h1>Entrada oficial de teatro</h1>',None)
+        source=dict(source_id="rd-web-099596cd",url=root,
+                    known_primary_details=old)
+        check,candidates=rd.scan_source(source,FakeBudget(pages),"incremental")
+        opened=[c["original_url"] for c in candidates]
+        self.assertEqual(opened[:2],new)
+        self.assertEqual(check["details_opened"],4)
+        self.assertGreaterEqual(check["links_found"],11)
+        self.assertEqual(len(opened),4)
+        self.assertTrue(any(u in old for u in opened[2:]),
+                        "Reserve one recheck for drift and cancellations")
+        self.assertTrue(all(u.startswith(prefix) for u in opened))
+        self.assertNotIn("approved",str(candidates).lower())
+
     def test_gap_aware_official_detail_budget_preserves_rechecks(self):
         base="https://www.teatrometrolp.com.ar/entrada/"
         links=[(base+"old-"+str(i),"detalle oficial") for i in range(6)]
