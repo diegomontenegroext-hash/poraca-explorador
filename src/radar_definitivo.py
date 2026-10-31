@@ -419,7 +419,13 @@ def scan_source(source,budget,mode):
     if not (urlparse(root).hostname in ("www.eldia.com","eldia.com")
             and urlparse(root).path.rstrip("/") in ("/ttags/espectaculos","/espectaculos")):
         links+=links_from_page(body,page,root)
-    links=list(dict(((u,lab),None) for u,lab in links).keys())
+    # Exact URL-level dedupe: special_links and generic discovery can
+    # return the same original with different labels. Preserve first/official
+    # priority so one document cannot consume multiple detail slots.
+    unique_links={}
+    for u,lab in links:
+        unique_links.setdefault(u,lab)
+    links=list(unique_links.items())
     check["links_found"]=len(links)
     if not links and not check["_listings"]:
         check["status"]="index_only"
