@@ -4,6 +4,7 @@ import json, os, sys, unicodedata
 from pathlib import Path
 from radar_funnel_metrics import read as read_run_funnel, persist as persist_run_funnel
 from radar_end_to_end import SQL as END_TO_END_SQL, assess as assess_end_to_end
+from radar_source_learning import SQL as SOURCE_LEARNING_SQL, summarize as summarize_source_learning
 
 SCHEMA="poraca-radar-category-pulse-v1"
 LABELS={"teatro":"Teatro","musica":"Música","cine":"Cine","artes":"Artes y exposiciones",
@@ -173,11 +174,14 @@ def fetch(url):
                 # Lectura de salud real de la cadena; no dispara Motor/API/SSO.
                 cur.execute(END_TO_END_SQL)
                 end_to_end=assess_end_to_end(cur.fetchone())
+                cur.execute(SOURCE_LEARNING_SQL)
+                source_learning=summarize_source_learning(cur.fetchall())
     report=summarize(canonical,observations,today)
     report["sourceModesPreviousCheck"]=source_mode_counts(source_rows)
     report["editorialReviewQueue"]=review_queue(candidate_rows)
     report["runFunnel"]=run_funnel
     report["endToEnd"]=end_to_end
+    report["sourceLearning"]=source_learning
     return report
 
 def main():
@@ -230,6 +234,23 @@ def main():
                 for item in sy["topContributors"][:6]:
                     out.write("- {}: {} registros nuevos, {} detectados\n".format(
                         safe_cell(item["name"]),item["new"],item["detected"]))
+                learning=report["sourceLearning"]
+                out.write("\n## Aprendizaje por fuente: visita, extracción y recuperación\n\n")
+                out.write("Fuentes medidas: **{}** · con alguna sesión fechada reciente: **{}**. "
+                    "Son señales técnicas, no aprobaciones ni cambio automático de prioridad.\n\n".format(
+                        learning["sourceCount"],learning["sourcesWithRecentDatedSessions"]))
+                out.write("| Diagnóstico | Fuentes |\n|---|---:|\n")
+                for diagnosis,n in sorted(learning["diagnosisCounts"].items()):
+                    out.write("| {} | {} |\n".format(safe_cell(diagnosis),n))
+                out.write("\n**Fuentes que requieren otra estrategia o revisión del canal:**\n\n")
+                for item in learning["priorityReview"]:
+                    out.write("- {}: {} visitas 7d, {} HTTP OK sin funciones, "
+                              "{} sesiones detectadas en los últimos 7d; **{}**.\n".format(
+                        safe_cell(item["sourceName"]),item["checks7d"],
+                        item["httpOkWithoutSessions7d"],
+                        item["observedSessions7d"],safe_cell(item["diagnosis"])))
+                out.write("\nUna fuente sin funciones fechadas puede tener valor como "
+                          "entidad o actividades permanentes. No se reordena ni elimina.\n")
                 e=report["endToEnd"]
                 out.write("\n## Cadena punta a punta: semáforo de datos (solo lectura)\n\n")
                 out.write("**{}** · siguiente puerta a verificar: **{}** · Radar {} de {} fuentes.\n\n".format(
