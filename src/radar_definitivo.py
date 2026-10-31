@@ -378,14 +378,21 @@ def prioritize_unseen_official_details(links, known, limit):
     Pure, budget-neutral and deterministic given rotated links; not a trust
     classifier or editorial approval. Only called for validated Metro roots.
     """
-    known_set=set(known)
+    def identity(url):
+        p=urlparse(url)
+        if p.scheme=="https" and p.hostname in (
+                "teatrometrolp.com.ar","www.teatrometrolp.com.ar"
+            ) and p.path.startswith("/entrada/") and not p.query:
+            return "https://www.teatrometrolp.com.ar"+p.path.rstrip("/")
+        return url
+    known_set={identity(url) for url in known}
     is_detail=lambda link: urlparse(link[0]).path.startswith("/entrada/")
-    unseen=[link for link in links if is_detail(link) and link[0] not in known_set]
+    unseen=[link for link in links if is_detail(link) and identity(link[0]) not in known_set]
     rechecks=[link for link in links if link not in unseen]
     if not unseen:
         return links
     # Reserve one slot for drift / cancellations when a known ticket exists.
-    has_known=any(is_detail(item) and item[0] in known_set for item in rechecks)
+    has_known=any(is_detail(item) and identity(item[0]) in known_set for item in rechecks)
     n=max(0,limit-1) if has_known and limit>1 else limit
     selected=unseen[:n]
     remainder=[link for link in rechecks if link not in selected]
