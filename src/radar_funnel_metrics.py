@@ -51,6 +51,21 @@ CHECKS_SQL="""
 SELECT status,count(*)::int FROM radar_definitivo.source_checks
 WHERE run_id=%s GROUP BY status
 """
+# One read-only, run-scoped source yield snapshot. No new collection.
+SOURCE_YIELD_SQL="""
+SELECT s.source_id,s.name,s.url,coalesce(nullif(s.circuit,''),'unclassified') AS circuit,
+ s.source_role,s.priority,c.status,c.http_status,c.details_opened,
+ c.links_found,c.error_type,count(l.listing_key)::int AS detected,
+ count(l.listing_key) FILTER (WHERE l.first_run_id=%s)::int AS new_entries
+FROM radar_definitivo.source_checks c
+JOIN radar_definitivo.sources s ON s.source_id=c.source_id
+LEFT JOIN radar_definitivo.listing_occurrences l
+ ON l.source_id=c.source_id AND l.last_run_id=c.run_id
+WHERE c.run_id=%s
+GROUP BY s.source_id,s.name,s.url,s.circuit,s.source_role,s.priority,
+ c.status,c.http_status,c.details_opened,c.links_found,c.error_type
+ORDER BY s.priority DESC,s.name,s.source_id
+"""
 SNAPSHOT_SQL="""
 SELECT
  (SELECT count(*)::int FROM public.radar_agenda_events
@@ -83,7 +98,58 @@ def blank_counts():
         completePrimaryEvidence=0,matchedPublished=0,
         venueNamesMentioned=0,missingTime=0,missingVenue=0)
 
-def calculate(run,rows,checks,snapshot):
+def source_yield(source_rows):
+    """Readback of check outcomes, not proof of why a source lacks events.
+
+    A 200 + index_only is a retrieval success and an acquisition gap;
+    it does NOT establish an empty agenda, a JS bug, or a stale venue.
+    """
+    checked=Counter()
+    productive=[]
+    review=[]
+    touched=0
+    newly=0
+    for source in source_rows:
+        (source_id,name,url,circuit,role,priority,status,http,
+         details,links,error,detected,new)=source
+        detected=asint(detected)
+        new=asint(new)
+        touched+=detected
+        newly+=new
+        checked[str(status or "unknown")]+=1
+        item={"sourceId":source_id,"name":name,"url":url,
+              "sourceCircuit":category(circuit),"sourceRole":role,
+              "priority":asint(priority),"status":status,
+              "httpStatus":http,"detailsOpened":asint(details),
+              "linksFound":asint(links),"detected":detected,"new":new}
+        if detected:
+            productive.append(item)
+        if status=="index_only":
+            item["observation"]=("http_ok_no_dated_sessions_extracted"
+                if http==200 else "index_only_no_dated_sessions_extracted")
+            item["suggestedReview"]=("inspect_page_purpose_and_official_event_details"
+                if not details and not links else "inspect_detected_links_and_schedule_parser")
+            review.append(item)
+        elif status in ("failed","rate_limited","skipped_by_budget"):
+            item["observation"]="technical_or_budget_exception"
+            item["suggestedReview"]="inspect_http_error_and_source_cadence"
+            if error:
+                item["errorType"]=str(error)[:80]
+            review.append(item)
+    productive.sort(key=lambda x:(-x["new"],-x["detected"],-x["priority"],x["sourceId"]))
+    review.sort(key=lambda x:(-x["priority"],x["sourceId"]))
+    return {"schema":"poraca-radar-source-yield-v1",
+            "scope":"source_checks and listing_occurrences touched by this run",
+            "selectedChecks":sum(checked.values()),
+            "checkStatusCounts":dict(sorted(checked.items())),
+            "detected":touched,"new":newly,
+            "productiveSources":len(productive),
+            "indexOnlyCount":checked["index_only"],
+            "priorityReview":review[:15],
+            "topContributors":productive[:10],
+            "caution":"source circuit is not event discipline; index_only with HTTP 200 does not identify the root cause; no auto-reclassification or approvals"}
+
+def calculate(run,rows,checks,snapshot,source_rows=()):
     """Only facts TOUCHED by this run, not every old lead in the database."""
     (rid,mode,status,started,ended,selected,checked,
      parsed_total,parsed_new,url_new,url_seen)=run
@@ -169,7 +235,8 @@ def calculate(run,rows,checks,snapshot):
         "cannotClaim":["citywide coverage","automatic editorial validation",
                        "new editorial publications attributed to this Radar run",
                        "deduplication accuracy without manual review"],
-        "autoPublished":False}
+        "autoPublished":False,
+        "sourceYieldV1":source_yield(source_rows)}
     if summary["distinctDetected"]!=summary["new"]+summary["seenAgain"]:
         raise ValueError("FUNNEL_RUN_PARTITION_INVARIANT")
     if summary["pendingEditorial"]+summary["matchedPublished"]>summary["distinctDetected"]:
@@ -186,9 +253,11 @@ def read(cur):
     facts=cur.fetchall()
     cur.execute(CHECKS_SQL,(run_id,))
     checks=dict(cur.fetchall())
+    cur.execute(SOURCE_YIELD_SQL,(run_id,run_id))
+    source_rows=cur.fetchall()
     cur.execute(SNAPSHOT_SQL)
     snapshot=cur.fetchone()
-    return calculate(run,facts,checks,snapshot)
+    return calculate(run,facts,checks,snapshot,source_rows)
 
 def persist(database_url,report):
     """One read-to-write handoff, bounded to a completed run.summary JSON key."""

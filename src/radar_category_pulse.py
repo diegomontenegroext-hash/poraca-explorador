@@ -203,6 +203,28 @@ def main():
                     out.write("| {label} | {distinctDetected} | {new} | {seenAgain} | {possibleDuplicates} | {pendingEditorial} | {completePrimaryEvidence} | {matchedPublished} | {venueNamesMentioned} |\n".format(
                         **{**row,"label":safe_cell(row["label"])}))
                 out.write("\n**Interpretación:** «revisitada» NO significa duplicada; «original completo» NO significa aprobada; «ya publicada» exige enlace comprobado al catálogo y NO es publicación nueva causada por Radar. Los lugares son nombres mencionados, no fichas nuevas aprobadas. Las detecciones sin circuito quedan «Sin clasificar».\n")
+                # Run-scoped source yield: explain index_only without mistaking
+                # HTTP 200 for extracted event sessions or changing source roles.
+                sy=funnel["sourceYieldV1"]
+                out.write("\n### Fuentes: rendimiento y cola de revisión (solo lectura)\n\n")
+                out.write("Fuentes con funciones detectadas: **{}** · con índice sin función: **{}**. "
+                    "Registros tocados: **{}**, nuevos: **{}**.\n\n".format(
+                        sy["productiveSources"],sy["indexOnlyCount"],
+                        sy["detected"],sy["new"]))
+                out.write("| Fuente | Circuito de origen | Estado | HTTP | Funciones detectadas | Nuevas | Revisión sugerida |\n")
+                out.write("|---|---|---|---:|---:|---:|---|\n")
+                for item in sy["priorityReview"]:
+                    out.write("| {} | {} | {} | {} | {} | {} | {} |\n".format(
+                        safe_cell(item["name"]),safe_cell(item["sourceCircuit"]),
+                        safe_cell(item["status"]),safe_cell(item["httpStatus"]),
+                        item["detected"],item["new"],
+                        safe_cell(item["suggestedReview"])))
+                out.write("\nLa causa es una **hipótesis de revisión**, no un diagnóstico de JS/agenda vacía. "
+                          "No se reclasifican fuentes ni se publican eventos.\n")
+                out.write("\n#### Fuentes que más contribuyeron\n\n")
+                for item in sy["topContributors"][:6]:
+                    out.write("- {}: {} registros nuevos, {} detectados\n".format(
+                        safe_cell(item["name"]),item["new"],item["detected"]))
                 out.write("\n## Por Acá: evolución por disciplina (lectura)\n\n")
                 out.write("Canónicos: **{}** · próximos confirmados ≤15 días: **{}** · observaciones pendientes ≤46 días: **{}**.\n\n".format(
                     report["totalCanonical"],report["totalConfirmedNext15"],report["totalPendingObservations46"]))
