@@ -13,6 +13,7 @@ import html
 import re
 from urllib.parse import urlsplit, parse_qs
 from radar_parallel import iso_event_fields
+from radar_ical_agenda import FEED_URL as OFFICIAL_ICS_FEED_URL, calendar_sessions
 
 MONTHS={"enero":1,"febrero":2,"marzo":3,"abril":4,"mayo":5,"junio":6,
         "julio":7,"agosto":8,"septiembre":9,"setiembre":9,"octubre":10,
@@ -677,6 +678,15 @@ def el_dia_editorial_agenda(raw, url, blocks=None, at=None):
 
 def extract_listings(raw,url):
     """Returns individual session observations; never returns verified status."""
+    if url == OFFICIAL_ICS_FEED_URL:
+        # A calendar record has its own UID, local ART day/time, venue and
+        # organizer day permalink. No automatic approval or recurrence inference.
+        out=[]
+        for title,day,clock,venue,proof in calendar_sessions(raw,url):
+            record=make_record(title,day,clock,venue,proof,
+                               "official_ics_explicit_session","primary_program_ics")
+            if record:out.append(record)
+        return out
     host,path=scope(url)
     if host not in SCOPED_HOSTS:
         return []
