@@ -7,3 +7,6 @@ trigger_reason=prove_e2e_gate_independently_of_acquisition
 
 # Segundo intento: diff-tree con fetch-depth=2 validado por diseño (no toca trigger programado).
 verification_attempt=02
+
+# Read-only validation using minimal scoped SELECTs, after successful unit/CI checks.
+verification_attempt=03
