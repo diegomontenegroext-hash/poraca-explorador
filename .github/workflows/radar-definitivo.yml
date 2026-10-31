@@ -37,6 +37,9 @@ jobs:
     steps:
       - name: Obtener codigo
         uses: actions/checkout@v4
+        with:
+          # Dos commits permiten identificar el archivo modificado sin adivinar.
+          fetch-depth: 2
       - name: Resolver alcance e identidad del disparo
         id: alcance
         env:
