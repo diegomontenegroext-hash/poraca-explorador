@@ -5,6 +5,7 @@ from pathlib import Path
 from radar_funnel_metrics import read as read_run_funnel, persist as persist_run_funnel
 from radar_end_to_end import SQL as END_TO_END_SQL, assess as assess_end_to_end
 from radar_source_learning import SQL as SOURCE_LEARNING_SQL, summarize as summarize_source_learning
+from radar_editorial_preview import SQL as EDITORIAL_PREVIEW_SQL, summarize as summarize_editorial_preview
 
 SCHEMA="poraca-radar-category-pulse-v1"
 LABELS={"teatro":"Teatro","musica":"Música","cine":"Cine","artes":"Artes y exposiciones",
@@ -176,12 +177,15 @@ def fetch(url):
                 end_to_end=assess_end_to_end(cur.fetchone())
                 cur.execute(SOURCE_LEARNING_SQL)
                 source_learning=summarize_source_learning(cur.fetchall())
+                cur.execute(EDITORIAL_PREVIEW_SQL)
+                editorial_preview=summarize_editorial_preview(cur.fetchall())
     report=summarize(canonical,observations,today)
     report["sourceModesPreviousCheck"]=source_mode_counts(source_rows)
     report["editorialReviewQueue"]=review_queue(candidate_rows)
     report["runFunnel"]=run_funnel
     report["endToEnd"]=end_to_end
     report["sourceLearning"]=source_learning
+    report["editorialPreview"]=editorial_preview
     return report
 
 def main():
@@ -251,6 +255,20 @@ def main():
                         item["observedSessions7d"],safe_cell(item["diagnosis"])))
                 out.write("\nUna fuente sin funciones fechadas puede tener valor como "
                           "entidad o actividades permanentes. No se reordena ni elimina.\n")
+                ep=report["editorialPreview"]
+                out.write("\n## Preadmisión desde el nuevo Radar (SIN escritura editorial)\n\n")
+                out.write("Grupos de funciones próximos 21 días: **{}** · revisión de originales: "
+                          "**{}** · variante de sede: **{}** · múltiples URLs: **{}**.\n\n".format(
+                              ep["reviewGroups"],ep["gates"]["REVIEW_ORIGINAL_EVENT"],
+                              ep["gates"]["HOLD_VENUE_IDENTITY_VARIANTS"],
+                              ep["gates"]["REVIEW_MULTIPLE_PROOF_URLS"]))
+                out.write("Los monitores que observan el mismo enlace no constituyen "
+                          "corroboraciones independientes. Ninguna sesión se admite automáticamente.\n\n")
+                for item in ep["sample"][:6]:
+                    out.write("- {} {} · {} · {} · **{}** · {}\n".format(
+                        safe_cell(item["day"][:10]),safe_cell(item["time"]),
+                        safe_cell(item["title"]),safe_cell(item["venue"]),
+                        safe_cell(item["reviewGate"]),safe_cell(item["proofUrl"])))
                 e=report["endToEnd"]
                 out.write("\n## Cadena punta a punta: semáforo de datos (solo lectura)\n\n")
                 out.write("**{}** · siguiente puerta a verificar: **{}** · Radar {} de {} fuentes.\n\n".format(
