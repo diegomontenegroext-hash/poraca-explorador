@@ -59,7 +59,10 @@ WITH labels(source_id,new_circuit) AS (VALUES
  RETURNING s.source_id,s.name,s.circuit
 )
 SELECT (SELECT count(*) FROM changed)::int labelled,
-       (SELECT count(*) FROM radar_definitivo.sources WHERE enabled AND monitoring_mode='fetch' AND circuit IS NULL)::int still_uncategorized,
+       -- PostgreSQL data-modifying CTE has statement-snapshot semantics;
+       -- subtract the RETURNING rows to avoid reporting pre-UPDATE total.
+       ((SELECT count(*) FROM radar_definitivo.sources WHERE enabled AND monitoring_mode='fetch' AND circuit IS NULL)
+        - (SELECT count(*) FROM changed))::int still_uncategorized,
        (SELECT coalesce(jsonb_object_agg(circuit,n),'{}'::jsonb) FROM (
           SELECT circuit,count(*)::int n FROM changed GROUP BY circuit
        ) a) labelled_by_circuit,
