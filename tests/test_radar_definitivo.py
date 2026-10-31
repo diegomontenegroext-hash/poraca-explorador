@@ -112,6 +112,39 @@ class RadarDefinitivoTests(unittest.TestCase):
         self.assertNotIn("next_due_at<=now()",cursor.queries[1])
         self.assertIn("NULLS FIRST",cursor.queries[1])
 
+    def test_gap_aware_official_detail_budget_preserves_rechecks(self):
+        base="https://www.teatrometrolp.com.ar/entrada/"
+        links=[(base+"old-"+str(i),"detalle oficial") for i in range(6)]
+        links+= [(base+"las-hijas-100958","detalle oficial"),
+                 (base+"las-hijas-101000","detalle oficial"),
+                 (base+"la-biblioteca-perdida-100765","detalle oficial"),
+                 (base+"ni-media-palabra.-100920","detalle oficial")]
+        known={base+"old-"+str(i) for i in range(6)}
+        # After the real first incremental the two other shows are also known.
+        known.update({base+"la-biblioteca-perdida-100765",
+                      base+"ni-media-palabra.-100920"})
+        out=rd.prioritize_unseen_official_details(links,known,4)
+        self.assertEqual(len(out),len(links))
+        self.assertEqual([u for u,_ in out[:2]],
+            [base+"las-hijas-100958",base+"las-hijas-101000"])
+        self.assertTrue(any(u in known for u,_ in out[:4]),
+                        "At least one budget slot still rechecks prior originals")
+        self.assertTrue(all(u.startswith(base) for u,_ in out))
+        self.assertEqual(rd.prioritize_unseen_official_details(links,set(),4),links)
+        self.assertEqual(rd.prioritize_unseen_official_details(links,
+                         {u for u,_ in links},4),links)
+
+    def test_gap_priority_is_independent_of_editorial_authorization(self):
+        base="https://www.teatrometrolp.com.ar/entrada/"
+        items=[(base+"new-one","detalle oficial"),(base+"old-one","detalle oficial")]
+        observed=[base+"old-one"]
+        first=rd.prioritize_unseen_official_details(items,observed,2)
+        self.assertEqual(first[0][0],base+"new-one")
+        self.assertEqual(first[1][0],base+"old-one")
+        self.assertEqual(first[0][1],"detalle oficial")
+        # Selection only; it must not mark either event as published/approved.
+        self.assertNotIn("approval",str(first).lower())
+
     def test_discovers_instagram_permalink_from_article_second_level(self):
         source=dict(source_id="s1",url="https://www.0221.com.ar/que-hago",source_role="local_press")
         article="https://www.0221.com.ar/que-hago/teatro-platense-n123/"
