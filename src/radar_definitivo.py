@@ -519,6 +519,10 @@ def scan_source(source,budget,mode):
         print(json.dumps({"source":source["source_id"],"adapter":"alpedo_browser",
             "pages":len(rendered),"secondary_sessions":len(check["_listings"]),
             "error":reason}),flush=True)
+    if urlparse(root).hostname in ("teatrodoblet.com.ar","www.teatrodoblet.com.ar"):
+        before_count=len(check["_listings"])
+        check["_listings"]=prefer_doblet_original_detail(check["_listings"])
+        check["_same_session_index_dropped"]=before_count-len(check["_listings"])
     return check,candidates
 
 
@@ -596,6 +600,30 @@ def entity_for(source_id,name,entity_type,url,origin):
     return dict(entity_key=key, name=label, entity_type=entity_type,
                 profile_url=url,source_id=source_id,evidence={
                     "method":origin,"not_verified":True})
+
+
+def prefer_doblet_original_detail(listings):
+    """For one Doble-T session, prefer individual original over its own index.
+
+    Never merge two individual original URLs, different dates or different
+    clocks, and never dedupe a secondary agenda against the original. A
+    venue-name variant (C. 23 565 vs Espacio Doble-T) is safe here ONLY
+    because the source is the same known official venue and title/time agree.
+    """
+    hostnames={"teatrodoblet.com.ar","www.teatrodoblet.com.ar"}
+    def session(item):
+        return (compact(item.get("title") or "",180).casefold(),
+                item.get("event_date"),item.get("event_time"))
+    details=set()
+    for row in listings:
+        p=urlsplit(row.get("proof_url") or "")
+        if (p.hostname in hostnames and p.path.startswith("/event/")
+            and row.get("event_date") and row.get("event_time")):
+            details.add(session(row))
+    return [row for row in listings if
+       not (row.get("method")=="doblet_official_index_explicit_function"
+           and urlsplit(row.get("proof_url") or "").hostname in hostnames
+           and session(row) in details)]
 
 
 def save_source_result(conn,run_id,source,check,candidates):
