@@ -905,7 +905,8 @@ def special_links(url,page,at=None):
         return [(u, "nota real de agenda semanal El Dia") for _, u in
                 list(dict((u,(stamp,u)) for stamp,u in links).values())[:2]]
     if host in ("teatrometrolp.com.ar","www.teatrometrolp.com.ar") and (
-            path.rstrip("/")=="/entradas/cartelera"):
+            path.rstrip("/")=="/entradas/cartelera"
+            and urlsplit(url).query in ("","mes=&anio=","anio=&mes=")):
         # La cartelera del Teatro Metro tiene a la vez indices paginados
         # y fichas /entrada/<slug>. Antes solo se leía la segunda página:
         # faltaban los originales de funciones próximas y se perdía el
