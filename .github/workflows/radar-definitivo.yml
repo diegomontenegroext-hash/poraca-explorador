@@ -58,6 +58,7 @@ jobs:
           fi
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
       - name: QA local obligatorio
+        id: qa
         run: |
           python3 -m compileall -q src
           python3 -m unittest discover -s tests -v
@@ -76,13 +77,42 @@ jobs:
             exit 1
           fi
       - name: Registrar en Neon operativa
+        id: ingesta
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
           RADAR_REQUIRE_OPERATIONAL: "true"
           RADAR_SCOPE: ${{ steps.alcance.outputs.mode }}
         run: python3 src/radar_definitivo.py --mode "$RADAR_SCOPE"
       - name: Medir renovación por rubro sin admitir eventos
+        id: control
         if: success()
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
         run: python3 src/radar_category_pulse.py
+      - name: Acta de cierre de ejecución, incluso ante fallos
+        if: always()
+        shell: bash
+        env:
+          QA_OUTCOME: ${{ steps.qa.outcome }}
+          INGEST_OUTCOME: ${{ steps.ingesta.outcome }}
+          CONTROL_OUTCOME: ${{ steps.control.outcome }}
+        run: |
+          set -euo pipefail
+          {
+            echo
+            echo "## Acta de cierre Radar (sin inferir contenido editorial)"
+            echo
+            echo "| Puerta | Estado técnico de GitHub |"
+            echo "|---|---|"
+            echo "| Pruebas QA | ${QA_OUTCOME:-unknown} |"
+            echo "| Adquisición / escritura en staging | ${INGEST_OUTCOME:-unknown} |"
+            echo "| Informe fuente, preadmisión y E2E | ${CONTROL_OUTCOME:-unknown} |"
+            echo
+            if [[ "$INGEST_OUTCOME" != "success" ]]; then
+              echo "**INGESTA NO CERTIFICADA**: no atribuir a este run resultados previos."
+            elif [[ "$CONTROL_OUTCOME" != "success" ]]; then
+              echo "**CONTROL NO CERTIFICADO**: ingesta y reporte separados; revisar Neon en SELECT."
+            else
+              echo "Se produjeron los controles. Consultar estado Neon: GitHub success no implica agenda publicada."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -4,7 +4,8 @@ import json, os, sys, unicodedata
 from pathlib import Path
 from radar_funnel_metrics import read as read_run_funnel, persist as persist_run_funnel
 from radar_end_to_end import SQL as END_TO_END_SQL, assess as assess_end_to_end
-from radar_source_learning import SQL as SOURCE_LEARNING_SQL, summarize as summarize_source_learning
+from radar_source_learning import SQL as SOURCE_LEARNING_SQL, summarize as summarize_source_learning, classify as classify_source_learning
+from radar_source_recovery import plan as plan_source_recovery
 from radar_editorial_preview import SQL as EDITORIAL_PREVIEW_SQL, summarize as summarize_editorial_preview
 
 SCHEMA="poraca-radar-category-pulse-v1"
@@ -176,7 +177,10 @@ def fetch(url):
                 cur.execute(END_TO_END_SQL)
                 end_to_end=assess_end_to_end(cur.fetchone())
                 cur.execute(SOURCE_LEARNING_SQL)
-                source_learning=summarize_source_learning(cur.fetchall())
+                learning_rows=cur.fetchall()
+                source_learning=summarize_source_learning(learning_rows)
+                source_recovery=plan_source_recovery([
+                    classify_source_learning(row) for row in learning_rows])
                 cur.execute(EDITORIAL_PREVIEW_SQL)
                 editorial_preview=summarize_editorial_preview(cur.fetchall())
     report=summarize(canonical,observations,today)
@@ -185,6 +189,7 @@ def fetch(url):
     report["runFunnel"]=run_funnel
     report["endToEnd"]=end_to_end
     report["sourceLearning"]=source_learning
+    report["sourceRecovery"]=source_recovery
     report["editorialPreview"]=editorial_preview
     return report
 
@@ -269,6 +274,19 @@ def main():
                         safe_cell(item["day"][:10]),safe_cell(item["time"]),
                         safe_cell(item["title"]),safe_cell(item["venue"]),
                         safe_cell(item["reviewGate"]),safe_cell(item["proofUrl"])))
+                rec=report["sourceRecovery"]
+                out.write("\n## Recuperación de cobertura (hipótesis, no autocuración)\n\n")
+                out.write("Fuentes para investigar: **{}** · sin canales alternativos "
+                          "de cobertura en su mismo circuito: **{}**.\n\n".format(
+                              rec["sourcesNeedingRecovery"],rec["uncoveredCases"]))
+                for item in rec["actions"][:7]:
+                    alts=", ".join(safe_cell(x["name"]) for x in
+                                   item["alternativeCoverageSources"])
+                    out.write("- {} · {} · cobertura alternativa: {} · **{}**\n".format(
+                        safe_cell(item["name"]),safe_cell(item["diagnosis"]),
+                        alts or "ninguna verificada",safe_cell(item["recommendation"])))
+                out.write("\n**Sin cambio de prioridades ni sustitución automática de entidades.** "
+                          "La recuperación deberá probarse contra fuentes originales.\n\n")
                 e=report["endToEnd"]
                 out.write("\n## Cadena punta a punta: semáforo de datos (solo lectura)\n\n")
                 out.write("**{}** · siguiente puerta a verificar: **{}** · Radar {} de {} fuentes.\n\n".format(
