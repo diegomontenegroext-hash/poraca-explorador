@@ -746,14 +746,28 @@ def teatro_cerca_listing_cards(raw, url, at=None):
         try:day=date.fromisoformat(date_raw)
         except ValueError:continue
         if not active_date(day,at):continue
-        detail=attr(element,"data-poster-href")
+        # A real subset of the current index exposes direct original
+        # ticket links in data-link instead of an on-site function slug.
+        # Never manufacture a detail URL from the date or title.
+        detail=attr(element,"data-poster-href") or attr(element,"data-link")
         detail_url=urlsplit(detail)
+        allowed_hosts={
+            "teatrocerca.com.ar","www.teatrocerca.com.ar",
+            "publico.alternativateatral.com",
+            "casametro.com.ar","www.casametro.com.ar",
+            "teatrometrolp.com.ar","www.teatrometrolp.com.ar",
+            "livepass.com.ar","www.livepass.com.ar",
+            "www.plateaunotickets.com","plateaunotickets.com",
+            "www.passline.com","passline.com"
+        }
         if (detail_url.scheme!="https" or
-                (detail_url.hostname or "").lower() not in
-                ("teatrocerca.com.ar","www.teatrocerca.com.ar") or
-                not detail_url.path.startswith("/obra/") or
-                "/funcion/" not in detail_url.path or
-                detail_url.username or detail_url.password or detail_url.port):
+                (detail_url.hostname or "").lower() not in allowed_hosts
+                or detail_url.username or detail_url.password or detail_url.port):
+            continue
+        if ((detail_url.hostname or "").lower() in
+                ("teatrocerca.com.ar","www.teatrocerca.com.ar")
+                and (not detail_url.path.startswith("/obra/") or
+                     "/funcion/" not in detail_url.path)):
             continue
         # Explicit individual date/time in card data, not in path or price.
         rec=make_record(title,day,time_raw[:5],venue,detail,
