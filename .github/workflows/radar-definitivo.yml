@@ -145,6 +145,12 @@ jobs:
             echo "| Verificación L4 tras ingesta (sin escrituras) | ${INTEGRITY_OUTCOME:-unknown} |"
             echo "| Certificación read-only independiente | ${VERIFY_OUTCOME:-unknown} |"
             echo
+            if [[ "$DIRECT_OUTCOME" == "success" ]]; then
+              echo "**LECTURA DIRECTA RADAR → NEON: PASS**, sin aprobación ni escrituras. Esto no cancela el P0 histórico."
+            elif [[ "$DIRECT_OUTCOME" == "failure" ]]; then
+              echo "**LECTURA DIRECTA RADAR → NEON: FAIL**, revisar entrada nueva separada de deudas anteriores."
+            fi
+            echo
             if [[ "$VERIFY_OUTCOME" != "skipped" && "$VERIFY_OUTCOME" != "" ]]; then
               if [[ "$VERIFY_OUTCOME" == "success" ]]; then
                 echo "**INTEGRIDAD DE DATOS CHECK PASS**. HTTP API y web SSO siguen siendo controles distintos."
