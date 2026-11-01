@@ -16,3 +16,6 @@ verification_id=20261031-after-el-animo-repair-26-orphans
 
 # L4 certification of receipts and canonical references after aggregated Neon attestation deploy.
 verification_id=20261031-l4-receipts-integrity-e2e-01
+
+# L4 accepted-relations integrity attestation; verify_only, no Radar ingestion.
+verification_id=20261031-l4-relations-exceptions-01
