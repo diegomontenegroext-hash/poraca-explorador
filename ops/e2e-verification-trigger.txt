@@ -25,3 +25,6 @@ verification_id=20261031-direct-archive-independent-01
 
 # Keyset v2 exhaustive direct Radar certificate, no re-ingestion or canonical writes.
 verification_id=20261031-2305-robust-60-100-200-readonly-v2
+
+# 2026-11-01: verify code-level regressions, protected identity and independent Freezer sentinel; no Radar acquisition.
+verification_id=20261101-f1-regression-no-writes
