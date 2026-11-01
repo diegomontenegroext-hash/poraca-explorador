@@ -2,12 +2,14 @@
 -- No event IDs, domain names, dates or sources hardcoded.
 -- One row per missing event ID across linked observations and accepted graph relations.
 -- Classify evidence, not authorize admission, deletion or silent repair.
+-- Archive only if ALL linked observations are past: prevents a mixed old/future
+-- event identity from being prematurely marked archival.
 WITH obs AS (
  SELECT o.matched_event_key AS event_id,
         count(*)::int AS observation_links,
-        min(o.observed_date) AS first_observed_day,
-        min((o.observed_date::text || ' ' || o.observed_time)::timestamp)
-          FILTER (WHERE o.observed_time ~ '^(?:[01][0-9]|2[0-3]):[0-5][0-9]$') AS first_valid_start,
+        max(o.observed_date) AS last_observed_day,
+        max((o.observed_date::text || ' ' || o.observed_time)::timestamp)
+          FILTER (WHERE o.observed_time ~ '^(?:[01][0-9]|2[0-3]):[0-5][0-9]$') AS last_valid_start,
         count(*) FILTER (WHERE o.observed_time ~ '^(?:[01][0-9]|2[0-3]):[0-5][0-9]$')::int AS timed_observations,
         count(*) FILTER (WHERE o.source_event_url LIKE 'https://%')::int AS original_urls,
         (array_agg(o.observed_title ORDER BY o.observed_date DESC))[1] AS observed_title
@@ -33,7 +35,7 @@ rels AS (
 ),
 ids AS (SELECT event_id FROM obs UNION SELECT event_id FROM rels),
 dated AS (
- SELECT i.event_id,o.observed_title,o.first_observed_day,o.first_valid_start,
+ SELECT i.event_id,o.observed_title,o.last_observed_day,o.last_valid_start,
         coalesce(o.observation_links,0) AS observation_links,
         coalesce(o.timed_observations,0) AS timed_observations,
         coalesce(o.original_urls,0) AS original_urls,
@@ -46,14 +48,14 @@ dated AS (
         r.predicates,(now() AT TIME ZONE 'America/Argentina/Buenos_Aires') AS now_local
  FROM ids i LEFT JOIN obs o USING(event_id) LEFT JOIN rels r USING(event_id)
 )
-SELECT event_id,observed_title,first_observed_day,first_valid_start,
+SELECT event_id,observed_title,last_observed_day,last_valid_start,
        observation_links,timed_observations,original_urls,
        accepted_relations,hosted_at_relations,context_relations,predicates,
        has_approved_venue,has_nonpublic_venue,relation_evidence_urls,
        CASE
          WHEN observation_links=0 THEN 'RESEARCH_RELATION_NO_OBSERVATION'
-         WHEN first_valid_start IS NOT NULL AND first_valid_start<=now_local THEN 'ARCHIVE_ONLY_REVIEW'
-         WHEN first_observed_day<now_local::date THEN 'ARCHIVE_ONLY_REVIEW'
+         WHEN last_observed_day<now_local::date THEN 'ARCHIVE_ONLY_REVIEW'
+         WHEN timed_observations=observation_links AND last_valid_start<=now_local THEN 'ARCHIVE_ONLY_REVIEW'
          WHEN has_nonpublic_venue THEN 'HOLD_INTERNAL_VENUE_REVIEW'
          WHEN timed_observations=0 THEN 'HOLD_MISSING_ORIGINAL_TIME'
          WHEN original_urls=0 THEN 'HOLD_NO_FIRST_PARTY_ORIGINAL'
