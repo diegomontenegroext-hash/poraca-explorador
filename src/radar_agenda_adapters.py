@@ -276,6 +276,55 @@ def alpedo_dated_sessions(raw,url):
     return list({(x["title"],x["event_date"],x["event_time"],x["venue"]):x
                 for x in out}.values())
 
+def centro_arte_unlp_original_session(raw,url):
+    """One dated/clocked original function, never a category, cycle or guess.
+
+    Centro de Arte UNLP's actual original posts print: 'Sábado 17.10.26',
+    '20:00h', 'Auditorio'. Large category pages have historic announcements,
+    so both the exact one-segment post URL and the near-headline field order
+    are mandatory. No upcoming exhibition schedule is synthesized.
+    """
+    parsed=urlsplit(url)
+    host=(parsed.hostname or "").lower()
+    path=parsed.path.lower().rstrip("/")
+    excluded={"/","/calendario-2","/artes-visuales","/artes-escenicas",
+              "/artes-audiovisuales","/musica","/cursos","/informacion-util"}
+    if (parsed.scheme!="https" or host not in
+            ("centrodearte.unlp.edu.ar","www.centrodearte.unlp.edu.ar")
+            or path in excluded or not re.fullmatch(r"/[a-z0-9][a-z0-9-]{3,160}",path)
+            or parsed.query or parsed.fragment or parsed.username or parsed.password
+            or parsed.port not in (None,443)):
+        return []
+    mhead=re.search(r"<h1\b[^>]*>(.*?)</h1\s*>",raw[:240_000],re.I|re.S)
+    if not mhead:return []
+    title=tidy(re.sub(r"<[^>]+>"," ",mhead.group(1)))
+    if len(title)<4:return []
+    # A day/clock/venue trio must appear soon after the actual post headline.
+    # Do not parse footer recommendations or site-wide opening hours.
+    sample=tidy(re.sub(r"<[^>]+>"," ",raw[mhead.end():mhead.end()+2800]))
+    matched=re.search(
+        r"\b(Lunes|Martes|Miércoles|Miercoles|Jueves|Viernes|Sábado|Sabado|Domingo)"
+        r"\s+([0-3]?\d)\.([01]?\d)\.(\d{2})\s+"
+        r"((?:[01]?\d|2[0-3]):[0-5]\d)\s*h\b"
+        r"(?:\s+(Auditorio|Sala\s+[A-Za-z0-9]+))?\b",
+        sample[:850],re.I)
+    if not matched:return []
+    try:
+        day=date(2000+int(matched.group(4)),int(matched.group(3)),int(matched.group(2)))
+    except ValueError:
+        return []
+    weekdays={"lunes":0,"martes":1,"miercoles":2,"miércoles":2,
+              "jueves":3,"viernes":4,"sábado":5,"sabado":5,"domingo":6}
+    if day.weekday()!=weekdays.get(matched.group(1).lower(),-1):
+        return []
+    venue=("Centro de Arte UNLP · "+tidy(matched.group(6))
+           if matched.group(6) else "Centro de Arte UNLP")
+    record=make_record(title,day,matched.group(5).zfill(5),venue,url,
+                       "centro_arte_unlp_official_original_explicit_session",
+                       "primary_venue")
+    return [record] if record else []
+
+
 def source_specific_sessions(raw,url,blocks):
     """Four known official layouts; no extrapolation of recurrences."""
     host,path=scope(url)
@@ -833,6 +882,7 @@ def extract_listings(raw,url):
     out.extend(source_specific_sessions(raw,url,blocks))
     out.extend(el_dia_editorial_agenda(raw,url,blocks))
     out.extend(teatro_cerca_listing_cards(raw,url))
+    out.extend(centro_arte_unlp_original_session(raw,url))
     if "alternativateatral.com" in host and re.match(r"/obra\d+",path):
         title=next((t for tag,t in blocks.headings if tag=="h1"),None)
         if title:
@@ -993,7 +1043,7 @@ def special_links(url,page,at=None):
     # synthesize section URLs or infer dates from pages lacking explicit years.
     institutional_roots={
         "centrodearte.unlp.edu.ar":(
-            "/calendario-2","/artes-visuales","/musica"),
+            "/musica","/artes-escenicas","/artes-visuales","/calendario-2"),
         "casadionisio.com.ar":(
             "/degustaciones","/ferias","/escuela-eas-lp","/expoarte"),
     }
@@ -1016,7 +1066,8 @@ def special_links(url,page,at=None):
                 continue
             target="https://"+p.hostname+p.path
             found.setdefault(key,(target,"seccion institucional original enlazada"))
-        return [found[k] for k in allowed if k in found]
+        selected=[found[k] for k in allowed if k in found]
+        return selected[:3] if bare_host=='centrodearte.unlp.edu.ar' else selected
     if host in ("teatrodoblet.com.ar","www.teatrodoblet.com.ar") and path in ("","/"):
         # Only actual links in the ORIGINAL program; no slugs guessed from
         # titles or dates and no off-host ticketing/tracking URLs.
