@@ -1,63 +1,66 @@
--- POR ACA · P0: 13 canonical identities still missing, independently classified.
--- Snapshot read-only; no automatic reconciliation, deletion or publication.
--- Re-run after the next ordinary Radar to compare actual identities and decisions.
-WITH orphan_ids AS (
+-- POR ACA / P0 / GENERALIZED ORPHAN TRIAGE / READ ONLY
+-- No event IDs, domain names, dates or sources hardcoded.
+-- One row per missing event ID across linked observations and accepted graph relations.
+-- Classify evidence, not authorize admission, deletion or silent repair.
+WITH obs AS (
  SELECT o.matched_event_key AS event_id,
-  min(o.observed_date) AS observed_day,
-  count(*)::int AS observation_links,
-  count(*) FILTER (WHERE o.observed_time ~ '^(?:[01][0-9]|2[0-3]):[0-5][0-9]$')::int AS timed_observations,
-  count(*) FILTER (WHERE o.source_event_url LIKE 'https://%')::int AS original_urls,
-  (array_agg(o.observed_title ORDER BY o.observed_date DESC))[1] AS title,
-  (array_agg(o.observed_venue ORDER BY o.observed_date DESC))[1] AS raw_venue
+        count(*)::int AS observation_links,
+        min(o.observed_date) AS first_observed_day,
+        min((o.observed_date::text || ' ' || o.observed_time)::timestamp)
+          FILTER (WHERE o.observed_time ~ '^(?:[01][0-9]|2[0-3]):[0-5][0-9]$') AS first_valid_start,
+        count(*) FILTER (WHERE o.observed_time ~ '^(?:[01][0-9]|2[0-3]):[0-5][0-9]$')::int AS timed_observations,
+        count(*) FILTER (WHERE o.source_event_url LIKE 'https://%')::int AS original_urls,
+        (array_agg(o.observed_title ORDER BY o.observed_date DESC))[1] AS observed_title
  FROM public.radar_v3_source_observations o
  WHERE o.matched_event_key IS NOT NULL
- AND NOT EXISTS(SELECT 1 FROM public.radar_agenda_events e WHERE e.event_key=o.matched_event_key)
+   AND NOT EXISTS(SELECT 1 FROM public.radar_agenda_events c WHERE c.event_key=o.matched_event_key)
  GROUP BY o.matched_event_key
-), receipt AS (
- SELECT item->>'eventId' AS event_id,count(*)::int AS accepted_receipts
- FROM public.radar_v3_checkpoints c
- CROSS JOIN LATERAL jsonb_array_elements(
-  CASE WHEN jsonb_typeof(c.metrics->'results')='array'
-  THEN c.metrics->'results' ELSE '[]'::jsonb END) item
- WHERE c.stage='cultural_pipeline_v1'
- AND item->>'state'='ACCEPTED_EVENT'
- GROUP BY item->>'eventId'
-), cases AS (
- SELECT o.*,COALESCE(r.accepted_receipts,0) AS accepted_receipts,
-  venues.display_name AS venue_name,
-  venues.entity_id AS venue_entity_id,
-  venues.entity_kind AS venue_entity_kind,
-  venues.editorial_state AS venue_editorial_state,
-  venues.hosted_at_relations,
-  CASE
-   WHEN o.observed_day < (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
-     THEN 'HOLD_HISTORICAL_ARCHIVE_DO_NOT_PUBLISH'
-   WHEN venues.hosted_at_relations=0 OR venues.entity_id IS NULL
-     THEN 'HOLD_UNKNOWN_PARENT_VENUE'
-   WHEN venues.entity_kind <> 'venue'
-     THEN 'HOLD_INSTITUTION_NOT_VENUE'
-   WHEN venues.editorial_state <> 'approved_public'
-     THEN 'HOLD_INTERNAL_ENTITY_REVIEW'
-   WHEN o.timed_observations=0
-     THEN 'HOLD_MISSING_ORIGINAL_TIME'
-   WHEN o.original_urls=0
-     THEN 'HOLD_NO_FIRST_PARTY_ORIGINAL'
-   ELSE 'REVIEW_ORIGINAL_FOR_INDIVIDUAL_ADMISSION'
-  END AS next_gate
- FROM orphan_ids o LEFT JOIN receipt r USING(event_id)
- LEFT JOIN LATERAL (
-  SELECT e.display_name,e.entity_id,e.entity_kind,e.editorial_state,
-         count(*) OVER()::int AS hosted_at_relations
-  FROM public.poraca_knowledge_relations rel
-  JOIN public.poraca_knowledge_entities e ON e.entity_id=rel.object_id
-  WHERE rel.subject_kind='event'
-   AND rel.subject_id=o.event_id AND rel.predicate='hosted_at'
-   AND rel.review_state='accepted'
-  ORDER BY rel.relation_id LIMIT 1
- ) venues ON true
+),
+rels AS (
+ SELECT r.subject_id AS event_id,
+        count(*)::int AS accepted_relations,
+        count(*) FILTER (WHERE r.predicate='hosted_at')::int AS hosted_at_relations,
+        count(*) FILTER (WHERE r.predicate IN ('organized_by','part_of_cycle'))::int AS context_relations,
+        bool_or(e.entity_kind='venue' AND e.editorial_state='approved_public') AS has_approved_venue,
+        bool_or(e.entity_kind='venue' AND e.editorial_state <> 'approved_public') AS has_nonpublic_venue,
+        count(*) FILTER (WHERE r.evidence_url LIKE 'https://%')::int AS relation_evidence_urls,
+        string_agg(DISTINCT r.predicate,', ' ORDER BY r.predicate) AS predicates
+ FROM public.poraca_knowledge_relations r
+ LEFT JOIN public.poraca_knowledge_entities e ON e.entity_id=r.object_id
+ WHERE r.subject_kind='event' AND r.review_state='accepted'
+   AND NOT EXISTS(SELECT 1 FROM public.radar_agenda_events c WHERE c.event_key=r.subject_id)
+ GROUP BY r.subject_id
+),
+ids AS (SELECT event_id FROM obs UNION SELECT event_id FROM rels),
+dated AS (
+ SELECT i.event_id,o.observed_title,o.first_observed_day,o.first_valid_start,
+        coalesce(o.observation_links,0) AS observation_links,
+        coalesce(o.timed_observations,0) AS timed_observations,
+        coalesce(o.original_urls,0) AS original_urls,
+        coalesce(r.accepted_relations,0) AS accepted_relations,
+        coalesce(r.hosted_at_relations,0) AS hosted_at_relations,
+        coalesce(r.context_relations,0) AS context_relations,
+        coalesce(r.relation_evidence_urls,0) AS relation_evidence_urls,
+        coalesce(r.has_approved_venue,false) AS has_approved_venue,
+        coalesce(r.has_nonpublic_venue,false) AS has_nonpublic_venue,
+        r.predicates,(now() AT TIME ZONE 'America/Argentina/Buenos_Aires') AS now_local
+ FROM ids i LEFT JOIN obs o USING(event_id) LEFT JOIN rels r USING(event_id)
 )
-SELECT event_id,title,observed_day,raw_venue,venue_name,venue_entity_id,
- venue_entity_kind,venue_editorial_state,observation_links,
- timed_observations,original_urls,accepted_receipts,next_gate,
- false AS publication_approved, false AS authorized_to_write
-FROM cases ORDER BY next_gate,observed_day,event_id;
+SELECT event_id,observed_title,first_observed_day,first_valid_start,
+       observation_links,timed_observations,original_urls,
+       accepted_relations,hosted_at_relations,context_relations,predicates,
+       has_approved_venue,has_nonpublic_venue,relation_evidence_urls,
+       CASE
+         WHEN observation_links=0 THEN 'RESEARCH_RELATION_NO_OBSERVATION'
+         WHEN first_valid_start IS NOT NULL AND first_valid_start<=now_local THEN 'ARCHIVE_ONLY_REVIEW'
+         WHEN first_observed_day<now_local::date THEN 'ARCHIVE_ONLY_REVIEW'
+         WHEN has_nonpublic_venue THEN 'HOLD_INTERNAL_VENUE_REVIEW'
+         WHEN timed_observations=0 THEN 'HOLD_MISSING_ORIGINAL_TIME'
+         WHEN original_urls=0 THEN 'HOLD_NO_FIRST_PARTY_ORIGINAL'
+         WHEN NOT has_approved_venue THEN 'HOLD_VENUE_REVIEW'
+         ELSE 'INDIVIDUAL_EDITORIAL_REVIEW'
+       END AS suggested_next_gate,
+       false AS publication_approved,
+       false AS authorized_to_write
+FROM dated
+ORDER BY suggested_next_gate,event_id;
