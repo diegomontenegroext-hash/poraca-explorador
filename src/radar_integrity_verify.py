@@ -6,8 +6,11 @@ authorization. Reuse the existing Radar workflow's verify_only branch.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+from pathlib import Path
+import re
 import sys
 
 from radar_end_to_end import SQL as E2E_SQL, assess as assess_end_to_end
@@ -28,6 +31,49 @@ REQUIRED_COUNTS = (
 )
 
 
+LEDGER_FILE = Path(__file__).resolve().parents[1] / "data/canonical_survival_ledger_20261101.json"
+
+
+def load_canonical_survival_ledger() -> dict:
+    """Independent historical baseline from Git, not from live Neon receipts."""
+    ledger = json.loads(LEDGER_FILE.read_text(encoding="utf-8"))
+    values = ledger.get("idsMd5")
+    if (ledger.get("schema") != "poraca-canonical-id-survival-ledger-v1"
+            or ledger.get("projectId") != EXPECTED[3]
+            or ledger.get("branchId") != EXPECTED[4]
+            or ledger.get("database") != EXPECTED[0]
+            or type(ledger.get("expectedAtLeast")) is not int
+            or ledger["expectedAtLeast"] != 133
+            or not isinstance(values, list)
+            or len(values) != 133
+            or values != sorted(set(values))
+            or any(not isinstance(v, str) or re.fullmatch(r"[0-9a-f]{32}", v) is None
+                   for v in values)):
+        raise RuntimeError("CANONICAL_SURVIVAL_LEDGER_INVALID")
+    digest = hashlib.md5(",".join(values).encode("ascii")).hexdigest()
+    if digest != ledger.get("baselineSortedHashesMd5"):
+        raise RuntimeError("CANONICAL_SURVIVAL_LEDGER_DIGEST_MISMATCH")
+    return ledger
+
+
+def assess_canonical_survival(ledger: dict, actual_hashes: list[str]) -> dict:
+    """Additional immutable-identity check; later additions are allowed."""
+    observed = set(actual_hashes)
+    required = set(ledger["idsMd5"])
+    if any(re.fullmatch(r"[0-9a-f]{32}", h) is None for h in observed):
+        raise RuntimeError("CANONICAL_SURVIVAL_READBACK_MALFORMED")
+    missing = required - observed
+    return {
+        "baselineRequired": len(required),
+        "baselinePresent": len(required) - len(missing),
+        "baselineMissing": len(missing),
+        "newIdsSinceBaseline": len(observed - required),
+        "baselineDigest": ledger["baselineSortedHashesMd5"],
+        # No unhashed names or event IDs emitted.
+        "writesPerformed": False,
+    }
+
+
 def certify(report: dict) -> tuple[str, int]:
     """L4 data-only gates. Never claim API/SSO/coverage PASS from DB counts."""
     orphans = report.get("orphanedCanonicalLinks")
@@ -44,6 +90,18 @@ def certify(report: dict) -> tuple[str, int]:
             or int(report.get("futureCanonical") or 0) != audit["canonicalFuture"]
             or int(report.get("futureConfirmed") or 0) < audit["confirmedScheduledFuture"]):
         return "NOT_CERTIFIED_CONTRADICTORY_READBACK", 2
+    ledger = report.get("canonicalSurvivalLedger")
+    if not isinstance(ledger, dict) or any(
+        type(ledger.get(k)) is not int or ledger[k] < 0
+        for k in ("baselineRequired", "baselinePresent", "baselineMissing",
+                  "newIdsSinceBaseline")
+    ) or ledger.get("baselineDigest") != "5f651497da4b186acc9f24dc80922d89":
+        return "NOT_CERTIFIED_MISSING_CANONICAL_SURVIVAL_LEDGER", 2
+    if (ledger["baselineRequired"] != 133
+            or ledger["baselinePresent"] + ledger["baselineMissing"] != 133):
+        return "NOT_CERTIFIED_CONTRADICTORY_CANONICAL_SURVIVAL", 2
+    if ledger["baselineMissing"] > 0:
+        return "P0_CANONICAL_SURVIVAL_LEDGER_MISSING_IDS", 2
     history = report.get("historicalCanaries")
     if not isinstance(history, dict) or any(
         type(history.get(k)) is not int or history[k] < 0
@@ -106,6 +164,13 @@ def read(url: str) -> dict:
                 cursor.execute("SELECT public.poraca_e2e_integrity_attestation_v1()")
                 receipt_row = cursor.fetchone()
                 report["attestation"] = receipt_row[0] if receipt_row else None
+                # 133 historical event identity hashes captured in Git on 2026-11-01.
+                # Future new event IDs are fine; any baseline deletion is P0.
+                # Neither the ledger nor this SELECT writes to Neon.
+                cursor.execute("SELECT md5(event_key) FROM public.radar_agenda_events")
+                baseline = load_canonical_survival_ledger()
+                report["canonicalSurvivalLedger"] = assess_canonical_survival(
+                    baseline, [row[0] for row in cursor.fetchall()])
                 # Independent acceptance acts, not merely surviving receipts.
                 # A lost canonical and its lost receipt must still be detected.
                 # Check the immutable-key guard separately from DELETE/TRUNCATE.
@@ -155,6 +220,7 @@ def main() -> int:
             "canaryElAnimo": (report.get("attestation") or {}).get("canaryElAnimo"),
             "protectionTriggers": (report.get("attestation") or {}).get("protectionTriggers"),
             "independentHistoricalCanaries": report.get("historicalCanaries"),
+            "canonicalSurvivalLedger": report.get("canonicalSurvivalLedger"),
             "nextBlockingGate": report.get("nextBlockingGate"),
             "httpApi": "NOT_CHECKED",
             "webSso": "NOT_CHECKED",
