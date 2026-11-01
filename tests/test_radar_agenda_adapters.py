@@ -11,6 +11,48 @@ import radar_agenda_adapters as ad
 import radar_definitivo as rd
 
 class CulturalAgendaAdapterTests(unittest.TestCase):
+    def test_teatro_cerca_card_scope_and_ticket_originals(self):
+        url="https://teatrocerca.com.ar/teatro-independiente"
+        def card(title,day,time,city,venue,ticket):
+            return (f'<article class="obra-card" data-obra-title="{title}">'
+                    f'<div class="poster-wrap" data-function-date="{day}" '
+                    f'data-function-time="{time}" data-city="{city}" '
+                    f'data-venue="{venue}" data-link="{ticket}">'
+                    '</div><h2>Obra</h2></article>')
+        good=card("Habitación Macbeth","2026-11-06","21:00:00",
+                  "La Plata","Teatro Metro La Plata",
+                  "https://casametro.com.ar/evento/habitacion-macbeth/")
+        good2=card("Te invito a mi velorio","2026-11-15","19:00:00",
+                   "City Bell","Teatro de Cámara",
+                   "https://publico.alternativateatral.com/entradas12345")
+        outside=card("Obra Quilmes","2026-11-07","20:00:00",
+                     "Quilmes","Teatro de Quilmes",
+                     "https://casametro.com.ar/evento/fake/")
+        fake_host=card("Impostor","2026-11-08","20:00:00",
+                       "La Plata","Sala Fake",
+                       "https://casametro.com.ar.attacker.example/evento/no")
+        missing_clock=card("Solo cartel","2026-11-08","",
+                           "La Plata","Sala Desconocida",
+                           "https://casametro.com.ar/evento/no")
+        malformed=card("Invalid date","2026-11-99","21:00:00",
+                       "La Plata","Teatro Metro",
+                       "https://casametro.com.ar/evento/no")
+        with patch.object(ad,"active_date",return_value=True):
+            rows=ad.extract_listings(
+                good+good2+outside+fake_host+missing_clock+malformed,url)
+            direct=ad.teatro_cerca_listing_cards(good,url)
+        self.assertEqual(len(rows),2)
+        self.assertEqual(len(direct),1)
+        self.assertEqual([x["event_time"] for x in rows],["21:00","19:00"])
+        self.assertEqual([x["event_date"] for x in rows],["2026-11-06","2026-11-15"])
+        self.assertEqual({x["evidence_tier"] for x in rows},
+                         {"secondary_specialized_agenda"})
+        self.assertEqual({x["review_state"] for x in rows},
+                         {"observed_unverified"})
+        self.assertTrue(all(x["proof_url"].startswith("https://") for x in rows))
+        self.assertEqual(ad.teatro_cerca_listing_cards(
+            good,"https://teatrocerca.com.ar.attacker.example/teatro-independiente"),[])
+
     def test_active_date_accepts_datetime_and_date(self):
         from datetime import date, timezone
         self.assertTrue(ad.active_date(date(2026,11,1),date(2026,11,1)))
