@@ -9,16 +9,20 @@ def assess(stats):
     quality = stats.get("evidence_quality", {})
     unavailable = [name for name in CONTROL_NAMES
                    if quality.get(name, {}).get("status") in (None, "unavailable")]
+    index_only = int(stats.get("index_only", 0))
+    index_errors = int(stats.get("index_errors", 0))
+    failed = max(0, checked-success-index_only)+index_errors
+    # An index_only check is not a failed request. Yield is tracked separately.
     acquisition = "sin_evidencia_suficiente" if selected == 0 else (
-        "correcto" if selected == checked == success else "parcial")
+        "correcto" if selected == checked == success+index_only and failed == 0 else "parcial")
     controls = "bloqueado" if unavailable else "correcto"
-    return {"schema": "poraca-health-v1", "acquisition": acquisition,
+    return {"schema": "poraca-health-v2", "acquisition": acquisition,
             "controls": controls, "unavailable_controls": unavailable,
             "overall": "bloqueado" if unavailable else acquisition,
+            "source_yield": "requiere_revision" if index_only else ("sin_evidencia_suficiente" if selected == 0 else "observado"),
             "sources": {"selected": selected, "checked": checked, "ok": success,
-                        "index_only": int(stats.get("index_only", 0)),
-                        "failed": max(0, checked-success-int(stats.get("index_only", 0))),
-                        "unvisited": max(0, selected-checked)},
+                        "index_only": index_only, "index_only_errors": index_errors,
+                        "failed": failed, "unvisited": max(0, selected-checked)},
             "admission": "not_performed", "api": "not_checked", "web": "not_checked",
             "coverage": "not_measured", "authorized_to_write": False}
 
@@ -34,8 +38,9 @@ def stability(rows, now=None):
     def dt(value):
         return value if isinstance(value, datetime) else datetime.fromisoformat(value.replace("Z", "+00:00"))
     result = {}
-    # Only runs recording this health contract constitute a baseline.
-    eligible = [r for r in rows if r.get("summary", {}).get("health", {}).get("schema") == "poraca-health-v1"]
+    # v1 conflated index_only with failed acquisition; preserve its history
+    # but begin the 3/7-day acceptance window on the corrected v2 contract.
+    eligible = [r for r in rows if (r.get("summary") or {}).get("health", {}).get("schema") == "poraca-health-v2"]
     for days in (3, 7):
         cutoff = now-timedelta(days=days)
         recent = sorted([r for r in eligible if cutoff <= dt(r["started_at"]) <= now], key=lambda r: dt(r["started_at"]))

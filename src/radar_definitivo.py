@@ -925,7 +925,7 @@ def main():
         return 2
     budget=Budget()
     run_id="definitivo-"+datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")+"-"+uuid.uuid4().hex[:6]
-    stats=dict(selected=0,checked=0,success=0,index_only=0,urls=0,candidates=0,new=0,entities=0,listings=0)
+    stats=dict(selected=0,checked=0,success=0,index_only=0,index_errors=0,urls=0,candidates=0,new=0,entities=0,listings=0)
     source_outcomes=[]
     try:
         sources=choose_sources(conn,args.mode)
@@ -964,6 +964,7 @@ def main():
             stats["checked"]+=1
             stats["success"]+=int(check["status"]=="ok")
             stats["index_only"]+=int(check["status"]=="index_only")
+            stats["index_errors"]+=int(check["status"]=="index_only" and bool(check.get("error_type")))
             stats["urls"]+=check["links_found"]
             stats["candidates"]+=len(candidates)
             stats["new"]+=new

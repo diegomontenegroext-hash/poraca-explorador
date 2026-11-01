@@ -73,6 +73,23 @@ class OperationalHealth(unittest.TestCase):
         self.assertEqual(result['api'],'not_checked')
         self.assertEqual(result['admission'],'not_performed')
 
+    def test_index_only_is_completed_check_not_confirmed_event_yield(self):
+        stats=self.good();stats.update(selected=4,checked=4,success=2,index_only=2)
+        result=assess(stats)
+        self.assertEqual(result['schema'],'poraca-health-v2')
+        self.assertEqual(result['acquisition'],'correcto')
+        self.assertEqual(result['overall'],'correcto')
+        self.assertEqual(result['source_yield'],'requiere_revision')
+        self.assertEqual(result['sources']['failed'],0)
+        self.assertEqual(result['coverage'],'not_measured')
+
+    def test_index_only_with_error_is_still_partial(self):
+        stats=self.good();stats.update(selected=4,checked=4,success=2,index_only=2,index_errors=1)
+        result=assess(stats)
+        self.assertEqual(result['acquisition'],'parcial')
+        self.assertEqual(result['sources']['failed'],1)
+        self.assertEqual(result['source_yield'],'requiere_revision')
+
     def test_partial_and_empty_run_do_not_claim_success(self):
         stats=self.good();stats.update(selected=6,checked=5,success=3,index_only=1)
         result=assess(stats)
@@ -86,13 +103,15 @@ class OperationalHealth(unittest.TestCase):
         now=datetime(2026,11,10,tzinfo=timezone.utc)
         def run(hours,health='correcto'):
             return dict(started_at=now-timedelta(hours=hours),finished_at=now-timedelta(hours=hours-1),
-                        status='complete',summary={'health':{'schema':'poraca-health-v1','overall':health}})
+                        status='complete',summary={'health':{'schema':'poraca-health-v2','overall':health}})
         self.assertEqual(stability([run(1)],now)['3d']['state'],'sin_evidencia_suficiente')
         rows=[run(h) for h in range(1,194,8)]
         self.assertEqual(stability(rows,now)['7d']['state'],'correcto')
         rows[0]=run(1,'bloqueado')
         self.assertEqual(stability(rows,now)['3d']['state'],'degradado')
         self.assertEqual(stability([run(190),run(1)],now)['7d']['state'],'degradado')
+        legacy=run(200);legacy['summary']['health']['schema']='poraca-health-v1'
+        self.assertEqual(stability([legacy,run(1)],now)['3d']['state'],'sin_evidencia_suficiente')
 
     def test_url_conflicts_are_review_only(self):
         result=summarize([('https://teatrodoblet.com.ar/event/167089','2026-11-09',2,

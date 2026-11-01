@@ -27,7 +27,8 @@ checks AS (
   SELECT count(*)::int AS checked,
    count(*) FILTER (WHERE status='ok')::int AS ok,
    count(*) FILTER (WHERE status='index_only')::int AS index_only,
-   count(*) FILTER (WHERE status NOT IN ('ok','index_only'))::int AS other
+   count(*) FILTER (WHERE status NOT IN ('ok','index_only')
+      OR coalesce(error_type,'')<>'' OR http_status NOT BETWEEN 200 AND 299)::int AS other
   FROM radar_definitivo.source_checks
   WHERE run_id=(SELECT run_id FROM latest)
 ),
@@ -245,21 +246,22 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  jsonb_build_object('selected',x.sources_selected,'checked',x.sources_checked,'checkRows',x.check_rows,'status',x.status),
  'Todas las fuentes seleccionadas tienen recibo de comprobacion en el run',
  'Corregir solo faltantes comprobados; PASS no implica extraccion'),
-(3,'SOURCE_YIELD',
- -- Incremental success never masks coverage gaps in the latest FULL.
- CASE WHEN x.full_checked<>x.full_sources_selected OR x.full_other>0
-            OR x.full_index_only>0 THEN 'PARTIAL'
-      WHEN x.full_ok=x.full_sources_selected AND x.full_ok>0
-           AND x.full_sources_checked=x.full_sources_selected THEN 'PASS'
-      ELSE 'FAIL' END,
+(3,'SOURCE_FETCH_HEALTH',
+ -- Only source transport and check completeness; yield is separate gate 9.
+ CASE WHEN x.full_sources_selected>0
+        AND x.full_checked=x.full_sources_selected
+        AND x.full_sources_checked=x.full_sources_selected
+        AND x.full_other=0 THEN 'PASS'
+      WHEN x.full_checked=0 THEN 'FAIL'
+      ELSE 'PARTIAL' END,
  jsonb_build_object('latestRunId',x.run_id,'latestOk',x.ok,
  'lastFullRunId',x.last_full_run_id,'lastFullAt',x.full_finished_at,
  'lastFullSelected',x.full_sources_selected,'lastFullCheckRows',x.full_checked,
  'lastFullOk',x.full_ok,'lastFullIndexOnly',x.full_index_only,
  'lastFullOther',x.full_other,'fetchEnabled',x.fetch_enabled,
  'discoverOnly',x.discover_only,'reviewOnly',x.review_only),
- 'Medir agenda fechada por fuente elegible, separada de indice/entidad/regular',
- 'Triar indices por proposito y priorizar El Dia, Teatro Cerca, UNLP, vinos, yoga y talleres'),
+ 'Todas las fuentes seleccionadas revisadas sin errores HTTP/operativos; index_only no prueba produccion de eventos',
+ 'El rendimiento por circuito sigue en COVERAGE_BY_CIRCUIT y nunca se infiere de HTTP 200'),
 (4,'RUN_FUNNEL',
  CASE WHEN (x.summary->'editorial_funnel_v1'->'counts'->>'distinctDetected') IS NOT NULL THEN 'PASS' ELSE 'FAIL' END,
  jsonb_build_object('new',x.summary->'editorial_funnel_v1'->'counts'->'new',
