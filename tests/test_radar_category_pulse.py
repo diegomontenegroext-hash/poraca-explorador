@@ -87,6 +87,18 @@ class PulseCategoryTest(unittest.TestCase):
         self.assertFalse(pulse.integrity_blocks_release({}))
         self.assertFalse(pulse.integrity_blocks_release(None))
 
+    def test_reported_p0_does_not_mask_strict_integrity_gate(self):
+        # Coverage reporter is not allowed to certify the historic data.
+        root=Path(__file__).resolve().parents[1]
+        src=(root/"src"/"radar_category_pulse.py").read_text()
+        self.assertIn("::warning::PORACA_E2E_P0_CANONICAL_INTEGRITY",src)
+        tail=src.split('if integrity_blocks_release(report["endToEnd"]):')[-1]
+        self.assertIn("return 0",tail.split("except Exception",1)[0])
+        self.assertNotIn("return 2",tail.split("except Exception",1)[0])
+        strict=(root/"src"/"radar_integrity_verify.py").read_text()
+        self.assertIn("P0_CANONICAL_HISTORY_BROKEN",strict)
+        self.assertIn("P0_INDEPENDENT_ACCEPTANCE_CANARY_MISSING",strict)
+
     def test_runtime_queries_are_select_only(self):
         self.assertTrue(pulse.CANONICAL_SQL.lstrip().startswith("SELECT "))
         self.assertTrue(pulse.OBS_SQL.lstrip().startswith("SELECT "))
