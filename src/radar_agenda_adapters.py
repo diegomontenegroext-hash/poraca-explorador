@@ -718,10 +718,10 @@ def teatro_cerca_listing_cards(raw, url, at=None):
     out=[]
     source=raw[:900_000]
     cards=re.finditer(
-        r"<article\\b(?=[^>]*\\bclass\\s*=\\s*['\"][^'\"]*\\bobra-card\\b)"
-        r"[^>]*>.*?</article\\s*>",source,re.I|re.S)
+        r"<article\b(?=[^>]*\bclass\s*=\s*['\"][^'\"]*\bobra-card\b)"
+        r"[^>]*>.*?</article\s*>",source,re.I|re.S)
     def attr(markup,name):
-        m=re.search(r"\\b"+re.escape(name)+r"\\s*=\\s*['\"]([^'\"]*)['\"]",
+        m=re.search(r"\b"+re.escape(name)+r"\s*=\s*['\"]([^'\"]*)['\"]",
                     markup,re.I)
         return html.unescape(m.group(1)).strip() if m else ""
     for i,match in enumerate(cards):
@@ -731,7 +731,7 @@ def teatro_cerca_listing_cards(raw, url, at=None):
         title=attr(opening,"data-obra-title")
         if not title:continue
         poster=re.search(
-            r"<div\\b(?=[^>]*\\bdata-function-date\\s*=)[^>]*>",card,re.I|re.S)
+            r"<div\b(?=[^>]*\bdata-function-date\s*=)[^>]*>",card,re.I|re.S)
         if not poster:continue
         element=poster.group(0)
         city=tidy(attr(element,"data-city")).casefold()
@@ -739,8 +739,8 @@ def teatro_cerca_listing_cards(raw, url, at=None):
         venue=tidy(attr(element,"data-venue"))
         date_raw=attr(element,"data-function-date")
         time_raw=attr(element,"data-function-time")
-        if (not re.fullmatch(r"20\\d{2}-\\d{2}-\\d{2}",date_raw)
-                or not re.fullmatch(r"(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?",time_raw)
+        if (not re.fullmatch(r"20\d{2}-\d{2}-\d{2}",date_raw)
+                or not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?",time_raw)
                 or not venue):
             continue
         try:day=date.fromisoformat(date_raw)
