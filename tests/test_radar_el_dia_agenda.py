@@ -90,6 +90,28 @@ class EditorialPressTests(unittest.TestCase):
         # Old weekly articles must not displace the latest date slot.
         self.assertTrue(all("agenda semanal" in x[1] for x in links))
 
+    def test_espectaculos_section_exposes_recent_septimo_dia_agenda(self):
+        # Current 01/11 article was linked from /espectaculos, NOT from
+        # the legacy /ttags/espectaculos root. Retain the same source ID,
+        # use a stable section URL and never synthesize article slugs.
+        root="https://www.eldia.com/espectaculos"
+        latest="https://www.eldia.com/espectaculos/agenda-septimo-dia_1793514734"
+        now=datetime(2026,11,1,12,0,tzinfo=ZoneInfo("America/Argentina/Buenos_Aires"))
+        html=('<a href="/espectaculos/agenda-septimo-dia_1793514734">'
+              'Agenda de espectáculos en La Plata para domingo y lunes</a>'
+              '<a href="/espectaculos/noticias-famosos_1793514734">No</a>'
+              '<a href="https://attacker.example/espectaculos/agenda-septimo-dia_1793514734">No</a>'
+              '<a href="/espectaculos/agenda-espectaculos_1792130350">Vieja</a>')
+        found=adapter.special_links(root,parallel.parse_html(html),at=now)
+        self.assertEqual([url for url,_ in found],[latest])
+        self.assertTrue(all("agenda semanal" in why for _,why in found))
+        # Keep the actual source role and secondary review boundary.
+        record=adapter.make_record("Ensayo del enlace",date(2026,11,1),
+            "19:00","La Plata",latest,
+            "el_dia_editorial_agenda_explicit_time","secondary_press_agenda")
+        self.assertEqual(record["review_state"],"observed_unverified")
+        self.assertEqual(record["evidence_tier"],"secondary_press_agenda")
+
     def test_collector_reuses_budget_and_keeps_secondary_tier(self):
         html='<a href="%s">Agenda de hoy</a>'%PUBLISHED_URL
         class Budget:
