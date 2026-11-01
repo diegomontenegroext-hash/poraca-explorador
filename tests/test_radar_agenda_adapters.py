@@ -11,6 +11,34 @@ import radar_agenda_adapters as ad
 import radar_definitivo as rd
 
 class CulturalAgendaAdapterTests(unittest.TestCase):
+    def test_el_dia_septimo_dia_real_article(self):
+        # Official real path observed in the newspaper on 2026-11-01.
+        root="https://www.eldia.com/septimo-dia"
+        article="https://www.eldia.com/septimo-dia/agenda-septimo-dia_1793514734/amp"
+        other="https://attacker.example/septimo-dia/agenda-septimo-dia_1793514734/amp"
+        links=(f'<a href="{article}">Agenda oficial</a>'
+               f'<a href="{other}">Agenda impostora</a>')
+        found=ad.special_links(root,rd.parse_html(links),
+            at=datetime(2026,11,1,12))
+        self.assertEqual([url for url,_ in found],[article])
+        article_html=(
+          '<time>Domingo, 01 de noviembre de 2026 a las 03:32</time>'
+          '<h2>HOY</h2><h3>ÓPERA</h3>'
+          '<p>La flauta mágica.- A las 17 en el Pasaje Dardo Rocha, '
+          '50 entre 6 y 7. Presentada por Lírica en Diagonal.</p>'
+          '<p>Un aviso sin hora ni formato de agenda.</p>')
+        with patch.object(ad,"active_date",return_value=True):
+            rows=ad.el_dia_editorial_agenda(
+                article_html,article,at=datetime(2026,11,1,12))
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["event_date"],"2026-11-01")
+        self.assertEqual(rows[0]["event_time"],"17:00")
+        self.assertEqual(rows[0]["evidence_tier"],"secondary_press_agenda")
+        self.assertEqual(rows[0]["review_state"],"observed_unverified")
+        self.assertEqual(ad.el_dia_editorial_agenda(
+            article_html.replace("<time>Domingo, 01 de noviembre de 2026 a las 03:32</time>",""),
+            article,at=datetime(2026,11,1,12)),[])
+
     def test_el_dia_new_agenda_slug_and_amp_from_actual_anchors(self):
         root="https://www.eldia.com/ttags/espectaculos"
         official="https://www.eldia.com/espectaculos/agenda-espectaculos_1793338233/amp"
