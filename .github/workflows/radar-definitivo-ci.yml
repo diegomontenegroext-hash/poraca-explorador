@@ -15,6 +15,8 @@ on:
       - 'sql/20261031_certificacion_punta_a_punta_readonly_v1.sql'
       - 'src/radar_end_to_end.py'
       - 'src/radar_integrity_verify.py'
+      - 'src/radar_direct_feed_verify.py'
+      - 'tests/test_radar_direct_feed_verify.py'
       - 'tests/test_radar_integrity_verify.py'
       - 'tests/test_radar_end_to_end.py'
       - 'src/radar_source_recovery.py'
