@@ -4,6 +4,11 @@ on:
     paths:
       - 'src/radar_parallel.py'
       - 'tests/test_radar_parallel.py'
+      - 'src/radar_integrity_verify.py'
+      - 'src/radar_executive_gates.py'
+      - 'tests/test_radar_integrity_verify.py'
+      - 'tests/test_radar_executive_gates.py'
+      - 'sql/20261101_executive_readiness_gates_READ_ONLY.sql'
       - '.github/workflows/radar-ci.yml'
   workflow_dispatch:
 
