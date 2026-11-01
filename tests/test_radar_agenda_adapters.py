@@ -53,6 +53,45 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertEqual(ad.teatro_cerca_listing_cards(
             good,"https://teatrocerca.com.ar.attacker.example/teatro-independiente"),[])
 
+    def test_teatro_cerca_deferred_html_escaped_json_cards(self):
+        # Based on actual deferred index cards (data-select-item JSON).
+        url="https://teatrocerca.com.ar/teatro-independiente"
+        def card(title,item_name,city,time,link):
+            selection=(
+                '{&quot;item_name&quot;:&quot;'+item_name+
+                '&quot;,&quot;city&quot;:&quot;'+city+
+                '&quot;,&quot;venue&quot;:&quot;Fabrica CITA&quot;'
+                ',&quot;function_date&quot;:&quot;2026-11-08&quot;'
+                ',&quot;function_time&quot;:&quot;'+time+'&quot;}')
+            return (
+                '<article class="obra-card obra-card--deferred"'
+                ' data-obra-title="'+title+'" hidden>'
+                '<div class="poster-wrap poster-is-clickable"'
+                ' data-select-item="'+selection+'"'
+                ' data-poster-href="'+link+'"></div></article>')
+        real=card("Disforia","Disforia","La Plata","19:30:00",
+            "https://teatrocerca.com.ar/obra/disforia/funcion/"
+            "la-plata/c-115-no1467/8-noviembre-2026")
+        offsite=card("Falso otro municipio","Falso otro municipio",
+            "Quilmes","19:30:00",
+            "https://teatrocerca.com.ar/obra/otro/funcion/quilmes/test")
+        wrong_name=card("Card original","Otro show","La Plata","19:30:00",
+            "https://teatrocerca.com.ar/obra/otro/funcion/la-plata/test")
+        impossible=card("Imposible","Imposible","La Plata","25:30:00",
+            "https://teatrocerca.com.ar/obra/bad/funcion/la-plata/test")
+        with patch.object(ad,"active_date",return_value=True):
+            rows=ad.teatro_cerca_listing_cards(
+                real+offsite+wrong_name+impossible,url)
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["title"],"Disforia")
+        self.assertEqual(rows[0]["event_date"],"2026-11-08")
+        self.assertEqual(rows[0]["event_time"],"19:30")
+        self.assertEqual(rows[0]["venue"],"Fabrica CITA")
+        self.assertEqual(rows[0]["review_state"],"observed_unverified")
+        self.assertEqual(rows[0]["evidence_tier"],"secondary_specialized_agenda")
+        self.assertTrue(rows[0]["proof_url"].startswith(
+            "https://teatrocerca.com.ar/obra/disforia/funcion/"))
+
     def test_teatro_cerca_structured_events_stay_secondary(self):
         # A JSON-LD Event in a theatre AGGREGATOR is still secondary,
         # even when markup looks as complete as a first-party original.
