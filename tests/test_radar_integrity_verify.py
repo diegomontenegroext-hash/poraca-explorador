@@ -40,6 +40,9 @@ class IndependentE2ECertificationTests(unittest.TestCase):
                          if orphaned or missing_receipts or missing_approved or dangling_relations
                          else "DATA_INTEGRITY_PASS_HTTP_SSO_SEPARATE"),
         }
+        report["historicalCanaries"] = {
+            "elAnimo": 1, "freezer": 1, "immutableGuard": 1,
+        }
         return report
 
     def test_real_defect_fails_due_to_missing_canons(self):
@@ -70,6 +73,24 @@ class IndependentE2ECertificationTests(unittest.TestCase):
     def test_missing_canary_fails(self):
         self.assertEqual(certify(self.sample(canary=0)),
                          ("P0_CANARY_NOT_PRESENT", 2))
+
+    def test_independent_approval_canary_missing_even_with_no_orphans(self):
+        report = self.sample()
+        report["historicalCanaries"]["freezer"] = 0
+        self.assertEqual(certify(report),
+                         ("P0_INDEPENDENT_ACCEPTANCE_CANARY_MISSING", 2))
+
+    def test_immutable_event_key_guard_must_exist(self):
+        report = self.sample()
+        report["historicalCanaries"]["immutableGuard"] = 0
+        self.assertEqual(certify(report),
+                         ("P0_CANONICAL_IMMUTABILITY_MISSING", 2))
+
+    def test_missing_independent_canary_readback_fails_closed(self):
+        report = self.sample()
+        report.pop("historicalCanaries")
+        self.assertEqual(certify(report),
+                         ("NOT_CERTIFIED_MISSING_INDEPENDENT_CANARIES", 2))
 
     def test_zero_future_events_is_not_success(self):
         self.assertEqual(certify(self.sample(canonical=0)),
