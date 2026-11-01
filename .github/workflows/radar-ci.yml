@@ -8,6 +8,8 @@ on:
       - 'src/radar_executive_gates.py'
       - 'tests/test_radar_integrity_verify.py'
       - 'tests/test_radar_executive_gates.py'
+      - 'src/radar_agenda_adapters.py'
+      - 'tests/test_radar_agenda_adapters.py'
       - 'sql/20261101_executive_readiness_gates_READ_ONLY.sql'
       - '.github/workflows/radar-ci.yml'
   workflow_dispatch:
