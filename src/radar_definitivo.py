@@ -456,7 +456,7 @@ def scan_source(source,budget,mode):
         source.get("source_role") in institutional_sections
         and urlsplit(root).path.rstrip("/")==""
         and not check["_listings"]
-        and sum(label in section_labels for _,label in links)>=2)
+        and any(label in section_labels for _,label in links))
     if institutional_sections_root:
         section_links=[item for item in links if item[1] in section_labels]
         other_links=[item for item in links if item[1] not in section_labels]
