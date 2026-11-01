@@ -44,6 +44,14 @@ def certify(report: dict) -> tuple[str, int]:
             or int(report.get("futureCanonical") or 0) != audit["canonicalFuture"]
             or int(report.get("futureConfirmed") or 0) < audit["confirmedScheduledFuture"]):
         return "NOT_CERTIFIED_CONTRADICTORY_READBACK", 2
+    history = report.get("historicalCanaries")
+    if not isinstance(history, dict) or any(
+        type(history.get(k)) is not int or history[k] < 0
+        for k in ("elAnimo", "freezer", "immutableGuard")
+    ):
+        return "NOT_CERTIFIED_MISSING_INDEPENDENT_CANARIES", 2
+    if history["immutableGuard"] != 1:
+        return "P0_CANONICAL_IMMUTABILITY_MISSING", 2
     if audit.get("checkpointSurvivalGuard") is not True or audit["protectionTriggers"] != 2:
         return "P0_CANONICAL_PROTECTION_MISSING", 2
     if (audit["missingAcceptedReceipts"] > 0
@@ -53,6 +61,8 @@ def certify(report: dict) -> tuple[str, int]:
         return "P0_CANONICAL_HISTORY_BROKEN", 2
     if audit["canaryElAnimo"] != 1:
         return "P0_CANARY_NOT_PRESENT", 2
+    if history["elAnimo"] != 1 or history["freezer"] != 1:
+        return "P0_INDEPENDENT_ACCEPTANCE_CANARY_MISSING", 2
     if audit["confirmedScheduledFuture"] == 0:
         return "P0_NO_CONFIRMED_FUTURE_EVENTS", 2
     if report.get("nextBlockingGate") != "authenticated_api_and_web_check":
@@ -96,6 +106,25 @@ def read(url: str) -> dict:
                 cursor.execute("SELECT public.poraca_e2e_integrity_attestation_v1()")
                 receipt_row = cursor.fetchone()
                 report["attestation"] = receipt_row[0] if receipt_row else None
+                # Independent acceptance acts, not merely surviving receipts.
+                # A lost canonical and its lost receipt must still be detected.
+                # Check the immutable-key guard separately from DELETE/TRUNCATE.
+                cursor.execute("""
+                  SELECT
+                    (SELECT count(*)::int FROM public.radar_agenda_events
+                     WHERE event_key='cultural-66d110c1850ad58739385baf263c0519'),
+                    (SELECT count(*)::int FROM public.radar_agenda_events
+                     WHERE event_key='freezer-brindis-inauguracion-ciudad-de-gatos-2026-11-05'),
+                    (SELECT count(*)::int FROM pg_catalog.pg_trigger
+                     WHERE tgrelid='public.radar_agenda_events'::regclass
+                       AND tgname='poraca_canonical_event_key_immutable_v1'
+                       AND tgenabled='O' AND NOT tgisinternal)
+                """)
+                h = cursor.fetchone()
+                report["historicalCanaries"] = (
+                    {"elAnimo":h[0],"freezer":h[1],"immutableGuard":h[2]}
+                    if h else None
+                )
     return report
 
 
@@ -125,6 +154,7 @@ def main() -> int:
             "missingAcceptedRelationEventIds": (report.get("attestation") or {}).get("missingAcceptedRelationEventIds"),
             "canaryElAnimo": (report.get("attestation") or {}).get("canaryElAnimo"),
             "protectionTriggers": (report.get("attestation") or {}).get("protectionTriggers"),
+            "independentHistoricalCanaries": report.get("historicalCanaries"),
             "nextBlockingGate": report.get("nextBlockingGate"),
             "httpApi": "NOT_CHECKED",
             "webSso": "NOT_CHECKED",
