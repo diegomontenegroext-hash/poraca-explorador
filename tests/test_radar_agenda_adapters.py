@@ -28,8 +28,11 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         doc=('<time>30 de octubre de 2026</time>'
              '<p>Hoy</p>'
              '<p>Segundo Tiempo Sexteto.- A las 20 en Casa Metro, 4 entre 51 y 53.</p>')
-        listed=ad.el_dia_editorial_agenda(
-            doc,official,at=datetime(2026,10,30,12))
+        # Stable fixture: an article from 2026 should not expire as CI ages.
+        # This mock only fixes the clock, it does not confer publication approval.
+        with patch.object(ad,"active_date",return_value=True):
+            listed=ad.el_dia_editorial_agenda(
+                doc,official,at=datetime(2026,10,30,12))
         self.assertEqual(len(listed),1)
         self.assertEqual(listed[0]["title"],"Segundo Tiempo Sexteto")
         self.assertEqual(listed[0]["event_time"],"20:00")
