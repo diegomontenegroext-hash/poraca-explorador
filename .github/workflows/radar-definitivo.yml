@@ -102,6 +102,12 @@ jobs:
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
         run: python3 src/radar_category_pulse.py
+      - name: Certificar lectura directa Radar→Neon para la API (sin escrituras)
+        id: directa
+        if: always() && steps.qa.outcome == 'success' && (steps.ingesta.outcome == 'success' || steps.alcance.outputs.mode == 'verify_only')
+        env:
+          NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
+        run: python3 src/radar_direct_feed_verify.py
       - name: Certificar L4 integridad tras ingesta ordinaria (solo lectura)
         id: integridad
         if: always() && steps.qa.outcome == 'success' && steps.alcance.outputs.mode != 'verify_only' && steps.ingesta.outcome == 'success'
@@ -121,6 +127,7 @@ jobs:
           QA_OUTCOME: ${{ steps.qa.outcome }}
           INGEST_OUTCOME: ${{ steps.ingesta.outcome }}
           CONTROL_OUTCOME: ${{ steps.control.outcome }}
+          DIRECT_OUTCOME: ${{ steps.directa.outcome }}
           INTEGRITY_OUTCOME: ${{ steps.integridad.outcome }}
           VERIFY_OUTCOME: ${{ steps.verificar.outcome }}
         run: |
@@ -134,6 +141,7 @@ jobs:
             echo "| Pruebas QA | ${QA_OUTCOME:-unknown} |"
             echo "| Adquisición / escritura en staging | ${INGEST_OUTCOME:-unknown} |"
             echo "| Informe fuente, preadmisión y E2E | ${CONTROL_OUTCOME:-unknown} |"
+            echo "| Lectura directa actual Radar → Neon/API (no promoción) | ${DIRECT_OUTCOME:-unknown} |"
             echo "| Verificación L4 tras ingesta (sin escrituras) | ${INTEGRITY_OUTCOME:-unknown} |"
             echo "| Certificación read-only independiente | ${VERIFY_OUTCOME:-unknown} |"
             echo
@@ -143,6 +151,8 @@ jobs:
               else
                 echo "**P0: CERTIFICACIÓN E2E FALLIDA**. Ninguna ingesta fue ejecutada. Ver error en step verificar."
               fi
+            elif [[ "$DIRECT_OUTCOME" == "failure" ]]; then
+              echo "**P0: RADAR DIRECTO NO CERTIFICADO**. El canal de descubrimientos debe investigarse separado de la historia canónica."
             elif [[ "$INTEGRITY_OUTCOME" == "failure" ]]; then
               echo "**P0: INTEGRIDAD L4 NO CERTIFICADA**. Ingesta de Radar ejecutada, pero contratos persistentes fallaron. La evidencia sigue en staging."
             elif [[ "$INGEST_OUTCOME" != "success" ]]; then
