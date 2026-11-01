@@ -4,7 +4,7 @@ import unittest
 from datetime import date,timedelta
 
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/"src"))
-from radar_adaptive_discovery import discover_sections
+from radar_adaptive_discovery import discover_sections, discover_original_posts_from_section
 import radar_definitivo as rd
 from radar_agenda_adapters import extract_listings
 
@@ -40,6 +40,65 @@ class AdaptiveDiscoveryTests(unittest.TestCase):
           <a href="//evil.example/agenda/">Agenda otra host</a>
           <a href="/contacto/">Contacto</a>''')
         self.assertEqual(discover_sections(root,rd.parse_html(html).links),[])
+
+    def test_original_article_hop_ignores_domain_and_unsafe_links(self):
+        section="https://artes-urbanas-ejemplo.org/musica/"
+        links=[
+            ("/agenda/","Agenda"),
+            ("/concierto-de-camara-2026/","Concierto de cámara"),
+            ("/concierto-de-camara-2026/","Duplicado de concierto"),
+            ("/exposicion-en-la-ciudad/","Exposición de la ciudad"),
+            ("https://evil.example/concierto-falso/","Concierto de otra sede"),
+            ("//evil.example/show","Evento"),
+            ("/concierto-falso/?hour=20","Concierto"),
+            ("https://user@artes-urbanas-ejemplo.org/concierto-falso/","Concierto"),
+            ("/contacto/","Contacto")]
+        got=discover_original_posts_from_section(section,links,limit=1)
+        self.assertEqual(got[0][0],
+            "https://artes-urbanas-ejemplo.org/concierto-de-camara-2026/")
+        self.assertEqual(len(got),1)
+        self.assertTrue(all("enlazado" in label for _,label in got))
+        self.assertEqual(discover_original_posts_from_section(
+            section,links,existing=[got[0]],limit=2)[0][0],
+            "https://artes-urbanas-ejemplo.org/exposicion-en-la-ciudad/")
+
+    def test_generic_institutional_sections_reach_original_posts(self):
+        root="https://cultura-ejemplo.org/"
+        music=root+"musica/"
+        visual=root+"artes-visuales/"
+        concert=root+"concierto-de-camara-2026/"
+        exhibit=root+"exposicion-de-fotografia-2026/"
+        day=(date.today()+timedelta(days=6)).isoformat()
+        event=('<script type="application/ld+json">'
+               '{"@type":"Event","name":"Concierto contemporáneo de prueba",'
+               '"startDate":"'+day+'T20:00:00-03:00",'
+               '"location":{"name":"Auditorio Principal"}}'
+               '</script>')
+        pages={root:'<a href="/musica/">Música</a>'
+                    '<a href="/artes-visuales/">Artes visuales</a>',
+               music:'<a href="/concierto-de-camara-2026/">Concierto de cámara</a>',
+               visual:'<a href="/exposicion-de-fotografia-2026/">Exposición de fotografía</a>',
+               concert:event,
+               exhibit:'<h1>Exposición abierta todo noviembre</h1><p>Sin función puntual</p>'}
+        class Budget:
+            def __init__(self):self.calls=[]
+            def can_fetch(self,u):return u in pages
+            def request(self,u):
+                self.calls.append(u)
+                return (200,pages[u],None)
+            def remaining(self):return 100
+        b=Budget()
+        check,_=rd.scan_source({"source_id":"fake-university",
+            "url":root,"source_role":"institutional_program","seed_urls":[]},b,"full")
+        self.assertIn(concert,b.calls)
+        self.assertIn(exhibit,b.calls)
+        self.assertLessEqual(len(b.calls),1+rd.MAX_DETAILS_FULL)
+        self.assertEqual(check["status"],"ok")
+        self.assertEqual(len(check["_listings"]),1)
+        self.assertEqual(check["_listings"][0]["review_state"],"observed_unverified")
+        self.assertEqual(check["_listings"][0]["evidence_tier"],
+                         "structured_origin_unverified")
+        self.assertNotIn(exhibit,[x["proof_url"] for x in check["_listings"]])
 
     def test_generic_schema_without_primary_claims(self):
         day=(date.today()+timedelta(days=7)).isoformat()
