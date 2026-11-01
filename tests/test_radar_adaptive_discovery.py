@@ -100,6 +100,45 @@ class AdaptiveDiscoveryTests(unittest.TestCase):
                          "structured_origin_unverified")
         self.assertNotIn(exhibit,[x["proof_url"] for x in check["_listings"]])
 
+    def test_crowded_institutional_root_reserves_article_budget(self):
+        # 6 watchlist links used to block ALL menu discovery, despite the
+        # real homepage linking to /programacion/. Same fixed FULL budget.
+        root="https://instituto-barrial-ejemplo.org/"
+        menu=root+"programacion/"
+        original=root+"concierto-original-de-la-ciudad/"
+        extra=[root+"pista-interna-"+str(i)+"/" for i in range(6)]
+        day=(date.today()+timedelta(days=4)).isoformat()
+        event=('<script type="application/ld+json">'
+               '{"@type":"Event","name":"Concierto con datos originales",'
+               '"startDate":"'+day+'T21:00:00-03:00",'
+               '"location":{"name":"Sala del instituto"}}'
+               '</script>')
+        pages={
+            root:'<a href="/programacion/">Programación</a>'
+                 '<a href="/contacto/">Contacto</a>',
+            menu:'<a href="/concierto-original-de-la-ciudad/">Concierto original de la ciudad</a>',
+            original:event,
+        }
+        pages.update({u:"<h1>Pista general de contexto, sin función</h1>"
+                       for u in extra})
+        class Budget:
+            def __init__(self):self.calls=[]
+            def can_fetch(self,url):return url in pages
+            def request(self,url):
+                self.calls.append(url)
+                return 200,pages[url],None
+        b=Budget()
+        check,_=rd.scan_source({
+           "source_id":"crowded-institution",
+           "url":root,"source_role":"institutional_program",
+           "seed_urls":extra},b,"full")
+        self.assertEqual(b.calls[0:2],[root,menu])
+        self.assertIn(original,b.calls)
+        self.assertLessEqual(len(b.calls),1+rd.MAX_DETAILS_FULL)
+        self.assertEqual(len(check["_listings"]),1)
+        self.assertEqual(check["_listings"][0]["event_time"],"21:00")
+        self.assertEqual(check["_listings"][0]["review_state"],"observed_unverified")
+
     def test_single_program_section_survives_menu_redesign(self):
         # Changing /agenda to /programacion leaves exactly ONE menu link.
         # No publisher-specific patch, data still needs explicit event facts.
