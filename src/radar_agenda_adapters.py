@@ -83,8 +83,22 @@ def parse_dmy(s):
         return None
 
 def active_date(d,at=None):
-    at=at or datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date()
-    return bool(d and at-timedelta(days=14)<=d<=at+timedelta(days=365))
+    # Source adapters and regression fixtures may pass datetime OR date.
+    # Never compare datetime with date (TypeError), nor infer a date from
+    # a malformed scalar. Normalize both sides to local calendar days.
+    if isinstance(d, datetime):
+        d=d.astimezone(ZoneInfo('America/Argentina/Buenos_Aires')).date() if d.tzinfo else d.date()
+    if not isinstance(d, date):
+        return False
+    if at is None:
+        today=datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date()
+    elif isinstance(at, datetime):
+        today=at.astimezone(ZoneInfo('America/Argentina/Buenos_Aires')).date() if at.tzinfo else at.date()
+    elif isinstance(at, date):
+        today=at
+    else:
+        return False
+    return today-timedelta(days=14)<=d<=today+timedelta(days=365)
 
 def make_record(title,when,time,venue,url,method,tier):
     title=tidy(title)[:180]
