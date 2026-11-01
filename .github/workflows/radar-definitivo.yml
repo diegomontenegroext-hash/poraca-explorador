@@ -102,6 +102,12 @@ jobs:
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
         run: python3 src/radar_category_pulse.py
+      - name: Certificar L4 integridad tras ingesta ordinaria (solo lectura)
+        id: integridad
+        if: always() && steps.qa.outcome == 'success' && steps.alcance.outputs.mode != 'verify_only' && steps.ingesta.outcome == 'success'
+        env:
+          NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
+        run: python3 src/radar_integrity_verify.py
       - name: Certificar E2E en modo solo lectura (sin Radar)
         id: verificar
         if: success() && steps.alcance.outputs.mode == 'verify_only'
@@ -115,6 +121,7 @@ jobs:
           QA_OUTCOME: ${{ steps.qa.outcome }}
           INGEST_OUTCOME: ${{ steps.ingesta.outcome }}
           CONTROL_OUTCOME: ${{ steps.control.outcome }}
+          INTEGRITY_OUTCOME: ${{ steps.integridad.outcome }}
           VERIFY_OUTCOME: ${{ steps.verificar.outcome }}
         run: |
           set -euo pipefail
@@ -127,6 +134,7 @@ jobs:
             echo "| Pruebas QA | ${QA_OUTCOME:-unknown} |"
             echo "| Adquisición / escritura en staging | ${INGEST_OUTCOME:-unknown} |"
             echo "| Informe fuente, preadmisión y E2E | ${CONTROL_OUTCOME:-unknown} |"
+            echo "| Verificación L4 tras ingesta (sin escrituras) | ${INTEGRITY_OUTCOME:-unknown} |"
             echo "| Certificación read-only independiente | ${VERIFY_OUTCOME:-unknown} |"
             echo
             if [[ "$VERIFY_OUTCOME" != "skipped" && "$VERIFY_OUTCOME" != "" ]]; then
@@ -135,6 +143,8 @@ jobs:
               else
                 echo "**P0: CERTIFICACIÓN E2E FALLIDA**. Ninguna ingesta fue ejecutada. Ver error en step verificar."
               fi
+            elif [[ "$INTEGRITY_OUTCOME" == "failure" ]]; then
+              echo "**P0: INTEGRIDAD L4 NO CERTIFICADA**. Ingesta de Radar ejecutada, pero contratos persistentes fallaron. La evidencia sigue en staging."
             elif [[ "$INGEST_OUTCOME" != "success" ]]; then
               echo "**INGESTA NO CERTIFICADA**: no atribuir a este run resultados previos."
             elif [[ "$CONTROL_OUTCOME" != "success" ]]; then
