@@ -5,7 +5,7 @@ from datetime import date, datetime, timezone
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
 from radar_direct_feed_verify import (
-    assess, safe_https, FEED_SQL, IDENTITY_SQL, OVERLAP_SQL, LAST_RUN_SQL
+    assess, collect_pages, safe_https, FEED_SQL, IDENTITY_SQL, OVERLAP_SQL, LAST_RUN_SQL
 )
 
 
@@ -58,11 +58,27 @@ class DirectRadarReadContractTests(unittest.TestCase):
         self.assertEqual(report["status"], "DIRECT_RADAR_NEON_READ_FAIL")
         self.assertIn("no_radar_discoveries", report["problems"])
 
-    def test_presentation_bound_is_not_source_coverage(self):
-        records = [fixture(rid="radar-"+format(i, "032x"),
-                           url=f"https://original.example/{i}") for i in range(37)]
-        report = assess(records, "2026-10-31", 0, RUN)
-        self.assertIn("unbounded_radar_discoveries", report["problems"])
+    def test_fully_traverses_60_100_200_without_truncation(self):
+        for total in (60, 100, 200):
+            records = [fixture(rid="radar-"+format(i, "032x"),
+                               url=f"https://original.example/{i}",
+                               name=f"Original {i}", day="2026-11-02") for i in range(total)]
+            keys = [r[0] for r in records]
+            def fetch(day, after_date, after_time, after_id):
+                start = keys.index(after_id)+1 if after_id else 0
+                return records[start:start+49]
+            collected, pages = collect_pages(fetch, date(2026, 10, 31))
+            self.assertEqual(len(collected), total)
+            self.assertEqual(len(set(x[0] for x in collected)), total)
+            self.assertGreaterEqual(pages, 2)
+            self.assertEqual(assess(collected,"2026-10-31",0,RUN)["status"],
+                             "DIRECT_RADAR_NEON_READ_PASS_API_HTTP_SEPARATE")
+
+    def test_cursor_loop_refused(self):
+        rows = [fixture(rid="radar-"+format(i, "032x"), name=f"Evento {i}")
+                for i in range(49)]
+        with self.assertRaisesRegex(ValueError, "RADAR_PAGE_CURSOR_LOOP"):
+            collect_pages(lambda *_: rows, date(2026,10,31))
 
     def test_non_new_report_is_still_valid(self):
         old = list(fixture())
@@ -73,7 +89,7 @@ class DirectRadarReadContractTests(unittest.TestCase):
                          "DIRECT_RADAR_NEON_READ_PASS_API_HTTP_SEPARATE")
 
     def test_readonly_sql_and_scoped_identity(self):
-        self.assertIn("poraca_radar_direct_discoveries_v1", FEED_SQL)
+        self.assertIn("poraca_radar_direct_discoveries_v2", FEED_SQL)
         self.assertIn("SET LOCAL ROLE poraca_definitivo_scope",
                       pathlib.Path(__file__).parents[1].joinpath(
                           "src/radar_direct_feed_verify.py").read_text())
