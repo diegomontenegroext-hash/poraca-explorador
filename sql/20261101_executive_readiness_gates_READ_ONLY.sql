@@ -52,6 +52,13 @@ reference_ledger AS (
       FILTER (WHERE NOT preserved),'[]'::jsonb) AS missing_ids
  FROM reference_ledger
 ),
+identity_key_guard AS (
+ SELECT count(*)::int AS active_guard
+ FROM pg_catalog.pg_trigger
+ WHERE tgrelid='public.radar_agenda_events'::regclass
+ AND tgname='poraca_canonical_event_key_immutable_v1'
+ AND NOT tgisinternal AND tgenabled='O'
+),
 security AS (
  SELECT pg_has_role('poraca_definitivo_ingest','neon_superuser','member') AS ingest_elevated,
         pg_has_role('poraca_explorador_writer','neon_superuser','member') AS writer_elevated
@@ -61,9 +68,9 @@ ctx AS (
     i.fetch_enabled,i.discover_only,i.review_only,i.fetch_no_circuit,
     f.future_staging,f.primary_structured_leads,
     a.a AS integrity,s.ingest_elevated,s.writer_elevated,
-    g.baseline_count,g.missing_count,g.missing_ids
+    g.baseline_count,g.missing_count,g.missing_ids,k.active_guard
  FROM latest l CROSS JOIN checks c CROSS JOIN inventory i CROSS JOIN future f
- CROSS JOIN attestation a CROSS JOIN security s CROSS JOIN historical_canaries g
+ CROSS JOIN attestation a CROSS JOIN security s CROSS JOIN historical_canaries g CROSS JOIN identity_key_guard k
 )
 SELECT g.ord,g.gate,g.state,g.evidence,g.acceptance,g.next_action
 FROM ctx x CROSS JOIN LATERAL (VALUES
@@ -106,17 +113,18 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  AND (x.integrity->>'missingApprovedEventIds')::int=0
  AND (x.integrity->>'protectionTriggers')::int>=2
  AND x.integrity->>'checkpointSurvivalGuard'='true'
- AND x.baseline_count=2 AND x.missing_count=0 THEN 'PASS' ELSE 'FAIL' END,
+ AND x.baseline_count=2 AND x.missing_count=0 AND x.active_guard=1 THEN 'PASS' ELSE 'FAIL' END,
  jsonb_build_object('decision',x.integrity->'decision',
  'missingReceipts',x.integrity->'missingAcceptedReceipts',
  'orphanedObservations',x.integrity->'orphanedObservationLinks',
  'orphanedAcceptedRelations',x.integrity->'orphanAcceptedEventRelations',
  'missingApprovedIds',x.integrity->'missingApprovedEventIds',
  'guards',x.integrity->'protectionTriggers',
+ 'eventKeyImmutableTriggerEnabled',x.active_guard,
  'independentHistoricalCanariesExpected',x.baseline_count,
  'independentHistoricalCanariesMissing',x.missing_count,
  'independentHistoricalMissingIds',x.missing_ids),
- 'Sin huerfanos, guardas activas y 2 canarios de actas historicas conservados',
+ 'Sin huerfanos, DELETE/TRUNCATE+event_key UPDATE guard activos y 2 canarios conservados',
  'Resolver 5/18/33 y canario Freezer ausente, sin publicar ni fabricar identidades'),
 (7,'DIRECT_RADAR_AND_API_HTTP',
  'NOT_CHECKED',
