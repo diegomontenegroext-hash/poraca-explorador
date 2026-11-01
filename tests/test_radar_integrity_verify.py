@@ -14,7 +14,7 @@ BRANCH = "br-mute-recipe-b4odj2bl"
 
 class IndependentE2ECertificationTests(unittest.TestCase):
     def sample(self, orphaned=0, canonical=4, editorial=7,
-               missing_receipts=0, missing_approved=0, guards=2,
+               missing_receipts=0, missing_approved=0, dangling_relations=0, guards=2,
                survival=True, canary=1):
         report = assess(("definitivo-current", "complete", 62, 62,
                          315, 77, editorial, canonical, canonical,
@@ -25,6 +25,8 @@ class IndependentE2ECertificationTests(unittest.TestCase):
             "acceptedReceipts": 22,
             "missingAcceptedReceipts": missing_receipts,
             "orphanedObservationLinks": orphaned,
+            "orphanAcceptedEventRelations": dangling_relations,
+            "missingAcceptedRelationEventIds": dangling_relations,
             "missingCanonicalIdentities": orphaned,
             "approvedEventIds": 1,
             "missingApprovedEventIds": missing_approved,
@@ -35,7 +37,7 @@ class IndependentE2ECertificationTests(unittest.TestCase):
             "protectionTriggers": guards,
             "checkpointSurvivalGuard": survival,
             "decision": ("P0_CANONICAL_HISTORY_BROKEN"
-                         if orphaned or missing_receipts or missing_approved
+                         if orphaned or missing_receipts or missing_approved or dangling_relations
                          else "DATA_INTEGRITY_PASS_HTTP_SSO_SEPARATE"),
         }
         return report
@@ -51,6 +53,10 @@ class IndependentE2ECertificationTests(unittest.TestCase):
 
     def test_approved_review_loss_never_hidden_by_zero_orphans(self):
         self.assertEqual(certify(self.sample(missing_approved=1)),
+                         ("P0_CANONICAL_HISTORY_BROKEN", 2))
+
+    def test_orphan_accepted_event_relations_fail_even_without_observations(self):
+        self.assertEqual(certify(self.sample(dangling_relations=33)),
                          ("P0_CANONICAL_HISTORY_BROKEN", 2))
 
     def test_missing_triggers_fail_even_when_data_appears_healthy(self):
