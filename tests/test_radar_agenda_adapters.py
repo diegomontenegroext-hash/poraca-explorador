@@ -11,6 +11,34 @@ import radar_agenda_adapters as ad
 import radar_definitivo as rd
 
 class CulturalAgendaAdapterTests(unittest.TestCase):
+    def test_el_dia_new_agenda_slug_and_amp_from_actual_anchors(self):
+        root="https://www.eldia.com/ttags/espectaculos"
+        official="https://www.eldia.com/espectaculos/agenda-espectaculos_1793338233/amp"
+        variant=("https://www.eldia.com/espectaculos/"
+                 "agenda-de-espectaculos-para-este-finde-en-la-plata-septimo-dia_1793338233")
+        raw=(f'<a href="{official}">Agenda del finde</a>'
+             f'<a href="{variant}">Más agenda</a>'
+             '<a href="https://evil.example/espectaculos/agenda-espectaculos_1793338233">'
+             'Enlace falso</a>')
+        found=ad.special_links(root,rd.parse_html(raw),
+                                at=datetime(2026,11,1,12))
+        self.assertEqual({url for url,reason in found},{official,variant})
+        self.assertTrue(all(reason.startswith("nota real") for _,reason in found))
+        # Actual article URL alone never supplies the event date.
+        doc=('<time>30 de octubre de 2026</time>'
+             '<p>Hoy</p>'
+             '<p>Segundo Tiempo Sexteto.- A las 20 en Casa Metro, 4 entre 51 y 53.</p>')
+        listed=ad.el_dia_editorial_agenda(
+            doc,official,at=datetime(2026,10,30,12))
+        self.assertEqual(len(listed),1)
+        self.assertEqual(listed[0]["title"],"Segundo Tiempo Sexteto")
+        self.assertEqual(listed[0]["event_time"],"20:00")
+        self.assertEqual(listed[0]["evidence_tier"],"secondary_press_agenda")
+        self.assertEqual(ad.el_dia_editorial_agenda(
+            '<p>Hoy</p><p>Show.- A las 20 en Sala 420.</p>',
+            official,at=datetime(2026,10,30,12)), [])
+
+
     def test_centro_arte_original_sections_from_real_homepage_anchors_only(self):
         root="https://www.centrodearte.unlp.edu.ar/"
         raw=('''<a href="/calendario-2/">Calendario</a>
