@@ -22,3 +22,6 @@ verification_id=20261031-l4-relations-exceptions-01
 
 # 2026-10-31 22:20 ART: verify direct Radar read-only proof separately from historical canonical integrity; no ingestion.
 verification_id=20261031-direct-archive-independent-01
+
+# Keyset v2 exhaustive direct Radar certificate, no re-ingestion or canonical writes.
+verification_id=20261031-2305-robust-60-100-200-readonly-v2
