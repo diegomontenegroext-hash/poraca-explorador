@@ -33,6 +33,21 @@ class ExecutiveGateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"UNEXPECTED_STATE"):
             report_for(rows)
 
+    def test_latest_full_run_determines_source_yield(self):
+        # A 10/10 incremental must not hide 33 index_only in a 62-source FULL.
+        root=Path(__file__).resolve().parents[1]
+        sql=(root/"sql/20261101_executive_readiness_gates_READ_ONLY.sql").read_text()
+        self.assertIn("last_full AS",sql)
+        self.assertIn("full_checks AS",sql)
+        self.assertIn("x.full_index_only>0 THEN 'PARTIAL'",sql)
+        self.assertIn("'lastFullIndexOnly',x.full_index_only",sql)
+        self.assertIn("'lastFullRunId',x.last_full_run_id",sql)
+        self.assertIn("'baselineCanonicalIdsMissing',x.lost_count",sql)
+        # SQL never mutates Neon and cannot claim API/SSO access.
+        self.assertNotIn("INSERT INTO ",sql)
+        self.assertNotIn("UPDATE public.",sql)
+        self.assertNotIn("DELETE FROM ",sql)
+
     def test_no_pass_can_self_certify(self):
         self.assertEqual(report_for(sample_rows())["decision"],"NOT_END_TO_END_CERTIFIED")
 
