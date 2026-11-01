@@ -28,3 +28,8 @@ verification_id=20261031-2305-robust-60-100-200-readonly-v2
 
 # 2026-11-01: verify code-level regressions, protected identity and independent Freezer sentinel; no Radar acquisition.
 verification_id=20261101-f1-regression-no-writes
+
+# 2026-11-01 manual audit: whole QA suite + Neon read-only, NOT an ingestion run.
+verification_id=20261101-manual-qa-teatro-cerca-final-p0-5-17
+expected_result=QA_PASS_AND_INTEGRITY_FAIL_ON_5_OBS_17_RELS
+trigger_reason=manual_end_to_end_checkpoint_without_writes
