@@ -34,6 +34,24 @@ future AS (
   WHERE event_date >= (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
 ),
 attestation AS (SELECT public.poraca_e2e_integrity_attestation_v1() AS a),
+-- Expected historical IDs from independent published acceptance acts.
+-- This detects lost checkpoints PLUS lost canon; not an automatic restore.
+reference_ledger AS (
+ SELECT baseline.event_key,baseline.act_ref,(e.event_key IS NOT NULL) AS preserved
+ FROM (VALUES
+  ('freezer-brindis-inauguracion-ciudad-de-gatos-2026-11-05',
+   'docs/PLAN_EXCELENCIA_BACKLOG_UNICO_20261030.md / 31-10 E2E HTTP'),
+  ('cultural-66d110c1850ad58739385baf263c0519',
+   'docs/PILOTO_EL_ANIMO_20261101_ADMISION_20261030.md')
+ ) AS baseline(event_key,act_ref)
+ LEFT JOIN public.radar_agenda_events e ON e.event_key=baseline.event_key
+), historical_canaries AS (
+ SELECT count(*)::int baseline_count,
+   count(*) FILTER (WHERE NOT preserved)::int missing_count,
+   coalesce(jsonb_agg(jsonb_build_object('eventKey',event_key,'actRef',act_ref))
+      FILTER (WHERE NOT preserved),'[]'::jsonb) AS missing_ids
+ FROM reference_ledger
+),
 security AS (
  SELECT pg_has_role('poraca_definitivo_ingest','neon_superuser','member') AS ingest_elevated,
         pg_has_role('poraca_explorador_writer','neon_superuser','member') AS writer_elevated
@@ -42,9 +60,10 @@ ctx AS (
  SELECT l.*, c.checked AS check_rows,c.ok,c.index_only,c.other,
     i.fetch_enabled,i.discover_only,i.review_only,i.fetch_no_circuit,
     f.future_staging,f.primary_structured_leads,
-    a.a AS integrity,s.ingest_elevated,s.writer_elevated
+    a.a AS integrity,s.ingest_elevated,s.writer_elevated,
+    g.baseline_count,g.missing_count,g.missing_ids
  FROM latest l CROSS JOIN checks c CROSS JOIN inventory i CROSS JOIN future f
- CROSS JOIN attestation a CROSS JOIN security s
+ CROSS JOIN attestation a CROSS JOIN security s CROSS JOIN historical_canaries g
 )
 SELECT g.ord,g.gate,g.state,g.evidence,g.acceptance,g.next_action
 FROM ctx x CROSS JOIN LATERAL (VALUES
@@ -86,15 +105,19 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  AND (x.integrity->>'orphanAcceptedEventRelations')::int=0
  AND (x.integrity->>'missingApprovedEventIds')::int=0
  AND (x.integrity->>'protectionTriggers')::int>=2
- AND x.integrity->>'checkpointSurvivalGuard'='true' THEN 'PASS' ELSE 'FAIL' END,
+ AND x.integrity->>'checkpointSurvivalGuard'='true'
+ AND x.baseline_count=2 AND x.missing_count=0 THEN 'PASS' ELSE 'FAIL' END,
  jsonb_build_object('decision',x.integrity->'decision',
  'missingReceipts',x.integrity->'missingAcceptedReceipts',
  'orphanedObservations',x.integrity->'orphanedObservationLinks',
  'orphanedAcceptedRelations',x.integrity->'orphanAcceptedEventRelations',
  'missingApprovedIds',x.integrity->'missingApprovedEventIds',
- 'guards',x.integrity->'protectionTriggers'),
- '0 recibos/observaciones/relaciones aceptadas huerfanas, guardas activas',
- 'Triage de 5/18/33 por clase, sin fabricar canones ni borrar evidencia'),
+ 'guards',x.integrity->'protectionTriggers',
+ 'independentHistoricalCanariesExpected',x.baseline_count,
+ 'independentHistoricalCanariesMissing',x.missing_count,
+ 'independentHistoricalMissingIds',x.missing_ids),
+ 'Sin huerfanos, guardas activas y 2 canarios de actas historicas conservados',
+ 'Resolver 5/18/33 y canario Freezer ausente, sin publicar ni fabricar identidades'),
 (7,'DIRECT_RADAR_AND_API_HTTP',
  'NOT_CHECKED',
  jsonb_build_object('databaseEvidence','La corrida no certifica HTTP autenticado','httpApi',x.integrity->'httpApi'),
