@@ -19,7 +19,8 @@ full_checks AS (
   SELECT count(*)::int AS checked,
    count(*) FILTER(WHERE status='ok')::int AS ok,
    count(*) FILTER(WHERE status='index_only')::int AS index_only,
-   count(*) FILTER(WHERE status NOT IN ('ok','index_only'))::int AS other
+   count(*) FILTER(WHERE status NOT IN ('ok','index_only')
+       OR coalesce(error_type,'')<>'' OR http_status NOT BETWEEN 200 AND 299)::int AS other
   FROM radar_definitivo.source_checks
   WHERE run_id=(SELECT run_id FROM last_full)
 ),
@@ -322,8 +323,8 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  'Credenciales operativas sin pertenencia a rol privilegiado ni DDL; ensayar migracion en clon',
  'P0 A17: preparar rol de minimo privilegio y cutover con rollback; no cambiar secretos a ciegas'),
 (11,'STABILITY',
- CASE WHEN x.summary->'stability'->'3d'->>'state'='healthy'
- AND x.summary->'stability'->'7d'->>'state'='healthy' THEN 'PASS' ELSE 'PARTIAL' END,
+ CASE WHEN x.summary->'stability'->'3d'->>'state'='correcto'
+ AND x.summary->'stability'->'7d'->>'state'='correcto' THEN 'PASS' ELSE 'PARTIAL' END,
  jsonb_build_object('last3d',x.summary->'stability'->'3d',
                     'last7d',x.summary->'stability'->'7d'),
  'Series completas de 3 y 7 dias sin perdida/duplicacion de calendario',
