@@ -731,15 +731,33 @@ def teatro_cerca_listing_cards(raw, url, at=None):
         opening=card[:card.find(">")+1]
         title=attr(opening,"data-obra-title")
         if not title:continue
+        # Real cards have two variants: explicit data-function-* attributes,
+        # or HTML-escaped JSON data-select-item on the same poster DIV.
+        # Neither variant may derive a date/time from a URL slug.
         poster=re.search(
-            r"<div\b(?=[^>]*\bdata-function-date\s*=)[^>]*>",card,re.I|re.S)
+            r"<div\b(?=[^>]*(?:\bdata-function-date\s*=|\bdata-select-item\s*=))"
+            r"[^>]*>",card,re.I|re.S)
         if not poster:continue
         element=poster.group(0)
-        city=tidy(attr(element,"data-city")).casefold()
+        embedded={}
+        raw_select=attr(element,"data-select-item")
+        if raw_select and len(raw_select)<=12000:
+            try:
+                decoded=json.loads(raw_select)
+                if isinstance(decoded,dict):
+                    embedded={key:value for key,value in decoded.items()
+                              if isinstance(value,str)}
+            except (TypeError,ValueError):
+                pass
+        if embedded.get("item_name") and tidy(embedded["item_name"])!=title:
+            continue
+        city=tidy(attr(element,"data-city") or embedded.get("city")).casefold()
         if city not in nearby:continue
-        venue=tidy(attr(element,"data-venue"))
-        date_raw=attr(element,"data-function-date")
-        time_raw=attr(element,"data-function-time")
+        venue=tidy(attr(element,"data-venue") or embedded.get("venue"))
+        date_raw=attr(element,"data-function-date") or embedded.get("function_date")
+        time_raw=attr(element,"data-function-time") or embedded.get("function_time")
+        if not isinstance(date_raw,str) or not isinstance(time_raw,str):
+            continue
         if (not re.fullmatch(r"20\d{2}-\d{2}-\d{2}",date_raw)
                 or not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?",time_raw)
                 or not venue):
