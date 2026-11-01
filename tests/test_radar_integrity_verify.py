@@ -5,7 +5,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from radar_integrity_verify import certify
+from radar_integrity_verify import certify, load_canonical_survival_ledger, assess_canonical_survival
 from radar_end_to_end import assess
 
 PROJECT = "frosty-union-52906378"
@@ -39,6 +39,12 @@ class IndependentE2ECertificationTests(unittest.TestCase):
             "decision": ("P0_CANONICAL_HISTORY_BROKEN"
                          if orphaned or missing_receipts or missing_approved or dangling_relations
                          else "DATA_INTEGRITY_PASS_HTTP_SSO_SEPARATE"),
+        }
+        report["canonicalSurvivalLedger"] = {
+            "baselineRequired": 133, "baselinePresent": 133,
+            "baselineMissing": 0, "newIdsSinceBaseline": 7,
+            "baselineDigest": "5f651497da4b186acc9f24dc80922d89",
+            "writesPerformed": False,
         }
         report["historicalCanaries"] = {
             "elAnimo": 1, "freezer": 1, "immutableGuard": 1,
@@ -91,6 +97,37 @@ class IndependentE2ECertificationTests(unittest.TestCase):
         report.pop("historicalCanaries")
         self.assertEqual(certify(report),
                          ("NOT_CERTIFIED_MISSING_INDEPENDENT_CANARIES", 2))
+
+    def test_git_baseline_ledger_is_valid_and_contains_133_id_hashes(self):
+        ledger=load_canonical_survival_ledger()
+        self.assertEqual(len(ledger["idsMd5"]),133)
+        self.assertEqual(ledger["expectedAtLeast"],133)
+        self.assertEqual(ledger["baselineSortedHashesMd5"],
+                         "5f651497da4b186acc9f24dc80922d89")
+
+    def test_ledger_detects_silent_canonical_deletion_without_receipt(self):
+        ledger=load_canonical_survival_ledger()
+        full=assess_canonical_survival(ledger,ledger["idsMd5"]+["0"*32])
+        self.assertEqual(full["baselineMissing"],0)
+        self.assertEqual(full["newIdsSinceBaseline"],1)
+        removed=assess_canonical_survival(ledger,ledger["idsMd5"][1:])
+        self.assertEqual(removed["baselineMissing"],1)
+        report=self.sample()
+        report["canonicalSurvivalLedger"]=removed
+        self.assertEqual(certify(report),
+                         ("P0_CANONICAL_SURVIVAL_LEDGER_MISSING_IDS",2))
+
+    def test_ledger_missing_technical_readback_never_certifies(self):
+        report=self.sample()
+        report.pop("canonicalSurvivalLedger")
+        self.assertEqual(certify(report),
+                         ("NOT_CERTIFIED_MISSING_CANONICAL_SURVIVAL_LEDGER",2))
+
+    def test_ledger_contradictory_total_never_certifies(self):
+        report=self.sample()
+        report["canonicalSurvivalLedger"]["baselinePresent"]=132
+        self.assertEqual(certify(report),
+                         ("NOT_CERTIFIED_CONTRADICTORY_CANONICAL_SURVIVAL",2))
 
     def test_zero_future_events_is_not_success(self):
         self.assertEqual(certify(self.sample(canonical=0)),
