@@ -53,6 +53,24 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
         self.assertEqual(ad.teatro_cerca_listing_cards(
             good,"https://teatrocerca.com.ar.attacker.example/teatro-independiente"),[])
 
+    def test_teatro_cerca_structured_events_stay_secondary(self):
+        # A JSON-LD Event in a theatre AGGREGATOR is still secondary,
+        # even when markup looks as complete as a first-party original.
+        url="https://teatrocerca.com.ar/teatro-independiente"
+        snippet=('<script type="application/ld+json">'
+                 '{"@context":"https://schema.org","@type":"Event",'
+                 '"name":"Disforia",'
+                 '"startDate":"2026-11-08T19:30:00-03:00",'
+                 '"location":{"@type":"Place","name":"Fábrica CITA"}}'
+                 '</script>')
+        with patch.object(ad,"active_date",return_value=True):
+            rows=ad.structured_sessions(snippet,url)
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["event_date"],"2026-11-08")
+        self.assertEqual(rows[0]["event_time"],"19:30")
+        self.assertEqual(rows[0]["evidence_tier"],"secondary_agenda")
+        self.assertEqual(rows[0]["review_state"],"observed_unverified")
+
     def test_active_date_accepts_datetime_and_date(self):
         from datetime import date, timezone
         self.assertTrue(ad.active_date(date(2026,11,1),date(2026,11,1)))
