@@ -222,6 +222,11 @@ def iso_event_fields(date_value: str | None) -> tuple[str | None, str | None]:
         r"\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}"
         r"(?::\d{2}(?:\.\d{1,6})?)?(?:Z|[+-]\d{2}:?\d{2})?",raw,re.I):
         return None,None
+    # Python 3.14 accepts ISO 24:00 and silently rolls the date forward.
+    # An announcement at 24:00 is ambiguous and must not become a new
+    # function on the following day by parser behavior/version drift.
+    if int(raw[11:13]) > 23:
+        return None,None
     try:
         parsed=datetime.fromisoformat(raw.replace("Z","+00:00").replace("z","+00:00"))
         if parsed.tzinfo is not None:
