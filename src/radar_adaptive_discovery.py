@@ -133,7 +133,7 @@ def discover_original_posts_from_section(section_url, links, existing=(), limit=
             continue
         score=2*int(signal)+int(descriptive)
         candidate="https://"+p.hostname+p.path
-        if candidate not in found or found[candidate]>score:
+        if candidate not in found or found[candidate]<score:
             found[candidate]=score
     return [(url,"original enlazado desde sección institucional")
             for url,score in sorted(found.items(),key=lambda x:(-x[1],x[0]))[:max(0,min(limit,3))]]
