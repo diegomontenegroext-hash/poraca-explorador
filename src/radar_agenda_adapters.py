@@ -594,7 +594,7 @@ def el_dia_editorial_agenda(raw, url, blocks=None, at=None):
     """
     host, path = scope(url)
     if host not in ("www.eldia.com", "eldia.com") or not re.fullmatch(
-            r"/espectaculos/agenda(?:-[a-z0-9]+){0,16}_\d{10}(?:/amp)?/?", path):
+            r"(?:/espectaculos/agenda(?:-[a-z0-9]+){0,16}|/septimo-dia/agenda-septimo-dia)_\d{10}(?:/amp)?/?", path):
         return []
     published = re.search(
         r"<time\b[^>]*>[^<]{0,180}?\b([0-3]?\d)\s+de\s+"
@@ -617,7 +617,7 @@ def el_dia_editorial_agenda(raw, url, blocks=None, at=None):
                 "miércoles": 2, "jueves": 3, "viernes": 4,
                 "sabado": 5, "sábado": 5, "domingo": 6}
     for tag, value in blocks.chunks:
-        if tag != "p":
+        if tag not in ("p", "h1", "h2", "h3"):
             continue
         line = tidy(value)
         heading = line.casefold().strip(" .:")
@@ -636,7 +636,7 @@ def el_dia_editorial_agenda(raw, url, blocks=None, at=None):
         if heading in ("pasado mañana", "pasado manana"):
             day = origin + timedelta(days=2)
             continue
-        if not day or not active_date(day, at):
+        if tag != "p" or not day or not active_date(day, at):
             continue
         match = re.fullmatch(r"(.{4,150}?)\.\s*-\s*(.{5,})", line)
         if not match:
@@ -929,7 +929,7 @@ def special_links(url,page,at=None):
                 range(min(4,len(rest))))
         return first[:6]
     if host in ("www.eldia.com", "eldia.com") and path.rstrip("/") in (
-            "/ttags/espectaculos", "/espectaculos"):
+            "/ttags/espectaculos", "/espectaculos", "/septimo-dia"):
         # Reuse existing max_details budget; official agenda slugs vary by day.\n        # Never synthesize URLs or treat a slug timestamp as a showtime.\n        # The tag page links weekly
         # agenda articles but the generic URL sorter starves recent ones.
         # Prioritize the two newest REAL anchors, no synthesized slugs.
@@ -940,7 +940,7 @@ def special_links(url,page,at=None):
             if raw_link.startswith("/"):
                 raw_link = "https://" + host + raw_link
             p = urlsplit(raw_link)
-            matched = re.fullmatch(r"/espectaculos/agenda(?:-[a-z0-9]+){0,16}_(\d{10})(?:/amp)?/?", p.path)
+            matched = re.fullmatch(r"(?:/espectaculos/agenda(?:-[a-z0-9]+){0,16}|/septimo-dia/agenda-septimo-dia)_(\d{10})(?:/amp)?/?", p.path)
             if (not matched or p.scheme != "https" or p.hostname not in
                 ("www.eldia.com", "eldia.com") or p.username or p.password or
                 p.port not in (None, 443) or p.query or p.fragment):
