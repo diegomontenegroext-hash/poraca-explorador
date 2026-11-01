@@ -191,7 +191,7 @@ class CulturalAgendaAdapterTests(unittest.TestCase):
             <a href="/calendario-2/">Calendario duplicado</a>''')
         found=ad.special_links(root,rd.parse_html(raw))
         self.assertEqual([u for u,label in found],[
-            root+"calendario-2/",root+"artes-visuales/",root+"musica/"])
+            root+"musica/",root+"artes-visuales/",root+"calendario-2/"])
         self.assertTrue(all("original enlazada" in label for _,label in found))
         self.assertEqual(ad.special_links(root,rd.parse_html("<p>Sin enlaces</p>")),[])
 
