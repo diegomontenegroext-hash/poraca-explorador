@@ -33,3 +33,7 @@ verification_id=20261101-f1-regression-no-writes
 verification_id=20261101-manual-qa-teatro-cerca-final-p0-5-17
 expected_result=QA_PASS_AND_INTEGRITY_FAIL_ON_5_OBS_17_RELS
 trigger_reason=manual_end_to_end_checkpoint_without_writes
+
+# Only QA suite and read-only attestation. Does not run Radar or write Neon.
+verification_id=20261101-eldia-section-source-target-regression
+trigger_reason=validate_stable_espectaculos_section_against_recent_actual_agenda
