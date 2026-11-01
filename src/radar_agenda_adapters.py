@@ -585,7 +585,7 @@ def alternativa_schedule_room(current_text,position,fallback):
 
 
 def el_dia_editorial_agenda(raw, url, blocks=None, at=None):
-    """Parse the dated paragraphs of one *specific* El Dia agenda article.
+    """Parse dated paragraphs of a linked El Dia agenda article, including slug variants.
 
     A newspaper programme is SECONDARY evidence. Rows are proposed sessions,
     never independent original confirmation, venue accreditation or release.
@@ -594,7 +594,7 @@ def el_dia_editorial_agenda(raw, url, blocks=None, at=None):
     """
     host, path = scope(url)
     if host not in ("www.eldia.com", "eldia.com") or not re.fullmatch(
-            r"/espectaculos/agenda-espectaculos_\d{10}/?", path):
+            r"/espectaculos/agenda(?:-[a-z0-9]+){0,16}_\d{10}(?:/amp)?/?", path):
         return []
     published = re.search(
         r"<time\b[^>]*>[^<]{0,180}?\b([0-3]?\d)\s+de\s+"
@@ -930,7 +930,7 @@ def special_links(url,page,at=None):
         return first[:6]
     if host in ("www.eldia.com", "eldia.com") and path.rstrip("/") in (
             "/ttags/espectaculos", "/espectaculos"):
-        # Reuse existing max_details budget. The tag page links weekly
+        # Reuse existing max_details budget; official agenda slugs vary by day.\n        # Never synthesize URLs or treat a slug timestamp as a showtime.\n        # The tag page links weekly
         # agenda articles but the generic URL sorter starves recent ones.
         # Prioritize the two newest REAL anchors, no synthesized slugs.
         now = at or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
@@ -940,7 +940,7 @@ def special_links(url,page,at=None):
             if raw_link.startswith("/"):
                 raw_link = "https://" + host + raw_link
             p = urlsplit(raw_link)
-            matched = re.fullmatch(r"/espectaculos/agenda-espectaculos_(\d{10})/?", p.path)
+            matched = re.fullmatch(r"/espectaculos/agenda(?:-[a-z0-9]+){0,16}_(\d{10})(?:/amp)?/?", p.path)
             if (not matched or p.scheme != "https" or p.hostname not in
                 ("www.eldia.com", "eldia.com") or p.username or p.password or
                 p.port not in (None, 443) or p.query or p.fragment):
