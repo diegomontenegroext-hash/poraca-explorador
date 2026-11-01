@@ -50,6 +50,39 @@ future AS (
   WHERE event_date >= (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
 ),
 attestation AS (SELECT public.poraca_e2e_integrity_attestation_v1() AS a),
+-- Positive proof of the approved editorial path, independent of historical P0.
+-- Presence of a receipt alone does not justify admitting any new candidate.
+admission_proof AS (
+ SELECT count(*) FILTER (WHERE verification='confirmed'
+          AND status IN ('scheduled','rescheduled')
+          AND event_date >= (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
+          AND source_url LIKE 'https://%'
+          AND jsonb_typeof(evidence)='array'
+          AND evidence <> '[]'::jsonb)::int AS confirmed_future_with_evidence,
+        count(*) FILTER (WHERE verification='confirmed'
+          AND (source_url NOT LIKE 'https://%'
+               OR jsonb_typeof(evidence)<>'array'
+               OR evidence='[]'::jsonb))::int AS confirmed_missing_evidence
+ FROM public.radar_agenda_events
+),
+-- Inventory and run receipts by circuit, not an unsupported census of
+-- every activity in La Plata. Missing categories remain observable gaps.
+circuit_checks AS (
+ SELECT count(*)::int AS fetch_rows,
+        count(DISTINCT NULLIF(btrim(s.circuit),''))::int AS circuits_mapped,
+        count(*) FILTER (WHERE s.circuit IS NULL OR btrim(s.circuit)='')::int AS fetch_without_circuit,
+        count(*) FILTER (WHERE sc.source_id IS NULL)::int AS fetch_unchecked,
+        count(*) FILTER (WHERE sc.source_id IS NOT NULL AND
+          (sc.status NOT IN ('ok','index_only') OR coalesce(sc.error_type,'')<>''
+            OR sc.http_status NOT BETWEEN 200 AND 299))::int AS fetch_errors,
+        count(*) FILTER (WHERE sc.status='ok')::int AS yield_eligible_checks,
+        count(*) FILTER (WHERE sc.status='index_only')::int AS index_only_checks
+ FROM radar_definitivo.sources s
+ LEFT JOIN radar_definitivo.source_checks sc
+   ON sc.source_id=s.source_id
+      AND sc.run_id=(SELECT run_id FROM last_full)
+ WHERE s.enabled AND s.monitoring_mode='fetch'
+),
 -- Expected historical IDs from independent published acceptance acts.
 -- This detects lost checkpoints PLUS lost canon; not an automatic restore.
 reference_ledger AS (
@@ -226,12 +259,16 @@ ctx AS (
  SELECT l.*, c.checked AS check_rows,c.ok,c.index_only,c.other,
     i.fetch_enabled,i.discover_only,i.review_only,i.fetch_no_circuit,
     f.future_staging,f.primary_structured_leads,
+    ap.confirmed_future_with_evidence,ap.confirmed_missing_evidence,
+    cc.fetch_rows,cc.circuits_mapped,cc.fetch_without_circuit,
+    cc.fetch_unchecked,cc.fetch_errors,cc.yield_eligible_checks,cc.index_only_checks,
     a.a AS integrity,s.ingest_elevated,s.writer_elevated,
     g.baseline_count,g.missing_count,g.missing_ids,k.active_guard,m.lost_count,fc.checked AS full_checked,fc.ok AS full_ok,
     fc.index_only AS full_index_only,fc.other AS full_other,
     lf.run_id AS last_full_run_id,lf.sources_selected AS full_sources_selected,
     lf.sources_checked AS full_sources_checked,lf.finished_at AS full_finished_at
  FROM latest l CROSS JOIN checks c CROSS JOIN inventory i CROSS JOIN future f
+ CROSS JOIN admission_proof ap CROSS JOIN circuit_checks cc
  CROSS JOIN attestation a CROSS JOIN security s CROSS JOIN historical_canaries g CROSS JOIN identity_key_guard k CROSS JOIN survival_missing m CROSS JOIN last_full lf CROSS JOIN full_checks fc
 )
 SELECT g.ord,g.gate,g.state,g.evidence,g.acceptance,g.next_action
@@ -272,11 +309,19 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  'Embudo guardado para el run y conteos separados de aprobacion',
  'Revisar originales individuales priorizados y posibles colisiones sin fusionar horarios'),
 (5,'EDITORIAL_ADMISSION',
- 'PARTIAL',
+ CASE WHEN (x.integrity->>'acceptedReceipts')::int > 0
+        AND (x.integrity->>'missingAcceptedReceipts')::int=0
+        AND x.confirmed_future_with_evidence>0
+        AND x.confirmed_missing_evidence=0 THEN 'PASS'
+      ELSE 'PARTIAL' END,
  jsonb_build_object('futureStaging',x.future_staging,'primaryStructuredLeads',x.primary_structured_leads,
- 'confirmedFuture',x.integrity->'confirmedScheduledFuture','autoPublished',false),
- 'Lotes solo con original puntual, horario, sede aprobada, autorizacion y readback idempotente',
- 'Preparar lote pequeno de expedientes; no insertar masivamente ni convertir indices en funciones'),
+ 'acceptedReceipts',x.integrity->'acceptedReceipts',
+ 'missingAcceptedReceipts',x.integrity->'missingAcceptedReceipts',
+ 'confirmedFutureWithEvidence',x.confirmed_future_with_evidence,
+ 'confirmedMissingEvidence',x.confirmed_missing_evidence,
+ 'autoPublicationAuthorized',false,'historicalIntegritySeparatelyChecked',true),
+ 'Ruta de admision probada con recibos, canon futuro confirmado y evidencia; no acredita integridad historica ni autoriza autopublicacion',
+ 'Si no hay recibos o evidencia valida, preparar un expediente individual con revision y readback; nunca publicar masivamente'),
 (6,'CANONICAL_INTEGRITY',
  CASE WHEN (x.integrity->>'missingAcceptedReceipts')::int=0
  AND (x.integrity->>'orphanedObservationLinks')::int=0
@@ -311,11 +356,21 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  'Chromium autentico 7 perfiles, viewport y capturas sobre SHA exacto',
  'Ejecutar QA estandar #30 sin desactivar SSO; si entorno bloqueado registrar BLOCKED'),
 (9,'COVERAGE_BY_CIRCUIT',
- 'PARTIAL',
- jsonb_build_object('fetchWithoutCircuit',x.fetch_no_circuit,
- 'knownCircuitNotEventGenre',true),
- 'Denominador representativo por disciplina y control de fuente primaria',
- 'Medir yoga, ceramica, vinos, under, teatro, artes y talleres sin inventar cobertura'),
+ CASE WHEN x.fetch_rows=0 OR x.circuits_mapped=0 THEN 'FAIL'
+      WHEN x.fetch_without_circuit=0 AND x.fetch_unchecked=0 AND x.fetch_errors=0
+       AND x.fetch_rows=x.full_sources_selected THEN 'PASS'
+      ELSE 'PARTIAL' END,
+ jsonb_build_object('fetchSources',x.fetch_rows,
+ 'circuitsMapped',x.circuits_mapped,
+ 'fetchWithoutCircuit',x.fetch_without_circuit,
+ 'fetchUncheckedInLastFull',x.fetch_unchecked,
+ 'fetchErrorsInLastFull',x.fetch_errors,
+ 'yieldEligibleChecks',x.yield_eligible_checks,
+ 'indexOnlyChecks',x.index_only_checks,
+ 'cityActivityExhaustiveness','not_measured',
+ 'sourceRosterCoverageOnly',true),
+ 'Inventario fetch clasificado por circuito y consultado en FULL sin errores; NO prueba exhaustividad cultural ni eventos por rubro',
+ 'Clasificar fuentes faltantes y medir por separado yoga, talleres, vinos y musica under segun evidencia de actividad o entidad, sin funciones ficticias'),
 (10,'LEAST_PRIVILEGE',
  CASE WHEN x.ingest_elevated OR x.writer_elevated THEN 'FAIL' ELSE 'PASS' END,
  jsonb_build_object('ingestNeonSuperuserMember',x.ingest_elevated,
