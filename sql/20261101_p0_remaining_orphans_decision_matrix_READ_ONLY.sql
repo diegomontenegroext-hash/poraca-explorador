@@ -34,10 +34,10 @@ WITH orphan_ids AS (
      THEN 'HOLD_HISTORICAL_ARCHIVE_DO_NOT_PUBLISH'
    WHEN venues.hosted_at_relations=0 OR venues.entity_id IS NULL
      THEN 'HOLD_UNKNOWN_PARENT_VENUE'
-   WHEN venues.editorial_state <> 'approved_public'
-     THEN 'HOLD_INTERNAL_ENTITY_REVIEW'
    WHEN venues.entity_kind <> 'venue'
      THEN 'HOLD_INSTITUTION_NOT_VENUE'
+   WHEN venues.editorial_state <> 'approved_public'
+     THEN 'HOLD_INTERNAL_ENTITY_REVIEW'
    WHEN o.timed_observations=0
      THEN 'HOLD_MISSING_ORIGINAL_TIME'
    WHEN o.original_urls=0
