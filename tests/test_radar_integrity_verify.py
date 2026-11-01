@@ -51,6 +51,20 @@ class IndependentE2ECertificationTests(unittest.TestCase):
         }
         return report
 
+    def test_migration_guard_is_non_destructive_and_canonical_anchored(self):
+        sql=(ROOT / "sql/20261101_accepted_event_relation_guard_v1_REQUIRES_APPROVAL.sql").read_text()
+        self.assertIn("BEFORE INSERT OR UPDATE OF review_state, subject_kind, subject_id", sql)
+        self.assertIn("NEW.review_state='accepted'",sql)
+        self.assertIn("NEW.subject_kind='event'",sql)
+        self.assertIn("c.event_key=NEW.subject_id",sql)
+        self.assertIn("RAISE EXCEPTION 'PORACA_ACCEPTED_EVENT_RELATION_MISSING_CANONICAL'",sql)
+        self.assertIn("CREATE OR REPLACE FUNCTION",sql)
+        self.assertIn("REQUIRES",str(ROOT / "sql/20261101_accepted_event_relation_guard_v1_REQUIRES_APPROVAL.sql"))
+        self.assertNotIn("DELETE FROM ",sql)
+        self.assertNotIn("TRUNCATE TABLE ",sql)
+        self.assertNotIn("UPDATE public.poraca_knowledge_relations SET",sql)
+        self.assertNotIn("INSERT INTO public.radar_agenda_events",sql)
+
     def test_real_defect_fails_due_to_missing_canons(self):
         report = self.sample(orphaned=26, missing_receipts=13)
         self.assertEqual(certify(report), ("P0_CANONICAL_HISTORY_BROKEN", 2))
