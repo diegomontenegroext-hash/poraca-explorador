@@ -11,6 +11,16 @@ import radar_agenda_adapters as ad
 import radar_definitivo as rd
 
 class CulturalAgendaAdapterTests(unittest.TestCase):
+    def test_active_date_accepts_datetime_and_date(self):
+        from datetime import date, timezone
+        self.assertTrue(ad.active_date(date(2026,11,1),date(2026,11,1)))
+        self.assertTrue(ad.active_date(date(2026,11,1),datetime(2026,11,1,12)))
+        self.assertTrue(ad.active_date(datetime(2026,11,1,19,tzinfo=timezone.utc),
+                                       datetime(2026,11,1,12,tzinfo=timezone.utc)))
+        self.assertFalse(ad.active_date("2026-11-01",datetime(2026,11,1,12)))
+        self.assertFalse(ad.active_date(date(2024,1,1),datetime(2026,11,1,12)))
+
+
     def test_el_dia_septimo_dia_real_article(self):
         # Official real path observed in the newspaper on 2026-11-01.
         root="https://www.eldia.com/septimo-dia"
