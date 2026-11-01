@@ -21,6 +21,7 @@ EXPECTED = (
 ATTESTATION_SCHEMA = "poraca-e2e-integrity-attestation-v1"
 REQUIRED_COUNTS = (
     "acceptedReceipts", "missingAcceptedReceipts", "orphanedObservationLinks",
+    "orphanAcceptedEventRelations", "missingAcceptedRelationEventIds",
     "missingCanonicalIdentities", "approvedEventIds", "missingApprovedEventIds",
     "canonicalTotal", "canonicalFuture", "confirmedScheduledFuture",
     "canaryElAnimo", "protectionTriggers",
@@ -47,7 +48,8 @@ def certify(report: dict) -> tuple[str, int]:
         return "P0_CANONICAL_PROTECTION_MISSING", 2
     if (audit["missingAcceptedReceipts"] > 0
             or audit["missingApprovedEventIds"] > 0
-            or audit["orphanedObservationLinks"] > 0):
+            or audit["orphanedObservationLinks"] > 0
+            or audit["orphanAcceptedEventRelations"] > 0):
         return "P0_CANONICAL_HISTORY_BROKEN", 2
     if audit["canaryElAnimo"] != 1:
         return "P0_CANARY_NOT_PRESENT", 2
@@ -119,6 +121,8 @@ def main() -> int:
             "orphanedCanonicalLinks": report.get("orphanedCanonicalLinks"),
             "missingAcceptedReceipts": (report.get("attestation") or {}).get("missingAcceptedReceipts"),
             "missingApprovedEventIds": (report.get("attestation") or {}).get("missingApprovedEventIds"),
+            "orphanAcceptedEventRelations": (report.get("attestation") or {}).get("orphanAcceptedEventRelations"),
+            "missingAcceptedRelationEventIds": (report.get("attestation") or {}).get("missingAcceptedRelationEventIds"),
             "canaryElAnimo": (report.get("attestation") or {}).get("canaryElAnimo"),
             "protectionTriggers": (report.get("attestation") or {}).get("protectionTriggers"),
             "nextBlockingGate": report.get("nextBlockingGate"),
