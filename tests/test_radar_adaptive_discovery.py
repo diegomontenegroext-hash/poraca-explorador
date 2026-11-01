@@ -100,6 +100,36 @@ class AdaptiveDiscoveryTests(unittest.TestCase):
                          "structured_origin_unverified")
         self.assertNotIn(exhibit,[x["proof_url"] for x in check["_listings"]])
 
+    def test_single_program_section_survives_menu_redesign(self):
+        # Changing /agenda to /programacion leaves exactly ONE menu link.
+        # No publisher-specific patch, data still needs explicit event facts.
+        root="https://instituto-cultura-ejemplo.org/"
+        program=root+"programacion/"
+        detail=root+"concierto-especial-de-invierno/"
+        day=(date.today()+timedelta(days=7)).isoformat()
+        pages={
+            root:'<a href="/programacion/">Programación</a>',
+            program:'<a href="/concierto-especial-de-invierno/">Concierto especial</a>',
+            detail:'<script type="application/ld+json">'
+                '{"@type":"Event","name":"Concierto especial del instituto",'
+                '"startDate":"'+day+'T19:30:00-03:00",'
+                '"location":{"name":"Auditorio del instituto"}}'
+                '</script>'}
+        class Budget:
+            def __init__(self):self.calls=[]
+            def can_fetch(self,u):return u in pages
+            def request(self,u):
+                self.calls.append(u)
+                return 200,pages[u],None
+        budget=Budget()
+        check,_=rd.scan_source({"source_id":"generic-institute",
+            "url":root,"source_role":"first_party_institution","seed_urls":[]},
+            budget,"full")
+        self.assertEqual(budget.calls,[root,program,detail])
+        self.assertEqual(len(check["_listings"]),1)
+        self.assertEqual(check["_listings"][0]["event_time"],"19:30")
+        self.assertEqual(check["_listings"][0]["review_state"],"observed_unverified")
+
     def test_generic_schema_without_primary_claims(self):
         day=(date.today()+timedelta(days=7)).isoformat()
         raw=('''<script type="application/ld+json">'''
