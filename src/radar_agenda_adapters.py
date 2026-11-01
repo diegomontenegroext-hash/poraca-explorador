@@ -133,7 +133,8 @@ def structured_sessions(raw,url):
     host=scope(url)[0]
     tier=("secondary_agenda" if host in (
           "agendalaplata.ar","www.agendalaplata.ar",
-          "alpedo.ar","www.alpedo.ar") else
+          "alpedo.ar","www.alpedo.ar",
+          "teatrocerca.com.ar","www.teatrocerca.com.ar") else
           "primary_structured_page" if host in SCOPED_HOSTS else
           "structured_origin_unverified")
     out=[]
