@@ -1,4 +1,4 @@
-"""Regression: on-demand E2E MUST not need Radar to run and must fail closed."""
+"""L4 regression: independent data-integrity verification is strict and read-only."""
 import pathlib
 import sys
 import unittest
@@ -8,47 +8,126 @@ sys.path.insert(0, str(ROOT / "src"))
 from radar_integrity_verify import certify
 from radar_end_to_end import assess
 
+PROJECT = "frosty-union-52906378"
+BRANCH = "br-mute-recipe-b4odj2bl"
+
 
 class IndependentE2ECertificationTests(unittest.TestCase):
-    def sample(self, orphaned=0, canonical=0, editorial=7):
-        return assess(("definitivo-current", "partial", 62, 62,
-                       315, 77, editorial, canonical, canonical, canonical,
-                       0, orphaned))
+    def sample(self, orphaned=0, canonical=4, editorial=7,
+               missing_receipts=0, missing_approved=0, guards=2,
+               survival=True, canary=1):
+        report = assess(("definitivo-current", "complete", 62, 62,
+                         315, 77, editorial, canonical, canonical,
+                         canonical, 0, orphaned))
+        report["attestation"] = {
+            "schema": "poraca-e2e-integrity-attestation-v1",
+            "projectId": PROJECT, "branchId": BRANCH,
+            "acceptedReceipts": 22,
+            "missingAcceptedReceipts": missing_receipts,
+            "orphanedObservationLinks": orphaned,
+            "missingCanonicalIdentities": orphaned,
+            "approvedEventIds": 1,
+            "missingApprovedEventIds": missing_approved,
+            "canonicalTotal": 140,
+            "canonicalFuture": canonical,
+            "confirmedScheduledFuture": canonical,
+            "canaryElAnimo": canary,
+            "protectionTriggers": guards,
+            "checkpointSurvivalGuard": survival,
+            "decision": ("P0_CANONICAL_HISTORY_BROKEN"
+                         if orphaned or missing_receipts or missing_approved
+                         else "DATA_INTEGRITY_PASS_HTTP_SSO_SEPARATE"),
+        }
+        return report
 
-    def test_real_defect_fails_due_to_missing_canons_not_unchanged_acquisition(self):
-        report = self.sample(orphaned=27)
-        decision, code = certify(report)
-        self.assertEqual((decision, code), ("P0_BROKEN_CANONICAL_REFERENCES", 2))
+    def test_real_defect_fails_due_to_missing_canons(self):
+        report = self.sample(orphaned=26, missing_receipts=13)
+        self.assertEqual(certify(report), ("P0_CANONICAL_HISTORY_BROKEN", 2))
         self.assertEqual(report["nextBlockingGate"], "canonical_integrity")
 
-    def test_no_canonical_future_is_still_not_success(self):
-        decision, code = certify(self.sample(orphaned=0, canonical=0))
-        self.assertEqual((decision, code), ("BLOCKED_EDITORIAL_ADMISSION", 2))
+    def test_receipt_loss_never_hidden_by_zero_orphans(self):
+        self.assertEqual(certify(self.sample(missing_receipts=1)),
+                         ("P0_CANONICAL_HISTORY_BROKEN", 2))
 
-    def test_healthy_sql_is_only_ready_for_http_not_full_certified(self):
-        decision, code = certify(self.sample(orphaned=0, canonical=9))
-        self.assertEqual((decision, code),
-                         ("DATA_CHAIN_READY_HTTP_AND_SSO_NOT_VERIFIED", 0))
+    def test_approved_review_loss_never_hidden_by_zero_orphans(self):
+        self.assertEqual(certify(self.sample(missing_approved=1)),
+                         ("P0_CANONICAL_HISTORY_BROKEN", 2))
 
-    def test_no_query_or_missing_values_never_pass(self):
+    def test_missing_triggers_fail_even_when_data_appears_healthy(self):
+        self.assertEqual(certify(self.sample(guards=1)),
+                         ("P0_CANONICAL_PROTECTION_MISSING", 2))
+
+    def test_missing_checkpoint_survival_guard_fails(self):
+        self.assertEqual(certify(self.sample(survival=False)),
+                         ("P0_CANONICAL_PROTECTION_MISSING", 2))
+
+    def test_missing_canary_fails(self):
+        self.assertEqual(certify(self.sample(canary=0)),
+                         ("P0_CANARY_NOT_PRESENT", 2))
+
+    def test_zero_future_events_is_not_success(self):
+        self.assertEqual(certify(self.sample(canonical=0)),
+                         ("P0_NO_CONFIRMED_FUTURE_EVENTS", 2))
+
+    def test_missing_receipt_audit_fails_closed(self):
+        report = self.sample()
+        del report["attestation"]
+        self.assertEqual(certify(report),
+                         ("NOT_CERTIFIED_MISSING_RECEIPT_ATTESTATION", 2))
+
+    def test_no_query_never_passes(self):
         self.assertEqual(certify({}),
                          ("NOT_CERTIFIED_MISSING_INTEGRITY_READBACK", 2))
 
-    def test_workflow_has_no_ingestion_in_verification_mode(self):
+    def test_wrong_branch_fails(self):
+        report = self.sample()
+        report["attestation"]["branchId"] = "br-wrong"
+        self.assertEqual(certify(report),
+                         ("NOT_CERTIFIED_WRONG_DATABASE_SCOPE", 2))
+
+    def test_missing_numeric_field_fails(self):
+        report = self.sample()
+        del report["attestation"]["missingAcceptedReceipts"]
+        self.assertEqual(certify(report),
+                         ("NOT_CERTIFIED_MALFORMED_RECEIPT_COUNTS", 2))
+
+    def test_contradictory_readbacks_fail(self):
+        report = self.sample()
+        report["attestation"]["orphanedObservationLinks"] = 3
+        self.assertEqual(certify(report),
+                         ("NOT_CERTIFIED_CONTRADICTORY_READBACK", 2))
+
+    def test_attestation_false_green_decision_conflict(self):
+        report = self.sample()
+        report["attestation"]["decision"] = "P0_CANONICAL_HISTORY_BROKEN"
+        self.assertEqual(certify(report),
+                         ("NOT_CERTIFIED_ATTESTATION_DECISION_CONFLICT", 2))
+
+    def test_healthy_sql_only_ready_for_http_not_full_certification(self):
+        self.assertEqual(certify(self.sample()),
+                         ("DATA_INTEGRITY_PASS_HTTP_AND_SSO_NOT_VERIFIED", 0))
+
+    def test_reconciliation_gate_remains_separate(self):
+        report = self.sample(editorial=0)
+        self.assertEqual(certify(report),
+                         ("BLOCKED_RADAR_TO_EDITORIAL_RECONCILIATION", 2))
+
+    def test_workflow_keeps_ingestion_separate(self):
         yml = (ROOT / ".github/workflows/radar-definitivo.yml").read_text()
         self.assertIn("python3 src/radar_integrity_verify.py", yml)
         self.assertIn("if: steps.alcance.outputs.mode != 'verify_only'", yml)
         self.assertIn("if: success() && steps.alcance.outputs.mode == 'verify_only'", yml)
         self.assertIn("fetch-depth: 2", yml)
 
-    def test_verification_has_read_only_transaction_and_explicit_scope(self):
+    def test_verifier_has_read_only_transaction_and_explicit_scope(self):
         text = (ROOT / "src/radar_integrity_verify.py").read_text()
-        self.assertIn('SET TRANSACTION READ ONLY', text)
-        self.assertIn('SET LOCAL ROLE poraca_definitivo_scope', text)
-        self.assertIn('E2E_READONLY_PRIVILEGES_NOT_ENFORCED', text)
-        self.assertIn('current_setting(\'neon.branch_id\',true)', text)
-        self.assertNotIn('persist_run_funnel', text)
-        self.assertNotIn('radar_definitivo.py --mode', text)
+        self.assertIn("SET TRANSACTION READ ONLY", text)
+        self.assertIn("SET LOCAL ROLE poraca_definitivo_scope", text)
+        self.assertIn("E2E_READONLY_PRIVILEGES_NOT_ENFORCED", text)
+        self.assertIn("current_setting('neon.branch_id',true)", text)
+        self.assertIn("poraca_e2e_integrity_attestation_v1()", text)
+        self.assertNotIn("persist_run_funnel", text)
+        self.assertNotIn("radar_definitivo.py --mode", text)
 
 
 if __name__ == "__main__":
