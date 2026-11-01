@@ -9,6 +9,20 @@ WITH latest AS (
   WHERE finished_at IS NOT NULL
   ORDER BY finished_at DESC LIMIT 1
 ),
+last_full AS (
+  SELECT run_id,finished_at,sources_selected,sources_checked,status
+  FROM radar_definitivo.runs
+  WHERE finished_at IS NOT NULL AND mode='full'
+  ORDER BY finished_at DESC LIMIT 1
+),
+full_checks AS (
+  SELECT count(*)::int AS checked,
+   count(*) FILTER(WHERE status='ok')::int AS ok,
+   count(*) FILTER(WHERE status='index_only')::int AS index_only,
+   count(*) FILTER(WHERE status NOT IN ('ok','index_only'))::int AS other
+  FROM radar_definitivo.source_checks
+  WHERE run_id=(SELECT run_id FROM last_full)
+),
 checks AS (
   SELECT count(*)::int AS checked,
    count(*) FILTER (WHERE status='ok')::int AS ok,
@@ -211,9 +225,12 @@ ctx AS (
     i.fetch_enabled,i.discover_only,i.review_only,i.fetch_no_circuit,
     f.future_staging,f.primary_structured_leads,
     a.a AS integrity,s.ingest_elevated,s.writer_elevated,
-    g.baseline_count,g.missing_count,g.missing_ids,k.active_guard,m.lost_count
+    g.baseline_count,g.missing_count,g.missing_ids,k.active_guard,m.lost_count,fc.checked AS full_checked,fc.ok AS full_ok,
+    fc.index_only AS full_index_only,fc.other AS full_other,
+    lf.run_id AS last_full_run_id,lf.sources_selected AS full_sources_selected,
+    lf.sources_checked AS full_sources_checked,lf.finished_at AS full_finished_at
  FROM latest l CROSS JOIN checks c CROSS JOIN inventory i CROSS JOIN future f
- CROSS JOIN attestation a CROSS JOIN security s CROSS JOIN historical_canaries g CROSS JOIN identity_key_guard k CROSS JOIN survival_missing m
+ CROSS JOIN attestation a CROSS JOIN security s CROSS JOIN historical_canaries g CROSS JOIN identity_key_guard k CROSS JOIN survival_missing m CROSS JOIN last_full lf CROSS JOIN full_checks fc
 )
 SELECT g.ord,g.gate,g.state,g.evidence,g.acceptance,g.next_action
 FROM ctx x CROSS JOIN LATERAL (VALUES
@@ -229,10 +246,18 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  'Todas las fuentes seleccionadas tienen recibo de comprobacion en el run',
  'Corregir solo faltantes comprobados; PASS no implica extraccion'),
 (3,'SOURCE_YIELD',
- CASE WHEN x.other>0 OR x.index_only>0 THEN 'PARTIAL'
-      WHEN x.ok=x.sources_selected AND x.ok>0 THEN 'PASS' ELSE 'FAIL' END,
- jsonb_build_object('ok',x.ok,'indexOnly',x.index_only,'other',x.other,
- 'fetchEnabled',x.fetch_enabled,'discoverOnly',x.discover_only,'reviewOnly',x.review_only),
+ -- Incremental success never masks coverage gaps in the latest FULL.
+ CASE WHEN x.full_checked<>x.full_sources_selected OR x.full_other>0
+            OR x.full_index_only>0 THEN 'PARTIAL'
+      WHEN x.full_ok=x.full_sources_selected AND x.full_ok>0
+           AND x.full_sources_checked=x.full_sources_selected THEN 'PASS'
+      ELSE 'FAIL' END,
+ jsonb_build_object('latestRunId',x.run_id,'latestOk',x.ok,
+ 'lastFullRunId',x.last_full_run_id,'lastFullAt',x.full_finished_at,
+ 'lastFullSelected',x.full_sources_selected,'lastFullCheckRows',x.full_checked,
+ 'lastFullOk',x.full_ok,'lastFullIndexOnly',x.full_index_only,
+ 'lastFullOther',x.full_other,'fetchEnabled',x.fetch_enabled,
+ 'discoverOnly',x.discover_only,'reviewOnly',x.review_only),
  'Medir agenda fechada por fuente elegible, separada de indice/entidad/regular',
  'Triar indices por proposito y priorizar El Dia, Teatro Cerca, UNLP, vinos, yoga y talleres'),
 (4,'RUN_FUNNEL',
