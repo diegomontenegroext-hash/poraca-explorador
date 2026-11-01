@@ -460,7 +460,14 @@ def scan_source(source,budget,mode):
     if institutional_sections_root:
         section_links=[item for item in links if item[1] in section_labels]
         other_links=[item for item in links if item[1] not in section_labels]
-        links=section_links[:3]+other_links
+        capacity=(MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL)
+        # A section costs one slot and its linked original needs another.
+        # Without this reservation unrelated navigation can consume the
+        # full budget before any genuine dated post is opened.
+        number_of_sections=min(3,len(section_links),max(1,capacity//2))
+        reserved_for_originals=number_of_sections
+        other_capacity=max(0,capacity-number_of_sections-reserved_for_originals)
+        links=section_links[:number_of_sections]+other_links[:other_capacity]
     # El Dia's tag index can expose dozens of stale weekly pages. Use only
     # genuinely linked and RECENT magazine agendas for this one source;
     # an outdated index must show index_only, not fake current coverage.
