@@ -120,6 +120,13 @@ jobs:
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
         run: python3 src/radar_integrity_verify.py
+      - name: Medir puertas ejecutivas en lectura, sin publicar
+        id: ejecutivo
+        if: always() && steps.qa.outcome == 'success' && (steps.ingesta.outcome == 'success' || steps.alcance.outputs.mode == 'verify_only')
+        continue-on-error: true
+        env:
+          NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
+        run: python3 src/radar_executive_gates.py
       - name: Acta de cierre de ejecución, incluso ante fallos
         if: always()
         shell: bash
@@ -130,6 +137,7 @@ jobs:
           DIRECT_OUTCOME: ${{ steps.directa.outcome }}
           INTEGRITY_OUTCOME: ${{ steps.integridad.outcome }}
           VERIFY_OUTCOME: ${{ steps.verificar.outcome }}
+          EXEC_OUTCOME: ${{ steps.ejecutivo.outcome }}
         run: |
           set -euo pipefail
           {
@@ -143,6 +151,7 @@ jobs:
             echo "| Informe fuente, preadmisión y E2E | ${CONTROL_OUTCOME:-unknown} |"
             echo "| Lectura directa actual Radar → Neon/API (no promoción) | ${DIRECT_OUTCOME:-unknown} |"
             echo "| Verificación L4 tras ingesta (sin escrituras) | ${INTEGRITY_OUTCOME:-unknown} |"
+            echo "| Ejecución de tablero ejecutivo (no certificación global) | ${EXEC_OUTCOME:-unknown} |"
             echo "| Certificación read-only independiente | ${VERIFY_OUTCOME:-unknown} |"
             echo
             if [[ "$DIRECT_OUTCOME" == "success" ]]; then
