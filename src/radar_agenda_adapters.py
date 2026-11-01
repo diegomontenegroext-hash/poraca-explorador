@@ -36,7 +36,8 @@ SCOPED_HOSTS={"agendalaplata.ar","www.agendalaplata.ar",
               "alpedo.ar","www.alpedo.ar",
               "www.centrodearte.unlp.edu.ar","centrodearte.unlp.edu.ar",
               "www.casadionisio.com.ar","casadionisio.com.ar",
-              "www.eldia.com","eldia.com"}
+              "www.eldia.com","eldia.com",
+              "teatrocerca.com.ar","www.teatrocerca.com.ar"}
 def tidy(s):
     return re.sub(r"\s+"," ",html.unescape(s or "")).strip()
 
@@ -696,6 +697,77 @@ def el_dia_editorial_agenda(raw, url, blocks=None, at=None):
             unique.append(record)
     return unique[:100]
 
+def teatro_cerca_listing_cards(raw, url, at=None):
+    """Extract date/time-locality-specific theatre cards, SECONDARY only.
+
+    The real Teatro Cerca index embeds each individual function's date, time,
+    locality, venue and original on-site URL on the SAME poster/card.
+    Cards for Quilmes/Lomas/Avellaneda must not enter the La Plata feed.
+    A date in a URL slug, a card without an explicit clock, and an unrelated
+    nested teaser are NEVER sufficient evidence of a session.
+    """
+    parsed=urlsplit(url)
+    if (parsed.scheme!="https" or (parsed.hostname or "").lower() not in
+            ("teatrocerca.com.ar","www.teatrocerca.com.ar")
+            or parsed.path.rstrip("/")!="/teatro-independiente"
+            or parsed.username or parsed.password or parsed.port):
+        return []
+    nearby={"la plata","city bell","gonnet","villa elisa","tolosa",
+            "ringuelet","los hornos","melchor romero","arturo seguí",
+            "arturo segui","abasto","olmos","berisso","ensenada"}
+    out=[]
+    source=raw[:900_000]
+    cards=re.finditer(
+        r"<article\\b(?=[^>]*\\bclass\\s*=\\s*['\"][^'\"]*\\bobra-card\\b)"
+        r"[^>]*>.*?</article\\s*>",source,re.I|re.S)
+    def attr(markup,name):
+        m=re.search(r"\\b"+re.escape(name)+r"\\s*=\\s*['\"]([^'\"]*)['\"]",
+                    markup,re.I)
+        return html.unescape(m.group(1)).strip() if m else ""
+    for i,match in enumerate(cards):
+        if i>=170:break
+        card=match.group(0)
+        opening=card[:card.find(">")+1]
+        title=attr(opening,"data-obra-title")
+        if not title:continue
+        poster=re.search(
+            r"<div\\b(?=[^>]*\\bdata-function-date\\s*=)[^>]*>",card,re.I|re.S)
+        if not poster:continue
+        element=poster.group(0)
+        city=tidy(attr(element,"data-city")).casefold()
+        if city not in nearby:continue
+        venue=tidy(attr(element,"data-venue"))
+        date_raw=attr(element,"data-function-date")
+        time_raw=attr(element,"data-function-time")
+        if (not re.fullmatch(r"20\\d{2}-\\d{2}-\\d{2}",date_raw)
+                or not re.fullmatch(r"(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?",time_raw)
+                or not venue):
+            continue
+        try:day=date.fromisoformat(date_raw)
+        except ValueError:continue
+        if not active_date(day,at):continue
+        detail=attr(element,"data-poster-href")
+        detail_url=urlsplit(detail)
+        if (detail_url.scheme!="https" or
+                (detail_url.hostname or "").lower() not in
+                ("teatrocerca.com.ar","www.teatrocerca.com.ar") or
+                not detail_url.path.startswith("/obra/") or
+                "/funcion/" not in detail_url.path or
+                detail_url.username or detail_url.password or detail_url.port):
+            continue
+        # Explicit individual date/time in card data, not in path or price.
+        rec=make_record(title,day,time_raw[:5],venue,detail,
+                        "teatro_cerca_embedded_function_card",
+                        "secondary_specialized_agenda")
+        if rec and not any(x["title"]==rec["title"] and
+                            x["event_date"]==rec["event_date"] and
+                            x["event_time"]==rec["event_time"] and
+                            x["venue"]==rec["venue"] for x in out):
+            out.append(rec)
+        if len(out)>=100:break
+    return out
+
+
 def extract_listings(raw,url):
     """Returns individual session observations; never returns verified status."""
     if url == OFFICIAL_ICS_FEED_URL:
@@ -727,6 +799,7 @@ def extract_listings(raw,url):
     out=structured_sessions(raw,url)
     out.extend(source_specific_sessions(raw,url,blocks))
     out.extend(el_dia_editorial_agenda(raw,url,blocks))
+    out.extend(teatro_cerca_listing_cards(raw,url))
     if "alternativateatral.com" in host and re.match(r"/obra\d+",path):
         title=next((t for tag,t in blocks.headings if tag=="h1"),None)
         if title:
