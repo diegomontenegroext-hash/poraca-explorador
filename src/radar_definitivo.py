@@ -25,7 +25,7 @@ from radar_parallel import (
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
 )
 from radar_agenda_adapters import extract_listings, special_links, tidy
-from radar_adaptive_discovery import discover_sections
+from radar_adaptive_discovery import discover_sections, discover_original_posts_from_section
 from radar_ical_generic import discover_calendar_links
 from radar_adaptive_cadence import cadence_hours as adaptive_cadence_hours
 from radar_evidence_quality import summarize as summarize_evidence_quality
@@ -443,17 +443,28 @@ def scan_source(source,budget,mode):
             nav=discover_sections(root,page.links,limit=min(2,available))
             # Avoid moving special/seed URLs behind generic navigation.
             links+=nav
-    # Centro de Arte UNLP: root categories are navigation, not sessions.
-    # Reserve slots within the SAME existing per-source budget for real
-    # first-party posts linked inside those categories. No extra crawl pass.
-    centro_arte_root=(urlsplit(root).hostname or "").removeprefix("www.")==(
-        "centrodearte.unlp.edu.ar") and urlsplit(root).path in ("","/")
-    if centro_arte_root:
-        links=links[:3]
+    # Reusable one-hop institutional navigation. No publisher hostname here:
+    # actual section anchors are preferred over generic menu/discovery links.
+    # Reserve up to three of the SAME detail slots for original first-party
+    # articles, instead of increasing request budgets or adding more sources.
+    institutional_sections=("institutional_program","first_party_institution",
+                            "institutional_program_and_community_venue",
+                            "original_institutional")
+    section_labels={"seccion institucional original enlazada",
+                    "adaptive_section_link","adaptive_calendar_feed"}
+    institutional_sections_root=(
+        source.get("source_role") in institutional_sections
+        and urlsplit(root).path.rstrip("/")==""
+        and not check["_listings"]
+        and sum(label in section_labels for _,label in links)>=2)
+    if institutional_sections_root:
+        section_links=[item for item in links if item[1] in section_labels]
+        other_links=[item for item in links if item[1] not in section_labels]
+        links=section_links[:3]+other_links
     # El Dia's tag index can expose dozens of stale weekly pages. Use only
     # genuinely linked and RECENT magazine agendas for this one source;
     # an outdated index must show index_only, not fake current coverage.
-    if (not centro_arte_root and not is_single_event_source(root) and
+    if (not institutional_sections_root and not is_single_event_source(root) and
         not (urlparse(root).hostname in ("www.eldia.com","eldia.com")
             and urlparse(root).path.rstrip("/") in ("/ttags/espectaculos","/espectaculos"))):
         links+=links_from_page(body,page,root)
@@ -493,27 +504,13 @@ def scan_source(source,budget,mode):
         if detail:
             check["details_opened"]+=1
             check["_listings"].extend(extract_listings(data,url))
-            if (centro_arte_root and label=="seccion institucional original enlazada"
+            if (institutional_sections_root and label in section_labels
                     and len(selected_links)<max_details):
-                # First linked original post in each genuine category page.
-                # Exact same-host one-slug permalink, no dates inferred from URL.
-                for href,post_label in detail.links[:160]:
-                    if not href or href.startswith("//"):continue
-                    p=urlsplit(urljoin(url,href))
-                    slug=p.path.lower().rstrip("/")
-                    if (p.scheme!="https" or (p.hostname or "").removeprefix("www.")!=
-                            "centrodearte.unlp.edu.ar"
-                            or p.username or p.password or p.port not in (None,443)
-                            or p.query or p.fragment
-                            or not re.fullmatch(r"/[a-z0-9][a-z0-9-]{3,160}",slug)
-                            or slug in ("/musica","/artes-escenicas","/artes-visuales",
-                                        "/calendario-2","/informacion-util","/cursos")):
-                        continue
-                    original="https://"+p.hostname+p.path
-                    if any(urlsplit(existing).path.rstrip("/")==slug
-                           for existing,_ in selected_links):continue
-                    selected_links.append((original,"original institucional enlazado desde sección"))
-                    break
+                # One actual first-party article per visited section. The
+                # same-domain, URL-safe helper is independent of site shape;
+                # event validation remains with the downstream parsers.
+                selected_links.extend(discover_original_posts_from_section(
+                    url,detail.links,existing=selected_links,limit=1))
         # Institution section indexes are *navigation*, not event details.
         # Keep evidence from any explicit JSON-LD Event, but never store
         # an undated "Degustaciones" / "Artes Visuales" as an event lead.
