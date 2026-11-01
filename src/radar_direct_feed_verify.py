@@ -15,26 +15,26 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
 
-SCHEMA = "poraca-radar-direct-read-contract-v1"
+SCHEMA = "poraca-radar-direct-read-contract-v2"
 IDENTITY_SQL = """
 SELECT current_database(),session_user,current_user,
  current_setting('neon.project_id',true),
  current_setting('neon.branch_id',true),
- has_function_privilege(current_user,'public.poraca_radar_direct_discoveries_v1(date)','EXECUTE'),
+ has_function_privilege(current_user,'public.poraca_radar_direct_discoveries_v2(date,date,text,text)','EXECUTE'),
  has_table_privilege(current_user,'public.radar_agenda_events','INSERT,UPDATE,DELETE,TRUNCATE')
 """
 DAY_SQL = "SELECT (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date"
 FEED_SQL = """
 SELECT observation_id,title,date,"time",venue,category,source_url,
        origin_url,last_seen_at,source_label
-FROM public.poraca_radar_direct_discoveries_v1(%s::date)
+FROM public.poraca_radar_direct_discoveries_v2(%s::date,%s::date,%s::text,%s::text)
 """
 OVERLAP_SQL = """
-SELECT count(*)::int
-FROM public.poraca_radar_direct_discoveries_v1(%s::date) f
-JOIN public.radar_agenda_events e ON
- e.event_date=f.date::date AND left(coalesce(e.event_time,''),5)=f."time"
- AND e.source_url=f.source_url
+SELECT count(*)::int FROM public.radar_agenda_events e
+JOIN unnest(%s::date[],%s::text[],%s::text[]) v(event_date,event_time,source_url)
+ ON e.event_date=v.event_date
+ AND left(coalesce(e.event_time,''),5)=v.event_time
+ AND e.source_url=v.source_url
 """
 LAST_RUN_SQL = """
 SELECT run_id,mode,status,started_at,finished_at,sources_checked,sources_success
@@ -59,6 +59,29 @@ def safe_https(value):
                 and x.port in (None, 443) and not re.search(r"[\s<>]", value))
     except ValueError:
         return False
+
+
+def collect_pages(fetch, day, max_pages=50):
+    """Get all eligible sessions, never treating a 48-row page as the whole feed."""
+    collected = []
+    after = (None, None, None)
+    seen_keys = set()
+    for index in range(max_pages):
+        rows = fetch(day, *after)
+        if len(rows) > 49:
+            raise ValueError("RADAR_PAGE_EXCEEDED_LIMIT")
+        selected = rows[:48]
+        collected.extend(selected)
+        if len(rows) <= 48:
+            return collected, index + 1
+        if len(selected) != 48:
+            raise ValueError("RADAR_PAGE_INVALID")
+        last = selected[-1]
+        after = (date.fromisoformat(last[2]), last[3], last[0])
+        if after in seen_keys:
+            raise ValueError("RADAR_PAGE_CURSOR_LOOP")
+        seen_keys.add(after)
+    raise ValueError("RADAR_PAGINATION_LIMIT_EXCEEDED")
 
 
 def assess(rows, day, canonical_overlap, last_run):
@@ -99,8 +122,6 @@ def assess(rows, day, canonical_overlap, last_run):
         problems["already_in_canonical"] += int(canonical_overlap)
     if not rows:
         problems["no_radar_discoveries"] += 1
-    if len(rows) > 36:
-        problems["unbounded_radar_discoveries"] += 1
     status = ("DIRECT_RADAR_NEON_READ_PASS_API_HTTP_SEPARATE" if not problems
               else "DIRECT_RADAR_NEON_READ_FAIL")
     return {
@@ -117,9 +138,9 @@ def assess(rows, day, canonical_overlap, last_run):
         "problems": dict(sorted(problems.items())),
         "apiHttp": "NOT_CHECKED", "browserSso": "NOT_CHECKED",
         "learning": "SOURCE_YIELD_DIAGNOSTICS_NOT_AUTOMATIC_SELF_IMPROVEMENT",
-        "interpretation": ("36 is a presentation cap, not total coverage; "
-                           "source success != dated event; zero newly refreshed "
-                           "rows may be legitimate on a no-change run.")
+        "interpretation": ("Each API page displays at most 48 discoveries, but the "
+                           "certifier traverses all Radar pages. Source success "
+                           "does not certify every advertised event.")
     }
 
 
@@ -136,13 +157,21 @@ def read(url):
                     raise RuntimeError("RADAR_DIRECT_READ_IDENTITY_MISMATCH")
                 cur.execute(DAY_SQL)
                 day = cur.fetchone()[0]
-                cur.execute(FEED_SQL, (day,))
-                rows = cur.fetchall()
-                cur.execute(OVERLAP_SQL, (day,))
+                def fetch_page(on_day, after_date, after_time, after_id):
+                    cur.execute(FEED_SQL, (on_day, after_date, after_time, after_id))
+                    return cur.fetchall()
+
+                rows, pages = collect_pages(fetch_page, day)
+                cur.execute(OVERLAP_SQL, (
+                    [r[2] for r in rows], [r[3] for r in rows],
+                    [r[6] for r in rows],
+                ))
                 overlaps = cur.fetchone()[0]
                 cur.execute(LAST_RUN_SQL)
                 last_run = cur.fetchone()
-    return assess(rows, day, overlaps, last_run)
+    report = assess(rows, day, overlaps, last_run)
+    report['pagesTraversed'] = pages
+    return report
 
 
 def main():
@@ -159,7 +188,8 @@ def main():
                 out.write("\n### Radar → Neon → API: lectura directa, no aprobación\n\n")
                 out.write("| Puerta | Resultado |\n|---|---|\n")
                 out.write("| Integridad de consulta directa | {} |\n".format(report["status"]))
-                out.write("| Anuncios por verificar | {} / 36 máximo |\n".format(report["visibleUnverified"]))
+                out.write("| Anuncios elegibles en todas las páginas | {} |\n".format(report["visibleUnverified"]))
+                out.write("| Páginas Radar recorridas | {} |\n".format(report["pagesTraversed"]))
                 out.write("| URLs originales distintas | {} |\n".format(report["distinctSourceUrls"]))
                 out.write("| Casos tocados desde última corrida | {} |\n".format(report["directResultsTouchedSinceLastRun"]))
                 out.write("| Conflictos con eventos canónicos | {} |\n".format(report["canonicalDuplicatesByDateTimeOriginal"]))
