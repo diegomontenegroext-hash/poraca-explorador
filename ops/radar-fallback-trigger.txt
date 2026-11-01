@@ -1,6 +1,9 @@
 # POR ACA - RADAR DEFINITIVO
-# Bootstrap unico del nuevo corpus tras archivo productivo verificado.
+# Full experimental, explicitly authorized to replay four deleted staging records.
+# 4 exact Freezer keys backed up in poraca-lp/docs/qa/evidence/20261031_freezer_four_real_listings_before_replay.json
+# This runs real source fetch; no historical canonical edits nor new crons.
 trigger_date=2026-10-31
 trigger_slot=bootstrap
 trigger_mode=full
-trigger_reason=adaptive_live_cutover_20261031
+trigger_reason=controlled_4_freezer_staging_recovery_20261031
+experiment_id=e2e-freezer4-20261031-2230
