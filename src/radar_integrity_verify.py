@@ -18,16 +18,46 @@ EXPECTED = (
 )
 
 
+ATTESTATION_SCHEMA = "poraca-e2e-integrity-attestation-v1"
+REQUIRED_COUNTS = (
+    "acceptedReceipts", "missingAcceptedReceipts", "orphanedObservationLinks",
+    "missingCanonicalIdentities", "approvedEventIds", "missingApprovedEventIds",
+    "canonicalTotal", "canonicalFuture", "confirmedScheduledFuture",
+    "canaryElAnimo", "protectionTriggers",
+)
+
+
 def certify(report: dict) -> tuple[str, int]:
-    """Keep every gate separate. Never call a SQL PASS full E2E certification."""
+    """L4 data-only gates. Never claim API/SSO/coverage PASS from DB counts."""
     orphans = report.get("orphanedCanonicalLinks")
     if orphans is None:
         return "NOT_CERTIFIED_MISSING_INTEGRITY_READBACK", 2
-    if int(orphans) > 0:
-        return "P0_BROKEN_CANONICAL_REFERENCES", 2
+    audit = report.get("attestation")
+    if not isinstance(audit, dict) or audit.get("schema") != ATTESTATION_SCHEMA:
+        return "NOT_CERTIFIED_MISSING_RECEIPT_ATTESTATION", 2
+    if audit.get("projectId") != EXPECTED[3] or audit.get("branchId") != EXPECTED[4]:
+        return "NOT_CERTIFIED_WRONG_DATABASE_SCOPE", 2
+    if any(type(audit.get(key)) is not int or audit[key] < 0 for key in REQUIRED_COUNTS):
+        return "NOT_CERTIFIED_MALFORMED_RECEIPT_COUNTS", 2
+    if (int(orphans) != audit["orphanedObservationLinks"]
+            or int(report.get("futureCanonical") or 0) != audit["canonicalFuture"]
+            or int(report.get("futureConfirmed") or 0) < audit["confirmedScheduledFuture"]):
+        return "NOT_CERTIFIED_CONTRADICTORY_READBACK", 2
+    if audit.get("checkpointSurvivalGuard") is not True or audit["protectionTriggers"] != 2:
+        return "P0_CANONICAL_PROTECTION_MISSING", 2
+    if (audit["missingAcceptedReceipts"] > 0
+            or audit["missingApprovedEventIds"] > 0
+            or audit["orphanedObservationLinks"] > 0):
+        return "P0_CANONICAL_HISTORY_BROKEN", 2
+    if audit["canaryElAnimo"] != 1:
+        return "P0_CANARY_NOT_PRESENT", 2
+    if audit["confirmedScheduledFuture"] == 0:
+        return "P0_NO_CONFIRMED_FUTURE_EVENTS", 2
     if report.get("nextBlockingGate") != "authenticated_api_and_web_check":
         return "BLOCKED_" + str(report.get("nextBlockingGate") or "UNKNOWN").upper(), 2
-    return "DATA_CHAIN_READY_HTTP_AND_SSO_NOT_VERIFIED", 0
+    if audit.get("decision") != "DATA_INTEGRITY_PASS_HTTP_SSO_SEPARATE":
+        return "NOT_CERTIFIED_ATTESTATION_DECISION_CONFLICT", 2
+    return "DATA_INTEGRITY_PASS_HTTP_AND_SSO_NOT_VERIFIED", 0
 
 
 def read(url: str) -> dict:
@@ -59,6 +89,11 @@ def read(url: str) -> dict:
                     raise RuntimeError("E2E_READONLY_PRIVILEGES_NOT_ENFORCED")
                 cursor.execute(E2E_SQL)
                 report = assess_end_to_end(cursor.fetchone())
+                # Aggregated SECURITY DEFINER function exposes counts only:
+                # the scoped role cannot SELECT checkpoint or editorial logs.
+                cursor.execute("SELECT public.poraca_e2e_integrity_attestation_v1()")
+                receipt_row = cursor.fetchone()
+                report["attestation"] = receipt_row[0] if receipt_row else None
     return report
 
 
@@ -82,6 +117,10 @@ def main() -> int:
             "canonicalFuture": report.get("futureCanonical"),
             "confirmedFuture": report.get("futureConfirmed"),
             "orphanedCanonicalLinks": report.get("orphanedCanonicalLinks"),
+            "missingAcceptedReceipts": (report.get("attestation") or {}).get("missingAcceptedReceipts"),
+            "missingApprovedEventIds": (report.get("attestation") or {}).get("missingApprovedEventIds"),
+            "canaryElAnimo": (report.get("attestation") or {}).get("canaryElAnimo"),
+            "protectionTriggers": (report.get("attestation") or {}).get("protectionTriggers"),
             "nextBlockingGate": report.get("nextBlockingGate"),
             "httpApi": "NOT_CHECKED",
             "webSso": "NOT_CHECKED",
