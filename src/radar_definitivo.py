@@ -433,29 +433,26 @@ def scan_source(source,budget,mode):
         # A link to a calendar is evidence of a *strategy*, not an Event.
         # Same-host, HTTPS, bounded and already present as an anchor.
         links=discover_calendar_links(root,page.links)+links
-    if not check["_listings"] and not is_single_event_source(root):
-        # A site may still have secondary links even when its program
-        # menu changed. Reserve at most 2 existing, same-host menu links
-        # within the original per-source budget; never synthesize URLs.
-        capacity=(MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL)
-        available=max(0,capacity-len(links))
-        if available:
-            nav=discover_sections(root,page.links,limit=min(2,available))
-            # Avoid moving special/seed URLs behind generic navigation.
-            links+=nav
-    # Reusable one-hop institutional navigation. No publisher hostname here:
-    # actual section anchors are preferred over generic menu/discovery links.
-    # Reserve up to three of the SAME detail slots for original first-party
-    # articles, instead of increasing request budgets or adding more sources.
+    # Reusable one-hop institutional navigation. A crowded root may already
+    # have many watchlist links; still discover genuine menu sections because
+    # the per-source budget reserves slots for their linked original posts.
     institutional_sections=("institutional_program","first_party_institution",
                             "institutional_program_and_community_venue",
                             "original_institutional")
     section_labels={"seccion institucional original enlazada",
                     "adaptive_section_link","adaptive_calendar_feed"}
-    institutional_sections_root=(
+    institutional_root=(
         source.get("source_role") in institutional_sections
-        and urlsplit(root).path.rstrip("/")==""
-        and not check["_listings"]
+        and urlsplit(root).path.rstrip("/")=="" and not check["_listings"])
+    if not check["_listings"] and not is_single_event_source(root):
+        capacity=(MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL)
+        available=max(0,capacity-len(links))
+        nav_limit=min(3,capacity//2) if institutional_root else min(2,available)
+        if nav_limit:
+            # Never invent URLs: only same-host links present on the page.
+            links+=discover_sections(root,page.links,limit=nav_limit)
+    institutional_sections_root=(
+        institutional_root
         and any(label in section_labels for _,label in links))
     if institutional_sections_root:
         section_links=[item for item in links if item[1] in section_labels]
