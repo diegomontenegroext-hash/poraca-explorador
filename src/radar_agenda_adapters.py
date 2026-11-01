@@ -6,6 +6,7 @@ URLs are always real source/document URLs; no manufactured post anchors.
 """
 from __future__ import annotations
 from datetime import date, datetime, timedelta
+from datetime import datetime as _datetime_type
 from zoneinfo import ZoneInfo
 from html.parser import HTMLParser
 import json
@@ -86,13 +87,13 @@ def active_date(d,at=None):
     # Source adapters and regression fixtures may pass datetime OR date.
     # Never compare datetime with date (TypeError), nor infer a date from
     # a malformed scalar. Normalize both sides to local calendar days.
-    if isinstance(d, datetime):
+    if isinstance(d, _datetime_type):
         d=d.astimezone(ZoneInfo('America/Argentina/Buenos_Aires')).date() if d.tzinfo else d.date()
     if not isinstance(d, date):
         return False
     if at is None:
         today=datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date()
-    elif isinstance(at, datetime):
+    elif isinstance(at, _datetime_type):
         today=at.astimezone(ZoneInfo('America/Argentina/Buenos_Aires')).date() if at.tzinfo else at.date()
     elif isinstance(at, date):
         today=at
