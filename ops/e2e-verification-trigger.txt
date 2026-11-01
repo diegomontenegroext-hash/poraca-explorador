@@ -10,3 +10,6 @@ verification_attempt=02
 
 # Read-only validation using minimal scoped SELECTs, after successful unit/CI checks.
 verification_attempt=03
+
+# Re-read after approved one-event canonical repair. No ingestion, no Neon writes.
+verification_id=20261031-after-el-animo-repair-26-orphans
