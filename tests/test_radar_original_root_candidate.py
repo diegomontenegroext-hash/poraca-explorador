@@ -28,7 +28,7 @@ class GenericOriginalIntakeTests(unittest.TestCase):
         self.assertEqual(c["evidence"]["admission"],
                          "UNVERIFIED_ORIGINAL_NEEDS_EDITORIAL_REVIEW")
     def test_02_cycle_is_not_an_individual_event_nor_unverified_venue(self):
-        x=root_review_candidate(self.src("first_party_organizer"),
+        x=root_review_candidate(self.src("original_cycle"),
           "https://libros.example/",object(),200,mk)[0]
         self.assertEqual(x["kind"],"cultural_cycle_index")
         for k in ("event_date","event_time","venue","organizer"):
@@ -72,7 +72,7 @@ class GenericOriginalIntakeTests(unittest.TestCase):
 
     def test_08_multivenue_jsonld_root_not_staged_as_single_session(self):
         root="https://libros.example/"
-        cycle=root_review_candidate(self.src("first_party_organizer"),root,object(),200,mk)
+        cycle=root_review_candidate(self.src("original_cycle"),root,object(),200,mk)
         listing={"title":"Noche de librerías","event_date":"2026-11-06",
                  "event_time":"18:00","venue":"Librerías Independientes",
                  "proof_url":root}
@@ -82,7 +82,7 @@ class GenericOriginalIntakeTests(unittest.TestCase):
 
     def test_09_individual_detail_with_distinct_original_url_survives(self):
         root="https://bookfestival.example/"
-        cycle=root_review_candidate(self.src("first_party_organizer"),root,object(),200,mk)
+        cycle=root_review_candidate(self.src("original_cycle"),root,object(),200,mk)
         child={"title":"Presentación de un libro","event_date":"2026-11-06",
                "event_time":"19:00","venue":"Librería propia",
                "proof_url":"https://bookfestival.example/programacion/taller-1"}
@@ -105,5 +105,15 @@ class GenericOriginalIntakeTests(unittest.TestCase):
         self.assertEqual(len(records),2)
         self.assertEqual(len(out),1)
         self.assertEqual(out[0]["title"],"individual")
+
+    def test_12_first_party_organizer_with_atomic_event_remains_dated(self):
+        # An organizer can genuinely advertise one dated function on its root.
+        # Only an explicit original_cycle role should drop root JSON-LD Event.
+        root="https://organizer.example/"
+        item=root_review_candidate(self.src("first_party_organizer"),root,object(),200,mk)
+        self.assertEqual(item[0]["kind"],"event_detail")
+        self.assertEqual(item[0]["event_date"],"2026-11-27")
+        listed={"proof_url":root,"title":"Función puntual","event_date":"2026-11-27"}
+        self.assertEqual(suppress_unverified_cycle_root_sessions([listed],root,item),[listed])
 
 if __name__=="__main__": unittest.main()
