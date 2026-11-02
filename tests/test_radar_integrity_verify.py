@@ -58,7 +58,7 @@ class IndependentE2ECertificationTests(unittest.TestCase):
             "writesPerformed": False,
         }
         report["historicalCanaries"] = {
-            "elAnimo": 1, "freezer": 1, "immutableGuard": 1,
+            "elAnimo": 1, "freezer": 1, "immutableGuard": 1, "relationGuard": 1,
         }
         return report
 
@@ -116,12 +116,12 @@ class IndependentE2ECertificationTests(unittest.TestCase):
         self.assertEqual(certify(self.sample(missing_approved=1)),
                          ("P0_CANONICAL_HISTORY_BROKEN", 2))
 
-    def test_documented_context_is_not_a_missing_approved_event(self):
+    def test_documented_context_is_never_an_accepted_orphan(self):
         report = self.sample(dangling_relations=17)
         report["attestation"]["missingAcceptedRelationEventIds"] = 15
         report["contextAudit"]["contextOnlyEventKeys"] = 15
         self.assertEqual(certify(report),
-                         ("DATA_INTEGRITY_PASS_HTTP_AND_SSO_NOT_VERIFIED", 0))
+                         ("P0_ACCEPTED_RELATION_WITHOUT_CANONICAL", 2))
 
     def test_unreviewed_context_remains_real_failure(self):
         report = self.sample(dangling_relations=17)
@@ -153,6 +153,17 @@ class IndependentE2ECertificationTests(unittest.TestCase):
     def test_missing_triggers_fail_even_when_data_appears_healthy(self):
         self.assertEqual(certify(self.sample(guards=1)),
                          ("P0_CANONICAL_PROTECTION_MISSING", 2))
+
+    def test_disabled_relation_guard_fails_even_with_healthy_data(self):
+        report = self.sample()
+        report["historicalCanaries"]["relationGuard"] = 0
+        self.assertEqual(certify(report),
+                         ("P0_ACCEPTED_EVENT_RELATION_GUARD_DISABLED", 2))
+
+    def test_one_accepted_orphan_event_cannot_pass_context_attestation(self):
+        report = self.sample(dangling_relations=1)
+        self.assertEqual(certify(report),
+                         ("P0_ACCEPTED_RELATION_WITHOUT_CANONICAL", 2))
 
     def test_missing_checkpoint_survival_guard_fails(self):
         self.assertEqual(certify(self.sample(survival=False)),
