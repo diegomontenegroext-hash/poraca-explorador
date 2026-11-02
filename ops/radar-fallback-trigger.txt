@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
 # Disparo por Guardia GPT - orquestador principal.
-trigger_date=2026-11-01
-trigger_slot=bootstrap
+trigger_date=2026-11-02
+trigger_slot=05
 trigger_mode=full
-trigger_reason=one_time_manual_full_after_teatro_cerca_parser_regression
+trigger_reason=gpt_primary_scheduler
