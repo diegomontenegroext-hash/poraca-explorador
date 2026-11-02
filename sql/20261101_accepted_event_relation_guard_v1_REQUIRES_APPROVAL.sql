@@ -1,3 +1,6 @@
+-- SUPERSEDED by sql/20261102_observation_canonical_link_guard_and_relation_policy.sql.
+-- Acceptance of venue/circuit relation DOES NOT equal event publication.
+-- Do not install or re-enable this graph-relation trigger: it was too strict.
 -- POR ACA / Canonical relation integrity / v1 / 2026-11-01.
 -- PREPARED ONLY: requires administrator authorization before applying in QA,
 -- negative tests, and explicit production cutover. Do NOT run as Radar.

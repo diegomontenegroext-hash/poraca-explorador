@@ -82,6 +82,16 @@ class IndependentE2ECertificationTests(unittest.TestCase):
         self.assertNotIn("UPDATE public.radar_agenda_events",sql)
         self.assertNotIn("UPDATE public.poraca_knowledge_relations",sql)
 
+    def test_observation_link_guard_preserves_independent_relations(self):
+        sql=(ROOT / "sql/20261102_observation_canonical_link_guard_and_relation_policy.sql").read_text()
+        self.assertIn("NEW.matched_event_key IS NOT NULL",sql)
+        self.assertIn("c.event_key=NEW.matched_event_key",sql)
+        self.assertIn("BEFORE INSERT OR UPDATE OF matched_event_key,reconciliation_state",sql)
+        self.assertIn("DISABLE TRIGGER poraca_accepted_event_relation_guard_v1",sql)
+        self.assertNotIn("UPDATE public.radar_v3_source_observations SET",sql)
+        self.assertNotIn("DELETE FROM public.",sql)
+        self.assertNotIn("TRUNCATE TABLE ",sql)
+
     def test_real_defect_fails_due_to_missing_canons(self):
         report = self.sample(orphaned=26, missing_receipts=13)
         self.assertEqual(certify(report), ("P0_CANONICAL_HISTORY_BROKEN", 2))
