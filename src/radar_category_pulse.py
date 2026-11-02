@@ -113,6 +113,37 @@ def review_queue(rows, max_total=14, max_per_category=2):
                        "publicationApproved":False})
     return picked
 
+def format_circuit_resilience(recovery):
+    """Compact read-only source-yield table for the EXISTING Actions summary.
+
+    7-day sightings are not unique events. A second fetch feed does not
+    establish independent organizers or certify an entire circuit.
+    """
+    rows=list((recovery or {}).get("circuitResilience") or [])
+    if not rows:
+        return "Sin métricas de extracción fechada por circuito disponibles.\\n"
+    output=[
+        "| Circuito | Canales fetch | Con sesiones (7d) | Diagnóstico |",
+        "|---|---:|---:|---|"
+    ]
+    for item in sorted(rows,key=lambda x:(
+            int(x.get("reportedDatedYieldSources7d") or 0),
+            str(x.get("circuit") or "")))[:25]:
+        gate=str(item.get("sourceResilienceGate") or "NOT_CHECKED")
+        if item.get("resilienceCertified") is True:
+            gate="REQUIRES_INDEPENDENT_EXTERNAL_ATTESTATION"
+        if item.get("futureOriginalResearchHint"):
+            gate+=" · original local pendiente de incorporación"
+        output.append("| {} | {} | {} | {} |".format(
+            safe_cell(item.get("circuit")),int(item.get("fetchSources") or 0),
+            int(item.get("reportedDatedYieldSources7d") or 0),
+            safe_cell(gate)))
+    output.append("")
+    output.append("**Canales con sesiones ≠ organizadores independientes ≠ eventos únicos. "
+                  "Todos los circuitos mantienen certificación de resiliencia pendiente.**")
+    return "\\n".join(output)+"\\n"
+
+
 def source_mode_counts(rows):
     """Status measures the last persisted source check, not today's execution."""
     return {str(mode):{"enabled":int(count or 0),
@@ -299,6 +330,9 @@ def main():
                 out.write("Fuentes para investigar: **{}** · sin canales alternativos "
                           "de cobertura en su mismo circuito: **{}**.\n\n".format(
                               rec["sourcesNeedingRecovery"],rec["uncoveredCases"]))
+                out.write("\n### Rendimiento real por circuito (7 días, no transporte HTTP)\n\n")
+                out.write(format_circuit_resilience(rec))
+                out.write("\n")
                 for item in rec["actions"][:7]:
                     alts=", ".join(safe_cell(x["name"]) for x in
                                    item["alternativeCoverageSources"])
@@ -312,6 +346,12 @@ def main():
                                       "no publicado ni registrado automáticamente.\n".format(
                                           safe_cell(lead["name"]),
                                           safe_cell(lead["upcomingOriginals"][0]["url"])))
+                for source in rec["actions"]:
+                    for lead in source.get("directoryReviewCandidates",[])[:2]:
+                        out.write("- **Directorio externo por investigar**: {} · {} · "
+                                  "sin sede ni función local confirmadas, no publicado.\n".format(
+                                      safe_cell(lead.get("title")),
+                                      safe_cell(lead.get("directoryUrl"))))
                 out.write("\n**Sin cambio de prioridades ni sustitución automática de entidades.** "
                           "La recuperación deberá probarse contra fuentes originales.\n\n")
                 e=report["endToEnd"]
