@@ -5,10 +5,11 @@
     "editorialApproval": false,
     "autoPublish": false,
     "canonicalWrite": false,
-    "sourceEnrollment": false,
+    "sourceEnrollment": true,
     "radarReprocessingRequested": false,
     "reason": "These are original public signals not yet observed in operational Neon. Evidence-led generalized source discovery, not parser patches or synthetic listings.",
-    "escalation": "Each original must independently enter the ordinary source→staging→editorial admission chain, with deduplication and original proof. No direct manual promotion."
+    "escalation": "Each original must independently enter the ordinary source→staging→editorial admission chain, with deduplication and original proof. No direct manual promotion.",
+    "enrollmentScope": "Two HTTPS originals approved for 24h FETCH source catalog; NO publish, NO individual session approval; passive next FULL."
   },
   "confirmedObservationQuery": {
     "neonProject": "frosty-union-52906378",
@@ -47,7 +48,8 @@
         "canon": 0,
         "staging": 0,
         "observation": 0
-      }
+      },
+      "neonSourceId": "rd-web-e60bb2a8"
     },
     {
       "id": "feria-catar-v-2026",
@@ -75,7 +77,8 @@
         "canon": 0,
         "staging": 0,
         "observation": 0
-      }
+      },
+      "neonSourceId": "rd-web-17f06bfe"
     }
   ],
   "additionalLeads": [
@@ -100,5 +103,42 @@
       "leadType": "known_neon_identity_current_activity_not_verified",
       "nextAction": "Obtain first-party evidence of any current wine event; never infer a cata from being a wine bar"
     }
-  ]
+  ],
+  "catalogEnrollment": {
+    "asOf": "2026-11-02",
+    "database": "neondb",
+    "branch": "br-mute-recipe-b4odj2bl",
+    "expectedTotalNew": 2,
+    "insertReadbackVerified": true,
+    "sources": [
+      {
+        "sourceId": "rd-web-e60bb2a8",
+        "url": "https://www.nochedelaslibrerias.com.ar/",
+        "circuit": "literatura",
+        "sourceRole": "first_party_organizer",
+        "monitoringMode": "fetch",
+        "enabled": true,
+        "firstCheck": "PENDING_NEXT_FULL",
+        "lastStatus": null
+      },
+      {
+        "sourceId": "rd-web-17f06bfe",
+        "url": "https://www.passline.com/eventos/feria-catar-v-edicion",
+        "circuit": "vinos",
+        "sourceRole": "first_party_ticketing",
+        "monitoringMode": "fetch",
+        "enabled": true,
+        "firstCheck": "PENDING_NEXT_FULL",
+        "lastStatus": null
+      }
+    ],
+    "scanImplementation": {
+      "module": "src/radar_original_root_candidate.py",
+      "hook": "src/radar_definitivo.py scan_source",
+      "claim": "Unverified original candidate; cycle index never becomes dated event solely because it links to many bookstores",
+      "unitTests": "tests/test_radar_original_root_candidate.py",
+      "passed": 7
+    },
+    "warning": "The source registry is now live; this does not mean either original has been opened by scheduled Radar, produced an occurrence, or reached the editorial/API/web chain."
+  }
 }
