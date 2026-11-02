@@ -101,4 +101,18 @@ class SourceRecoveryTests(unittest.TestCase):
         self.assertEqual(reconstruct_historical_network(sample,"vinos",date(2026,11,2)),[])
 
 
+
+    def test_future_original_bubbles_uncovered_circuit_into_top_n(self):
+        rows=[src(str(i),"Index source","artes",diagnosis="REPEATED_INDEX_ONLY",
+                  observed=0,checks=8) for i in range(20)]
+        rows.append(src("wine","Source without events","vinos",
+                        diagnosis="REPEATED_INDEX_ONLY",observed=0))
+        data=json.loads((pathlib.Path(__file__).resolve().parents[1]/
+                         "data/historical-circuit-network-v1.json").read_text())
+        out=plan(rows,limit=12,historical_evidence=data["evidence"],
+                 today=date(2026,11,2))
+        self.assertEqual(out["actions"][0]["sourceId"],"wine")
+        self.assertEqual(out["sourcesNeedingRecovery"],21)
+        self.assertFalse(out["actions"][0]["selfHealConfirmed"])
+
 if __name__=="__main__":unittest.main()
