@@ -57,11 +57,15 @@ class GenericOriginalIntakeTests(unittest.TestCase):
                   "source_role":"first_party_ticketing"},
                   "https://site.example/a",object(),200,mk),[])
     def test_06_no_automatic_date_when_cycle_is_multi_venue(self):
-        for role in ("original_cycle","first_party_organizer"):
-            result=root_review_candidate(self.src(role),
-                "https://cycle.example/",object(),200,mk)[0]
-            self.assertIsNone(result["event_date"])
-            self.assertFalse(result["evidence"]["auto_publish"])
+        # Only an explicitly multi-venue cycle is a non-atomic root.
+        # An organizer's own detail may be a genuine dated event (test_12).
+        result=root_review_candidate(self.src("original_cycle"),
+            "https://cycle.example/",object(),200,mk)[0]
+        self.assertIsNone(result["event_date"])
+        self.assertIsNone(result["event_time"])
+        self.assertIsNone(result["venue"])
+        self.assertTrue(result["evidence"]["not_an_atomic_event"])
+        self.assertFalse(result["evidence"]["auto_publish"])
     def test_07_origin_mismatch_not_a_new_proof(self):
         def wrong(url,source_id,label,page,status):
             a=mk(url,source_id,label,page,status)
