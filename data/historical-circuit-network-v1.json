@@ -1,0 +1,140 @@
+{
+  "schema": "poraca-historical-circuit-network-v1",
+  "policy": "PAST_MENTIONS_ARE_SOURCE_LEADS_NOT_FUTURE_EVENTS",
+  "evidence": [
+    {
+      "circuit": "vinos",
+      "sourceAnchor": "rd-web-56c74fce",
+      "date": "2026-08-27",
+      "kind": "historical",
+      "title": "Cena degustación Huentala Wines",
+      "url": "https://www.casadionisio.com.ar/degustaciones",
+      "targets": [
+        {
+          "id": "huentala-wines",
+          "name": "Huentala Wines",
+          "role": "guest_winery",
+          "url": "https://huentalawines.com.ar/",
+          "locality": "outside_city"
+        }
+      ]
+    },
+    {
+      "circuit": "vinos",
+      "sourceAnchor": "rd-web-56c74fce",
+      "date": "2026-04-10",
+      "kind": "historical",
+      "title": "Sunset Wine Mixology 4V",
+      "url": "https://www.casadionisio.com.ar/sunset-wine-mixology",
+      "targets": [
+        {
+          "id": "4v-vinotecas",
+          "name": "4V vinotecas de La Plata",
+          "role": "co_organizer_collective",
+          "locality": "La Plata"
+        }
+      ]
+    },
+    {
+      "circuit": "vinos",
+      "sourceAnchor": "rd-web-56c74fce",
+      "date": "2026-08-04",
+      "kind": "historical",
+      "title": "Escuela y talleres de vinos",
+      "url": "https://www.casadionisio.com.ar/escuela-eas-lp",
+      "targets": [
+        {
+          "id": "eas-sommeliers",
+          "name": "Escuela Argentina de Sommeliers",
+          "role": "education_partner",
+          "url": "https://sommeliers.com.ar/",
+          "locality": "multi_city"
+        }
+      ]
+    },
+    {
+      "circuit": "vinos",
+      "sourceAnchor": "rd-web-56c74fce",
+      "date": "2026-07-11",
+      "kind": "historical_secondary",
+      "title": "Participación en BEBER Expo de Vinotecas",
+      "url": "https://www.findglocal.com/AR/La-Plata/126149450766795/Casa-Dionisio",
+      "targets": [
+        {
+          "id": "beber-expo",
+          "name": "BEBER Expo de Vinotecas",
+          "role": "regional_event_series",
+          "locality": "La Plata"
+        }
+      ]
+    },
+    {
+      "circuit": "vinos",
+      "sourceAnchor": "rd-web-56c74fce",
+      "date": "2026-09-25",
+      "kind": "historical",
+      "title": "Pinamar Wine Week / Viajar & Beber",
+      "url": "https://compraenlaplata.com/producto/viaje-a-la-pinamar-wine-week",
+      "targets": [
+        {
+          "id": "viajar-beber",
+          "name": "Viajar & Beber",
+          "role": "travel_partner",
+          "locality": "La Plata"
+        },
+        {
+          "id": "bodega-gamboa",
+          "name": "Bodega Gamboa",
+          "role": "trip_stop",
+          "locality": "outside_city"
+        },
+        {
+          "id": "antiguo-legado",
+          "name": "Bodega Antiguo Legado",
+          "role": "trip_stop",
+          "locality": "outside_city"
+        }
+      ]
+    },
+    {
+      "circuit": "vinos",
+      "sourceAnchor": "rd-web-56c74fce",
+      "date": "2025-11-06",
+      "kind": "historical_secondary",
+      "title": "Feria Catar 2025",
+      "url": "https://www.eldia.com/nota/2025-11-6-3-47-58-llega-la-feria-catar-al-paseo-mitre-de-gorina-gourmet",
+      "targets": [
+        {
+          "id": "acsba",
+          "name": "Asociación Civil de Sommeliers de Buenos Aires",
+          "role": "regional_organizer",
+          "url": "https://www.instagram.com/sommeliersdebuenosaires/",
+          "locality": "La Plata"
+        }
+      ]
+    },
+    {
+      "circuit": "vinos",
+      "sourceAnchor": "rd-web-56c74fce",
+      "date": "2026-11-27",
+      "kind": "upcoming_original",
+      "title": "Feria Catar 2026 V edición",
+      "url": "https://www.passline.com/eventos/feria-catar-v-edicion",
+      "event": {
+        "date": "2026-11-27",
+        "time": "19:00",
+        "venue": "Paseo Mitre, Gorina, La Plata",
+        "status": "UNVERIFIED_FOR_PORACA"
+      },
+      "targets": [
+        {
+          "id": "acsba",
+          "name": "Asociación Civil de Sommeliers de Buenos Aires",
+          "role": "regional_organizer",
+          "url": "https://www.instagram.com/sommeliersdebuenosaires/",
+          "locality": "La Plata"
+        }
+      ]
+    }
+  ]
+}
