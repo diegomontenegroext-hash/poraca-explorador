@@ -1,5 +1,22 @@
 # Por Acá · F1 Seguridad e integridad — ejecución 01/11/2026
 
+<!-- PORACA_MINPRIV_QA_SQL_VERIFIED_20261101 -->
+## Actualización: mecanismo limitado demostrado en QA (01/11/2026)
+
+**La vía correcta está identificada y probada, sin modificar producción.** La [documentación oficial de Neon](https://neon.com/docs/manage/roles) aclara que los roles creados por consola, API o CLI heredan `neon_superuser`, mientras que los creados con SQL no. El error anterior fue intentar degradar roles creados con la API.
+
+**Prueba reversible en Neon QA `br-icy-night-b4larkc3`:**
+1. En una transacción con `SAVEPOINT`, `CREATE ROLE <probe> NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT`.
+2. `GRANT poraca_definitivo_scope TO <probe>`, sin tocar permisos de tablas ni autorizar DDL.
+3. Readback: `neon_superuser=false`; `CREATEROLE=false`; `CREATEDB=false`; `INSERT` en `radar_definitivo.runs/source_checks/listing_occurrences=true`; `UPDATE radar_definitivo.sources=true`; `INSERT/DELETE public.radar_agenda_events=false`; `CREATE DATABASE=false`.
+4. `ROLLBACK TO SAVEPOINT`; la consulta independiente verificó **cero roles residuales**. También se comprobó ausente la vieja cuenta `poraca_ingest_limited_qa_20261101`.
+
+**Siguiente paso requerido para terminar A17**: administrador crea mediante **SQL del editor de Neon, no API** un nuevo usuario `LOGIN` de mínimo privilegio con contraseña aleatoria gestionada en un cofre; `GRANT poraca_definitivo_scope` y preflight de roles + staging y negativa canónica con credencial real, en QA primero. Requiere **actualizar atómicamente el secreto de GitHub Actions `NEON_RADAR_OPERATIONAL_DATABASE_URL` y comprobar el siguiente run ordinario/verify_only antes de inutilizar las dos identidades anteriores**. El conector GitHub disponible aquí no ofrece operación autorizada para editar Actions Secrets; no copiar claves a chats, logs o repositorios. Sin ese cutover con rollback no declarar `LEAST_PRIVILEGE PASS`. La cuenta `poraca_explorador_writer` no se toca hasta confirmar dependencias.
+
+**Permanece abierto en PROD:** ambos logins originales siguen `neon_superuser`, CREATEDB y CREATEROLE. Ningún secreto ni acceso productivo fue modificado en esta prueba.
+<!-- /PORACA_MINPRIV_QA_SQL_VERIFIED_20261101 -->
+
+
 ## Resultado comprobado
 
 - **Operación vigente**: Neon proyecto `frosty-union-52906378`, rama `br-mute-recipe-b4odj2bl`, base `neondb`. 130 filas canónicas antes y después del cambio.
