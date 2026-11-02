@@ -43,8 +43,12 @@ def is_local_future_original(record,today):
             return False
     except (TypeError,ValueError,KeyError):
         return False
-    return any(isinstance(t,dict) and t.get("locality") in LOCAL_CIRCUIT_AREAS
-               for t in record.get("targets",[]))
+    # The EVENT'S verified venue governs territorial relevance. A visiting
+    # artist, touring producer or national organizer can advertise a valid
+    # event in La Plata. The organizer's headquarters is neither required
+    # nor enough to establish event locality.
+    proof=ev.get("localityProof")
+    return isinstance(proof,str) and bool(proof.strip())
 
 
 def reconstruct_historical_network(evidence,circuit,today,limit=10):
@@ -93,7 +97,7 @@ def reconstruct_historical_network(evidence,circuit,today,limit=10):
     for item in found.values():
         local=item["locality"] in LOCAL_CIRCUIT_AREAS
         item["reviewPriority"]=(
-            "VERIFY_UPCOMING_ORIGINAL" if local and item["upcomingOriginals"] else
+            "VERIFY_UPCOMING_ORIGINAL" if item["upcomingOriginals"] else
             "FIND_CURRENT_LOCAL_PROGRAM" if local else
             "RELATED_PARTNER_NOT_LOCAL_FEED")
     def role_priority(item):
