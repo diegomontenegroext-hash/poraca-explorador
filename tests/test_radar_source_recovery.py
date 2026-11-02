@@ -1,7 +1,7 @@
 import pathlib,sys,unittest,json
 from datetime import date
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/"src"))
-from radar_source_recovery import plan,reconstruct_historical_network,discover_directory_review_leads
+from radar_source_recovery import plan,reconstruct_historical_network,discover_directory_review_leads,is_local_future_original
 
 
 def src(id,name,circuit="teatro",mode="fetch",diagnosis="DATED_SESSIONS_OBSERVED",
@@ -253,5 +253,32 @@ class SourceRecoveryTests(unittest.TestCase):
         bad[0]["url"]="http://bad.invalid"
         bad[0]["dateEvidenceUrl"]="https://example.org/d"
         self.assertEqual(discover_directory_review_leads(bad,"vinos",date(2026,11,2)),[])
+
+    def test_local_organizer_does_not_localize_out_of_area_event(self):
+        remote={"kind":"upcoming_original","circuit":"vinos","date":"2026-11-27",
+                "url":"https://example.org/event","title":"Cata en Córdoba",
+                "event":{"date":"2026-11-27","time":"19:00",
+                         "venue":"Local de Córdoba","locality":"Cordoba"},
+                "targets":[{"id":"local","name":"Organizador LP",
+                            "locality":"La Plata"}]}
+        self.assertFalse(is_local_future_original(remote,date(2026,11,2)))
+        remote_leads=reconstruct_historical_network([remote],"vinos",date(2026,11,2))
+        self.assertFalse(remote_leads[0]["upcomingOriginals"])
+        self.assertFalse(remote_leads[0]["historicalProofUrls"])
+        result=plan([],historical_evidence=[remote],today=date(2026,11,2))
+        self.assertEqual(result["circuitResilience"],[])
+        self.assertEqual(result["confirmedReplacements"],0)
+
+    def test_official_gorina_original_verified_and_eligible_as_research_hint(self):
+        records=json.loads((pathlib.Path(__file__).resolve().parents[1]/
+                           "data/historical-circuit-network-v1.json").read_text())["evidence"]
+        original=next(x for x in records if x.get("kind")=="upcoming_original"
+                      and x.get("date")=="2026-11-27")
+        self.assertEqual(original["event"]["locality"],"Gorina")
+        self.assertTrue(is_local_future_original(original,date(2026,11,2)))
+        self.assertFalse(is_local_future_original(original,date(2026,12,1)))
+        missing_locality=json.loads(json.dumps(original))
+        del missing_locality["event"]["locality"]
+        self.assertFalse(is_local_future_original(missing_locality,date(2026,11,2)))
 
 if __name__=="__main__":unittest.main()
