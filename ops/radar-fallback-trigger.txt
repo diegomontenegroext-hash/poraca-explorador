@@ -1,6 +1,7 @@
 # POR ACA - RADAR DEFINITIVO
-# Disparo extraordinario FULL, solicitado explicitamente por el usuario; no altera horario ordinario.
+# Disparo incremental extraordinario para certificar dos originales nuevos, sin admision editorial.
+# Verificado: dos fuentes pendientes en rangos 1 y 2, ninguna corrida activa al disparar.
 trigger_date=2026-11-02
 trigger_slot=bootstrap
-trigger_mode=full
-trigger_reason=user_requested_post_improvements_e2e_measure_20261102_1106_ART
+trigger_mode=incremental
+trigger_reason=first_party_literatura_vinos_two_sources_real_qa_20261102
