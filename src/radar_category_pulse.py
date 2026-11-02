@@ -13,7 +13,9 @@ SCHEMA="poraca-radar-category-pulse-v1"
 LABELS={"teatro":"Teatro","musica":"Música","cine":"Cine","artes":"Artes y exposiciones",
 "literatura":"Literatura","festival":"Festivales","yoga":"Yoga","ceramica":"Cerámica",
 "danza":"Danza","fiestas":"Fiestas","taller":"Talleres","naturaleza":"Naturaleza",
-"comunidad":"Comunidad","otras":"Otras / por clasificar"}
+"comunidad":"Comunidad","ciencia":"Ciencia",
+"vinos":"Vinos y degustaciones","gastronomia":"Gastronomía",
+"deportes":"Deportes","otras":"Otras / por clasificar"}
 ALIASES={
 "teatro":"teatro","teatro musical":"teatro","stand up":"teatro","teatro stand up":"teatro",
 "musica":"musica","music":"musica","cine":"cine","artes":"artes","arte":"artes",
@@ -21,8 +23,12 @@ ALIASES={
 "libros":"literatura","festival":"festival","festivales":"festival","feria":"festival",
 "yoga":"yoga","ceramica":"ceramica","danza":"danza","milonga":"danza",
 "clase_tango":"danza","fiesta":"fiestas","fiestas":"fiestas","noche":"fiestas",
-"taller":"taller","formacion":"taller","naturaleza":"naturaleza","ecologia":"naturaleza",
-"comunidad":"comunidad","cultura":"comunidad","infantil":"comunidad","ciencia":"comunidad"}
+"taller":"taller","talleres":"taller","formacion":"taller","naturaleza":"naturaleza","ecologia":"naturaleza",
+"comunidad":"comunidad","cultura":"comunidad","infantil":"comunidad",
+"ciencia":"ciencia","ciencias":"ciencia",
+"vinos":"vinos","vino":"vinos","cata":"vinos","catas":"vinos","degustacion":"vinos","degustaciones":"vinos",
+"gastronomia":"gastronomia","gastronomia_cultural":"gastronomia",
+"deportes":"deportes","deportes_nauticos":"deportes"}
 
 CANONICAL_SQL="""
 SELECT category,COUNT(*)::int,
