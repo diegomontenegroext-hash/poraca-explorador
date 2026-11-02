@@ -80,6 +80,56 @@ def reconstruct_historical_network(evidence,circuit,today,limit=10):
         -len(x["historicalProofUrls"]),x["targetId"]))[:max(0,min(limit,30))]
 
 
+def discover_directory_review_leads(evidence,circuit,today,limit=3):
+    """National/regional calendars can reveal channels, NEVER local events.
+
+    A directory dated for November is not evidence that any specific shop in
+    La Plata participates. It stays in a separate review queue until a
+    participant's local identity and original dated activity are verified.
+    """
+    if not isinstance(today,date):
+        raise ValueError("Local date required")
+    leads=[]
+    seen=set()
+    for record in list(evidence)[:300]:
+        if not isinstance(record,dict) or record.get("kind")!="upcoming_directory":
+            continue
+        if record.get("circuit")!=circuit or record.get("localParticipantVerified") is not False:
+            continue
+        url=record.get("url")
+        if not isinstance(url,str) or len(url)>1500:
+            continue
+        parsed=urlsplit(url)
+        if parsed.scheme!="https" or not parsed.hostname or parsed.username or parsed.password:
+            continue
+        try:
+            event_date=date.fromisoformat(record["date"])
+        except (ValueError,TypeError,KeyError):
+            continue
+        if event_date<today or url in seen:
+            continue
+        if record.get("directoryScope") not in ("AR_nationwide","regional_unverified"):
+            continue
+        if not record.get("dateEvidenceUrl"):
+            continue
+        proof=urlsplit(record["dateEvidenceUrl"])
+        if proof.scheme!="https" or not proof.hostname:
+            continue
+        seen.add(url)
+        leads.append({
+            "title":str(record.get("title") or "")[:140],
+            "date":event_date.isoformat(),"directoryUrl":url,
+            "dateEvidenceUrl":record["dateEvidenceUrl"],
+            "directoryScope":record["directoryScope"],
+            "localParticipantVerified":False,
+            "localEventDetected":False,"autoRegistered":False,
+            "publicationApproved":False,
+            "requiredReview":"VERIFY_LOCAL_PARTICIPANT_AND_ORIGINAL_DATED_ACTIVITY",
+            "sourcePurpose":"PARTICIPANT_DISCOVERY_INDEX_NOT_EVENT_FEED"
+        })
+    return sorted(leads,key=lambda x:(x["date"],x["directoryUrl"]))[:max(0,min(limit,10))]
+
+
 TRIGGERS={"RECENT_YIELD_DROP","SUCCESSFUL_FETCH_ZERO_DATED_SESSIONS",
           "REPEATED_INDEX_ONLY"}
 
@@ -195,6 +245,8 @@ def plan(rows,limit=12,historical_evidence=(),today=None):
             "recommendation":("TEST_ALTERNATE_CHANNELS_WITHIN_CIRCUIT"
                               if suggestions else "DISCOVER_NEW_VERIFIABLE_CHANNEL"),
             "historicalNetworkCandidates":reconstruct_historical_network(
+                historical_evidence,circuit,today) if today is not None else [],
+            "directoryReviewCandidates":discover_directory_review_leads(
                 historical_evidence,circuit,today) if today is not None else [],
             "selfHealConfirmed":False,"sourceDisabled":False
         })
