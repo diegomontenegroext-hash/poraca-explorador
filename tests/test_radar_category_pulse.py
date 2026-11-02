@@ -160,7 +160,7 @@ class PulseCategoryTest(unittest.TestCase):
         md=pulse.format_circuit_resilience(recovery)
         self.assertIn("REQUIRES_INDEPENDENT_EXTERNAL_ATTESTATION",md)
         self.assertNotIn("| vinos | 3 | 3 | PASS",md)
-        self.assertTrue(pulse.format_circuit_resilience({}).endswith("\\n"))
+        self.assertTrue(pulse.format_circuit_resilience({}).endswith("\n"))
 
 if __name__=="__main__":
     unittest.main()
