@@ -2,12 +2,12 @@
 -- READ-ONLY / Neon operational branch br-mute-recipe-b4odj2bl / neondb.
 -- Repetir después de completar el workflow NORMAL; no lanza Radar ni escribe.
 -- No incluir los 123 históricos con status='scheduled' como próximas funciones.
-WITH window AS (
+WITH slot_window AS (
  SELECT '2026-11-02 05:00:00-03'::timestamptz AS begins_at,
         '2026-11-03 05:00:00-03'::timestamptz AS ends_at,
         (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date AS today
 ), target AS (
- SELECT r.* FROM radar_definitivo.runs r CROSS JOIN window w
+ SELECT r.* FROM radar_definitivo.runs r CROSS JOIN slot_window w
  WHERE r.mode='full' AND r.started_at >= w.begins_at
    AND r.started_at < w.ends_at
  ORDER BY r.started_at DESC LIMIT 1
@@ -22,14 +22,14 @@ WITH window AS (
  WHERE c.run_id=(SELECT run_id FROM target)
 ), catalog AS (
  SELECT (SELECT count(*)::int FROM radar_definitivo.listing_occurrences) staging_total,
-        (SELECT count(*)::int FROM radar_definitivo.listing_occurrences WHERE event_date>=(SELECT today FROM window)) staging_future,
+        (SELECT count(*)::int FROM radar_definitivo.listing_occurrences WHERE event_date>=(SELECT today FROM slot_window)) staging_future,
         (SELECT count(*)::int FROM public.radar_agenda_events) canonical_total,
-        (SELECT count(*)::int FROM public.radar_agenda_events WHERE event_date>=(SELECT today FROM window)) canonical_future,
-        (SELECT count(*)::int FROM public.radar_agenda_events WHERE event_date>=(SELECT today FROM window) AND verification='confirmed') canonical_future_confirmed,
+        (SELECT count(*)::int FROM public.radar_agenda_events WHERE event_date>=(SELECT today FROM slot_window)) canonical_future,
+        (SELECT count(*)::int FROM public.radar_agenda_events WHERE event_date>=(SELECT today FROM slot_window) AND verification='confirmed') canonical_future_confirmed,
         (SELECT count(*)::int FROM public.poraca_knowledge_entities) entities,
         (SELECT count(*)::int FROM public.poraca_knowledge_relations) cultural_relations,
         (SELECT count(*)::int FROM public.poraca_event_release_readiness_v2
-          WHERE first_program_day>=(SELECT today FROM window)
+          WHERE first_program_day>=(SELECT today FROM slot_window)
           AND release_quality_gate LIKE 'hold%') future_editorial_holds
 ), identity AS (
  SELECT pg_has_role('poraca_radar_limited_prod','neon_superuser','member') AS is_elevated,
