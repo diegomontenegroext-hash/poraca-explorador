@@ -281,4 +281,39 @@ class SourceRecoveryTests(unittest.TestCase):
         del missing_locality["event"]["locality"]
         self.assertFalse(is_local_future_original(missing_locality,date(2026,11,2)))
 
+    def test_visiting_organizer_local_event_is_researchable_not_published(self):
+        event={"kind":"upcoming_original","circuit":"musica",
+               "date":"2026-11-22","title":"Gira en La Plata",
+               "url":"https://organizer.example/la-plata",
+               "event":{"date":"2026-11-22","time":"21:00",
+                        "venue":"Teatro en La Plata","locality":"La Plata",
+                        "localityProof":"Sede en La Plata confirmada en el original"},
+               "targets":[{"id":"tour-producer","name":"Productora nacional",
+                           "role":"organizer","locality":"outside_city",
+                           "url":"https://organizer.example/"}]}
+        today=date(2026,11,2)
+        self.assertTrue(is_local_future_original(event,today))
+        leads=reconstruct_historical_network([event],"musica",today)
+        self.assertEqual(leads[0]["reviewPriority"],"VERIFY_UPCOMING_ORIGINAL")
+        self.assertEqual(leads[0]["locality"],"outside_city")
+        self.assertFalse(leads[0]["autoRegistered"])
+        self.assertFalse(leads[0]["publicationApproved"])
+        out=plan([],historical_evidence=[event],today=today)
+        self.assertEqual(out["circuitsWithoutReportedDatedYield"],1)
+        self.assertEqual(out["circuitResilience"][0]["circuit"],"musica")
+        self.assertTrue(out["circuitResilience"][0]["futureOriginalResearchHint"])
+        self.assertEqual(out["confirmedReplacements"],0)
+
+    def test_unproved_locality_does_not_create_future_research_hints(self):
+        original={"kind":"upcoming_original","circuit":"musica",
+                  "date":"2026-11-22","url":"https://example.org/local",
+                  "event":{"date":"2026-11-22","time":"21:00",
+                           "venue":"Teatro en La Plata","locality":"La Plata"},
+                  "targets":[{"id":"local","name":"Local","locality":"La Plata"}]}
+        self.assertFalse(is_local_future_original(original,date(2026,11,2)))
+        out=plan([],historical_evidence=[original],today=date(2026,11,2))
+        self.assertEqual(out["circuitResilience"],[])
+        leads=reconstruct_historical_network([original],"musica",date(2026,11,2))
+        self.assertEqual(leads[0]["upcomingOriginals"],[])
+
 if __name__=="__main__":unittest.main()
