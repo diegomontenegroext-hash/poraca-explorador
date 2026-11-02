@@ -121,7 +121,7 @@ def format_circuit_resilience(recovery):
     """
     rows=list((recovery or {}).get("circuitResilience") or [])
     if not rows:
-        return "Sin métricas de extracción fechada por circuito disponibles.\\n"
+        return "Sin métricas de extracción fechada por circuito disponibles.\n"
     output=[
         "| Circuito | Canales fetch | Con sesiones (7d) | Diagnóstico |",
         "|---|---:|---:|---|"
@@ -141,7 +141,7 @@ def format_circuit_resilience(recovery):
     output.append("")
     output.append("**Canales con sesiones ≠ organizadores independientes ≠ eventos únicos. "
                   "Todos los circuitos mantienen certificación de resiliencia pendiente.**")
-    return "\\n".join(output)+"\\n"
+    return "\n".join(output)+"\n"
 
 
 def source_mode_counts(rows):
