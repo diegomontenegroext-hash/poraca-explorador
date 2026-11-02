@@ -98,7 +98,7 @@
     },
     {
       "circuit": "vinos",
-      "sourceAnchor": "rd-web-56c74fce",
+      "sourceAnchor": null,
       "date": "2025-11-06",
       "kind": "historical_secondary",
       "title": "Feria Catar 2025",
@@ -111,11 +111,12 @@
           "url": "https://www.instagram.com/sommeliersdebuenosaires/",
           "locality": "La Plata"
         }
-      ]
+      ],
+      "networkExpansionFrom": "regional_wine_circuit_independent_of_dionisio"
     },
     {
       "circuit": "vinos",
-      "sourceAnchor": "rd-web-56c74fce",
+      "sourceAnchor": null,
       "date": "2026-11-27",
       "kind": "upcoming_original",
       "title": "Feria Catar 2026 V edición",
@@ -134,7 +135,8 @@
           "url": "https://www.instagram.com/sommeliersdebuenosaires/",
           "locality": "La Plata"
         }
-      ]
+      ],
+      "networkExpansionFrom": "regional_wine_circuit_independent_of_dionisio"
     }
   ]
 }
