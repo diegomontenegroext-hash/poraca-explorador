@@ -19,6 +19,10 @@ SELECT x.source_id,x.circuit,x.original_url,
    WHERE k.source_id=x.source_id) AS source_checks,
  (SELECT count(*)::int FROM radar_definitivo.listing_occurrences l
    WHERE l.source_id=x.source_id AND l.event_date=x.event_day) AS exact_day_occurrences,
+ (SELECT count(*)::int FROM radar_definitivo.listing_occurrences l
+   WHERE l.source_id=x.source_id AND l.proof_url=x.original_url
+     AND l.review_state='observed_unverified'
+     AND c.kind='cultural_cycle_index') AS historical_unverified_cycle_root_rows,
  (SELECT count(*)::int FROM public.radar_agenda_events e
    WHERE e.source_url=x.original_url AND e.event_date=x.event_day) AS approved_canonical_matches,
  CASE
