@@ -77,8 +77,28 @@ def plan(rows,limit=12,historical_evidence=(),today=None):
                 x.get("diagnosis")=="DATED_SESSIONS_OBSERVED"]
     failing=[x for x in records if x.get("monitoringMode")=="fetch" and
              x.get("diagnosis") in TRIGGERS]
+    productive_circuits={str(x.get("circuit") or "") for x in productive}
+    # An evidence-backed UPCOMING local original from a circuit with no
+    # productive feed deserves review before a generic index-only page.
+    # This prioritizes investigation only; it never changes ingest sources.
+    future_circuits=set()
+    if today is not None:
+        for record in historical_evidence:
+            if record.get("kind")!="upcoming_original":
+                continue
+            if not any(t.get("locality") in ("La Plata","Gorina")
+                       for t in record.get("targets",[])):
+                continue
+            try:
+                if date.fromisoformat(record["date"])>=today:
+                    future_circuits.add(str(record.get("circuit") or ""))
+            except (TypeError,ValueError,KeyError):
+                continue
     failing.sort(key=lambda x:(
+        0 if x.get("circuit") in future_circuits and
+             x.get("circuit") not in productive_circuits else 1,
         0 if x["diagnosis"]=="RECENT_YIELD_DROP" else 1,
+        0 if x.get("circuit") not in productive_circuits else 1,
         -int(x.get("checks7d",0)),str(x.get("sourceId"))))
     actions=[]
     for source in failing[:limit]:
