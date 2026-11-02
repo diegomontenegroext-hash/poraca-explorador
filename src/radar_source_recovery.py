@@ -116,6 +116,47 @@ def plan(rows,limit=12,historical_evidence=(),today=None):
         0 if x["diagnosis"]=="RECENT_YIELD_DROP" else 1,
         0 if x.get("circuit") not in productive_circuits else 1,
         -int(x.get("checks7d",0)),str(x.get("sourceId"))))
+    # Count real, reported 7-day dated yields by independent fetch source.
+    # These are UNAPPROVED sightings, not proof of source quality or coverage
+    # of a whole cultural circuit. Discovery-only and review channels never
+    # count as a productive extraction channel.
+    circuit_rows={}
+    for item in records:
+        circuit=str(item.get("circuit") or "").strip()
+        if not circuit or item.get("monitoringMode")!="fetch":
+            continue
+        aggregate=circuit_rows.setdefault(circuit,{"fetchIds":set(),
+            "yieldIds":set(),"zeroYieldIds":set()})
+        source_id=str(item.get("sourceId") or "").strip()
+        if not source_id:
+            continue
+        aggregate["fetchIds"].add(source_id)
+        if (item.get("diagnosis")=="DATED_SESSIONS_OBSERVED"
+                and int(item.get("observedSessions7d") or 0)>0):
+            aggregate["yieldIds"].add(source_id)
+        else:
+            aggregate["zeroYieldIds"].add(source_id)
+    circuit_resilience=[]
+    for circuit,counts in circuit_rows.items():
+        reported=len(counts["yieldIds"])
+        gate=("NO_REPORTED_DATED_YIELD" if reported==0 else
+              "SINGLE_REPORTED_YIELD_CHANNEL" if reported==1 else
+              "MULTIPLE_REPORTED_YIELD_CHANNELS_NOT_CERTIFIED")
+        circuit_resilience.append({
+            "circuit":circuit,
+            "fetchSources":len(counts["fetchIds"]),
+            "reportedDatedYieldSources7d":reported,
+            "fetchSourcesWithoutReportedDatedYield7d":len(
+                counts["fetchIds"]-counts["yieldIds"]),
+            "sourceResilienceGate":gate,
+            "independentOrganizerVerified":False,
+            "resilienceCertified":False,
+            "minimumTargetChannels":2,
+            "interpretation":"Reported sessions may duplicate; original links, "
+                             "organizer independence and admission remain untested."
+        })
+    circuit_resilience.sort(key=lambda x:(
+        x["reportedDatedYieldSources7d"],x["circuit"]))
     actions=[]
     for source in failing[:limit]:
         circuit=str(source.get("circuit") or "")
@@ -146,6 +187,12 @@ def plan(rows,limit=12,historical_evidence=(),today=None):
             "shown":len(actions),"actions":actions,
             "strategy":"SHADOW_RECOMMENDATIONS_ONLY",
             "confirmedReplacements":0,
+            "circuitResilience":circuit_resilience,
+            "circuitsWithoutReportedDatedYield":sum(
+                x["reportedDatedYieldSources7d"]==0 for x in circuit_resilience),
+            "circuitsWithOneReportedYieldChannel":sum(
+                x["reportedDatedYieldSources7d"]==1 for x in circuit_resilience),
+            "resilienceCertification":"NOT_CERTIFIED_REQUIRES_INDEPENDENT_ORIGINALS",
             "uncoveredCases":sum(not a["alternativeCoverageSources"] for a in actions),
             "note":"Cobertura alternativa en mismo circuito NO es reemplazo "
                    "verificado del canal de una entidad. Sin visita nueva al "
