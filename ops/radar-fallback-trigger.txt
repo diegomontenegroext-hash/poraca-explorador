@@ -1,6 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Disparo por Guardia GPT - orquestador principal.
+# Disparo extraordinario FULL, solicitado explicitamente por el usuario; no altera horario ordinario.
 trigger_date=2026-11-02
-trigger_slot=05
+trigger_slot=bootstrap
 trigger_mode=full
-trigger_reason=gpt_primary_scheduler
+trigger_reason=user_requested_post_improvements_e2e_measure_20261102_1106_ART
