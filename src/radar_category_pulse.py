@@ -181,8 +181,15 @@ def fetch(url):
                 cur.execute(SOURCE_LEARNING_SQL)
                 learning_rows=cur.fetchall()
                 source_learning=summarize_source_learning(learning_rows)
+                # Curated past events are source-discovery hints only.
+                # They can never enroll, authorize, or publish a source/event.
+                historical_network=json.loads((Path(__file__).resolve().parents[1]
+                    /"data/historical-circuit-network-v1.json").read_text(encoding="utf-8"))
+                if historical_network.get("schema")!="poraca-historical-circuit-network-v1":
+                    raise RuntimeError("HISTORICAL_NETWORK_SCHEMA_MISMATCH")
                 source_recovery=plan_source_recovery([
-                    classify_source_learning(row) for row in learning_rows])
+                    classify_source_learning(row) for row in learning_rows],
+                    historical_evidence=historical_network["evidence"],today=today)
                 cur.execute(EDITORIAL_PREVIEW_SQL)
                 editorial_preview=summarize_editorial_preview(cur.fetchall())
     report=summarize(canonical,observations,today)
@@ -292,6 +299,13 @@ def main():
                     out.write("- {} · {} · cobertura alternativa: {} · **{}**\n".format(
                         safe_cell(item["name"]),safe_cell(item["diagnosis"]),
                         alts or "ninguna verificada",safe_cell(item["recommendation"])))
+                for source in rec["actions"]:
+                    for lead in source.get("historicalNetworkCandidates",[])[:4]:
+                        if lead["reviewPriority"]=="VERIFY_UPCOMING_ORIGINAL":
+                            out.write("- **Nuevo canal a comprobar**: {} · {} · "
+                                      "no publicado ni registrado automáticamente.\n".format(
+                                          safe_cell(lead["name"]),
+                                          safe_cell(lead["upcomingOriginals"][0]["url"])))
                 out.write("\n**Sin cambio de prioridades ni sustitución automática de entidades.** "
                           "La recuperación deberá probarse contra fuentes originales.\n\n")
                 e=report["endToEnd"]
