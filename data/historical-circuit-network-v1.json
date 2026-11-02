@@ -1,6 +1,6 @@
 {
   "schema": "poraca-historical-circuit-network-v1",
-  "policy": "PAST_MENTIONS_ARE_SOURCE_LEADS_NOT_FUTURE_EVENTS",
+  "policy": "PAST_MENTIONS_ARE_SOURCE_LEADS_NOT_FUTURE_EVENTS; VERIFY_DATE_WITH_ORIGINAL; DO_NOT_AUTO_ENROLL",
   "evidence": [
     {
       "circuit": "vinos",
@@ -33,40 +33,27 @@
           "role": "co_organizer_collective",
           "locality": "La Plata"
         }
-      ]
+      ],
+      "occurrenceCaveat": "Original page advertises postponement by rain; no proof it occurred on the shown date."
     },
     {
       "circuit": "vinos",
       "sourceAnchor": "rd-web-56c74fce",
-      "date": "2026-08-04",
+      "date": "2026-07-10",
       "kind": "historical",
-      "title": "Escuela y talleres de vinos",
-      "url": "https://www.casadionisio.com.ar/escuela-eas-lp",
+      "title": "Feria BEBER tercera edición 2026 — fecha oficial de ticketera 10/07",
+      "url": "https://compras.evento-simple.com/feriabeber/eventos/feria-beber-e1/v2",
       "targets": [
         {
-          "id": "eas-sommeliers",
-          "name": "Escuela Argentina de Sommeliers",
-          "role": "education_partner",
-          "url": "https://sommeliers.com.ar/",
-          "locality": "multi_city"
+          "id": "camara-platense-vinotecas",
+          "name": "Cámara Platense de Vinotecas y Afines",
+          "role": "organizer",
+          "locality": "La Plata",
+          "url": null,
+          "accountHint": "@camaraplatensedevinotecas"
         }
-      ]
-    },
-    {
-      "circuit": "vinos",
-      "sourceAnchor": "rd-web-56c74fce",
-      "date": "2026-07-11",
-      "kind": "historical_secondary",
-      "title": "Participación en BEBER Expo de Vinotecas",
-      "url": "https://www.findglocal.com/AR/La-Plata/126149450766795/Casa-Dionisio",
-      "targets": [
-        {
-          "id": "beber-expo",
-          "name": "BEBER Expo de Vinotecas",
-          "role": "regional_event_series",
-          "locality": "La Plata"
-        }
-      ]
+      ],
+      "dateDiscrepancy": "Some secondary publications mentioned 11/07; authoritative ticket listing says 10/07. Do not auto-publish a past session."
     },
     {
       "circuit": "vinos",
@@ -181,6 +168,109 @@
           "locality": "La Plata"
         }
       ]
+    },
+    {
+      "circuit": "vinos",
+      "sourceAnchor": "rd-web-56c74fce",
+      "date": "2025-10-17",
+      "kind": "historical_secondary",
+      "title": "Sunset Wine Mixology — 4V vinotecas identificadas",
+      "url": "https://www.0221.com.ar/que-hago/la-sunset-wine-mixology-vuelve-la-plata-mas-40-bodegas-una-degustacion-lujo-n116918",
+      "targets": [
+        {
+          "id": "golden-wine",
+          "name": "Golden Wine",
+          "role": "co_organizer_historic",
+          "locality": "La Plata"
+        },
+        {
+          "id": "villa-wine",
+          "name": "Villa Wine",
+          "role": "co_organizer_historic",
+          "locality": "Gonnet"
+        },
+        {
+          "id": "terruno-vinoteca",
+          "name": "Terruño Vinoteca",
+          "role": "co_organizer_historic",
+          "locality": "Berisso"
+        },
+        {
+          "id": "casa-dionisio",
+          "name": "Casa Dionisio",
+          "role": "co_organizer_historic",
+          "url": "https://www.casadionisio.com.ar/",
+          "locality": "La Plata"
+        }
+      ],
+      "networkRelationNote": "The four named members are evidenced for the 2025 edition. The 2026 4V original page does not individually name them; do not assume unchanged membership."
+    },
+    {
+      "circuit": "vinos",
+      "sourceAnchor": "rd-web-56c74fce",
+      "date": "2026-07-10",
+      "kind": "historical_secondary",
+      "title": "BEBER 2026 — vinotecas participantes documentadas",
+      "url": "https://tucoweb.info/se-viene-la-tercera-edicion-de-la-expo-vinotecas-beber-2026/",
+      "targets": [
+        {
+          "id": "villa-wine",
+          "name": "Villa Wine",
+          "role": "historical_participant",
+          "locality": "Gonnet"
+        },
+        {
+          "id": "terruno-vinoteca",
+          "name": "Terruño Vinoteca",
+          "role": "historical_participant",
+          "locality": "Berisso"
+        },
+        {
+          "id": "galpon-de-vinos",
+          "name": "Galpón de Vinos",
+          "role": "historical_participant",
+          "locality": "La Plata"
+        },
+        {
+          "id": "assemblage",
+          "name": "Assemblage",
+          "role": "historical_participant",
+          "locality": "La Plata"
+        },
+        {
+          "id": "chapeau",
+          "name": "Chapeau",
+          "role": "historical_participant",
+          "locality": "La Plata"
+        },
+        {
+          "id": "orujos",
+          "name": "Orujos",
+          "role": "historical_participant",
+          "locality": "La Plata"
+        },
+        {
+          "id": "vinoteca-city-bell",
+          "name": "Vinoteca City Bell",
+          "role": "historical_participant",
+          "locality": "City Bell"
+        },
+        {
+          "id": "don-santiago",
+          "name": "Don Santiago",
+          "role": "historical_participant",
+          "locality": "La Plata"
+        },
+        {
+          "id": "casa-dionisio",
+          "name": "Casa Dionisio",
+          "role": "historical_participant",
+          "url": "https://www.casadionisio.com.ar/",
+          "locality": "La Plata"
+        }
+      ],
+      "networkRelationNote": "Participants only, not necessarily organizers or currently active event publishers; do not auto-monitor all."
     }
-  ]
+  ],
+  "researchUpdated": "2026-11-02"
 }
