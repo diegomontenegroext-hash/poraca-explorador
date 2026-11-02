@@ -1,5 +1,15 @@
 # Por Acá · Explorador cultural
 
+## 02/11/2026 — fuentes originales activadas, admisión editorial intacta
+
+**Novedad operativa:** se incorporaron al catálogo vivo de Neon `radar_definitivo.sources` **dos orígenes oficiales** con `monitoring_mode=fetch` y cadencia de 24 h: Noche de las Librerías (`rd-web-e60bb2a8`, literatura, fuente organizadora) y Feria Catar V (`rd-web-17f06bfe`, vinos, ticketera original). **Readback SELECT confirmado**, inventario total **230**, `fetch` habilitados **64**. Ambas fuentes **aún no habían sido consultadas** por Radar en el corte de alta; no hay nuevos candidatos ni eventos atribuidos.
+
+Se implementó el [módulo genérico de página raíz original](src/radar_original_root_candidate.py) integrado en [Radar Definitivo](src/radar_definitivo.py): al abrir realmente un original HTTPS con rol válido, guarda **a lo sumo un candidato no aprobado**; el circuito multisedes queda como `cultural_cycle_index`, sin fecha ni sede individual inventadas; el detalle de ticketing conserva los metadatos estructurados si existen, **sin permiso de publicar**. Se evita generar aristas de una URL hacia sí misma. **QA final Python 7/7 PASS + py_compile** del recolector vigente en Sandbox aislado.
+
+[Handoff actualizado y recibo de altas](data/participation-circuit-handoff-20261102.json) · [SQL de lectura tras la próxima FULL natural](sql/20261102_first_party_intake_e2e_READ_ONLY.sql). La lectura inicial devolvió **2 `ENROLLED_PENDING_FIRST_FETCH`**, **0 source checks, 0 candidatos, 0 nuevos canónicos**. Próximo requisito: primera FULL normal con `source_checks` y candidato `unverified` por original; después ver si la página contiene una sesión fechada real y exigir aprobación editorial individual antes de la web. No se agregó cron, parser específico, ni publicación automática. **IICS web permanece 3,8/10**.
+
+---
+
 ## Radar Definitivo — adquisición principal de Por Acá
 
 **Operación al 28/10/2026:** la tarea ChatGPT recolectora anterior está **pausada**. Una sola tarea **«Por Acá — Radar GitHub 3 veces al día»** actúa como programador GPT **05:00 FULL, 13:00 incremental y 21:00 incremental ART**. Hace `GitHub.fetch_file/update_file` sobre `ops/radar-fallback-trigger.txt` y el workflow [Radar Definitivo](.github/workflows/radar-definitivo.yml) ejecuta el programa. No hay `schedule` directo de GitHub porque ningún disparo horario fue confirmado en las primeras pruebas.
