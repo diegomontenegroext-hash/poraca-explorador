@@ -34,10 +34,37 @@ class PulseCategoryTest(unittest.TestCase):
         self.assertEqual(groups["yoga"]["confirmedNext15"],0)
         self.assertEqual(groups["ceramica"]["confirmedNext15"],0)
 
+    def test_new_circuits_are_not_hidden_in_miscellaneous(self):
+        for raw,expected in (
+            ("Vinos","vinos"),("vino","vinos"),("catas","vinos"),
+            ("Degustación","vinos"),("Talleres","taller"),
+            ("Ciencia","ciencia"),("Gastronomía","gastronomia"),
+            ("gastronomia_cultural","gastronomia"),
+            ("deportes_nauticos","deportes"),
+        ):
+            self.assertEqual(pulse.category_of(raw),expected)
+        self.assertEqual(pulse.category_of("feria"),"festival")
+        self.assertEqual(pulse.category_of("fiesta de vinos en otra provincia"),"otras")
+
+    def test_wine_and_workshops_are_separate_from_other_categories(self):
+        canon=[("ciencia",1,1,1,1,1),("talleres",2,2,2,0,0),
+               ("vino",3,1,1,0,0),("Gastronomía",4,0,0,0,0)]
+        obs=[("catas",5,2),("taller",3,0),("periodic_cultural_coverage",7,0)]
+        report=pulse.summarize(canon,obs,"2026-11-02")
+        categories={x["rubro"]:x for x in report["categories"]}
+        self.assertEqual(categories["vinos"]["historical"],3)
+        self.assertEqual(categories["vinos"]["pendingObservations46"],5)
+        self.assertEqual(categories["taller"]["historical"],2)
+        self.assertEqual(categories["taller"]["pendingObservations46"],3)
+        self.assertEqual(categories["ciencia"]["confirmedNext15"],1)
+        self.assertEqual(categories["gastronomia"]["historical"],4)
+        self.assertEqual(categories["otras"]["pendingObservations46"],7)
+        self.assertFalse(report["publicationApproved"])
+
     def test_complete_taxonomy_no_duplicates(self):
         result=pulse.summarize([],[],"2026-10-30")
-        self.assertEqual(len(result["categories"]),14)
-        self.assertEqual(len({x["rubro"] for x in result["categories"]}),14)
+        self.assertEqual(len(result["categories"]),18)
+        self.assertEqual(len({x["rubro"] for x in result["categories"]}),18)
         self.assertTrue(all(x["confirmedNext15"]==0 for x in result["categories"]))
 
     def test_original_review_queue_never_approves_and_deduplicates(self):
