@@ -1,0 +1,104 @@
+{
+  "schema": "poraca-radar-circuit-first-party-handoff-v1",
+  "asOf": "2026-11-02",
+  "policy": {
+    "editorialApproval": false,
+    "autoPublish": false,
+    "canonicalWrite": false,
+    "sourceEnrollment": false,
+    "radarReprocessingRequested": false,
+    "reason": "These are original public signals not yet observed in operational Neon. Evidence-led generalized source discovery, not parser patches or synthetic listings.",
+    "escalation": "Each original must independently enter the ordinary source→staging→editorial admission chain, with deduplication and original proof. No direct manual promotion."
+  },
+  "confirmedObservationQuery": {
+    "neonProject": "frosty-union-52906378",
+    "neonBranch": "br-mute-recipe-b4odj2bl",
+    "database": "neondb",
+    "asOf": "2026-11-02",
+    "matchedCanonicalRows": 0,
+    "matchedStagingRows": 0,
+    "matchedV3Observations": 0,
+    "scope": "Two exact title/date/URL searches; a lack of match does not prove the source is wholly absent."
+  },
+  "signals": [
+    {
+      "id": "librerias-platenses-sixth-2026",
+      "scene": "literatura",
+      "signalKind": "multi_venue_cycle",
+      "title": "Noche de las Librerías Independientes",
+      "eventDay": "2026-11-06",
+      "start": "17:00",
+      "end": "23:00",
+      "locationScope": "La Plata y alrededores",
+      "originalUrl": "https://www.nochedelaslibrerias.com.ar/",
+      "sourceRole": "first_party_organizer",
+      "sourceObservedAt": "2026-11-02",
+      "headlineCountClaim": "21 librerías listadas en el sitio observado, recuentos de otros medios difieren; no equivale a 21 sesiones fechadas",
+      "producerIdentity": "Circuito de Librerías Independientes de La Plata",
+      "captureNeed": [
+        "origin and verified local time",
+        "parent cycle as one identity",
+        "child sessions only where evidence gives title, venue and exact time",
+        "link each participant venue without creating duplicates"
+      ],
+      "risk": "2026 program is multi-venue, official site has a mixture of 0 and N announced local activities; don't explode directory into fake events",
+      "editorialState": "UNADMITTED_DO_NOT_PUBLISH",
+      "neonMatched": {
+        "canon": 0,
+        "staging": 0,
+        "observation": 0
+      }
+    },
+    {
+      "id": "feria-catar-v-2026",
+      "scene": "vinos",
+      "signalKind": "dated_event",
+      "title": "Feria Catar V edición",
+      "eventDay": "2026-11-27",
+      "start": "19:00",
+      "end": "23:00",
+      "locationScope": "Paseo Mitre · 485 y 138 · Gorina (La Plata)",
+      "originalUrl": "https://www.passline.com/eventos/feria-catar-v-edicion",
+      "sourceRole": "first_party_ticketing",
+      "sourceObservedAt": "2026-11-02",
+      "producerIdentity": "Asociación Civil de Sommelier de Buenos Aires",
+      "admissionAgePolicy": "18+",
+      "captureNeed": [
+        "approved event identity and organizer resolution",
+        "venue/address ground truth",
+        "one date/venue/ticket vendor single canonical",
+        "editorial admission and signed receipt before API"
+      ],
+      "risk": "No matching event in Neon at this cut, despite explicit public ticket listing. The sales page does not authorize auto-publication.",
+      "editorialState": "UNADMITTED_DO_NOT_PUBLISH",
+      "neonMatched": {
+        "canon": 0,
+        "staging": 0,
+        "observation": 0
+      }
+    }
+  ],
+  "additionalLeads": [
+    {
+      "scene": "literatura",
+      "name": "Verba Taller",
+      "originalUrl": "https://tallerverba.com.ar/talleres/",
+      "leadType": "recurrent_workshop",
+      "nextAction": "Reconcile identity and program; no specific dated occurrence"
+    },
+    {
+      "scene": "vinos",
+      "name": "Pescando Vinos / Nómade 23",
+      "originalUrl": "https://radiolaplata.com.ar/pescando-vinos-una-propuesta-distinta-que-llego-para-quedarse/",
+      "leadType": "historical_network_recovery",
+      "nextAction": "Derive first-party organizer account from historical coverage, confirm active program independently before ingesting"
+    },
+    {
+      "scene": "vinos",
+      "name": "Cava Vrava",
+      "originalUrl": "https://www.instagram.com/cavavrava/",
+      "leadType": "known_neon_identity_current_activity_not_verified",
+      "nextAction": "Obtain first-party evidence of any current wine event; never infer a cata from being a wine bar"
+    }
+  ]
+}
