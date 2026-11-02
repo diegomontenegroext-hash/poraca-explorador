@@ -64,6 +64,42 @@ class EditorialPressTests(unittest.TestCase):
         self.assertEqual(sunday["event_date"],
                          (today+timedelta(days=(6-today.weekday())%7)).isoformat())
 
+    def test_article_publication_metadata_survives_layout_redesign(self):
+        html=('<h2>HOY</h2><h3>TEATRO</h3>'
+              '<p>Función documentada.- A las 21 en la Sala del Centro, calle 12.</p>')
+        day=datetime.now(ZoneInfo("America/Argentina/Buenos_Aires")).date()
+        forms=[
+          '<time datetime="'+day.isoformat()+'T02:10:00-03:00">Publicado hoy</time>',
+          '<meta property="article:published_time" content="'
+             +day.isoformat()+'T02:10:00-03:00">',
+          '<meta content="'+day.isoformat()+'T02:10:00-03:00" '
+             'property="article:published_time">'
+        ]
+        for metadata in forms:
+            with self.subTest(metadata=metadata):
+                rows=adapter.el_dia_editorial_agenda(metadata+html,PUBLISHED_URL)
+                self.assertEqual(len(rows),1)
+                self.assertEqual(rows[0]["event_date"],day.isoformat())
+                self.assertEqual(rows[0]["event_time"],"21:00")
+                self.assertEqual(rows[0]["evidence_tier"],"secondary_press_agenda")
+                self.assertEqual(rows[0]["review_state"],"observed_unverified")
+
+    def test_publication_metadata_stale_invalid_or_conflicting(self):
+        html='<p>HOY</p><p>Función documentada.- A las 21 en Sala del Centro.</p>'
+        today=datetime.now(ZoneInfo("America/Argentina/Buenos_Aires")).date()
+        yesterday=(today-timedelta(days=1)).isoformat()
+        for metadata in [
+            '<time datetime="2020-11-01T02:00:00-03:00">Publicado</time>',
+            '<meta property="article:published_time" content="2026-13-99">',
+            '<meta property="article:modified_time" content="'+today.isoformat()+'T02:00:00-03:00">',
+            '<time datetime="'+yesterday+'T02:00:00-03:00">Publicado</time>'
+            '<meta property="article:published_time" content="'+today.isoformat()+'T02:00:00-03:00">'
+        ]:
+            with self.subTest(metadata=metadata):
+                self.assertEqual(adapter.el_dia_editorial_agenda(metadata+html,PUBLISHED_URL),[])
+        self.assertIsNone(adapter.original_article_publication_day(
+            '<a href="/agenda-espectaculos_1793514734">Hoy</a>'))
+
     def test_no_inference_without_publication_time(self):
         self.assertEqual(adapter.extract_listings(
             "<p>Hoy</p><p>Concierto.- A las 21 en Teatro Metro.</p>",

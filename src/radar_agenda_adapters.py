@@ -650,6 +650,41 @@ def alternativa_schedule_room(current_text,position,fallback):
     return fallback,False
 
 
+def original_article_publication_day(raw):
+    """Article publication metadata, never an event date inferred from its URL.
+
+    Common semantic metadata survives a CSS/layout redesign. This is ONLY
+    used to interpret relative HOY/MAÑANA headings on an actual agenda post.
+    It is not confirmation of any particular event or its venue/clock.
+    """
+    front=raw[:120_000]
+    visible=re.search(
+        r"<time\b[^>]*>[^<]{0,180}?\b([0-3]?\d)\s+de\s+"
+        r"([a-záéíóúñ]+)\s+de\s+(20\d{2})\b",
+        front,re.I|re.S)
+    if visible:
+        month=MONTHS.get(visible.group(2).lower())
+        try:
+            if month:return date(int(visible.group(3)),month,int(visible.group(1)))
+        except ValueError:
+            pass
+    candidates=[]
+    for opening in re.findall(r"<time\b[^>]*>",front[:35_000],re.I|re.S)[:10]:
+        m=re.search(r"\bdatetime\s*=\s*['\"](20\d{2}-\d{2}-\d{2})(?:T[^'\"]*)?['\"]",
+                    opening,re.I)
+        if m:candidates.append(m.group(1))
+    for opening in re.findall(r"<meta\b[^>]*>",front[:35_000],re.I|re.S)[:150]:
+        if not re.search(r"\b(?:property|name)\s*=\s*['\"]article:published_time['\"]",
+                         opening,re.I):continue
+        m=re.search(r"\bcontent\s*=\s*['\"](20\d{2}-\d{2}-\d{2})(?:T[^'\"]*)?['\"]",
+                    opening,re.I)
+        if m:candidates.append(m.group(1))
+    if not candidates or len(set(candidates))!=1:
+        return None
+    try:return date.fromisoformat(candidates[0])
+    except ValueError:return None
+
+
 def el_dia_editorial_agenda(raw, url, blocks=None, at=None):
     """Parse dated paragraphs of a linked El Dia agenda article, including slug variants.
 
@@ -662,17 +697,7 @@ def el_dia_editorial_agenda(raw, url, blocks=None, at=None):
     if host not in ("www.eldia.com", "eldia.com") or not re.fullmatch(
             r"(?:/espectaculos/agenda(?:-[a-z0-9]+){0,16}|/septimo-dia/agenda-septimo-dia)_\d{10}(?:/amp)?/?", path):
         return []
-    published = re.search(
-        r"<time\b[^>]*>[^<]{0,180}?\b([0-3]?\d)\s+de\s+"
-        r"([a-záéíóúñ]+)\s+de\s+(20\d{2})\b", raw[:120_000],
-        re.I | re.S)
-    if not published:
-        return []
-    month = MONTHS.get(published.group(2).lower())
-    try:
-        origin = date(int(published.group(3)), month, int(published.group(1))) if month else None
-    except ValueError:
-        origin = None
+    origin = original_article_publication_day(raw)
     if not origin or not active_date(origin, at):
         return []
 
