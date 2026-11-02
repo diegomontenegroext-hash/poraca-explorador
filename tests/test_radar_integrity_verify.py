@@ -67,6 +67,21 @@ class IndependentE2ECertificationTests(unittest.TestCase):
         self.assertNotIn("UPDATE public.poraca_knowledge_relations SET",sql)
         self.assertNotIn("INSERT INTO public.radar_agenda_events",sql)
 
+    def test_unpublished_link_reconciliation_requires_evidence(self):
+        sql=(ROOT / "sql/20261101_reconcile_unpublished_observation_links_REQUIRES_APPROVAL.sql").read_text()
+        self.assertIn("n_before NOT IN (0,5)",sql)
+        self.assertIn("reconciliation_state='reconciled_linked'",sql)
+        self.assertIn("original_evidence#>>'{reconciliation_v1,publication_approved}'='false'",sql)
+        self.assertIn("original_evidence#>>'{reconciliation_v1,canonical_target}'=o.matched_event_key",sql)
+        self.assertIn("matched_event_key=NULL",sql)
+        self.assertIn("'previous_event_key',o.matched_event_key",sql)
+        self.assertIn("reconciliation_state='observed_unverified'",sql)
+        self.assertIn("n_updated<>n_before",sql)
+        self.assertNotIn("DELETE FROM ",sql)
+        self.assertNotIn("TRUNCATE TABLE ",sql)
+        self.assertNotIn("UPDATE public.radar_agenda_events",sql)
+        self.assertNotIn("UPDATE public.poraca_knowledge_relations",sql)
+
     def test_real_defect_fails_due_to_missing_canons(self):
         report = self.sample(orphaned=26, missing_receipts=13)
         self.assertEqual(certify(report), ("P0_CANONICAL_HISTORY_BROKEN", 2))
