@@ -143,13 +143,13 @@
           "id": "villa-wine-lp",
           "name": "Villa Wine",
           "role": "co_organizer",
-          "locality": "La Plata"
+          "locality": "Gonnet"
         },
         {
           "id": "terruno-vinoteca-lp",
           "name": "Terruño (vinoteca integrante de 4V)",
           "role": "co_organizer",
-          "locality": "La Plata"
+          "locality": "Berisso"
         }
       ]
     },
@@ -178,19 +178,19 @@
       "url": "https://www.0221.com.ar/que-hago/la-sunset-wine-mixology-vuelve-la-plata-mas-40-bodegas-una-degustacion-lujo-n116918",
       "targets": [
         {
-          "id": "golden-wine",
+          "id": "golden-wine-lp",
           "name": "Golden Wine",
           "role": "co_organizer_historic",
           "locality": "La Plata"
         },
         {
-          "id": "villa-wine",
+          "id": "villa-wine-lp",
           "name": "Villa Wine",
           "role": "co_organizer_historic",
           "locality": "Gonnet"
         },
         {
-          "id": "terruno-vinoteca",
+          "id": "terruno-vinoteca-lp",
           "name": "Terruño Vinoteca",
           "role": "co_organizer_historic",
           "locality": "Berisso"
@@ -207,13 +207,13 @@
       "url": "https://tucoweb.info/se-viene-la-tercera-edicion-de-la-expo-vinotecas-beber-2026/",
       "targets": [
         {
-          "id": "villa-wine",
+          "id": "villa-wine-lp",
           "name": "Villa Wine",
           "role": "historical_participant",
           "locality": "Gonnet"
         },
         {
-          "id": "terruno-vinoteca",
+          "id": "terruno-vinoteca-lp",
           "name": "Terruño Vinoteca",
           "role": "historical_participant",
           "locality": "Berisso"
