@@ -366,7 +366,7 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  AND x.integrity->>'checkpointSurvivalGuard'='true'
  AND x.baseline_count=2 AND x.missing_count=0 AND x.active_guard=1
  AND x.lost_count=0 THEN 'PASS' ELSE 'FAIL' END,
- jsonb_build_object('decision',x.integrity->'decision',
+ jsonb_build_object('auditScope','CANONICAL_SURVIVAL_AND_CONTEXTUAL_RELATION_RECONCILIATION',
  'missingReceipts',x.integrity->'missingAcceptedReceipts',
  'orphanedObservations',x.integrity->'orphanedObservationLinks',
  'contextOnlyAcceptedRelations',x.integrity->'orphanAcceptedEventRelations',
