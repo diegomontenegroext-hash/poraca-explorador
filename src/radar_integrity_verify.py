@@ -106,11 +106,13 @@ def certify(report: dict) -> tuple[str, int]:
     history = report.get("historicalCanaries")
     if not isinstance(history, dict) or any(
         type(history.get(k)) is not int or history[k] < 0
-        for k in ("elAnimo", "freezer", "immutableGuard")
+        for k in ("elAnimo", "freezer", "immutableGuard", "relationGuard")
     ):
         return "NOT_CERTIFIED_MISSING_INDEPENDENT_CANARIES", 2
     if history["immutableGuard"] != 1:
         return "P0_CANONICAL_IMMUTABILITY_MISSING", 2
+    if history["relationGuard"] != 1:
+        return "P0_ACCEPTED_EVENT_RELATION_GUARD_DISABLED", 2
     if audit.get("checkpointSurvivalGuard") is not True or audit["protectionTriggers"] != 2:
         return "P0_CANONICAL_PROTECTION_MISSING", 2
     # Prepublication facts have independent reviews; only accepted events
@@ -130,6 +132,12 @@ def certify(report: dict) -> tuple[str, int]:
     if (context["contextOnlyAccepted"] != audit["orphanAcceptedEventRelations"]
             or context["contextOnlyEventKeys"] != audit["missingAcceptedRelationEventIds"]):
         return "NOT_CERTIFIED_CONTEXT_RELATION_COUNT_CONFLICT", 2
+    # A documented historical relation cannot be labeled accepted when the
+    # canonical event no longer exists. Keep evidence as proposal, never as an
+    # approved live graph edge. Fail the chain before calling it healthy.
+    if (audit["orphanAcceptedEventRelations"] > 0
+            or audit["missingAcceptedRelationEventIds"] > 0):
+        return "P0_ACCEPTED_RELATION_WITHOUT_CANONICAL", 2
     if (audit["missingAcceptedReceipts"] > 0
             or audit["missingApprovedEventIds"] > 0
             or audit["orphanedObservationLinks"] > 0
@@ -222,11 +230,15 @@ def read(url: str) -> dict:
                     (SELECT count(*)::int FROM pg_catalog.pg_trigger
                      WHERE tgrelid='public.radar_agenda_events'::regclass
                        AND tgname='poraca_canonical_event_key_immutable_v1'
+                       AND tgenabled='O' AND NOT tgisinternal),
+                    (SELECT count(*)::int FROM pg_catalog.pg_trigger
+                     WHERE tgrelid='public.poraca_knowledge_relations'::regclass
+                       AND tgname='poraca_accepted_event_relation_guard_v1'
                        AND tgenabled='O' AND NOT tgisinternal)
                 """)
                 h = cursor.fetchone()
                 report["historicalCanaries"] = (
-                    {"elAnimo":h[0],"freezer":h[1],"immutableGuard":h[2]}
+                    {"elAnimo":h[0],"freezer":h[1],"immutableGuard":h[2],"relationGuard":h[3]}
                     if h else None
                 )
     return report
