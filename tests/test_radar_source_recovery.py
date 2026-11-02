@@ -1,6 +1,7 @@
-import pathlib,sys,unittest
+import pathlib,sys,unittest,json
+from datetime import date
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/"src"))
-from radar_source_recovery import plan
+from radar_source_recovery import plan,reconstruct_historical_network
 
 
 def src(id,name,circuit="teatro",mode="fetch",diagnosis="DATED_SESSIONS_OBSERVED",
@@ -52,5 +53,52 @@ class SourceRecoveryTests(unittest.TestCase):
         got=plan(data,limit=5)
         self.assertEqual(got["sourcesNeedingRecovery"],20)
         self.assertEqual(got["shown"],5)
+
+
+    def test_07_actual_network_recovers_future_organizer_without_publishing(self):
+        path=pathlib.Path(__file__).resolve().parents[1]/"data/historical-circuit-network-v1.json"
+        data=json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(data["schema"],"poraca-historical-circuit-network-v1")
+        result=plan([src("rd-web-56c74fce","Casa Dionisio","vinos",
+                         diagnosis="REPEATED_INDEX_ONLY",observed=0)],
+                    historical_evidence=data["evidence"],today=date(2026,11,2))
+        action=result["actions"][0]
+        leads=action["historicalNetworkCandidates"]
+        self.assertEqual(leads[0]["targetId"],"acsba")
+        self.assertEqual(leads[0]["reviewPriority"],"VERIFY_UPCOMING_ORIGINAL")
+        self.assertEqual(leads[0]["upcomingOriginals"][0]["date"],"2026-11-27")
+        self.assertEqual(leads[0]["upcomingOriginals"][0]["status"],"UNVERIFIED_FOR_PORACA")
+        self.assertTrue(all(not x["publicationApproved"] and not x["autoRegistered"]
+                            for x in leads))
+        self.assertEqual(result["confirmedReplacements"],0)
+        self.assertFalse(action["sourceDisabled"])
+        self.assertGreaterEqual(len(leads),6)
+
+    def test_08_no_prediction_after_event_expiration(self):
+        data=json.loads((pathlib.Path(__file__).resolve().parents[1]/
+                        "data/historical-circuit-network-v1.json").read_text())
+        leads=reconstruct_historical_network(data["evidence"],"vinos",date(2026,12,1))
+        self.assertFalse(any(x["upcomingOriginals"] for x in leads))
+        self.assertEqual(leads[0]["reviewPriority"],"FIND_CURRENT_LOCAL_PROGRAM")
+
+    def test_09_past_mentions_do_not_make_future_events(self):
+        records=[{"circuit":"vinos","date":"2026-07-01","kind":"historical",
+                  "url":"https://organizer.example/2026-july","title":"Feria",
+                  "targets":[{"id":"org","name":"Organizador",
+                              "locality":"La Plata"}]},
+                 {"circuit":"ciencia","date":"2026-11-27","kind":"upcoming_original",
+                  "url":"https://organizer.example/tickets","title":"Otro circuito",
+                  "targets":[{"id":"other","name":"Otro","locality":"La Plata"}]}]
+        leads=reconstruct_historical_network(records,"vinos",date(2026,11,2))
+        self.assertEqual(len(leads),1)
+        self.assertEqual(leads[0]["historicalProofUrls"],["https://organizer.example/2026-july"])
+        self.assertEqual(leads[0]["upcomingOriginals"],[])
+
+    def test_10_rejects_unverifiable_and_non_https_originals(self):
+        sample=[{"circuit":"vinos","date":"2026-11-27","kind":"upcoming_original",
+                 "url":"http://not-secure.example/event","targets":[
+                     {"id":"candidate","name":"Fake","locality":"La Plata"}]}]
+        self.assertEqual(reconstruct_historical_network(sample,"vinos",date(2026,11,2)),[])
+
 
 if __name__=="__main__":unittest.main()
