@@ -43,3 +43,15 @@ Ambas existen en `poraca_knowledge_entities` como `approved_public`, pero no tie
 - P2 3/7 días y SSO Chromium real: evidencia temporal y navegador protegido, no simular PASS.
 
 **La seguridad del proceso requiere que el diagnóstico y la revisión no se confundan con la aceptación de una publicación.** El bloqueo de redacción está resuelto; el recibo faltante sigue siendo una puerta editorial.
+
+## D. Verificación oficial adicional — mismo evento, cinco observaciones
+
+Relectura **02/11/2026**, sin DML sobre Neon, rama `br-mute-recipe-b4odj2bl`, base `neondb`:
+
+- `radar_definitivo.listing_occurrences`: **5 registros** con título Malena Muyala, fecha 21/11 y hora 22:00; son **una función potencial, no cinco**, con 4 IDs de fuente distintos. Tres registros recuperan el **mismo enlace primario** `https://casametro.com.ar/evento/malena-muyala/`, uno usa la tarjeta oficial general `https://casametro.com.ar/categoria-producto/casa-metro/` y otro una agenda secundaria `https://agendalaplata.ar/?fecha=2026-11-21`. No tratar múltiples monitores de una URL como corroboraciones independientes.
+- El [original del recinto](https://casametro.com.ar/evento/malena-muyala/) confirma **sábado 21/11/2026, 22:00, Sala A de Casa Metro, calle 4 entre 51 y 53, La Plata**, y conserva enlace a entradas. La [programación oficial](https://casametro.com.ar/categoria-producto/casa-metro/) presenta el espectáculo en la fecha exacta. [Teatrina](https://teatrina.com/obras/malena-muyala) coincide en identidad, día, hora y sala; [Agenda La Plata](https://agendalaplata.ar/evento/malena-muyala-casa-metro-20261024025141) indica la dirección 4 n.º 978 entre 51 y 53. Confirmación cruzada **del hecho**, no de independencia de sistemas editoriales.
+- `public.radar_agenda_events` devuelve **0 coincidencias** título+día; `review_state` de los cinco registros sigue `observed_unverified`. No se certificó recepción de una decisión de un editor identificado ni su readback API/web.
+- **Se diferencia de otras fechas históricas** con Malena Muyala (por ejemplo el concierto «Las Mismas» del 20/06/2026 junto a Ana Prada). No fusionar por artista ni título sin fecha/función.
+- **Recomendación editorial preparada, NO ejecutada:** aceptar **un** expediente de función con `title=Malena Muyala`, `event_date=2026-11-21`, `event_time=22:00`, `venue=Sala A - Casa Metro`, `category=musica`, `source_url` igual al enlace original. Antes de escribir: revisión independiente del registro, sujeto/fecha de decisión, recibo `ACCEPTED_EVENT`, identidad de venue aprobada y prueba negativa sobre horario/sala distintos; luego admisión idempotente por flujo existente y readback Neon→API→web. **Ninguna aprobación ni publicación fue realizada**.
+
+Esta investigación consolida la evidencia; no debe convertir `EDITORIAL_ADMISSION` en verde por el solo hecho de que la ficha pública exista.
