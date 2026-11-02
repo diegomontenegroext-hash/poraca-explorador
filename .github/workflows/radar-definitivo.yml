@@ -131,8 +131,9 @@ jobs:
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_LIMITED_DATABASE_URL }}
         run: python3 src/radar_integrity_verify.py
-      # Only an explicit manual verify_only with credential_probe=limited uses
-      # the new GitHub secret; FULL/incremental always use the original secret.
+      # Optional verify-only credential probe; all modes (including FULL
+      # and incremental above) already use the LIMITED GitHub secret.
+      # The older secret is retained solely for an explicitly approved rollback.
       - name: Validar credencial nueva sin cambiar Radar ni publicar
         id: limited_qa
         if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.mode == 'verify_only' && inputs.credential_probe == 'limited' && steps.qa.outcome == 'success' }}
