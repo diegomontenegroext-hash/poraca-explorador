@@ -253,8 +253,22 @@ identity_key_guard AS (
  AND NOT tgisinternal AND tgenabled='O'
 ),
 security AS (
+ -- Identity of the CURRENT Radar ingestion credential is also asserted by the
+ -- workflow secret binding + run provenance; SQL alone cannot read GitHub secrets.
+ -- This query separately checks grants of the deployed limited role and the
+ -- residual privilege risk from LEGACY logins (still real until retired).
  SELECT pg_has_role('poraca_definitivo_ingest','neon_superuser','member') AS ingest_elevated,
-        pg_has_role('poraca_explorador_writer','neon_superuser','member') AS writer_elevated
+        pg_has_role('poraca_explorador_writer','neon_superuser','member') AS writer_elevated,
+        EXISTS (
+          SELECT 1 FROM pg_catalog.pg_roles r
+          WHERE r.rolname='poraca_radar_limited_prod'
+            AND r.rolcanlogin AND NOT r.rolsuper
+            AND NOT r.rolcreatedb AND NOT r.rolcreaterole
+            AND NOT pg_has_role(r.rolname,'neon_superuser','member')
+            AND has_table_privilege(r.rolname,'radar_definitivo.runs','INSERT,UPDATE')
+            AND has_table_privilege(r.rolname,'radar_definitivo.listing_occurrences','INSERT,UPDATE')
+            AND NOT has_table_privilege(r.rolname,'public.radar_agenda_events','INSERT,UPDATE,DELETE,TRUNCATE')
+        ) AS limited_scope_verified
 ),
 ctx AS (
  SELECT l.*, c.checked AS check_rows,c.ok,c.index_only,c.other,
@@ -264,7 +278,7 @@ ctx AS (
     cc.fetch_rows,cc.circuits_mapped,cc.fetch_without_circuit,
     cc.fetch_unchecked,cc.fetch_errors,cc.yield_eligible_checks,cc.index_only_checks,
     a.a AS integrity,a.context_audit AS context_audit,
-    s.ingest_elevated,s.writer_elevated,
+    s.ingest_elevated,s.writer_elevated,s.limited_scope_verified,
     g.baseline_count,g.missing_count,g.missing_ids,k.active_guard,m.lost_count,fc.checked AS full_checked,fc.ok AS full_ok,
     fc.index_only AS full_index_only,fc.other AS full_other,
     lf.run_id AS last_full_run_id,lf.sources_selected AS full_sources_selected,
@@ -387,11 +401,19 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  'Inventario fetch clasificado por circuito y consultado en FULL sin errores; NO prueba exhaustividad cultural ni eventos por rubro',
  'Clasificar fuentes faltantes y medir por separado yoga, talleres, vinos y musica under segun evidencia de actividad o entidad, sin funciones ficticias'),
 (10,'LEAST_PRIVILEGE',
- CASE WHEN x.ingest_elevated OR x.writer_elevated THEN 'FAIL' ELSE 'PASS' END,
- jsonb_build_object('ingestNeonSuperuserMember',x.ingest_elevated,
- 'writerNeonSuperuserMember',x.writer_elevated),
- 'Credenciales operativas sin pertenencia a rol privilegiado ni DDL; ensayar migracion en clon',
- 'P0 A17: preparar rol de minimo privilegio y cutover con rollback; no cambiar secretos a ciegas'),
+ -- Preserve FAIL for active credential misconfiguration OR lingering legacy
+ -- elevated identities. A working limited ingestion does not erase old risk.
+ CASE WHEN NOT x.limited_scope_verified OR x.ingest_elevated OR x.writer_elevated
+      THEN 'FAIL' ELSE 'PASS' END,
+ jsonb_build_object(
+ 'limitedRadarLogin','poraca_radar_limited_prod',
+ 'limitedRoleGrantsSafe',x.limited_scope_verified,
+ 'activeRunCredential','VERIFY_FROM_GITHUB_WORKFLOW_AND_RUN_SEPARATELY',
+ 'legacyIngestNeonSuperuserMember',x.ingest_elevated,
+ 'legacyWriterNeonSuperuserMember',x.writer_elevated,
+ 'residualLegacyPrivilegeRisk',(x.ingest_elevated OR x.writer_elevated)),
+ 'Credencial limitada validada por rol y corrida; evaluar por separado los dos logins legacy elevados',
+ 'Mantener FAIL hasta retirar privilegios legacy de forma administrada; verificar dependencias, reversion y recibos de staging'),
 (11,'STABILITY',
  CASE WHEN x.summary->'stability'->'3d'->>'state'='correcto'
  AND x.summary->'stability'->'7d'->>'state'='correcto' THEN 'PASS' ELSE 'PARTIAL' END,
