@@ -52,3 +52,8 @@ trigger_reason=prove_no_canonical_or_receipt_loss_and_surface_editorial_continui
 verification_id=20261101-limited-secret-postcutover-readonly-01
 expected_result=DATA_INTEGRITY_PASS_EDITORIAL_CONTINUITY_PENDING_HTTP_SSO_NOT_VERIFIED
 trigger_reason=confirm_limited_login_after_workflow_cutover
+
+# 2026-11-02: verify 12-case first-party root intake guards and scope after real two-source incremental.
+verification_id=20261102-first-party-cycle-12-tests-after-incremental-01
+expected_result=QA_PASS_SCOPE_LIMITED_NO_INGEST
+trigger_reason=verify_guard_for_multivenue_parent_without_synthetic_listing
