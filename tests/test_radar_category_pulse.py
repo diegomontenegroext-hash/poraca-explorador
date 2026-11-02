@@ -135,5 +135,32 @@ class PulseCategoryTest(unittest.TestCase):
         self.assertIn("matched_event_key IS NULL",pulse.REVIEW_QUEUE_SQL)
         self.assertIn("enabled=true",pulse.SOURCE_MODES_SQL)
 
+    def test_circuit_resilience_markdown_exposes_zero_yield(self):
+        recovery={"circuitResilience":[
+            {"circuit":"vinos","fetchSources":1,
+             "reportedDatedYieldSources7d":0,
+             "sourceResilienceGate":"NO_REPORTED_DATED_YIELD",
+             "futureOriginalResearchHint":True,"resilienceCertified":False},
+            {"circuit":"musica","fetchSources":5,
+             "reportedDatedYieldSources7d":2,
+             "sourceResilienceGate":"MULTIPLE_REPORTED_YIELD_CHANNELS_NOT_CERTIFIED",
+             "futureOriginalResearchHint":False,"resilienceCertified":False}]}
+        md=pulse.format_circuit_resilience(recovery)
+        self.assertIn("| vinos | 1 | 0 |",md)
+        self.assertIn("| musica | 5 | 2 |",md)
+        self.assertIn("original local pendiente",md)
+        self.assertIn("organizadores independientes",md)
+        self.assertGreater(len(md.splitlines()),4)
+
+    def test_circuit_resilience_markdown_never_self_certifies(self):
+        recovery={"circuitResilience":[{
+            "circuit":"vinos","fetchSources":3,"reportedDatedYieldSources7d":3,
+            "sourceResilienceGate":"MULTIPLE_REPORTED_YIELD_CHANNELS_NOT_CERTIFIED",
+            "resilienceCertified":True}]}
+        md=pulse.format_circuit_resilience(recovery)
+        self.assertIn("REQUIRES_INDEPENDENT_EXTERNAL_ATTESTATION",md)
+        self.assertNotIn("| vinos | 3 | 3 | PASS",md)
+        self.assertTrue(pulse.format_circuit_resilience({}).endswith("\\n"))
+
 if __name__=="__main__":
     unittest.main()
