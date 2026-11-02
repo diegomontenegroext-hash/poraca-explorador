@@ -62,6 +62,17 @@ class ExecutiveGateTests(unittest.TestCase):
         self.assertNotIn("UPDATE public.",sql)
         self.assertNotIn("DELETE FROM ",sql)
 
+    def test_minimum_privilege_separates_live_scope_from_legacy_risk(self):
+        sql=(Path(__file__).resolve().parents[1]/"sql/20261101_executive_readiness_gates_READ_ONLY.sql").read_text()
+        self.assertIn("limited_scope_verified",sql)
+        self.assertIn("'poraca_radar_limited_prod'",sql)
+        self.assertIn("'limitedRoleGrantsSafe',x.limited_scope_verified",sql)
+        self.assertIn("'legacyIngestNeonSuperuserMember',x.ingest_elevated",sql)
+        self.assertIn("'legacyWriterNeonSuperuserMember',x.writer_elevated",sql)
+        self.assertIn("WHEN NOT x.limited_scope_verified OR x.ingest_elevated OR x.writer_elevated",sql)
+        # A limited active login cannot hide lingering legacy elevated users.
+        self.assertIn("'residualLegacyPrivilegeRisk',(x.ingest_elevated OR x.writer_elevated)",sql)
+
     def test_stability_uses_actual_status_spelling(self):
         sql=(Path(__file__).resolve().parents[1]/"sql/20261101_executive_readiness_gates_READ_ONLY.sql").read_text()
         self.assertIn("->>'state'='correcto'",sql)
