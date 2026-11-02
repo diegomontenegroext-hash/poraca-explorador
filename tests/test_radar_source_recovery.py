@@ -74,6 +74,26 @@ class SourceRecoveryTests(unittest.TestCase):
         self.assertFalse(action["sourceDisabled"])
         self.assertGreaterEqual(len(leads),6)
 
+    def test_11_archival_network_expansion_is_source_discovery_not_registration(self):
+        data=json.loads((pathlib.Path(__file__).resolve().parents[1]/
+                        "data/historical-circuit-network-v1.json").read_text())
+        items=reconstruct_historical_network(data["evidence"],"vinos",date(2026,11,2),limit=30)
+        by_id={x["targetId"]:x for x in items}
+        self.assertIn("camara-platense-vinotecas",by_id)
+        self.assertEqual(by_id["camara-platense-vinotecas"]["reviewPriority"],
+                         "FIND_CURRENT_LOCAL_PROGRAM")
+        self.assertEqual(by_id["camara-platense-vinotecas"]["accountHint"],
+                         "@camaraplatensedevinotecas")
+        self.assertEqual(by_id["terruno-vinoteca"]["reviewPriority"],
+                         "FIND_CURRENT_LOCAL_PROGRAM")
+        self.assertEqual(by_id["villa-wine"]["reviewPriority"],
+                         "FIND_CURRENT_LOCAL_PROGRAM")
+        self.assertEqual(by_id["acsba"]["reviewPriority"],
+                         "VERIFY_UPCOMING_ORIGINAL")
+        self.assertNotIn("casa-dionisio",by_id)
+        self.assertTrue(all(not x["autoRegistered"] and not x["publicationApproved"]
+                            for x in items))
+
     def test_08_no_prediction_after_event_expiration(self):
         data=json.loads((pathlib.Path(__file__).resolve().parents[1]/
                         "data/historical-circuit-network-v1.json").read_text())

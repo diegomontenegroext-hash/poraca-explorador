@@ -10,6 +10,12 @@ from datetime import date
 from urllib.parse import urlsplit
 
 
+# Regional coverage is more than a city-center address. Historic neighbors
+# (Berisso / Ensenada / Gonnet / City Bell) are valid candidates for validation.
+# Still no claim their current accounts actually publish dated events.
+LOCAL_CIRCUIT_AREAS={"La Plata","Gorina","Gonnet","City Bell","Berisso",
+                     "Ensenada","Tolosa","Los Hornos","Abasto"}
+
 def reconstruct_historical_network(evidence,circuit,today,limit=10):
     """Follow old named participants to new local channels, never to publication."""
     if not isinstance(today,date):
@@ -40,6 +46,7 @@ def reconstruct_historical_network(evidence,circuit,today,limit=10):
             item=found.setdefault(key,{
                 "targetId":key,"name":target["name"],
                 "relationshipRole":target.get("role"),"channelUrl":profile,
+                "accountHint":target.get("accountHint"),
                 "locality":target.get("locality"),"historicalProofUrls":[],
                 "upcomingOriginals":[],"autoRegistered":False,
                 "publicationApproved":False})
@@ -53,7 +60,7 @@ def reconstruct_historical_network(evidence,circuit,today,limit=10):
                         "time":ev["time"],"venue":ev["venue"],"url":original,
                         "status":"UNVERIFIED_FOR_PORACA"})
     for item in found.values():
-        local=item["locality"] in ("La Plata","Gorina")
+        local=item["locality"] in LOCAL_CIRCUIT_AREAS
         item["reviewPriority"]=(
             "VERIFY_UPCOMING_ORIGINAL" if local and item["upcomingOriginals"] else
             "FIND_CURRENT_LOCAL_PROGRAM" if local else
@@ -86,7 +93,7 @@ def plan(rows,limit=12,historical_evidence=(),today=None):
         for record in historical_evidence:
             if record.get("kind")!="upcoming_original":
                 continue
-            if not any(t.get("locality") in ("La Plata","Gorina")
+            if not any(t.get("locality") in LOCAL_CIRCUIT_AREAS
                        for t in record.get("targets",[])):
                 continue
             try:
