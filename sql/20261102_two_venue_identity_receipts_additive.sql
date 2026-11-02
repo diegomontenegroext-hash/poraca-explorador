@@ -33,10 +33,9 @@ WITH proposed(entity_id,evidence_url,tier,description) AS (
  )
 ), added AS (
  INSERT INTO public.poraca_knowledge_assertions
-  (assertion_id,entity_id,predicate,value,evidence_url,evidence_tier,
+  (entity_id,predicate,value,evidence_url,evidence_tier,
    evidence_observed_at,reuse_policy,review_state,reviewed_by,reviewed_at)
- SELECT nextval(pg_get_serial_sequence('public.poraca_knowledge_assertions','assertion_id')),
-   entity_id,'descripcion',
+ SELECT entity_id,'descripcion',
    jsonb_build_object('text',description,
     'scope','identity_only_non_current_activity',
     'evidence_checked_day','2026-11-02',
