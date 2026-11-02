@@ -1,6 +1,6 @@
 import pathlib,sys,unittest
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/"src"))
-from radar_original_root_candidate import root_review_candidate
+from radar_original_root_candidate import root_review_candidate, suppress_unverified_cycle_root_sessions
 
 
 def mk(url,source_id,label,page,http):
@@ -69,5 +69,41 @@ class GenericOriginalIntakeTests(unittest.TestCase):
             return a
         self.assertEqual(root_review_candidate(self.src("original_ticketing"),
             "https://site.example/events",object(),200,wrong),[])
+
+    def test_08_multivenue_jsonld_root_not_staged_as_single_session(self):
+        root="https://libros.example/"
+        cycle=root_review_candidate(self.src("first_party_organizer"),root,object(),200,mk)
+        listing={"title":"Noche de librerías","event_date":"2026-11-06",
+                 "event_time":"18:00","venue":"Librerías Independientes",
+                 "proof_url":root}
+        self.assertEqual(suppress_unverified_cycle_root_sessions([listing],root,cycle),[])
+        self.assertEqual(len(cycle),1)
+        self.assertIsNone(cycle[0]["event_date"])
+
+    def test_09_individual_detail_with_distinct_original_url_survives(self):
+        root="https://bookfestival.example/"
+        cycle=root_review_candidate(self.src("first_party_organizer"),root,object(),200,mk)
+        child={"title":"Presentación de un libro","event_date":"2026-11-06",
+               "event_time":"19:00","venue":"Librería propia",
+               "proof_url":"https://bookfestival.example/programacion/taller-1"}
+        self.assertEqual(suppress_unverified_cycle_root_sessions([child],root,cycle),[child])
+
+    def test_10_non_cycle_never_suppresses_dated_original(self):
+        root="https://tickets.example/events/feria"
+        ticket=root_review_candidate(self.src("first_party_ticketing"),root,object(),200,mk)
+        real={"title":"Feria Catar V","event_date":"2026-11-27",
+              "event_time":"19:00","venue":"Paseo Mitre","proof_url":root}
+        self.assertEqual(suppress_unverified_cycle_root_sessions([real],root,ticket),[real])
+        self.assertEqual(suppress_unverified_cycle_root_sessions([real],root,[]),[real])
+
+    def test_11_filter_is_pure_and_does_not_mutate_input(self):
+        root="https://literature.example/"
+        cycle=root_review_candidate(self.src("original_cycle"),root,object(),200,mk)
+        records=[{"proof_url":root,"title":"cycle","event_date":"2026-11-06"},
+                 {"proof_url":root+"/session","title":"individual","event_date":"2026-11-06"}]
+        out=suppress_unverified_cycle_root_sessions(records,root,cycle)
+        self.assertEqual(len(records),2)
+        self.assertEqual(len(out),1)
+        self.assertEqual(out[0]["title"],"individual")
 
 if __name__=="__main__": unittest.main()
