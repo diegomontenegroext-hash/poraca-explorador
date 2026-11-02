@@ -43,3 +43,16 @@ Se consolidó la investigación **en la infraestructura histórica que ya exist�
 - Medir en cada FULL: fuentes activas con rendimiento real de vino (base **0/1**), fuentes sustitutas validadas (base **0**), nuevas actividades futuras wine detectadas vía Radar (base **0**), candidatos documentados (base **17 entidades**, **1 original próximo externo**). El objetivo es **redundancia real**, no que una única agenda vuelva a imprimir fechas por casualidad.
 
 **Estado global:** GRAFO HISTÓRICO RECONSTRUIDO Y CONECTADO AL REPORTE = ✅; FUENTES SUSTITUTAS PRODUCTIVAS = ❌ aún sin prueba; EVENTO FUTURO ORIGINAL LOCALIZADO = ✅, INGRESA A PROCESO EDITORIAL, NO PUBLICADO.
+
+## Anexo 02/11 · Nuevo canal nacional verificado y protección territorial (sin alta automática)
+
+A las **10 evidencias originales** se agregó una **11.ª referencia de tipo `upcoming_directory`**, no una función local: [La Noche de las Vinotecas](https://lanochedelasvinotecas.com.ar/), organizada por CAVA. [Información publicada el 28/10/2026](https://enolife.com.ar/es/el-13-11-26-600-vinotecas-bares-y-restaurantes-festejan-con-musica-descuentos-y-sorteos/) confirma la edición federal el **viernes 13/11 de 20:00 a 00:00**; una agenda histórica local que mencionaba 14/11 no acredita que una vinoteca platense participe en esa edición. El sitio oficial contiene un mapa de participantes, pero **todavía no se identificó y validó un local de La Plata con su propia actividad fechada**. Es un directorio de investigación, no un segundo canal productivo ya certificado.
+
+Implementación incremental en **main**, sin nueva tarea ni motor:
+
+- `radar_source_recovery.discover_directory_review_leads` ofrece el directorio como `directoryReviewCandidates` si hay una fuente improductiva del circuito. Propiedades obligatorias: `localParticipantVerified=false`, `localEventDetected=false`, `autoRegistered=false`, `publicationApproved=false`, `PARTICIPANT_DISCOVERY_INDEX_NOT_EVENT_FEED`. No aumenta el conteo de sesiones ni de fuentes productivas.
+- `is_local_future_original` exige **localidad del evento**, separada de la localidad del organizador; una organización de La Plata con un evento en Córdoba ya no produce una alerta falsa de actividad futura local. Feria Catar (Gorina 27/11) conserva su condición de original regional con `event.locality=Gorina`, pero sigue sin admisión canónica.
+- El pulso editorial distingue explícitamente `vinos`, `ciencia`, `gastronomia`, `deportes` y el alias `talleres`; ya no caen genéricamente en «Otras». No deduce disciplina desde títulos multietiqueta ni promueve un evento.
+- **QA verificada** en Vercel Sandbox sobre SHA `6989354`: **359 pruebas ejecutadas, 358 aprobadas, 1 omitida, 0 fallas**. No es la FULL siguiente ni QA Chromium autenticado contra producción.
+
+**Próximo paso de cobertura real:** verificar sobre el mapa organizador si hay locales efectivamente registrados en La Plata/Berisso/Ensenada/City Bell/Gonnet; corroborar actividad fechada y localidad en su anuncio propio; incorporar el canal con admisión controlada y después medir extracción en la FULL ordinaria. No publicar «La Noche de las Vinotecas» como un único evento platense multi-sede sin identificar sedes y programación.
