@@ -84,13 +84,18 @@ class SourceRecoveryTests(unittest.TestCase):
                          "FIND_CURRENT_LOCAL_PROGRAM")
         self.assertEqual(by_id["camara-platense-vinotecas"]["accountHint"],
                          "@camaraplatensedevinotecas")
-        self.assertEqual(by_id["terruno-vinoteca"]["reviewPriority"],
+        self.assertEqual(by_id["terruno-vinoteca-lp"]["reviewPriority"],
                          "FIND_CURRENT_LOCAL_PROGRAM")
-        self.assertEqual(by_id["villa-wine"]["reviewPriority"],
+        self.assertEqual(by_id["villa-wine-lp"]["reviewPriority"],
                          "FIND_CURRENT_LOCAL_PROGRAM")
         self.assertEqual(by_id["acsba"]["reviewPriority"],
                          "VERIFY_UPCOMING_ORIGINAL")
         self.assertNotIn("casa-dionisio",by_id)
+        self.assertNotIn("golden-wine",by_id)
+        self.assertNotIn("villa-wine",by_id)
+        self.assertNotIn("terruno-vinoteca",by_id)
+        self.assertIn("golden-wine-lp",by_id)
+        self.assertEqual(len(by_id),17)
         self.assertTrue(all(not x["autoRegistered"] and not x["publicationApproved"]
                             for x in items))
 
