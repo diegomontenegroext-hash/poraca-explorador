@@ -56,3 +56,22 @@ def root_review_candidate(source, root, page, http_status, make_candidate):
         item["evidence"]["structured_event_found"] = False
         item["evidence"].pop("cultural_signals_v1", None)
     return [item]
+
+
+def suppress_unverified_cycle_root_sessions(listings, root, root_candidates):
+    """Keep dated children with their own proof; drop fake atomic root Event.
+
+    Multi-venue cycle roots often expose a JSON-LD Event whose location is
+    merely 'all independent bookstores'. That is not a verified individual
+    session. This applies by semantic candidate kind, not by URL or domain.
+    """
+    if not isinstance(listings, list):
+        return listings
+    cycle=any(isinstance(item,dict) and item.get("kind")=="cultural_cycle_index"
+              and item.get("original_url")==root
+              and item.get("evidence",{}).get("not_an_atomic_event") is True
+              for item in (root_candidates or []))
+    if not cycle:
+        return listings
+    return [item for item in listings
+            if not (isinstance(item,dict) and item.get("proof_url")==root)]
