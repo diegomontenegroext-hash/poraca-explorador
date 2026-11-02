@@ -143,14 +143,24 @@ def certify(report: dict) -> tuple[str, int]:
         return "P0_INDEPENDENT_ACCEPTANCE_CANARY_MISSING", 2
     if audit["confirmedScheduledFuture"] == 0:
         return "P0_NO_CONFIRMED_FUTURE_EVENTS", 2
-    if report.get("nextBlockingGate") != "authenticated_api_and_web_check":
-        return "BLOCKED_" + str(report.get("nextBlockingGate") or "UNKNOWN").upper(), 2
     # Keep the legacy v1 diagnostic visible and consistent with context proof.
     legacy_expected = ("P0_CANONICAL_HISTORY_BROKEN"
                        if context["contextOnlyAccepted"] > 0
                        else "DATA_INTEGRITY_PASS_HTTP_SSO_SEPARATE")
     if audit.get("decision") != legacy_expected:
         return "NOT_CERTIFIED_ATTESTATION_DECISION_CONFLICT", 2
+    if audit["acceptedReceipts"] == 0:
+        return "NOT_CERTIFIED_NO_ACCEPTED_RECEIPTS", 2
+    gate = report.get("nextBlockingGate")
+    if gate == "radar_to_editorial_reconciliation":
+        # Radar publishes no event automatically. Observations touched since
+        # this FULL may be zero; preserve that missing editorial continuity,
+        # but it is not lost historical identity or broken canonical data.
+        if report.get("editorialObservationsTouchedSinceRadarRun") != 0:
+            return "NOT_CERTIFIED_CONTRADICTORY_EDITORIAL_GATE", 2
+        return "DATA_INTEGRITY_PASS_EDITORIAL_CONTINUITY_PENDING_HTTP_SSO_NOT_VERIFIED", 0
+    if gate != "authenticated_api_and_web_check":
+        return "BLOCKED_" + str(gate or "UNKNOWN").upper(), 2
     return "DATA_INTEGRITY_PASS_HTTP_AND_SSO_NOT_VERIFIED", 0
 
 

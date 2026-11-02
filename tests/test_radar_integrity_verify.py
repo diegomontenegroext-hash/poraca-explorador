@@ -253,10 +253,24 @@ class IndependentE2ECertificationTests(unittest.TestCase):
         self.assertEqual(certify(self.sample()),
                          ("DATA_INTEGRITY_PASS_HTTP_AND_SSO_NOT_VERIFIED", 0))
 
-    def test_reconciliation_gate_remains_separate(self):
+    def test_reconciliation_gate_remains_explicit_and_distinct_from_integrity(self):
         report = self.sample(editorial=0)
+        self.assertEqual(report["nextBlockingGate"], "radar_to_editorial_reconciliation")
+        self.assertEqual(report["editorialObservationsTouchedSinceRadarRun"], 0)
         self.assertEqual(certify(report),
-                         ("BLOCKED_RADAR_TO_EDITORIAL_RECONCILIATION", 2))
+                         ("DATA_INTEGRITY_PASS_EDITORIAL_CONTINUITY_PENDING_HTTP_SSO_NOT_VERIFIED", 0))
+        self.assertEqual(report["nextBlockingGate"], "radar_to_editorial_reconciliation")
+
+    def test_missing_all_accepted_receipts_never_passes(self):
+        report = self.sample(editorial=0)
+        report["attestation"]["acceptedReceipts"] = 0
+        self.assertEqual(certify(report), ("NOT_CERTIFIED_NO_ACCEPTED_RECEIPTS", 2))
+
+    def test_editorial_gate_conflict_fails_closed(self):
+        report = self.sample(editorial=0)
+        report["editorialObservationsTouchedSinceRadarRun"] = 4
+        self.assertEqual(certify(report),
+                         ("NOT_CERTIFIED_CONTRADICTORY_EDITORIAL_GATE", 2))
 
     def test_workflow_keeps_ingestion_separate(self):
         yml = (ROOT / ".github/workflows/radar-definitivo.yml").read_text()
