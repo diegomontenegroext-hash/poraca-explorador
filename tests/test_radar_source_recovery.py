@@ -316,4 +316,35 @@ class SourceRecoveryTests(unittest.TestCase):
         leads=reconstruct_historical_network([original],"musica",date(2026,11,2))
         self.assertEqual(leads[0]["upcomingOriginals"],[])
 
+    def test_local_books_circuit_directory_is_not_a_single_event_or_21_events(self):
+        records=json.loads((pathlib.Path(__file__).resolve().parents[1]/
+            "data/historical-circuit-network-v1.json").read_text())["evidence"]
+        leads=discover_directory_review_leads(records,"literatura",date(2026,11,2))
+        self.assertEqual(len(leads),1)
+        self.assertEqual(leads[0]["date"],"2026-11-06")
+        self.assertEqual(leads[0]["directoryScope"],"regional_unverified")
+        self.assertFalse(leads[0]["localParticipantVerified"])
+        self.assertFalse(leads[0]["localEventDetected"])
+        self.assertFalse(leads[0]["autoRegistered"])
+        self.assertFalse(leads[0]["publicationApproved"])
+        self.assertEqual(discover_directory_review_leads(records,"literatura",date(2026,11,7)),[])
+        # An organizer directory is not a verified dated occurrence with a
+        # unique venue, time and original proof for each individual session.
+        self.assertFalse(any(is_local_future_original(x,date(2026,11,2))
+            for x in records if x.get("circuit")=="literatura"))
+        out=plan([],historical_evidence=records,today=date(2026,11,2))
+        self.assertFalse(any(x["circuit"]=="literatura" for x in out["circuitResilience"]))
+        self.assertEqual(out["confirmedReplacements"],0)
+
+    def test_books_directory_does_not_pollute_wine_channel_recovery(self):
+        records=json.loads((pathlib.Path(__file__).resolve().parents[1]/
+            "data/historical-circuit-network-v1.json").read_text())["evidence"]
+        wines=discover_directory_review_leads(records,"vinos",date(2026,11,2))
+        self.assertEqual(len(wines),1)
+        self.assertEqual(wines[0]["date"],"2026-11-13")
+        self.assertNotIn("librerias",wines[0]["directoryUrl"])
+        literary=discover_directory_review_leads(records,"literatura",date(2026,11,2))
+        self.assertFalse(any(x["directoryUrl"] in [w["directoryUrl"] for w in wines]
+                             for x in literary))
+
 if __name__=="__main__":unittest.main()
