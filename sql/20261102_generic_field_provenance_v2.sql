@@ -61,6 +61,6 @@ SELECT e.event_key,
         END AS start_source_quality,
     'No suponer que fuente primaria sobre fecha o sede prueba por sí sola el horario; los soportes de evidencia son campos independientes'::text AS policy
    FROM radar_agenda_events e
-     JOIN poraca_event_knowledge_integrated_v1 q ON q.event_key = e.event_key;;
+     JOIN poraca_event_knowledge_integrated_v1 q ON q.event_key = e.event_key;
 
 -- Verificar con sql/20261102_event_provenance_readback_READ_ONLY.sql.

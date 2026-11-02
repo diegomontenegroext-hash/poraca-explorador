@@ -13,8 +13,10 @@ class ProvenanceContractTests(unittest.TestCase):
         self.assertEqual(MIGRATION.count("'official_institution'::text"),4)
         self.assertEqual(MIGRATION.count("'first_party'::text"),4)
         for field in ("title","date","time","venue"):
-            self.assertEqual(MIGRATION.count("'fieldEvidence'::text ->> '"+field+"'::text"),4)
-        self.assertEqual(MIGRATION.count('["title","date","time","venue"]'),4)
+            self.assertEqual(MIGRATION.count("->> '"+field+"'::text) = e."+
+                                  {"title":"title","date":"event_date::text",
+                                   "time":"event_time","venue":"venue"}[field]),4)
+        self.assertEqual(MIGRATION.count('["title", "date", "time", "venue"]'),4)
         for domain in ("livepass.com","alternativateatral.com","teatroargentino.gba.gob.ar"):
             self.assertNotIn(domain,MIGRATION.lower())
 
@@ -30,7 +32,7 @@ class ProvenanceContractTests(unittest.TestCase):
         self.assertEqual(MIGRATION.count("(x.value ->> 'url'::text) = e.source_url"),4)
         for text in ("= e.title","= e.event_date::text","= e.event_time","= e.venue"):
             self.assertEqual(MIGRATION.count(text),4)
-        self.assertIn("jsonb_typeof(x.value -> 'supports'::text)='array'::text",MIGRATION)
+        self.assertIn("jsonb_typeof(x.value -> 'supports'::text) = 'array'::text",MIGRATION)
 
 if __name__=="__main__":
     unittest.main()
