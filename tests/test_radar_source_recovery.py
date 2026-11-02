@@ -1,7 +1,7 @@
 import pathlib,sys,unittest,json
 from datetime import date
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/"src"))
-from radar_source_recovery import plan,reconstruct_historical_network
+from radar_source_recovery import plan,reconstruct_historical_network,discover_directory_review_leads
 
 
 def src(id,name,circuit="teatro",mode="fetch",diagnosis="DATED_SESSIONS_OBSERVED",
@@ -216,5 +216,42 @@ class SourceRecoveryTests(unittest.TestCase):
               "targets":[{"id":"organizer","name":"Org","locality":"La Plata"}]}]
         out=plan([],today=date(2026,11,2),historical_evidence=bad)
         self.assertEqual(out["circuitResilience"],[])
+
+    def test_national_directory_never_counts_as_local_future_event(self):
+        raw=json.loads((pathlib.Path(__file__).resolve().parents[1]/
+                       "data/historical-circuit-network-v1.json").read_text())
+        data=raw["evidence"]
+        directories=discover_directory_review_leads(data,"vinos",date(2026,11,2))
+        self.assertEqual(len(directories),1)
+        self.assertEqual(directories[0]["date"],"2026-11-13")
+        self.assertEqual(directories[0]["directoryScope"],"AR_nationwide")
+        self.assertFalse(directories[0]["localParticipantVerified"])
+        self.assertFalse(directories[0]["localEventDetected"])
+        self.assertFalse(directories[0]["publicationApproved"])
+        out=plan([src("dionisio","Dionisio","vinos",
+                      diagnosis="REPEATED_INDEX_ONLY",observed=0)],
+                 historical_evidence=data,today=date(2026,11,2))
+        self.assertEqual(len(out["actions"][0]["directoryReviewCandidates"]),1)
+        self.assertEqual(out["actions"][0]["historicalNetworkCandidates"][0]["targetId"],"acsba")
+        self.assertEqual(out["confirmedReplacements"],0)
+        self.assertEqual(out["circuitResilience"][0]["reportedDatedYieldSources7d"],0)
+
+    def test_directory_expires_and_never_registers_source(self):
+        data=[{"kind":"upcoming_directory","circuit":"vinos","date":"2026-11-13",
+               "url":"https://example.org/map","dateEvidenceUrl":"https://example.org/date",
+               "directoryScope":"AR_nationwide","localParticipantVerified":False}]
+        self.assertEqual(discover_directory_review_leads(data,"vinos",date(2026,11,14)),[])
+        self.assertEqual(discover_directory_review_leads(data,"yoga",date(2026,11,2)),[])
+        self.assertEqual(plan([],historical_evidence=data,today=date(2026,11,2))["circuitResilience"],[])
+        self.assertEqual(plan([],historical_evidence=data,today=date(2026,11,2))["confirmedReplacements"],0)
+
+    def test_directory_rejects_unverified_urls_and_no_date_evidence(self):
+        bad=[{"kind":"upcoming_directory","circuit":"vinos","date":"2026-11-13",
+              "url":"https://unsafe.example@evil.invalid/","directoryScope":"AR_nationwide",
+              "localParticipantVerified":False}]
+        self.assertEqual(discover_directory_review_leads(bad,"vinos",date(2026,11,2)),[])
+        bad[0]["url"]="http://bad.invalid"
+        bad[0]["dateEvidenceUrl"]="https://example.org/d"
+        self.assertEqual(discover_directory_review_leads(bad,"vinos",date(2026,11,2)),[])
 
 if __name__=="__main__":unittest.main()
