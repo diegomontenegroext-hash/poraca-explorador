@@ -351,6 +351,12 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  CASE WHEN (x.integrity->>'missingAcceptedReceipts')::int=0
  AND (x.integrity->>'orphanedObservationLinks')::int=0
  AND (x.integrity->>'missingApprovedEventIds')::int=0
+ AND (x.integrity->>'orphanAcceptedEventRelations')::int=0
+ AND (x.integrity->>'missingAcceptedRelationEventIds')::int=0
+ AND (SELECT count(*) FROM pg_catalog.pg_trigger
+      WHERE tgrelid='public.poraca_knowledge_relations'::regclass
+      AND tgname='poraca_accepted_event_relation_guard_v1'
+      AND tgenabled='O' AND NOT tgisinternal)=1
  AND x.context_audit->>'schema'='poraca-context-relations-v1'
  AND x.context_audit->>'branchId'='br-mute-recipe-b4odj2bl'
  AND x.context_audit->>'scope'='documented_context_not_publication'
@@ -376,6 +382,10 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  'missingApprovedIds',x.integrity->'missingApprovedEventIds',
  'guards',x.integrity->'protectionTriggers',
  'eventKeyImmutableTriggerEnabled',x.active_guard,
+ 'acceptedEventRelationGuardEnabled',(SELECT count(*) FROM pg_catalog.pg_trigger
+   WHERE tgrelid='public.poraca_knowledge_relations'::regclass
+   AND tgname='poraca_accepted_event_relation_guard_v1'
+   AND tgenabled='O' AND NOT tgisinternal),
  'baselineCanonicalIdsExpected',133,
  'baselineCanonicalIdsMissing',x.lost_count,
  'independentHistoricalCanariesExpected',x.baseline_count,
