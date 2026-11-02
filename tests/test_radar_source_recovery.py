@@ -197,4 +197,24 @@ class SourceRecoveryTests(unittest.TestCase):
         self.assertEqual(out["circuitResilience"],[])
         self.assertEqual(out["circuitsWithoutReportedDatedYield"],0)
 
+
+    def test_future_original_marks_circuit_with_no_fetch_source(self):
+        evidence=json.loads((pathlib.Path(__file__).resolve().parents[1]/
+             "data/historical-circuit-network-v1.json").read_text())["evidence"]
+        out=plan([],today=date(2026,11,2),historical_evidence=evidence)
+        wine={x["circuit"]:x for x in out["circuitResilience"]}["vinos"]
+        self.assertEqual(wine["fetchSources"],0)
+        self.assertEqual(wine["reportedDatedYieldSources7d"],0)
+        self.assertTrue(wine["futureOriginalResearchHint"])
+        self.assertFalse(wine["resilienceCertified"])
+        self.assertEqual(out["confirmedReplacements"],0)
+
+    def test_incomplete_future_research_hint_does_not_create_circuit(self):
+        bad=[{"circuit":"vinos","kind":"upcoming_original",
+              "date":"2026-11-27","url":"https://example.org/event",
+              "event":{"date":"2026-11-27","time":"19:00"},
+              "targets":[{"id":"organizer","name":"Org","locality":"La Plata"}]}]
+        out=plan([],today=date(2026,11,2),historical_evidence=bad)
+        self.assertEqual(out["circuitResilience"],[])
+
 if __name__=="__main__":unittest.main()
