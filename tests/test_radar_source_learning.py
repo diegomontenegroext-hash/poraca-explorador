@@ -43,6 +43,37 @@ class YieldLearningTests(unittest.TestCase):
         self.assertIn("30 days",SQL)
         self.assertNotIn("last_run_id",SQL)
 
+    def test_purpose_triage_never_reclassifies_sources(self):
+        def role(r):
+            x=list(sample(checks=6,idx=6,latest_n=3))
+            x[2]=r
+            return classify(tuple(x))
+        self.assertEqual(role("local_press")["sourcePurposeHypothesis"],
+                         "POTENTIAL_DATED_FEED_EXTRACTION_GAP")
+        self.assertEqual(role("official_custodian")["sourcePurposeHypothesis"],
+                         "REFERENCE_OR_EVIDENCE_REVIEW")
+        self.assertEqual(role("ticketing_blocked")["sourcePurposeHypothesis"],
+                         "ACCESS_OR_SCRIPT_BLOCK_REVIEW")
+        self.assertEqual(role("new_source_role")["sourcePurposeHypothesis"],
+                         "PURPOSE_REQUIRES_FIRST_PARTY_CHECK")
+        self.assertFalse(role("local_press")["sourcePurposeCertified"])
+        self.assertFalse(role("official_custodian")["sourceModeChanged"])
+        self.assertEqual(role("official_custodian")["diagnosis"],
+                         "REPEATED_INDEX_ONLY")
+
+    def test_dated_sources_before_static_reference_in_review_queue(self):
+        press=list(sample("Diario",checks=6,idx=6,latest_n=3))
+        press[0]="press";press[2]="local_press"
+        static=list(sample("Museo",checks=6,idx=6,latest_n=3))
+        static[0]="static";static[2]="official_museum_archive"
+        report=summarize([tuple(static),tuple(press)])
+        self.assertEqual([x["sourceId"] for x in report["priorityReview"]],
+                         ["press","static"])
+        self.assertEqual(report["sourceModeChanges"],0)
+        self.assertEqual(report["persistentZeroYieldByPurposeHypothesis"],
+                         {"POTENTIAL_DATED_FEED_EXTRACTION_GAP":1,
+                          "REFERENCE_OR_EVIDENCE_REVIEW":1})
+
     def test_summary_sorts_diagnostic_anomalies(self):
         r=summarize([sample("Fuente A",checks=5,empty=5),
                      sample("Fuente B",mode="discover_only")])

@@ -44,6 +44,46 @@ ORDER BY s.source_id
 """
 
 
+# Source roles are declarations, not demonstrated behaviour. This hypothesis
+# is used to SORT investigation, never to disable a source or certify events.
+REFERENCE_ROLES={
+    "original_event_date_check",
+    "historical_original_organizer_not_current_venue",
+    "official_custodian",
+    "official_museum_archive",
+    "original_organization_link_hub",
+    "community_cooperative_profile",
+    "original_editorial_venue",
+}
+AGENDAS_AND_PROGRAMS={
+    "local_press","secondary_agenda","specialized_agenda",
+    "institutional_program","first_party_institution",
+    "institutional_program_and_community_venue",
+    "original_institutional","original_venue","official_ticketing",
+    "original_venue_program","original_venue_ticketing",
+    "authorized_ticketing","ticketing_primary","theatre_ticketing",
+    "original_ticketing","official_festival","original_festival_calendar_ics",
+}
+
+def investigation_lane(source_role,monitoring_mode):
+    """Conservative, source-role-based triage for persistent zero-yield.
+
+    A static place profile is NOT an error; an agenda with real upcoming
+    dates that produces no sessions is. Role is only a queue hint: check the
+    actual original before deciding whether the source should change mode.
+    """
+    if monitoring_mode!="fetch":
+        return "OTHER_MODE_NOT_A_DATED_FEED"
+    role=(source_role or "").strip().lower()
+    if role=="ticketing_blocked":
+        return "ACCESS_OR_SCRIPT_BLOCK_REVIEW"
+    if role in REFERENCE_ROLES:
+        return "REFERENCE_OR_EVIDENCE_REVIEW"
+    if role in AGENDAS_AND_PROGRAMS:
+        return "POTENTIAL_DATED_FEED_EXTRACTION_GAP"
+    return "PURPOSE_REQUIRES_FIRST_PARTY_CHECK"
+
+
 def classify(row):
     """Read-only diagnosis, grounded in 7/30d per-run outcomes."""
     (source_id,name,role,circuit,mode,checks,successful_empty,index_only,
@@ -76,6 +116,8 @@ def classify(row):
         suggestion="Seguir observando; no modificar reputación por pocas visitas"
     return {
         "sourceId":source_id, "sourceName":name, "sourceRole":role or "unknown",
+        "sourcePurposeHypothesis":investigation_lane(role,mode),
+        "sourcePurposeCertified":False, "sourceModeChanged":False,
         "circuit":circuit or "sin_circuito", "monitoringMode":mode,
         "checks7d":checks, "httpOkWithoutSessions7d":successful_empty,
         "indexOnly7d":index_only, "observedSessions7d":sessions7,
@@ -96,14 +138,25 @@ def summarize(rows):
     high_priority=[x for x in items if x["diagnosis"] in (
         "RECENT_YIELD_DROP","SUCCESSFUL_FETCH_ZERO_DATED_SESSIONS",
         "REPEATED_INDEX_ONLY")]
+    lane_rank={"POTENTIAL_DATED_FEED_EXTRACTION_GAP":0,
+               "ACCESS_OR_SCRIPT_BLOCK_REVIEW":1,
+               "PURPOSE_REQUIRES_FIRST_PARTY_CHECK":2,
+               "REFERENCE_OR_EVIDENCE_REVIEW":3}
     high_priority.sort(key=lambda x:(
         {"RECENT_YIELD_DROP":0,"SUCCESSFUL_FETCH_ZERO_DATED_SESSIONS":1,
          "REPEATED_INDEX_ONLY":2}[x["diagnosis"]],
+        lane_rank.get(x["sourcePurposeHypothesis"],4),
         -x["httpOkWithoutSessions7d"],-x["checks7d"],str(x["sourceId"])))
+    triage_counts={}
+    for item in high_priority:
+        lane=item["sourcePurposeHypothesis"]
+        triage_counts[lane]=triage_counts.get(lane,0)+1
     return {"schema":SCHEMA,"sourceCount":len(items),"diagnosisCounts":counts,
             "priorityReview":high_priority[:12],
             "sourcesWithRecentDatedSessions":sum(
                 1 for x in items if x["observedSessions7d"]>0),
+            "persistentZeroYieldByPurposeHypothesis":triage_counts,
+            "sourceModeChanges":0,
             "learningState":"DIAGNOSTIC_ONLY",
             "warning":"HTTP OK no implica funciones; sesiones observadas no equivalen "
                       "a eventos distintos ni confirmados. Cambios de formato "
