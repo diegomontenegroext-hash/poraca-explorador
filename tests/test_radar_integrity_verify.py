@@ -124,12 +124,12 @@ class IndependentE2ECertificationTests(unittest.TestCase):
                          ("P0_ACCEPTED_RELATION_WITHOUT_CANONICAL", 2))
 
     def test_unreviewed_context_remains_real_failure(self):
-        report = self.sample(dangling_relations=17)
+        report = self.sample()
         report["contextAudit"]["contextMissingProvenance"] = 1
         self.assertEqual(certify(report), ("P0_CANONICAL_HISTORY_BROKEN", 2))
 
     def test_unknown_context_predicate_fails(self):
-        report = self.sample(dangling_relations=17)
+        report = self.sample()
         report["contextAudit"]["contextUnsupportedPredicate"] = 1
         self.assertEqual(certify(report), ("P0_CANONICAL_HISTORY_BROKEN", 2))
 
@@ -146,7 +146,7 @@ class IndependentE2ECertificationTests(unittest.TestCase):
                          ("NOT_CERTIFIED_CONTEXT_RELATION_COUNT_CONFLICT", 2))
 
     def test_missing_accepted_event_object_fails(self):
-        report = self.sample(dangling_relations=17)
+        report = self.sample()
         report["contextAudit"]["acceptedMissingEventObjects"] = 1
         self.assertEqual(certify(report), ("P0_CANONICAL_HISTORY_BROKEN", 2))
 
