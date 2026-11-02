@@ -2,6 +2,7 @@
 """Post-run category pulse, read-only: no new scheduler, ingestion, or approvals."""
 import json, os, sys, unicodedata
 from pathlib import Path
+from radar_security_identity import approved_operational_identity
 from radar_funnel_metrics import read as read_run_funnel, persist as persist_run_funnel
 from radar_end_to_end import SQL as END_TO_END_SQL, assess as assess_end_to_end
 from radar_source_learning import SQL as SOURCE_LEARNING_SQL, summarize as summarize_source_learning, classify as classify_source_learning
@@ -163,7 +164,8 @@ def fetch(url):
                 identity=cur.fetchone()
                 expected=("neondb","poraca_definitivo_ingest","poraca_definitivo_scope",
                           "frosty-union-52906378","br-mute-recipe-b4odj2bl",True,True,True,False)
-                if identity!=expected:raise RuntimeError("PULSE_DB_READ_ONLY_IDENTITY_MISMATCH")
+                if not approved_operational_identity(cur, identity, expected):
+                    raise RuntimeError("PULSE_DB_READ_ONLY_IDENTITY_MISMATCH")
                 cur.execute("SELECT (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date")
                 today=cur.fetchone()[0]
                 cur.execute(CANONICAL_SQL);canonical=cur.fetchall()

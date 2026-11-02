@@ -5,6 +5,7 @@ Only touches radar_definitivo.runs.summary.editorial_funnel_v1. Never writes to
 sources, candidates, occurrences, public events or editorial approvals.
 Run-level link reads are snapshotted immediately because last_run_id is mutable.
 """
+from radar_security_identity import approved_operational_identity
 from collections import Counter, defaultdict
 import json
 
@@ -271,9 +272,10 @@ def persist(database_url,report):
                   current_setting('neon.branch_id',true),
                   has_table_privilege(current_user,'radar_definitivo.runs','UPDATE'),
                   has_table_privilege(current_user,'public.radar_agenda_events','INSERT,UPDATE,DELETE,TRUNCATE')""")
-                if cur.fetchone()!=("neondb","poraca_definitivo_ingest",
+                expected=("neondb","poraca_definitivo_ingest",
                     "poraca_definitivo_scope","frosty-union-52906378",
-                    "br-mute-recipe-b4odj2bl",True,False):
+                    "br-mute-recipe-b4odj2bl",True,False)
+                if not approved_operational_identity(cur, cur.fetchone(), expected):
                     raise RuntimeError("FUNNEL_SCOPE_OR_WRITE_BOUNDARY_MISMATCH")
                 cur.execute(PERSIST_SQL,(json.dumps(report,ensure_ascii=False),report["runId"]))
                 if cur.fetchone() is None:

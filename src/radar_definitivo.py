@@ -20,6 +20,7 @@ import uuid
 from urllib.parse import urlparse, urljoin, urlsplit, urlunsplit, quote, parse_qsl, urlencode
 from zoneinfo import ZoneInfo
 
+from radar_security_identity import approved_operational_login
 from radar_parallel import (
     clean_link, compact, discover_links, WORDS, LOCAL_DETAIL,
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
@@ -123,7 +124,9 @@ def isolated_connection():
         db,login,table=cur.fetchone()
         expected_db = EXPECTED_OPERATIVE_DB if operational else EXPECTED_LAB_DB
         expected_login = EXPECTED_OPERATIVE_LOGIN if operational else EXPECTED_LAB_ROLE
-        if db != expected_db or login != expected_login or table is None:
+        if (db != expected_db or table is None
+                or (not operational and login != expected_login)
+                or (operational and not approved_operational_login(cur, login))):
             conn.close()
             raise RuntimeError("Isolation guard: database/role/schema mismatch")
         if operational:

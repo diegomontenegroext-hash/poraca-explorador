@@ -10,6 +10,7 @@ import json
 import os
 import re
 import sys
+from radar_security_identity import approved_operational_identity
 from collections import Counter
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -153,7 +154,7 @@ def read(url):
                 cur.execute("SET LOCAL ROLE poraca_definitivo_scope")
                 cur.execute(IDENTITY_SQL)
                 identity = cur.fetchone()
-                if identity != EXPECTED:
+                if not approved_operational_identity(cur, identity, EXPECTED):
                     raise RuntimeError("RADAR_DIRECT_READ_IDENTITY_MISMATCH")
                 cur.execute(DAY_SQL)
                 day = cur.fetchone()[0]

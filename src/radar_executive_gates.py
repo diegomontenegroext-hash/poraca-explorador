@@ -4,6 +4,7 @@ import json
 import os
 import re
 import sys
+from radar_security_identity import approved_operational_identity
 from collections import Counter
 from pathlib import Path
 
@@ -69,9 +70,10 @@ def fetch_rows(database_url, sql):
                     current_setting('neon.project_id',true),
                     current_setting('neon.branch_id',true)""")
                 identity = cur.fetchone()
-                if identity != ("neondb","poraca_definitivo_ingest",
+                expected=("neondb","poraca_definitivo_ingest",
                       "poraca_definitivo_scope","frosty-union-52906378",
-                      "br-mute-recipe-b4odj2bl"):
+                      "br-mute-recipe-b4odj2bl")
+                if not approved_operational_identity(cur, identity, expected):
                     raise RuntimeError("EXEC_GATE_OPERATIONAL_IDENTITY_MISMATCH")
                 cur.execute(sql)
                 cols = [item.name for item in cur.description]

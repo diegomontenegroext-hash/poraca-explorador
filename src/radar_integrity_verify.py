@@ -13,6 +13,7 @@ from pathlib import Path
 import re
 import sys
 
+from radar_security_identity import approved_operational_identity
 from radar_end_to_end import SQL as E2E_SQL, assess as assess_end_to_end
 
 EXPECTED = (
@@ -166,7 +167,7 @@ def read(url: str) -> dict:
                       current_setting('neon.branch_id',true)
                 """)
                 identity = tuple(cursor.fetchone())
-                if identity != EXPECTED:
+                if not approved_operational_identity(cursor, identity, EXPECTED):
                     raise RuntimeError("E2E_IDENTITY_SCOPE_MISMATCH")
                 cursor.execute("""
                     SELECT
