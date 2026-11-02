@@ -27,6 +27,7 @@ from radar_parallel import (
 )
 from radar_agenda_adapters import extract_listings, special_links, tidy
 from radar_adaptive_discovery import discover_sections, discover_original_posts_from_section
+from radar_original_root_candidate import root_review_candidate
 from radar_ical_generic import discover_calendar_links
 from radar_adaptive_cadence import cadence_hours as adaptive_cadence_hours
 from radar_evidence_quality import summarize as summarize_evidence_quality
@@ -511,7 +512,10 @@ def scan_source(source,budget,mode):
     if "known_primary_details" in source:
         links=prioritize_unseen_official_details(
             links,source["known_primary_details"],max_details)
-    candidates=[]
+    # Persist the ACTUALLY OPENED original root as a review-only candidate.
+    # A multi-venue cultural cycle is a lead, not N dated sessions.
+    # This is generic by source_role, never by organizer domain.
+    candidates=root_review_candidate(source,root,page,status,make_candidate)
     known=set()
     selected_links=list(links[:max_details])
     for url,label in selected_links:
