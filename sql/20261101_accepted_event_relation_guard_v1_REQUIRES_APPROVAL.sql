@@ -3,8 +3,9 @@
 -- negative tests, and explicit production cutover. Do NOT run as Radar.
 -- Does not delete, edit, admit or publish any existing rows.
 -- Existing accepted dangling relations remain P0 and must be reconciled separately.
--- Only a reviewed relation whose subject is an existing canonical event can
--- become accepted. Research relations can remain proposal/disputed/retracted.
+-- Only a reviewed relation whose event endpoints exist in the canonical
+-- catalog can become accepted, whether the event is the subject or object.
+-- Research relations can remain proposal/disputed/retracted.
 -- Source keys are never inferred; the canonical reference is checked in DB.
 CREATE OR REPLACE FUNCTION public.poraca_accepted_event_relation_guard_v1()
 RETURNS trigger
@@ -12,12 +13,14 @@ LANGUAGE plpgsql
 SET search_path = pg_catalog, public, pg_temp
 AS $guard$
 BEGIN
-    IF NEW.review_state='accepted'
-       AND NEW.subject_kind='event'
-       AND NOT EXISTS (
+    IF NEW.review_state='accepted' AND
+       ((NEW.subject_kind='event' AND NOT EXISTS (
            SELECT 1 FROM public.radar_agenda_events c
            WHERE c.event_key=NEW.subject_id
-       ) THEN
+       )) OR (NEW.object_kind='event' AND NOT EXISTS (
+           SELECT 1 FROM public.radar_agenda_events c
+           WHERE c.event_key=NEW.object_id
+       ))) THEN
       RAISE EXCEPTION 'PORACA_ACCEPTED_EVENT_RELATION_MISSING_CANONICAL'
         USING ERRCODE='23503',
         HINT='Conservar la evidencia como propuesta; admitir solo despues de crear o reconciliar el evento canonico autorizado.';
@@ -35,7 +38,7 @@ BEGIN
         AND NOT t.tgisinternal
   ) THEN
     CREATE TRIGGER poraca_accepted_event_relation_guard_v1
-    BEFORE INSERT OR UPDATE OF review_state, subject_kind, subject_id
+    BEFORE INSERT OR UPDATE OF review_state, subject_kind, subject_id, object_kind, object_id
     ON public.poraca_knowledge_relations
     FOR EACH ROW
     EXECUTE FUNCTION public.poraca_accepted_event_relation_guard_v1();
