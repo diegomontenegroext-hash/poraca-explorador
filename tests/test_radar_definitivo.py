@@ -303,6 +303,56 @@ class RadarDefinitivoTests(unittest.TestCase):
         self.assertEqual(response[0],429)
         self.assertFalse(budget.can_fetch(url))
 
+    def test_temporary_http_503_is_retried_once_with_budget(self):
+        budget=rd.Budget(seconds=100)
+        url="https://www.example.org/muestras"
+        with patch.object(rd,"fetch",side_effect=[
+             (503,None,"HTTP_ERROR"),(200,"<html>agenda</html>",None)]) as call:
+            with patch.object(rd.time,"sleep",return_value=None):
+                response=budget.request(url)
+        self.assertEqual(response,(200,"<html>agenda</html>",None))
+        self.assertEqual(call.call_count,2)
+        self.assertEqual(budget.total,2)
+        self.assertEqual(budget.by_host["www.example.org"],2)
+
+    def test_persistent_http_503_stays_failed_after_single_retry(self):
+        budget=rd.Budget(seconds=100)
+        with patch.object(rd,"fetch",return_value=(503,None,"HTTP_ERROR")) as call:
+            with patch.object(rd.time,"sleep",return_value=None):
+                response=budget.request("https://example.org/muestras")
+        self.assertEqual(response,(503,None,"HTTP_ERROR"))
+        self.assertEqual(call.call_count,2)
+        self.assertEqual(budget.total,2)
+
+    def test_no_retry_for_rate_limits_forbidden_or_instagram(self):
+        for code,error,url in [
+            (429,"RATE_LIMIT","https://example.org/agenda"),
+            (403,"HTTP_ERROR","https://example.org/agenda"),
+            (503,"HTTP_ERROR","https://www.instagram.com/p/DeHOPiJRwNi/"),
+        ]:
+            budget=rd.Budget(seconds=100)
+            with patch.object(rd,"fetch",return_value=(code,None,error)) as call:
+                with patch.object(rd.time,"sleep",return_value=None):
+                    self.assertEqual(budget.request(url)[0],code)
+            self.assertEqual(call.call_count,1)
+            self.assertEqual(budget.total,1)
+
+    def test_retry_respects_host_request_limit_and_remaining_time(self):
+        url="https://example.org/agenda"
+        budget=rd.Budget(seconds=100)
+        budget.by_host["example.org"]=rd.MAX_DOMAIN_REQUESTS-1
+        with patch.object(rd,"fetch",return_value=(503,None,"HTTP_ERROR")) as call:
+            with patch.object(rd.time,"sleep",return_value=None):
+                budget.request(url)
+        self.assertEqual(call.call_count,1)
+        self.assertEqual(budget.by_host["example.org"],rd.MAX_DOMAIN_REQUESTS)
+        budget=rd.Budget(seconds=100)
+        with patch.object(budget,"remaining",return_value=6):
+            with patch.object(rd,"fetch",return_value=(503,None,"HTTP_ERROR")) as call:
+                with patch.object(rd.time,"sleep",return_value=None):
+                    budget.request(url)
+        self.assertEqual(call.call_count,1)
+
 if __name__=="__main__":
     unittest.main()
 
