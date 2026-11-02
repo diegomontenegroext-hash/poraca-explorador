@@ -1,5 +1,29 @@
 # Por Acá · F1 Seguridad e integridad — ejecución 01/11/2026
 
+<!-- PORACA_DUAL_SECRET_PREFLIGHT_20261101 -->
+## Cutover seguro en dos fases — **preparado, todavía NO ejecutado en PROD**
+
+**Evidencia:** commits [0650164](https://github.com/diegomontenegroext-hash/poraca-explorador/commit/0650164458046425b106ce7e564688628856b994) (atestación contextual integrada, dos suites CI verdes), [f86369a](https://github.com/diegomontenegroext-hash/poraca-explorador/commit/f86369af234e35c8dc949532ad3a52f2f813d520) (los seis procesos admiten solo el login nuevo exacto `poraca_radar_limited_prod` con verificación de rama, scope y ausencia de privilegios superiores; 327 tests OK, 1 omitido; 2 workflows verdes), y [cd27776](https://github.com/diegomontenegroext-hash/poraca-explorador/commit/cd2777627734b10ba99014965190514f77941a32) (prueba manual del secreto candidato en el **workflow existente**, nunca en FULL). Neon QA probó `CREATE ROLE ... LOGIN ...; GRANT poraca_definitivo_scope` dentro de SAVEPOINT: `LOGIN=true`, `CREATEROLE=false`, `CREATEDB=false`, `neon_superuser=false`, `INSERT staging=true`, `INSERT/DELETE canon=false`; ROLLBACK, **0 roles de prueba residuales**. Ningún secreto original fue alterado.
+
+### Intervención puntual del propietario (sin Codespaces ni apagar Radar)
+
+1. **Neon → proyecto `frosty-union-52906378` → rama operacional `br-mute-recipe-b4odj2bl` → base `neondb` → SQL Editor.** Crear la cuenta mediante SQL (NO panel/API Roles, que otorga `neon_superuser`):
+   ```sql
+   CREATE ROLE poraca_radar_limited_prod
+     WITH LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE
+     PASSWORD '<PASSWORD_ALEATORIA_LARGA_GENERADA_LOCALMENTE>';
+   GRANT poraca_definitivo_scope TO poraca_radar_limited_prod;
+   ```
+   Reemplazar el marcador **localmente** por una contraseña fuerte de gestor de contraseñas, sin divulgarla en chat, issue, commit, capturas o logs; proteger el historial del editor. La cuenta nueva aún no es usada por Radar.
+2. **GitHub → `diegomontenegroext-hash/poraca-explorador` → Settings → Secrets and variables → Actions → New repository secret.** Crear **`NEON_RADAR_LIMITED_DATABASE_URL`** con la URL Neon **de rama operativa** usando ese usuario y su contraseña (copiar host/base/opciones SSL del connection details, modificar solo credenciales; codificar cualquier carácter reservado en formato URL). **NO modificar ni borrar `NEON_RADAR_OPERATIONAL_DATABASE_URL`**.
+3. **GitHub → Actions → Por Aca - Radar Definitivo (Neon operativo) → Run workflow → `mode=verify_only`, `credential_probe=limited`.** La primera lectura corre con secreto antiguo y el paso independiente `Validar credencial nueva sin cambiar Radar ni publicar` utiliza el nuevo; exige pruebas de frontera de permisos e integridad. Nunca ejecutar `full` / `incremental` manuales para esto. Verificar conclusión PASS; si falla, mantener la credencial antigua intacta e informar el error *sin copiar secretos*.
+
+**Segunda fase (solo tras PASS):** cambiar el uso normal del workflow al secreto limitado con un único commit pequeño, conservando `NEON_RADAR_OPERATIONAL_DATABASE_URL` como rollback hasta corroborar una corrida ordinaria. Luego retirar los privilegios y accesos de las dos identidades elevadas bajo revisión de dependencias. No declarar LEAST_PRIVILEGE PASS hasta que ambas hayan dejado de ser privilegiadas. El integrador puede preparar ese commit tras la prueba manual; no crear otro cron.
+
+**Si el usuario no puede hacer la operación en Neon:** no improvisar otro login creado por API. Mantener el flujo antiguo protegido, registrar el bloqueo, y pedir una operación administrativa asistida por un responsable de Neon.
+<!-- /PORACA_DUAL_SECRET_PREFLIGHT_20261101 -->
+
+
 <!-- PORACA_MINPRIV_QA_SQL_VERIFIED_20261101 -->
 ## Actualización: mecanismo limitado demostrado en QA (01/11/2026)
 
