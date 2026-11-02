@@ -17,6 +17,9 @@ on:
       - 'sql/20261102_generic_field_provenance_v2.sql'
       - 'sql/20261102_event_provenance_readback_READ_ONLY.sql'
       - 'tests/test_radar_provenance_contract_v2.py'
+      - 'sql/20261102_editorial_candidate_chain_READ_ONLY.sql'
+      - 'sql/20261102_editorial_candidate_negative_gates_READ_ONLY.sql'
+      - 'tests/test_editorial_candidate_readonly_v1.py'
       - '.github/workflows/radar-ci.yml'
   workflow_dispatch:
 
