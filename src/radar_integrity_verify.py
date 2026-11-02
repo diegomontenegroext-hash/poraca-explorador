@@ -112,10 +112,29 @@ def certify(report: dict) -> tuple[str, int]:
         return "P0_CANONICAL_IMMUTABILITY_MISSING", 2
     if audit.get("checkpointSurvivalGuard") is not True or audit["protectionTriggers"] != 2:
         return "P0_CANONICAL_PROTECTION_MISSING", 2
+    # Prepublication facts have independent reviews; only accepted events
+    # and true links must have canonical identities. Never skip provenance.
+    context = report.get("contextAudit")
+    fields = ("contextOnlyAccepted", "contextOnlyEventKeys",
+              "contextMissingProvenance", "contextUnsupportedPredicate",
+              "acceptedMissingEventObjects")
+    if (not isinstance(context, dict)
+            or context.get("schema") != "poraca-context-relations-v1"
+            or context.get("branchId") != EXPECTED[4]
+            or context.get("database") != EXPECTED[0]
+            or context.get("scope") != "documented_context_not_publication"
+            or context.get("writesPerformed") is not False
+            or any(type(context.get(k)) is not int or context[k] < 0 for k in fields)):
+        return "NOT_CERTIFIED_MISSING_CONTEXT_PROVENANCE_AUDIT", 2
+    if (context["contextOnlyAccepted"] != audit["orphanAcceptedEventRelations"]
+            or context["contextOnlyEventKeys"] != audit["missingAcceptedRelationEventIds"]):
+        return "NOT_CERTIFIED_CONTEXT_RELATION_COUNT_CONFLICT", 2
     if (audit["missingAcceptedReceipts"] > 0
             or audit["missingApprovedEventIds"] > 0
             or audit["orphanedObservationLinks"] > 0
-            or audit["orphanAcceptedEventRelations"] > 0):
+            or context["contextMissingProvenance"] > 0
+            or context["contextUnsupportedPredicate"] > 0
+            or context["acceptedMissingEventObjects"] > 0):
         return "P0_CANONICAL_HISTORY_BROKEN", 2
     if audit["canaryElAnimo"] != 1:
         return "P0_CANARY_NOT_PRESENT", 2
@@ -125,7 +144,11 @@ def certify(report: dict) -> tuple[str, int]:
         return "P0_NO_CONFIRMED_FUTURE_EVENTS", 2
     if report.get("nextBlockingGate") != "authenticated_api_and_web_check":
         return "BLOCKED_" + str(report.get("nextBlockingGate") or "UNKNOWN").upper(), 2
-    if audit.get("decision") != "DATA_INTEGRITY_PASS_HTTP_SSO_SEPARATE":
+    # Keep the legacy v1 diagnostic visible and consistent with context proof.
+    legacy_expected = ("P0_CANONICAL_HISTORY_BROKEN"
+                       if context["contextOnlyAccepted"] > 0
+                       else "DATA_INTEGRITY_PASS_HTTP_SSO_SEPARATE")
+    if audit.get("decision") != legacy_expected:
         return "NOT_CERTIFIED_ATTESTATION_DECISION_CONFLICT", 2
     return "DATA_INTEGRITY_PASS_HTTP_AND_SSO_NOT_VERIFIED", 0
 
@@ -164,6 +187,11 @@ def read(url: str) -> dict:
                 cursor.execute("SELECT public.poraca_e2e_integrity_attestation_v1()")
                 receipt_row = cursor.fetchone()
                 report["attestation"] = receipt_row[0] if receipt_row else None
+                # Scoped SECURITY DEFINER audit: counts only, no raw graph access.
+                cursor.execute(
+                    "SELECT public.poraca_contextual_relation_evidence_attestation_v1()")
+                context_row = cursor.fetchone()
+                report["contextAudit"] = context_row[0] if context_row else None
                 # 133 historical event identity hashes captured in Git on 2026-11-01.
                 # Future new event IDs are fine; any baseline deletion is P0.
                 # Neither the ledger nor this SELECT writes to Neon.
@@ -216,6 +244,7 @@ def main() -> int:
             "missingAcceptedReceipts": (report.get("attestation") or {}).get("missingAcceptedReceipts"),
             "missingApprovedEventIds": (report.get("attestation") or {}).get("missingApprovedEventIds"),
             "orphanAcceptedEventRelations": (report.get("attestation") or {}).get("orphanAcceptedEventRelations"),
+            "contextAudit": report.get("contextAudit"),
             "missingAcceptedRelationEventIds": (report.get("attestation") or {}).get("missingAcceptedRelationEventIds"),
             "canaryElAnimo": (report.get("attestation") or {}).get("canaryElAnimo"),
             "protectionTriggers": (report.get("attestation") or {}).get("protectionTriggers"),

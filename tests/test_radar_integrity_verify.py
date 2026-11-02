@@ -40,6 +40,17 @@ class IndependentE2ECertificationTests(unittest.TestCase):
                          if orphaned or missing_receipts or missing_approved or dangling_relations
                          else "DATA_INTEGRITY_PASS_HTTP_SSO_SEPARATE"),
         }
+        report["contextAudit"] = {
+            "schema": "poraca-context-relations-v1",
+            "scope": "documented_context_not_publication",
+            "database": "neondb", "branchId": BRANCH,
+            "contextOnlyAccepted": dangling_relations,
+            "contextOnlyEventKeys": dangling_relations,
+            "contextMissingProvenance": 0,
+            "contextUnsupportedPredicate": 0,
+            "acceptedMissingEventObjects": 0,
+            "writesPerformed": False,
+        }
         report["canonicalSurvivalLedger"] = {
             "baselineRequired": 133, "baselinePresent": 133,
             "baselineMissing": 0, "newIdsSinceBaseline": 7,
@@ -105,9 +116,39 @@ class IndependentE2ECertificationTests(unittest.TestCase):
         self.assertEqual(certify(self.sample(missing_approved=1)),
                          ("P0_CANONICAL_HISTORY_BROKEN", 2))
 
-    def test_orphan_accepted_event_relations_fail_even_without_observations(self):
-        self.assertEqual(certify(self.sample(dangling_relations=33)),
-                         ("P0_CANONICAL_HISTORY_BROKEN", 2))
+    def test_documented_context_is_not_a_missing_approved_event(self):
+        report = self.sample(dangling_relations=17)
+        report["attestation"]["missingAcceptedRelationEventIds"] = 15
+        report["contextAudit"]["contextOnlyEventKeys"] = 15
+        self.assertEqual(certify(report),
+                         ("DATA_INTEGRITY_PASS_HTTP_AND_SSO_NOT_VERIFIED", 0))
+
+    def test_unreviewed_context_remains_real_failure(self):
+        report = self.sample(dangling_relations=17)
+        report["contextAudit"]["contextMissingProvenance"] = 1
+        self.assertEqual(certify(report), ("P0_CANONICAL_HISTORY_BROKEN", 2))
+
+    def test_unknown_context_predicate_fails(self):
+        report = self.sample(dangling_relations=17)
+        report["contextAudit"]["contextUnsupportedPredicate"] = 1
+        self.assertEqual(certify(report), ("P0_CANONICAL_HISTORY_BROKEN", 2))
+
+    def test_context_missing_fails_closed(self):
+        report = self.sample(dangling_relations=17)
+        report.pop("contextAudit")
+        self.assertEqual(certify(report),
+                         ("NOT_CERTIFIED_MISSING_CONTEXT_PROVENANCE_AUDIT", 2))
+
+    def test_context_count_conflict_fails_closed(self):
+        report = self.sample(dangling_relations=17)
+        report["contextAudit"]["contextOnlyAccepted"] = 16
+        self.assertEqual(certify(report),
+                         ("NOT_CERTIFIED_CONTEXT_RELATION_COUNT_CONFLICT", 2))
+
+    def test_missing_accepted_event_object_fails(self):
+        report = self.sample(dangling_relations=17)
+        report["contextAudit"]["acceptedMissingEventObjects"] = 1
+        self.assertEqual(certify(report), ("P0_CANONICAL_HISTORY_BROKEN", 2))
 
     def test_missing_triggers_fail_even_when_data_appears_healthy(self):
         self.assertEqual(certify(self.sample(guards=1)),
@@ -231,6 +272,7 @@ class IndependentE2ECertificationTests(unittest.TestCase):
         self.assertIn("E2E_READONLY_PRIVILEGES_NOT_ENFORCED", text)
         self.assertIn("current_setting('neon.branch_id',true)", text)
         self.assertIn("poraca_e2e_integrity_attestation_v1()", text)
+        self.assertIn("poraca_contextual_relation_evidence_attestation_v1()", text)
         self.assertNotIn("persist_run_funnel", text)
         self.assertNotIn("radar_definitivo.py --mode", text)
 

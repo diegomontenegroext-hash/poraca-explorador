@@ -49,7 +49,8 @@ future AS (
   FROM radar_definitivo.listing_occurrences
   WHERE event_date >= (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
 ),
-attestation AS (SELECT public.poraca_e2e_integrity_attestation_v1() AS a),
+attestation AS (SELECT public.poraca_e2e_integrity_attestation_v1() AS a,
+ public.poraca_contextual_relation_evidence_attestation_v1() AS context_audit),
 -- Positive proof of the approved editorial path, independent of historical P0.
 -- Presence of a receipt alone does not justify admitting any new candidate.
 admission_proof AS (
@@ -262,7 +263,8 @@ ctx AS (
     ap.confirmed_future_with_evidence,ap.confirmed_missing_evidence,
     cc.fetch_rows,cc.circuits_mapped,cc.fetch_without_circuit,
     cc.fetch_unchecked,cc.fetch_errors,cc.yield_eligible_checks,cc.index_only_checks,
-    a.a AS integrity,s.ingest_elevated,s.writer_elevated,
+    a.a AS integrity,a.context_audit AS context_audit,
+    s.ingest_elevated,s.writer_elevated,
     g.baseline_count,g.missing_count,g.missing_ids,k.active_guard,m.lost_count,fc.checked AS full_checked,fc.ok AS full_ok,
     fc.index_only AS full_index_only,fc.other AS full_other,
     lf.run_id AS last_full_run_id,lf.sources_selected AS full_sources_selected,
@@ -325,8 +327,18 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
 (6,'CANONICAL_INTEGRITY',
  CASE WHEN (x.integrity->>'missingAcceptedReceipts')::int=0
  AND (x.integrity->>'orphanedObservationLinks')::int=0
- AND (x.integrity->>'orphanAcceptedEventRelations')::int=0
  AND (x.integrity->>'missingApprovedEventIds')::int=0
+ AND x.context_audit->>'schema'='poraca-context-relations-v1'
+ AND x.context_audit->>'branchId'='br-mute-recipe-b4odj2bl'
+ AND x.context_audit->>'scope'='documented_context_not_publication'
+ AND x.context_audit->>'writesPerformed'='false'
+ AND (x.context_audit->>'contextOnlyAccepted')::int =
+     (x.integrity->>'orphanAcceptedEventRelations')::int
+ AND (x.context_audit->>'contextOnlyEventKeys')::int =
+     (x.integrity->>'missingAcceptedRelationEventIds')::int
+ AND (x.context_audit->>'contextMissingProvenance')::int=0
+ AND (x.context_audit->>'contextUnsupportedPredicate')::int=0
+ AND (x.context_audit->>'acceptedMissingEventObjects')::int=0
  AND (x.integrity->>'protectionTriggers')::int>=2
  AND x.integrity->>'checkpointSurvivalGuard'='true'
  AND x.baseline_count=2 AND x.missing_count=0 AND x.active_guard=1
@@ -334,7 +346,10 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  jsonb_build_object('decision',x.integrity->'decision',
  'missingReceipts',x.integrity->'missingAcceptedReceipts',
  'orphanedObservations',x.integrity->'orphanedObservationLinks',
- 'orphanedAcceptedRelations',x.integrity->'orphanAcceptedEventRelations',
+ 'contextOnlyAcceptedRelations',x.integrity->'orphanAcceptedEventRelations',
+ 'contextOnlyEventKeys',x.integrity->'missingAcceptedRelationEventIds',
+ 'contextEvidenceAudit',x.context_audit,
+ 'legacyV1Decision',x.integrity->'decision',
  'missingApprovedIds',x.integrity->'missingApprovedEventIds',
  'guards',x.integrity->'protectionTriggers',
  'eventKeyImmutableTriggerEnabled',x.active_guard,
@@ -343,8 +358,8 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  'independentHistoricalCanariesExpected',x.baseline_count,
  'independentHistoricalCanariesMissing',x.missing_count,
  'independentHistoricalMissingIds',x.missing_ids),
- 'Sin huerfanos, 3 protecciones activas, 2 canarios y 133 IDs base conservados',
- 'Resolver huérfanos restantes por expediente; nunca falsear canarios ni borrados históricos'),
+ 'Sin enlaces canonicos falsos ni recibos perdidos; hechos contextuales con fuente/revision, tres protecciones y 133 IDs historicos preservados',
+ 'Conservar el contexto antes de publicacion; nunca generar sesiones para cerrar cifras'),
 (7,'DIRECT_RADAR_AND_API_HTTP',
  'NOT_CHECKED',
  jsonb_build_object('databaseEvidence','La corrida no certifica HTTP autenticado','httpApi',x.integrity->'httpApi'),
