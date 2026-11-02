@@ -1,0 +1,92 @@
+{
+  "schema": "poraca-radar-first-party-intake-e2e-v1",
+  "cutDate": "2026-11-02",
+  "run": {
+    "id": "definitivo-20261102T192757Z-f485eb",
+    "mode": "incremental",
+    "status": "complete",
+    "startedAtUtc": "2026-11-02T19:27:57.946Z",
+    "finishedAtUtc": "2026-11-02T19:28:05.699Z",
+    "selected": 3,
+    "checked": 3,
+    "successSources": 2,
+    "indexOnly": 1,
+    "httpRequests": 3,
+    "newCandidates": 2,
+    "newListings": 2,
+    "automaticPublications": 0
+  },
+  "neon": {
+    "projectId": "frosty-union-52906378",
+    "branchId": "br-mute-recipe-b4odj2bl",
+    "db": "neondb",
+    "method": "SELECT readback after authenticated GitHub triggered incremental"
+  },
+  "sources": [
+    {
+      "sourceId": "rd-web-17f06bfe",
+      "scene": "vinos",
+      "url": "https://www.passline.com/eventos/feria-catar-v-edicion",
+      "sourceRole": "first_party_ticketing",
+      "httpStatus": 200,
+      "sourceChecks": 1,
+      "candidateKind": "event_detail",
+      "candidateTitle": "Feria Catar V Edición",
+      "candidateEventDay": "2026-11-27",
+      "candidateTime": "19:00",
+      "candidateVenue": "Paseo Mitre",
+      "candidateReview": "unverified",
+      "rootOriginalOpened": true,
+      "structuredEvent": true,
+      "atomicListingRows": 1,
+      "canonicalMatches": 0,
+      "needs": "Individual editorial authority, organizer/venue identity reconciliation, canonical/API/web readback"
+    },
+    {
+      "sourceId": "rd-web-e60bb2a8",
+      "scene": "literatura",
+      "url": "https://www.nochedelaslibrerias.com.ar/",
+      "sourceRoleNow": "original_cycle",
+      "sourceRoleAtInitialRun": "first_party_organizer",
+      "httpStatus": 200,
+      "sourceChecks": 1,
+      "candidateKind": "cultural_cycle_index",
+      "candidateTitle": "La Noche de las Librerías - La Plata",
+      "candidateEventDay": null,
+      "candidateReview": "unverified",
+      "rootOriginalOpened": true,
+      "atomicListingRows": 1,
+      "legacyUnverifiedRootRows": 1,
+      "canonicalMatches": 0,
+      "needs": "Preserve parent cycle; reconcile organizer and participant venues; dated child sessions ONLY with independent individual detail proof"
+    }
+  ],
+  "regression": {
+    "priorPass": "11/11 Python tests and py_compile",
+    "newCase": "test_12_first_party_organizer_with_atomic_event_remains_dated",
+    "newCaseExecution": "workflow verify_only requested; completion not independently retrieved",
+    "safeSourceCode": "src/radar_original_root_candidate.py + src/radar_definitivo.py",
+    "cycleFix": "suppress_unverified_cycle_root_sessions on explicit original_cycle ROOT before persistence, retaining distinct child URLs",
+    "oldCycleRowPolicy": "Old staging row retains observed_unverified. Do not delete or publish automatically; SQL readback exposes it."
+  },
+  "workflow": {
+    "incrementalTriggerCommit": "bf53b4be4bc803dd23411b7c737e32c086a98b73",
+    "readonlyVerificationCommit": "0c525dc33cb1627ef4ae4e154db420e37bb3aafa",
+    "verificationResult": "NOT_ATTESTED_YET",
+    "noNewCron": true
+  },
+  "publication": {
+    "editorialApproved": false,
+    "canonicalWritten": false,
+    "apiVerified": false,
+    "webVerified": false,
+    "realUserValidation": false
+  },
+  "score": {
+    "iicsBefore": 3.8,
+    "iicsAfter": 3.8,
+    "delta": 0,
+    "why": "No new 50-gate condition fulfilled: source intake demonstrated but no independent four-scene coverage, public editorial end-to-end, or real user outcome."
+  },
+  "readbackSql": "sql/20261102_first_party_intake_e2e_READ_ONLY.sql"
+}
