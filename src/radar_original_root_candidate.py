@@ -44,7 +44,7 @@ def root_review_candidate(source, root, page, http_status, make_candidate):
         "auto_publish": False,
         "auto_accept": False,
     })
-    if source["source_role"] in ("original_cycle", "first_party_organizer"):
+    if source["source_role"] == "original_cycle":
         # A distributed circuit is not one concert at every named bookstore.
         # Even a JSON-LD Event is reviewed as a cycle without a single venue.
         item["kind"] = "cultural_cycle_index"
