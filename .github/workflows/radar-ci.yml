@@ -14,6 +14,9 @@ on:
       - 'src/radar_agenda_adapters.py'
       - 'tests/test_radar_agenda_adapters.py'
       - 'sql/20261101_executive_readiness_gates_READ_ONLY.sql'
+      - 'sql/20261102_generic_field_provenance_v2.sql'
+      - 'sql/20261102_event_provenance_readback_READ_ONLY.sql'
+      - 'tests/test_radar_provenance_contract_v2.py'
       - '.github/workflows/radar-ci.yml'
   workflow_dispatch:
 
