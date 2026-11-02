@@ -856,16 +856,17 @@ def save_source_result(conn,run_id,source,check,candidates):
                      clock_from_original,c["event_time"],
                      json.dumps(c["evidence"]),c["original_url"]))
             source_page=c["evidence"].get("linked_from") or source["url"]
-            edge_key=hashlib.sha256((source["source_id"]+"|"+source_page+"|"+c["original_url"]).encode("utf-8")).hexdigest()
-            cur.execute("""INSERT INTO radar_definitivo.link_edges
-               (edge_key,source_id,from_url,to_url,relation,evidence)
-               VALUES(%s,%s,%s,%s,%s,%s::jsonb)
-               ON CONFLICT(edge_key) DO UPDATE SET last_seen_at=now()""",
-               (edge_key,source["source_id"],source_page,c["original_url"],
-                ("seeded_exact_permalink" if c["evidence"].get("seeded_permalink")
-                 else "original_instagram_permalink" if exact_instagram(c["original_url"])
-                 else "detail"),
-                json.dumps({"runId":run_id,"http":c["evidence"].get("detail_http")})))
+            if source_page != c["original_url"]:
+                edge_key=hashlib.sha256((source["source_id"]+"|"+source_page+"|"+c["original_url"]).encode("utf-8")).hexdigest()
+                cur.execute("""INSERT INTO radar_definitivo.link_edges
+                   (edge_key,source_id,from_url,to_url,relation,evidence)
+                   VALUES(%s,%s,%s,%s,%s,%s::jsonb)
+                   ON CONFLICT(edge_key) DO UPDATE SET last_seen_at=now()""",
+                   (edge_key,source["source_id"],source_page,c["original_url"],
+                    ("seeded_exact_permalink" if c["evidence"].get("seeded_permalink")
+                     else "original_instagram_permalink" if exact_instagram(c["original_url"])
+                     else "detail"),
+                    json.dumps({"runId":run_id,"http":c["evidence"].get("detail_http")})))
             image_url=c["evidence"].get("og_image_url")
             if image_url:
                 media_key=hashlib.sha256((c["candidate_key"]+"|"+image_url).encode()).hexdigest()
