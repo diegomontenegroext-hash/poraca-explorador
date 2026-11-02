@@ -112,7 +112,9 @@
         "date": "2026-11-27",
         "time": "19:00",
         "venue": "Paseo Mitre, Gorina, La Plata",
-        "status": "UNVERIFIED_FOR_PORACA"
+        "status": "UNVERIFIED_FOR_PORACA",
+        "locality": "Gorina",
+        "localityProof": "Primary ticketing confirms Paseo Mitre, 485 y 138, Gorina, La Plata"
       },
       "targets": [
         {
