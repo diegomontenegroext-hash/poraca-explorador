@@ -57,3 +57,9 @@ trigger_reason=confirm_limited_login_after_workflow_cutover
 verification_id=20261102-first-party-cycle-12-tests-after-incremental-01
 expected_result=QA_PASS_SCOPE_LIMITED_NO_INGEST
 trigger_reason=verify_guard_for_multivenue_parent_without_synthetic_listing
+
+# 02/11: 11/11 Radar incremental COMPLETE; 17 historical accepted orphan edges quarantined to proposal, source preserved.
+# Requires canonical survival, receipts, zero accepted-orphan relations and active relation guard; read-only E2E.
+verification_id=20261102-post-quarantine-accepted-orphan-guard-no-ingest-01
+expected_result=DATA_INTEGRITY_PASS_EDITORIAL_CONTINUITY_PENDING_HTTP_SSO_NOT_VERIFIED
+trigger_reason=certify_data_integrity_after_user_authorized_safe_quarantine
