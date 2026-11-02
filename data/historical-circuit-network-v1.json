@@ -194,13 +194,6 @@
           "name": "Terruño Vinoteca",
           "role": "co_organizer_historic",
           "locality": "Berisso"
-        },
-        {
-          "id": "casa-dionisio",
-          "name": "Casa Dionisio",
-          "role": "co_organizer_historic",
-          "url": "https://www.casadionisio.com.ar/",
-          "locality": "La Plata"
         }
       ],
       "networkRelationNote": "The four named members are evidenced for the 2025 edition. The 2026 4V original page does not individually name them; do not assume unchanged membership."
@@ -259,13 +252,6 @@
           "id": "don-santiago",
           "name": "Don Santiago",
           "role": "historical_participant",
-          "locality": "La Plata"
-        },
-        {
-          "id": "casa-dionisio",
-          "name": "Casa Dionisio",
-          "role": "historical_participant",
-          "url": "https://www.casadionisio.com.ar/",
           "locality": "La Plata"
         }
       ],
