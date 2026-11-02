@@ -256,6 +256,30 @@
         }
       ],
       "networkRelationNote": "Participants only, not necessarily organizers or currently active event publishers; do not auto-monitor all."
+    },
+    {
+      "circuit": "vinos",
+      "sourceAnchor": null,
+      "date": "2026-11-13",
+      "kind": "upcoming_directory",
+      "title": "La Noche de las Vinotecas — edición federal 2026",
+      "url": "https://lanochedelasvinotecas.com.ar/",
+      "dateEvidenceUrl": "https://enolife.com.ar/es/el-13-11-26-600-vinotecas-bares-y-restaurantes-festejan-con-musica-descuentos-y-sorteos/",
+      "directoryScope": "AR_nationwide",
+      "dateConflict": "Una crónica histórica del circuito de La Plata menciona 14/11; agenda federal de la edición 2026 confirma viernes 13/11. Nunca inferir una función local desde la fecha nacional.",
+      "localParticipantVerified": false,
+      "originalParticipantDirectory": "https://lanochedelasvinotecas.com.ar/",
+      "requiredLocalCheck": "Verificar en el mapa del organizador participantes de La Plata/Gonnet/City Bell/Berisso/Ensenada, direcciones, cada actividad y su evidencia propia.",
+      "targets": [
+        {
+          "id": "cava-national",
+          "name": "Cámara Argentina de Vinotecas y Afines",
+          "role": "national_directory_organizer",
+          "locality": "nationwide",
+          "url": "https://lanochedelasvinotecas.com.ar/"
+        }
+      ],
+      "publicationApproved": false
     }
   ],
   "researchUpdated": "2026-11-02"
