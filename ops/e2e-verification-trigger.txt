@@ -37,3 +37,8 @@ trigger_reason=manual_end_to_end_checkpoint_without_writes
 # Only QA suite and read-only attestation. Does not run Radar or write Neon.
 verification_id=20261101-eldia-section-source-target-regression
 trigger_reason=validate_stable_espectaculos_section_against_recent_actual_agenda
+
+# Confirm merged context audit on actual operational Neon, no ingestion or writes.
+verification_id=20261101-context-separated-integrity-v2-readonly
+expected_result=DATA_INTEGRITY_PASS_HTTP_AND_SSO_NOT_VERIFIED
+trigger_reason=verify_canonical_integrity_after_context_contract_merged
