@@ -16,13 +16,19 @@ last_full AS (
   ORDER BY finished_at DESC LIMIT 1
 ),
 full_checks AS (
-  SELECT count(*)::int AS checked,
-   count(*) FILTER(WHERE status='ok')::int AS ok,
-   count(*) FILTER(WHERE status='index_only')::int AS index_only,
-   count(*) FILTER(WHERE status NOT IN ('ok','index_only')
-       OR coalesce(error_type,'')<>'' OR http_status NOT BETWEEN 200 AND 299)::int AS other
-  FROM radar_definitivo.source_checks
-  WHERE run_id=(SELECT run_id FROM last_full)
+  -- Only fetch mode counts toward acquisition health. discover_only seeds are
+  -- extra scheduled probes: not event-yield sources and not a transport failure.
+  SELECT count(*) FILTER(WHERE s.monitoring_mode='fetch')::int AS checked,
+   count(*) FILTER(WHERE s.monitoring_mode='fetch' AND sc.status='ok')::int AS ok,
+   count(*) FILTER(WHERE s.monitoring_mode='fetch' AND sc.status='index_only')::int AS index_only,
+   count(*) FILTER(WHERE s.monitoring_mode='fetch' AND
+     (sc.status NOT IN ('ok','index_only') OR coalesce(sc.error_type,'')<>''
+      OR sc.http_status NOT BETWEEN 200 AND 299))::int AS other,
+   count(*) FILTER(WHERE s.monitoring_mode='discover_only'
+     AND sc.status='ok' AND sc.http_status BETWEEN 200 AND 299)::int AS supplemental
+  FROM radar_definitivo.source_checks sc
+  LEFT JOIN radar_definitivo.sources s ON s.source_id=sc.source_id
+  WHERE sc.run_id=(SELECT run_id FROM last_full)
 ),
 checks AS (
   SELECT count(*)::int AS checked,
@@ -281,6 +287,7 @@ ctx AS (
     s.ingest_elevated,s.writer_elevated,s.limited_scope_verified,
     g.baseline_count,g.missing_count,g.missing_ids,k.active_guard,m.lost_count,fc.checked AS full_checked,fc.ok AS full_ok,
     fc.index_only AS full_index_only,fc.other AS full_other,
+    fc.supplemental AS full_supplemental,
     lf.run_id AS last_full_run_id,lf.sources_selected AS full_sources_selected,
     lf.sources_checked AS full_sources_checked,lf.finished_at AS full_finished_at
  FROM latest l CROSS JOIN checks c CROSS JOIN inventory i CROSS JOIN future f
@@ -303,7 +310,8 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
 (3,'SOURCE_FETCH_HEALTH',
  -- Only source transport and check completeness; yield is separate gate 9.
  CASE WHEN x.full_sources_selected>0
-        AND x.full_checked=x.full_sources_selected
+        AND x.full_checked=x.fetch_enabled
+        AND x.full_checked+x.full_supplemental=x.full_sources_selected
         AND x.full_sources_checked=x.full_sources_selected
         AND x.full_other=0 THEN 'PASS'
       WHEN x.full_checked=0 THEN 'FAIL'
@@ -312,7 +320,8 @@ FROM ctx x CROSS JOIN LATERAL (VALUES
  'lastFullRunId',x.last_full_run_id,'lastFullAt',x.full_finished_at,
  'lastFullSelected',x.full_sources_selected,'lastFullCheckRows',x.full_checked,
  'lastFullOk',x.full_ok,'lastFullIndexOnly',x.full_index_only,
- 'lastFullOther',x.full_other,'fetchEnabled',x.fetch_enabled,
+ 'lastFullOther',x.full_other,'lastFullSupplemental',x.full_supplemental,
+ 'fetchEnabled',x.fetch_enabled,
  'discoverOnly',x.discover_only,'reviewOnly',x.review_only),
  'Todas las fuentes seleccionadas revisadas sin errores HTTP/operativos; index_only no prueba produccion de eventos',
  'El rendimiento por circuito sigue en COVERAGE_BY_CIRCUIT y nunca se infiere de HTTP 200'),
