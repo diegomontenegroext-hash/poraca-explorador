@@ -102,8 +102,16 @@ def plan(rows,limit=12,historical_evidence=(),today=None):
         for record in historical_evidence:
             if record.get("kind")!="upcoming_original":
                 continue
+            # A future research lead must have a complete and exact original,
+            # not merely a link or a date from an unrelated press article.
+            link=urlsplit(record.get("url") or "")
+            ev=record.get("event") or {}
+            if (link.scheme!="https" or not link.hostname
+                    or ev.get("date")!=record.get("date")
+                    or not ev.get("time") or not ev.get("venue")):
+                continue
             if not any(t.get("locality") in LOCAL_CIRCUIT_AREAS
-                       for t in record.get("targets",[])):
+                       for t in record.get("targets",[]) if isinstance(t,dict)):
                 continue
             try:
                 if date.fromisoformat(record["date"])>=today:
@@ -136,6 +144,13 @@ def plan(rows,limit=12,historical_evidence=(),today=None):
             aggregate["yieldIds"].add(source_id)
         else:
             aggregate["zeroYieldIds"].add(source_id)
+    # A verified future original discovered through historical research
+    # reveals a coverage hole even if the circuit has NO fetch source at all.
+    # Do not register it as a source, observation or approved event.
+    for circuit in future_circuits:
+        if circuit:
+            circuit_rows.setdefault(circuit,{"fetchIds":set(),
+                "yieldIds":set(),"zeroYieldIds":set()})
     circuit_resilience=[]
     for circuit,counts in circuit_rows.items():
         reported=len(counts["yieldIds"])
@@ -145,6 +160,7 @@ def plan(rows,limit=12,historical_evidence=(),today=None):
         circuit_resilience.append({
             "circuit":circuit,
             "fetchSources":len(counts["fetchIds"]),
+            "futureOriginalResearchHint":circuit in future_circuits,
             "reportedDatedYieldSources7d":reported,
             "fetchSourcesWithoutReportedDatedYield7d":len(
                 counts["fetchIds"]-counts["yieldIds"]),
