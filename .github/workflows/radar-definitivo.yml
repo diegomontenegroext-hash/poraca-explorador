@@ -21,6 +21,14 @@ on:
           - incremental
           - full
           - verify_only
+      credential_probe:
+        description: "Manual verify_only: current / limited (secret separado, nunca ingesta)"
+        required: false
+        type: choice
+        default: current
+        options:
+          - current
+          - limited
 
 permissions:
   contents: read
@@ -120,6 +128,26 @@ jobs:
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_OPERATIONAL_DATABASE_URL }}
         run: python3 src/radar_integrity_verify.py
+      # Only an explicit manual verify_only with credential_probe=limited uses
+      # the new GitHub secret; FULL/incremental always use the original secret.
+      - name: Validar credencial nueva sin cambiar Radar ni publicar
+        id: limited_qa
+        if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.mode == 'verify_only' && inputs.credential_probe == 'limited' && steps.qa.outcome == 'success' }}
+        env:
+          NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_LIMITED_DATABASE_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${NEON_RADAR_OPERATIONAL_DATABASE_URL:-}" ]]; then
+            echo "::error::NEON_RADAR_LIMITED_DATABASE_URL missing. Existing Radar secret unchanged."
+            exit 1
+          fi
+          # Both probes enforce database, branch, scope, canonic DML denial.
+          python3 src/radar_direct_feed_verify.py
+          python3 src/radar_integrity_verify.py
+          python3 src/radar_executive_gates.py
+          echo "LIMITED_CREDENTIAL_VERIFY_ONLY_PASS; no Radar ingestion; no secret cutover."
+
       - name: Medir puertas ejecutivas en lectura, sin publicar
         id: ejecutivo
         if: always() && steps.qa.outcome == 'success' && (steps.ingesta.outcome == 'success' || steps.alcance.outputs.mode == 'verify_only')
