@@ -16,6 +16,37 @@ from urllib.parse import urlsplit
 LOCAL_CIRCUIT_AREAS={"La Plata","Gorina","Gonnet","City Bell","Berisso",
                      "Ensenada","Tolosa","Los Hornos","Abasto"}
 
+def is_local_future_original(record,today):
+    """A local ORGANIZER is not proof of a local EVENT.
+
+    Requires the exact source's future date/time/venue plus an explicit,
+    independently checked locality for the EVENT itself.
+    """
+    if not isinstance(record,dict) or not isinstance(today,date):
+        return False
+    if record.get("kind")!="upcoming_original":
+        return False
+    url=record.get("url")
+    if not isinstance(url,str):
+        return False
+    parsed=urlsplit(url)
+    if parsed.scheme!="https" or not parsed.hostname or parsed.username or parsed.password:
+        return False
+    ev=record.get("event")
+    if not isinstance(ev,dict) or ev.get("locality") not in LOCAL_CIRCUIT_AREAS:
+        return False
+    if (not ev.get("time") or not ev.get("venue")
+            or ev.get("date")!=record.get("date")):
+        return False
+    try:
+        if date.fromisoformat(record["date"])<today:
+            return False
+    except (TypeError,ValueError,KeyError):
+        return False
+    return any(isinstance(t,dict) and t.get("locality") in LOCAL_CIRCUIT_AREAS
+               for t in record.get("targets",[]))
+
+
 def reconstruct_historical_network(evidence,circuit,today,limit=10):
     """Follow old named participants to new local channels, never to publication."""
     if not isinstance(today,date):
@@ -35,7 +66,7 @@ def reconstruct_historical_network(evidence,circuit,today,limit=10):
         kind=record.get("kind")
         if kind not in ("historical","historical_secondary","upcoming_original"):
             continue
-        is_future=kind=="upcoming_original" and day>=today
+        is_future=is_local_future_original(record,today)
         for target in record.get("targets",[])[:30]:
             if not isinstance(target,dict) or not target.get("id") or not target.get("name"):
                 continue
@@ -50,7 +81,7 @@ def reconstruct_historical_network(evidence,circuit,today,limit=10):
                 "locality":target.get("locality"),"historicalProofUrls":[],
                 "upcomingOriginals":[],"autoRegistered":False,
                 "publicationApproved":False})
-            if not is_future and original not in item["historicalProofUrls"]:
+            if (kind in ("historical","historical_secondary") or day<today) and original not in item["historicalProofUrls"]:
                 item["historicalProofUrls"].append(original)
             if is_future and not any(x["url"]==original for x in item["upcomingOriginals"]):
                 ev=record.get("event") or {}
@@ -150,24 +181,8 @@ def plan(rows,limit=12,historical_evidence=(),today=None):
     future_circuits=set()
     if today is not None:
         for record in historical_evidence:
-            if record.get("kind")!="upcoming_original":
-                continue
-            # A future research lead must have a complete and exact original,
-            # not merely a link or a date from an unrelated press article.
-            link=urlsplit(record.get("url") or "")
-            ev=record.get("event") or {}
-            if (link.scheme!="https" or not link.hostname
-                    or ev.get("date")!=record.get("date")
-                    or not ev.get("time") or not ev.get("venue")):
-                continue
-            if not any(t.get("locality") in LOCAL_CIRCUIT_AREAS
-                       for t in record.get("targets",[]) if isinstance(t,dict)):
-                continue
-            try:
-                if date.fromisoformat(record["date"])>=today:
-                    future_circuits.add(str(record.get("circuit") or ""))
-            except (TypeError,ValueError,KeyError):
-                continue
+            if is_local_future_original(record,today):
+                future_circuits.add(str(record.get("circuit") or ""))
     failing.sort(key=lambda x:(
         0 if x.get("circuit") in future_circuits and
              x.get("circuit") not in productive_circuits else 1,
