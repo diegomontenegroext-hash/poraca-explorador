@@ -147,4 +147,54 @@ class SourceRecoveryTests(unittest.TestCase):
         self.assertEqual(out["sourcesNeedingRecovery"],21)
         self.assertFalse(out["actions"][0]["selfHealConfirmed"])
 
+
+    def test_circuit_yield_resilience_has_zero_for_unproductive_wine(self):
+        data=[
+            src("wine-home","Dionisio","vinos",diagnosis="REPEATED_INDEX_ONLY",observed=0),
+            src("yoga-one","Yoga directo","yoga",observed=3),
+            src("ig-wine","IG sin extracción","vinos",mode="discover_only",observed=80)
+        ]
+        out=plan(data)
+        by_circuit={r["circuit"]:r for r in out["circuitResilience"]}
+        self.assertEqual(by_circuit["vinos"]["fetchSources"],1)
+        self.assertEqual(by_circuit["vinos"]["reportedDatedYieldSources7d"],0)
+        self.assertEqual(by_circuit["vinos"]["sourceResilienceGate"],
+                         "NO_REPORTED_DATED_YIELD")
+        self.assertEqual(by_circuit["yoga"]["sourceResilienceGate"],
+                         "SINGLE_REPORTED_YIELD_CHANNEL")
+        self.assertEqual(out["circuitsWithoutReportedDatedYield"],1)
+        self.assertEqual(out["circuitsWithOneReportedYieldChannel"],1)
+        self.assertFalse(by_circuit["vinos"]["resilienceCertified"])
+
+    def test_multiple_source_yields_never_certify_independent_organizers(self):
+        out=plan([src("a","Agenda 1","musica",observed=7),
+                  src("b","Agenda 2","musica",observed=15)])
+        metric=out["circuitResilience"][0]
+        self.assertEqual(metric["reportedDatedYieldSources7d"],2)
+        self.assertEqual(metric["sourceResilienceGate"],
+                         "MULTIPLE_REPORTED_YIELD_CHANNELS_NOT_CERTIFIED")
+        self.assertFalse(metric["independentOrganizerVerified"])
+        self.assertFalse(metric["resilienceCertified"])
+        self.assertEqual(out["confirmedReplacements"],0)
+        self.assertEqual(out["resilienceCertification"],
+                         "NOT_CERTIFIED_REQUIRES_INDEPENDENT_ORIGINALS")
+
+    def test_reporting_deduplicates_source_ids_not_runs(self):
+        out=plan([src("same","Repeated","talleres",observed=3),
+                  src("same","Repeated","talleres",observed=6),
+                  src("empty","Institution","talleres",
+                      diagnosis="REPEATED_INDEX_ONLY",observed=0)])
+        metric=out["circuitResilience"][0]
+        self.assertEqual(metric["fetchSources"],2)
+        self.assertEqual(metric["reportedDatedYieldSources7d"],1)
+        self.assertEqual(metric["fetchSourcesWithoutReportedDatedYield7d"],1)
+        self.assertEqual(out["circuitsWithOneReportedYieldChannel"],1)
+
+    def test_no_fetch_sources_do_not_create_false_coverage(self):
+        out=plan([src("seed","Direct permalink","vinos",
+                      mode="discover_only",observed=10),
+                  src("review","Secondary","vinos",mode="review",observed=20)])
+        self.assertEqual(out["circuitResilience"],[])
+        self.assertEqual(out["circuitsWithoutReportedDatedYield"],0)
+
 if __name__=="__main__":unittest.main()
