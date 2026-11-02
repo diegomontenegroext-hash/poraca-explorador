@@ -98,6 +98,17 @@ class Budget:
         if MIN_SOURCE_DELAY_SECONDS:
             time.sleep(MIN_SOURCE_DELAY_SECONDS)
         status, body, error = fetch(url)
+        # A bounded, general resilience rule for temporary server faults.
+        # No retries for 429 (cooldown), Instagram, denied content, or
+        # exhausted request/time/host budgets. Each retry counts as a request.
+        if (status in (500, 502, 503, 504) and error == "HTTP_ERROR"
+                and not exact_instagram(url) and self.remaining() > 15
+                and self.can_fetch(url)):
+            time.sleep(1.0)
+            if self.remaining() > 12 and self.can_fetch(url):
+                self.total += 1
+                self.by_host[host] += 1
+                status, body, error = fetch(url)
         if status == 429:
             self.blocked_hosts.add(host)
         return status, body, error
