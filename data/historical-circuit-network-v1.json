@@ -137,6 +137,50 @@
         }
       ],
       "networkExpansionFrom": "regional_wine_circuit_independent_of_dionisio"
+    },
+    {
+      "circuit": "vinos",
+      "sourceAnchor": "rd-web-56c74fce",
+      "date": "2025-10-17",
+      "kind": "historical_secondary",
+      "title": "Sunset Wine Mixology — cuatro vinotecas organizadoras",
+      "url": "https://www.0221.com.ar/que-hago/la-sunset-wine-mixology-vuelve-la-plata-mas-40-bodegas-una-degustacion-lujo-n116918",
+      "targets": [
+        {
+          "id": "golden-wine-lp",
+          "name": "Golden Wine",
+          "role": "co_organizer",
+          "locality": "La Plata"
+        },
+        {
+          "id": "villa-wine-lp",
+          "name": "Villa Wine",
+          "role": "co_organizer",
+          "locality": "La Plata"
+        },
+        {
+          "id": "terruno-vinoteca-lp",
+          "name": "Terruño (vinoteca integrante de 4V)",
+          "role": "co_organizer",
+          "locality": "La Plata"
+        }
+      ]
+    },
+    {
+      "circuit": "vinos",
+      "sourceAnchor": null,
+      "date": "2026-09-11",
+      "kind": "historical_secondary",
+      "title": "Bunker La Plata — cursos de cata octubre 2026",
+      "url": "https://www.restaurants10.com/AR/La-Plata/100503944764096/Bunker-La-Plata",
+      "targets": [
+        {
+          "id": "bunker-lp",
+          "name": "Bunker La Plata",
+          "role": "wine_course_venue",
+          "locality": "La Plata"
+        }
+      ]
     }
   ]
 }
