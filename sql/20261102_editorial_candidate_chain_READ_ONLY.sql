@@ -12,7 +12,7 @@ WITH packet AS (
 ), proof AS (
  SELECT
   count(*)::int AS exact_original_observations,
-  count(DISTINCT s.source_id)::int AS independent_source_ids,
+  count(DISTINCT s.source_id)::int AS distinct_catalog_source_ids,
   count(*) FILTER(WHERE l.evidence_tier IN
     ('primary_venue','primary_ticket_listing','primary_program_ics','primary_structured_page')
     AND l.review_state='observed_unverified')::int AS structured_primary_observations,
@@ -29,8 +29,6 @@ WITH packet AS (
  FROM packet p JOIN radar_definitivo.listing_occurrences l
   ON l.event_date=p.event_day AND l.event_time=p.event_time
   AND lower(btrim(l.title))=lower(btrim(p.title))
-  AND (lower(btrim(l.venue))=lower(btrim(p.venue))
-       OR l.proof_url=p.original_url)
 ), canon AS (
  SELECT count(*)::int AS canonical_collision_count
  FROM packet p JOIN public.radar_agenda_events e
@@ -61,7 +59,7 @@ WITH packet AS (
  CROSS JOIN canon v CROSS JOIN host h CROSS JOIN receipts r
 )
 SELECT a.title,a.event_day,a.event_time,a.venue,a.original_url,a.proposed_host_id,
- a.exact_original_observations,a.independent_source_ids,
+ a.exact_original_observations,a.distinct_catalog_source_ids,
  a.structured_primary_observations,a.raw_similar_observations,
  a.first_seen,a.last_seen,a.canonical_collision_count,
  (SELECT approved_host_count FROM host) AS approved_host_count,
