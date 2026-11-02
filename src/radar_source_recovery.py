@@ -6,12 +6,69 @@ replaced a disappeared original or reflects the same venue/organizer.
 No network, writes, ranking changes, or automated publication.
 """
 from __future__ import annotations
+from datetime import date
+from urllib.parse import urlsplit
+
+
+def reconstruct_historical_network(evidence,circuit,today,limit=10):
+    """Follow old named participants to new local channels, never to publication."""
+    if not isinstance(today,date):
+        raise ValueError("Local date required")
+    found={}
+    for record in list(evidence)[:300]:
+        if not isinstance(record,dict) or record.get("circuit")!=circuit:
+            continue
+        original=record.get("url") or ""
+        parsed=urlsplit(original)
+        if parsed.scheme!="https" or not parsed.hostname:
+            continue
+        try:
+            day=date.fromisoformat(record["date"])
+        except (ValueError,TypeError,KeyError):
+            continue
+        kind=record.get("kind")
+        if kind not in ("historical","historical_secondary","upcoming_original"):
+            continue
+        is_future=kind=="upcoming_original" and day>=today
+        for target in record.get("targets",[])[:30]:
+            if not isinstance(target,dict) or not target.get("id") or not target.get("name"):
+                continue
+            profile=target.get("url")
+            if profile and (urlsplit(profile).scheme!="https" or not urlsplit(profile).hostname):
+                continue
+            key=str(target["id"])
+            item=found.setdefault(key,{
+                "targetId":key,"name":target["name"],
+                "relationshipRole":target.get("role"),"channelUrl":profile,
+                "locality":target.get("locality"),"historicalProofUrls":[],
+                "upcomingOriginals":[],"autoRegistered":False,
+                "publicationApproved":False})
+            if not is_future and original not in item["historicalProofUrls"]:
+                item["historicalProofUrls"].append(original)
+            if is_future and not any(x["url"]==original for x in item["upcomingOriginals"]):
+                ev=record.get("event") or {}
+                if ev.get("date")==record["date"] and ev.get("time") and ev.get("venue"):
+                    item["upcomingOriginals"].append({
+                        "title":record.get("title"),"date":record["date"],
+                        "time":ev["time"],"venue":ev["venue"],"url":original,
+                        "status":"UNVERIFIED_FOR_PORACA"})
+    for item in found.values():
+        local=item["locality"] in ("La Plata","Gorina")
+        item["reviewPriority"]=(
+            "VERIFY_UPCOMING_ORIGINAL" if local and item["upcomingOriginals"] else
+            "FIND_CURRENT_LOCAL_PROGRAM" if local else
+            "RELATED_PARTNER_NOT_LOCAL_FEED")
+    return sorted(found.values(),key=lambda x:(
+        {"VERIFY_UPCOMING_ORIGINAL":0,"FIND_CURRENT_LOCAL_PROGRAM":1,
+         "RELATED_PARTNER_NOT_LOCAL_FEED":2}[x["reviewPriority"]],
+        -len(x["historicalProofUrls"]),x["targetId"]))[:max(0,min(limit,30))]
+
 
 TRIGGERS={"RECENT_YIELD_DROP","SUCCESSFUL_FETCH_ZERO_DATED_SESSIONS",
           "REPEATED_INDEX_ONLY"}
 
 
-def plan(rows,limit=12):
+def plan(rows,limit=12,historical_evidence=(),today=None):
     # rows are from radar_source_learning.classify, not merely DB inventory
     records=[dict(x) for x in rows]
     productive=[x for x in records if
@@ -44,6 +101,8 @@ def plan(rows,limit=12):
             "requiredRecoveryTest":"REOPEN_REAL_SOURCE_THEN_VALIDATE_EXACT_ORIGINAL",
             "recommendation":("TEST_ALTERNATE_CHANNELS_WITHIN_CIRCUIT"
                               if suggestions else "DISCOVER_NEW_VERIFIABLE_CHANNEL"),
+            "historicalNetworkCandidates":reconstruct_historical_network(
+                historical_evidence,circuit,today) if today is not None else [],
             "selfHealConfirmed":False,"sourceDisabled":False
         })
     return {"schema":"poraca-source-recovery-plan-v1",
