@@ -65,9 +65,18 @@ def reconstruct_historical_network(evidence,circuit,today,limit=10):
             "VERIFY_UPCOMING_ORIGINAL" if local and item["upcomingOriginals"] else
             "FIND_CURRENT_LOCAL_PROGRAM" if local else
             "RELATED_PARTNER_NOT_LOCAL_FEED")
+    def role_priority(item):
+        role=str(item.get("relationshipRole") or "").lower()
+        # Event organizers control future notices more often than participants.
+        # This is only an investigation order, never a source reliability claim.
+        if "organizer" in role:return 0
+        if "host" in role or "venue" in role:return 1
+        if "participant" in role:return 2
+        return 3
     return sorted(found.values(),key=lambda x:(
         {"VERIFY_UPCOMING_ORIGINAL":0,"FIND_CURRENT_LOCAL_PROGRAM":1,
          "RELATED_PARTNER_NOT_LOCAL_FEED":2}[x["reviewPriority"]],
+        role_priority(x),
         -len(x["historicalProofUrls"]),x["targetId"]))[:max(0,min(limit,30))]
 
 

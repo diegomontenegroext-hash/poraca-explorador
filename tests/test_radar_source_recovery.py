@@ -96,6 +96,13 @@ class SourceRecoveryTests(unittest.TestCase):
         self.assertNotIn("terruno-vinoteca",by_id)
         self.assertIn("golden-wine-lp",by_id)
         self.assertEqual(len(by_id),17)
+        # The standard bounded report must show the actual past co-organizers,
+        # not only arbitrary alphabetically earlier wine shops.
+        top=reconstruct_historical_network(data["evidence"],"vinos",date(2026,11,2))
+        self.assertEqual(top[0]["targetId"],"acsba")
+        self.assertTrue({"camara-platense-vinotecas","golden-wine-lp",
+                         "villa-wine-lp","terruno-vinoteca-lp"}.issubset(
+                            {item["targetId"] for item in top}))
         self.assertTrue(all(not x["autoRegistered"] and not x["publicationApproved"]
                             for x in items))
 
