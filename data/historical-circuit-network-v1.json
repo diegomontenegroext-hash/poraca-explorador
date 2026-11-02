@@ -282,6 +282,37 @@
         }
       ],
       "publicationApproved": false
+    },
+    {
+      "circuit": "literatura",
+      "sourceAnchor": null,
+      "date": "2026-11-06",
+      "kind": "upcoming_directory",
+      "title": "Noche de las Librerías Independientes de La Plata — circuito colaborativo 2026",
+      "url": "https://www.nochedelaslibrerias.com.ar/",
+      "dateEvidenceUrl": "https://www.0221.com.ar/la-plata/el-cronograma-completo-la-noche-las-librerias-platenses-lecturas-talleres-y-espectaculos-n136514/amp",
+      "directoryScope": "regional_unverified",
+      "localParticipantVerified": false,
+      "localEventDetected": false,
+      "originalParticipantDirectory": "https://www.nochedelaslibrerias.com.ar/",
+      "scheduleType": "multi_venue_multi_activity",
+      "assertedEditionDate": "2026-11-06",
+      "publishedWindow": "17:00-23:00",
+      "participationCountDiscrepancy": "Official directory currently displays 21 shops; organizer interview dated 21 Oct identifies 23 at that point; some news reports say roughly 30. Do not select one as global verified headcount.",
+      "requiresVenueLevelEvidence": true,
+      "requiresSessionLevelEvidence": true,
+      "requiredLocalCheck": "For each venue confirm original role, locality, opening hours and named activities independently. A directory entry with zero programmed activities is NOT a dated session. Multi-venue circuit must not be published as 21-30 separate sessions without proof.",
+      "targets": [
+        {
+          "id": "librerias-independientes-lp",
+          "name": "Red de Librerías Independientes de La Plata",
+          "role": "collective_organizer",
+          "locality": "La Plata",
+          "url": "https://www.nochedelaslibrerias.com.ar/"
+        }
+      ],
+      "publicationApproved": false,
+      "autoRegistered": false
     }
   ],
   "researchUpdated": "2026-11-02"
