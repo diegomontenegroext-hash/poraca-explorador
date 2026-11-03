@@ -55,6 +55,17 @@ ranked AS (
 SELECT event_date,event_time,title,venue,proof_url,proof_method,evidence_tier,
        source_name,monitors,raw_observations,different_proofs,venue_variants,
        CASE
+          -- Different clock on the same original: prevent doors/show dupes.
+          WHEN EXISTS(SELECT 1 FROM public.radar_v3_source_observations o
+            WHERE o.observed_date=ranked.event_date
+              AND o.source_event_url=ranked.proof_url
+              AND public.poraca_fact_key_v1(o.observed_title)=
+                  public.poraca_fact_key_v1(ranked.title)
+              AND left(coalesce(o.observed_time,''),5)<>ranked.event_time)
+            THEN 'HOLD_EXISTING_OBSERVATION_OTHER_TIME'
+          -- Accessory ticket/upgrade cannot create an independent show.
+          WHEN ranked.title ~* '^[[:space:]]*(meet[[:space:]]*(&|and|y)[[:space:]]*greet|upgrade[[:space:]]|entrada[[:space:]]+adicional)'
+            THEN 'HOLD_ACCESSORY_TICKET_NOT_SEPARATE_EVENT'
           WHEN venue_variants>1 THEN 'HOLD_VENUE_IDENTITY_VARIANTS'
           WHEN different_proofs>1 THEN 'REVIEW_MULTIPLE_PROOF_URLS'
           ELSE 'REVIEW_ORIGINAL_EVENT'
@@ -93,6 +104,8 @@ ORDER BY event_date,event_time,title LIMIT 300
 
 def summarize(rows):
     seen={"HOLD_VENUE_IDENTITY_VARIANTS":0,
+          "HOLD_EXISTING_OBSERVATION_OTHER_TIME":0,
+          "HOLD_ACCESSORY_TICKET_NOT_SEPARATE_EVENT":0,
           "REVIEW_MULTIPLE_PROOF_URLS":0,"REVIEW_ORIGINAL_EVENT":0}
     handoff={"groupsWithProbe":0,"withEditorialObservation":0,
              "missingEditorialObservation":0,"priorEditorialHolds":0,

@@ -96,6 +96,25 @@ class EditorialPreviewTests(unittest.TestCase):
         self.assertFalse(out["sample"][0]["canonWriteApproved"])
         self.assertFalse(out["sample"][0]["publicationApproved"])
 
+    def test_10_readonly_report_prioritizes_existing_clock_and_addon(self):
+        self.assertIn("HOLD_EXISTING_OBSERVATION_OTHER_TIME", SQL)
+        self.assertIn("HOLD_ACCESSORY_TICKET_NOT_SEPARATE_EVENT", SQL)
+        self.assertIn("o.source_event_url=ranked.proof_url", SQL)
+        self.assertIn("left(coalesce(o.observed_time,''),5)<>ranked.event_time", SQL)
+        self.assertIn("meet[[:space:]]*(&|and|y)[[:space:]]*greet", SQL)
+        out=summarize([
+            item(gate="HOLD_EXISTING_OBSERVATION_OTHER_TIME")+(False,False,False),
+            item(gate="HOLD_ACCESSORY_TICKET_NOT_SEPARATE_EVENT")+(False,False,False),
+            item(gate="REVIEW_ORIGINAL_EVENT")+(False,False,False),
+        ])
+        self.assertEqual(out["reviewGroups"],3)
+        self.assertEqual(out["gates"]["HOLD_EXISTING_OBSERVATION_OTHER_TIME"],1)
+        self.assertEqual(out["gates"]["HOLD_ACCESSORY_TICKET_NOT_SEPARATE_EVENT"],1)
+        self.assertEqual(out["gates"]["REVIEW_ORIGINAL_EVENT"],1)
+        self.assertEqual(out["editorialObservationsWritten"],0)
+        self.assertFalse(out["canonWriteApproved"])
+        self.assertFalse(out["publicationApproved"])
+
     def test_07_unfamiliar_status_is_rejected(self):
         with self.assertRaises(ValueError):
             summarize([item(gate="APPROVED")])
