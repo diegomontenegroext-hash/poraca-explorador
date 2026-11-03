@@ -70,7 +70,7 @@ def discover_sections(base_url, links, limit=3):
 
 
 # Signals describe an event article, not a specific publisher's URL structure.
-ORIGINAL_POST_HINTS={"concierto","obra","funcion","funciones","recital",
+ORIGINAL_POST_HINTS={"concierto","obra","funcion","funciones","recital","feria",
                      "estreno","presentacion","charla","conferencia",
                      "espectaculo","festival","seminario","proyeccion",
                      "exposicion","muestra","taller","ciclo","encuentro"}
