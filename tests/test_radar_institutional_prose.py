@@ -103,6 +103,52 @@ class OfficialInstitutionReviewTests(unittest.TestCase):
                 article().replace('<article>','<main>').replace('</article>','</main>'),
                 URL,source_role="institutional_program"),[])
 
+    def test_institution_homepage_reaches_exact_article_without_site_parser(self):
+        import radar_definitivo as radar
+        root=ROOT
+        official=URL
+        other=root+"muestra-oktubre-eterno-retorno/"
+        home=('<a href="/feria-de-editoriales-noctambula/">'
+              'Feria de editoriales Noctámbula</a>'
+              '<a href="/muestra-oktubre-eterno-retorno/">Muestra Oktubre</a>'
+              '<a href="https://unrelated.example/feria/">Feria externa</a>'
+              '<a href="/contacto/">Contacto</a>')
+        pages={root:home, official:article(),
+               other:'<article><h1>Muestra Oktubre</h1>'
+                     '<p>Exposición sin fecha de función explícita</p></article>'}
+        class Budget:
+            def __init__(self): self.calls=[]
+            def can_fetch(self,u): return u in pages
+            def request(self,u):
+                self.calls.append(u)
+                return 200,pages[u],None
+            def remaining(self): return 100
+        b=Budget()
+        with patch.object(ad,"active_date",return_value=True):
+            check,_=radar.scan_source({
+                "source_id":"institution-review-only",
+                "url":root,"source_role":"institutional_program",
+                "seed_urls":[]},b,"full")
+        self.assertEqual(b.calls[0],root)
+        self.assertIn(official,b.calls)
+        self.assertNotIn("https://unrelated.example/feria/",b.calls)
+        self.assertLessEqual(len(b.calls),1+radar.MAX_DETAILS_FULL)
+        records=[x for x in check["_listings"] if x["proof_url"]==official]
+        self.assertEqual(len(records),1)
+        self.assertIsNone(records[0]["event_time"])
+        self.assertEqual(records[0]["event_date"],"2026-11-14")
+        self.assertEqual(records[0]["evidence_tier"],"structured_origin_unverified")
+        self.assertEqual(records[0]["time_semantics"],"cycle_public_hours_not_session")
+        # Same source without institutional provenance must not treat an
+        # unscoped text article as an independently verified session.
+        b=Budget()
+        with patch.object(ad,"active_date",return_value=True):
+            check,_=radar.scan_source({
+                "source_id":"secondary-index",
+                "url":root,"source_role":"secondary_specialized_agenda",
+                "seed_urls":[]},b,"full")
+        self.assertFalse(check["_listings"])
+
     def test_no_cross_host_urls_or_made_up_year(self):
         with patch.object(ad,"active_date",return_value=True):
             for url in ("http://biblioteca.example.edu.ar/anuncio/",
