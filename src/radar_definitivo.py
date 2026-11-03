@@ -442,7 +442,7 @@ def scan_source(source,budget,mode):
         return check,[]
     page=parse_html(body)
     # Source-specific evidence, including multiple sessions per theatre work.
-    check["_listings"]=extract_listings(body,root)
+    check["_listings"]=extract_listings(body,root,source_role=source.get("source_role"))
     root_candidates=root_review_candidate(source,root,page,status,make_candidate)
     check["_listings"]=suppress_unverified_cycle_root_sessions(
         check["_listings"],root,root_candidates)
@@ -528,7 +528,7 @@ def scan_source(source,budget,mode):
         detail=parse_html(data) if data else None
         if detail:
             check["details_opened"]+=1
-            check["_listings"].extend(extract_listings(data,url))
+            check["_listings"].extend(extract_listings(data,url,source_role=source.get("source_role")))
             if (institutional_sections_root and label in section_labels
                     and len(selected_links)<max_details):
                 # One actual first-party article per visited section. The
