@@ -1,9 +1,6 @@
 # POR ACA - RADAR DEFINITIVO
-# Reejecucion manual de certificacion E2E autorizada por el usuario 2026-11-02.
-# Preflight: 11 fuentes fetch vencidas; 0 corridas Neon activas; 0 GitHub Radar en curso.
-# QA obligatorio: test de ciclo multisedes vs organizador individual coherente.
-# Incremental unicamente; salida no verificada ni publicada automaticamente.
-trigger_date=2026-11-02
-trigger_slot=bootstrap
-trigger_mode=incremental
-trigger_reason=manual_certification_due_11_sources_20261102_after_qa_repair
+# Disparo por Guardia GPT - orquestador principal.
+trigger_date=2026-11-03
+trigger_slot=05
+trigger_mode=full
+trigger_reason=gpt_primary_scheduler
