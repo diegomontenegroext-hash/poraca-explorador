@@ -125,6 +125,15 @@ jobs:
         env:
           NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_LIMITED_DATABASE_URL }}
         run: python3 src/radar_integrity_verify.py
+      # O3 observes the existing natural FULL only. A stored 'complete'
+      # with failed HTTP checks is not counted as strictly complete.
+      - name: Medir ventana O3 de siete FULL reales posteriores al cutover
+        id: o3
+        if: always() && steps.qa.outcome == 'success' && steps.alcance.outputs.mode == 'full' && steps.ingesta.outcome == 'success'
+        continue-on-error: true
+        env:
+          NEON_RADAR_OPERATIONAL_DATABASE_URL: ${{ secrets.NEON_RADAR_LIMITED_DATABASE_URL }}
+        run: python3 src/radar_o3_full_window.py
       - name: Certificar E2E en modo solo lectura (sin Radar)
         id: verificar
         if: success() && steps.alcance.outputs.mode == 'verify_only'
@@ -168,6 +177,7 @@ jobs:
           CONTROL_OUTCOME: ${{ steps.control.outcome }}
           DIRECT_OUTCOME: ${{ steps.directa.outcome }}
           INTEGRITY_OUTCOME: ${{ steps.integridad.outcome }}
+          O3_OUTCOME: ${{ steps.o3.outcome }}
           VERIFY_OUTCOME: ${{ steps.verificar.outcome }}
           EXEC_OUTCOME: ${{ steps.ejecutivo.outcome }}
         run: |
@@ -183,6 +193,7 @@ jobs:
             echo "| Informe fuente, preadmisión y E2E | ${CONTROL_OUTCOME:-unknown} |"
             echo "| Lectura directa actual Radar → Neon/API (no promoción) | ${DIRECT_OUTCOME:-unknown} |"
             echo "| Verificación L4 tras ingesta (sin escrituras) | ${INTEGRITY_OUTCOME:-unknown} |"
+            echo "| Ventana O3: 7 FULL naturales post-cutover (lectura) | ${O3_OUTCOME:-unknown} |"
             echo "| Ejecución de tablero ejecutivo (no certificación global) | ${EXEC_OUTCOME:-unknown} |"
             echo "| Certificación read-only independiente | ${VERIFY_OUTCOME:-unknown} |"
             echo
