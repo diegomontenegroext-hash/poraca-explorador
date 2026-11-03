@@ -81,6 +81,21 @@ class EditorialPreviewTests(unittest.TestCase):
         self.assertEqual(d["groupsWithProbe"],0)
         self.assertEqual(d["missingEditorialObservation"],0)
 
+    def test_09_any_writer_blocked_handoff_is_prior_hold(self):
+        # The canonical writer treats ANY conflict != 'false' as blocking;
+        # QA staging uses a textual sentinel, not the boolean string 'true'.
+        self.assertIn("coalesce(o.original_evidence->>'conflict','false')<>'false'",SQL)
+        self.assertIn("'DO_NOT_APPROVE','DO_NOT_AUTO_APPROVE'",SQL)
+        self.assertIn("o.reconciliation_state IN ('rejected','conflict','disputed')",SQL)
+        self.assertNotIn("o.original_evidence->>'conflict'='true'",SQL)
+        # Staging can be present while explicitly held. Neither is approval.
+        out=summarize([item()+(True,True,False)])
+        self.assertEqual(out["handoffDiagnostic"]["withEditorialObservation"],1)
+        self.assertEqual(out["handoffDiagnostic"]["priorEditorialHolds"],1)
+        self.assertTrue(out["sample"][0]["priorEditorialHold"])
+        self.assertFalse(out["sample"][0]["canonWriteApproved"])
+        self.assertFalse(out["sample"][0]["publicationApproved"])
+
     def test_07_unfamiliar_status_is_rejected(self):
         with self.assertRaises(ValueError):
             summarize([item(gate="APPROVED")])
