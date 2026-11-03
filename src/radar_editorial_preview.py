@@ -58,7 +58,30 @@ SELECT event_date,event_time,title,venue,proof_url,proof_method,evidence_tier,
           WHEN venue_variants>1 THEN 'HOLD_VENUE_IDENTITY_VARIANTS'
           WHEN different_proofs>1 THEN 'REVIEW_MULTIPLE_PROOF_URLS'
           ELSE 'REVIEW_ORIGINAL_EVENT'
-       END AS review_gate
+       END AS review_gate,
+       EXISTS(SELECT 1 FROM public.radar_v3_source_observations o
+         WHERE o.observed_date=ranked.event_date
+           AND left(coalesce(o.observed_time,''),5)=ranked.event_time
+           AND public.poraca_fact_key_v1(o.observed_title)=
+               public.poraca_fact_key_v1(ranked.title)
+           AND o.source_event_url=ranked.proof_url)
+         AS has_editorial_observation,
+       EXISTS(SELECT 1 FROM public.radar_v3_source_observations o
+         WHERE o.observed_date=ranked.event_date
+           AND public.poraca_fact_key_v1(o.observed_title)=
+               public.poraca_fact_key_v1(ranked.title)
+           AND o.source_event_url=ranked.proof_url
+           AND (o.original_evidence->'editorialHandoff'->>'publication'='DO_NOT_APPROVE'
+             OR o.reconciliation_state IN ('rejected','conflict','disputed')
+             OR o.original_evidence->>'conflict'='true'))
+         AS prior_editorial_hold,
+       EXISTS(SELECT 1 FROM public.radar_agenda_events e
+         WHERE e.event_date=ranked.event_date
+           AND left(coalesce(e.event_time,''),5)=ranked.event_time
+           AND (public.poraca_fact_key_v1(e.title)=
+                  public.poraca_fact_key_v1(ranked.title)
+             OR e.source_url=ranked.proof_url))
+         AS likely_canonical
 FROM ranked WHERE choice=1
 ORDER BY event_date,event_time,title LIMIT 300
 """
@@ -67,10 +90,23 @@ ORDER BY event_date,event_time,title LIMIT 300
 def summarize(rows):
     seen={"HOLD_VENUE_IDENTITY_VARIANTS":0,
           "REVIEW_MULTIPLE_PROOF_URLS":0,"REVIEW_ORIGINAL_EVENT":0}
+    handoff={"groupsWithProbe":0,"withEditorialObservation":0,
+             "missingEditorialObservation":0,"priorEditorialHolds":0,
+             "possiblyCanonical":0}
     items=[]
     for row in rows:
         (day,clock,title,venue,proof,method,tier,source,
-         monitors,observations,different_proofs,venue_variants,gate)=row
+         monitors,observations,different_proofs,venue_variants,gate)=row[:13]
+        # Old fixture tuples remain accepted. Production SQL returns three
+        # read-only cross-stage indicators, not a writer authorization.
+        probed=len(row)>=16
+        has_obs,prior_hold,likely_canon=(bool(x) for x in row[13:16]) if probed else (False,False,False)
+        if probed:
+            handoff["groupsWithProbe"]+=1
+            handoff["withEditorialObservation"]+=int(has_obs)
+            handoff["missingEditorialObservation"]+=int(not has_obs)
+            handoff["priorEditorialHolds"]+=int(prior_hold)
+            handoff["possiblyCanonical"]+=int(likely_canon)
         if gate not in seen:
             raise ValueError("Unrecognized review gate")
         seen[gate]+=1
@@ -80,8 +116,14 @@ def summarize(rows):
              "observations":int(observations),
              "differentProofUrls":int(different_proofs),
              "venueVariants":int(venue_variants),"reviewGate":gate,
+             "handoffProbeAvailable":probed,
+             "hasEditorialObservation":has_obs if probed else None,
+             "priorEditorialHold":prior_hold if probed else None,
+             "likelyCanonical":likely_canon if probed else None,
              "canonWriteApproved":False,"publicationApproved":False})
     return {"schema":SCHEMA,"reviewGroups":len(items),"gates":seen,
+            "handoffDiagnostic":handoff,
+            "handoffDiagnosticState":"READ_ONLY_NOT_AUTHORIZATION",
             "sample":items[:12],
             "independentCorroborationsVerified":0,
             "editorialObservationsWritten":0,
