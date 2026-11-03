@@ -875,7 +875,123 @@ def teatro_cerca_listing_cards(raw, url, at=None):
     return out
 
 
-def extract_listings(raw,url):
+# Generic, source-role gated institution notice reader. It is NOT a new
+# collector and it never invents a publication-approved event or exact venue.
+# The role comes from the registered original source, not from website text.
+INSTITUTIONAL_NOTICE_ROLES=frozenset({
+    "institutional_program","original_institutional",
+    "first_party_institution","institutional_program_and_community_venue",
+})
+INSTITUTIONAL_WEEKDAYS={"lunes":0,"martes":1,"miércoles":2,"miercoles":2,
+    "jueves":3,"viernes":4,"sábado":5,"sabado":5,"domingo":6}
+
+
+def institutional_prose_review(raw,url,source_role,at=None):
+    """Retrieve a review-only public event window from a first-party article.
+
+    Requires a *single* article, an event headline, a full dated publication
+    stamp (not copyright year), an explicit weekday, and hours in the SAME
+    sentence. A fair's 19–24 public window is not a session at 19:00.
+    No published article or inferred event year -> no output.
+    """
+    if source_role not in INSTITUTIONAL_NOTICE_ROLES:
+        return []
+    u=urlsplit(url)
+    if (u.scheme!="https" or not u.hostname or u.username or u.password
+            or u.port not in (None,443) or u.query or u.fragment
+            or not u.path.strip("/")):
+        return []
+    if not isinstance(raw,str) or len(raw)>900_000:
+        return []
+    article=re.findall(r"<article\b[^>]*>(.*?)</article\s*>",raw,re.I|re.S)
+    if len(article)!=1:
+        return []
+    body=article[0]
+    headings=re.findall(r"<h1\b[^>]*>(.*?)</h1\s*>",body,re.I|re.S)
+    if len(headings)!=1:
+        return []
+    title=tidy(re.sub(r"<[^>]+>"," ",headings[0]))
+    if not (8<=len(title)<=180 and
+            re.search(r"\b(?:feria|festival|encuentro|muestra|exposici[oó]n|"
+                      r"actividad|jornada|ciclo|taller)\b",title,re.I)):
+        return []
+    published=[]
+    for tag in re.findall(r"<meta\b[^>]*>",raw[:35_000],re.I):
+        attrs=dict((key.lower(),value) for key,value in re.findall(
+            r"""([\w:-]+)\s*=\s*["']([^"']+)["']""",tag))
+        if (attrs.get("property") in ("article:published_time","article:published") or
+                attrs.get("name") in ("datePublished","article:published_time")):
+            v=(attrs.get("content") or "")[:10]
+            try:published.append(date.fromisoformat(v))
+            except ValueError:pass
+    if not published:
+        for tag in re.findall(r"<time\b[^>]*>",body[:9000],re.I)[:5]:
+            attrs=dict((key.lower(),value) for key,value in re.findall(
+                r"""([\w:-]+)\s*=\s*["']([^"']+)["']""",tag))
+            if not re.search(r"\b(?:published|entry-date|posted-on)\b",
+                             attrs.get("class",""),re.I):
+                continue
+            try:published.append(date.fromisoformat(attrs.get("datetime","")[:10]))
+            except ValueError:pass
+    if len(set(published))!=1:
+        return []
+    posted=published[0]
+    paragraphs=re.findall(r"<p\b[^>]*>(.*?)</p\s*>",body[:80_000],re.I|re.S)
+    if not paragraphs:
+        return []
+    date_pattern=re.compile(
+        r"\b(?:el\s+)?(lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)"
+        r"\s+([0-3]?\d)\s+de\s+([a-záéíóúñ]+)"
+        r"(?:\s+de\s+(20\d{2}))?\b"
+        r"\s*,?\s*de\s+([01]?\d|2[0-3])(?::([0-5]\d))?"
+        r"\s+a\s+([01]?\d|2[0-4])(?::([0-5]\d))?\s*h(?:oras?)?\b",re.I)
+    candidates=[]
+    for paragraph in paragraphs[:12]:
+        visible=tidy(re.sub(r"<[^>]+>"," ",paragraph))
+        if (len(visible)>1600 or
+                re.search(r"horario\s+de\s+atenci[oó]n|horario\s+comercial",
+                          visible[:150],re.I)):
+            continue
+        for match in date_pattern.finditer(visible[:900]):
+            month=MONTHS.get(match.group(3).casefold())
+            if not month:
+                continue
+            years=[int(match.group(4))] if match.group(4) else [posted.year,posted.year+1]
+            for year in years:
+                try:day=date(year,month,int(match.group(2)))
+                except ValueError:continue
+                if (day.weekday()!=INSTITUTIONAL_WEEKDAYS[match.group(1).casefold()]
+                        or not posted<=day<=posted+timedelta(days=75)
+                        or not active_date(day,at)):
+                    continue
+                start=int(match.group(5))*60+int(match.group(6) or 0)
+                end=int(match.group(7))*60+int(match.group(8) or 0)
+                if (start<7*60 or end<=start or end>24*60
+                        or end-start>12*60):
+                    continue
+                # This is an institution's public program/fair WINDOW,
+                # not the start clock for an individual performance.
+                record=make_record(title,day,None,None,url,
+                    "institutional_prose_public_window_review",
+                    "structured_origin_unverified")
+                if record:
+                    record.update(public_window_start=f"{start//60:02d}:{start%60:02d}",
+                                  public_window_end=f"{end//60:02d}:{end%60:02d}",
+                                  time_semantics="cycle_public_hours_not_session",
+                                  year_basis=("explicit_event_year" if match.group(4)
+                                              else "publication_year_weekday_correlated"),
+                                  publication_date=posted.isoformat(),
+                                  event_time_inferred=False,
+                                  venue_inferred=False)
+                    candidates.append(record)
+            if candidates:
+                break
+        if candidates:
+            break
+    return candidates[:1]
+
+
+def extract_listings(raw,url,source_role=None):
     """Returns individual session observations; never returns verified status."""
     if url == OFFICIAL_ICS_FEED_URL:
         # A calendar record has its own UID, local ART day/time, venue and
@@ -900,8 +1016,13 @@ def extract_listings(raw,url):
     if host not in SCOPED_HOSTS:
         # Se aceptan sólo fechas explícitas de JSON-LD Event. El origen de
         # un dominio nuevo NO se considera primario ni se autoaprueba.
-        return (structured_sessions(raw,url)[:100]
-                if urlsplit(url).scheme=="https" and host else [])
+        if urlsplit(url).scheme!="https" or not host:
+            return []
+        structured=structured_sessions(raw,url)[:100]
+        # Only a registered institutional original may add a conservative
+        # text-only programme WINDOW. Never merge it into an Event session
+        # startTime or upgrade it to a primary evidence tier.
+        return structured+institutional_prose_review(raw,url,source_role)
     blocks=visible_blocks(raw)
     out=structured_sessions(raw,url)
     out.extend(source_specific_sessions(raw,url,blocks))
