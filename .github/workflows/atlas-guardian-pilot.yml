@@ -68,6 +68,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh issue comment 4 --repo diegomontenegroext-hash/poraca-explorador --body-file guardian/out/digest.md
+      - name: Guardar resumen del mes para Google Apps Script (URL pública sin GitHub API)
+        if: always() && steps.cycle.outputs.audit == 'true' && github.event_name == 'schedule' && hashFiles('guardian/out/digest.md') != ''
+        run: |
+          mkdir -p guardian/monthly
+          cp guardian/out/digest.md guardian/monthly/latest.md
+          git add guardian/monthly/latest.md
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'chore(guardian): conservar resumen del ciclo mensual [skip ci]'
+          git push origin HEAD:main
       - name: Correo directo mensual (si hay proveedor configurado)
         if: always() && steps.cycle.outputs.audit == 'true' && github.event_name == 'schedule' && vars.GUARDIAN_MAIL_MODE == 'resend' && hashFiles('guardian/out/report.json') != ''
         env:
