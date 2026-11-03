@@ -1,8 +1,9 @@
-"""Strict and transitional Neon identity gate for Radar operational cutover.
+"""Strict Neon identity gate for operational Radar; fail closed on legacy login.
 
-The legacy elevated login remains accepted temporarily for continuity.
-Only the named SQL-created limited login can be added. Never accept a
-name from environment variables or relax project/branch scoping.
+Since production's verified cutover to NEON_RADAR_LIMITED_DATABASE_URL, the
+previous elevated poraca_definitivo_ingest login cannot authenticate normal
+Radar, executive probes or E2E verification. No automatic credential fallback.
+Never accept a name from environment variables or relax project/branch scope.
 """
 from __future__ import annotations
 
@@ -15,9 +16,9 @@ EXPECTED_BRANCH = "br-mute-recipe-b4odj2bl"
 
 def approved_operational_login(cursor, login: str) -> bool:
     """Run under current transaction; prove new login cannot mutate editorial data."""
-    if login == LEGACY_LOGIN:
-        # Compatible only until a successful, authorized credential cutover.
-        return True
+    # The 01/11 production secret has already been cut over to the limited
+    # login. If it regresses to the old overprivileged credential, fail rather
+    # than silently repairing ingestion by accepting superuser-like access.
     if login != LIMITED_LOGIN:
         return False
     cursor.execute("""
@@ -25,6 +26,7 @@ def approved_operational_login(cursor, login: str) -> bool:
                current_setting('neon.project_id',true),
                current_setting('neon.branch_id',true),
                r.rolcanlogin,r.rolsuper,r.rolcreatedb,r.rolcreaterole,
+               r.rolreplication,r.rolbypassrls,
                pg_has_role(r.rolname,'neon_superuser','member'),
                pg_has_role(r.rolname,'poraca_definitivo_scope','member'),
                has_database_privilege(r.rolname,current_database(),'CREATE'),
@@ -34,7 +36,7 @@ def approved_operational_login(cursor, login: str) -> bool:
     """, (login,))
     return cursor.fetchone() == (
         EXPECTED_DATABASE, EXPECTED_PROJECT, EXPECTED_BRANCH,
-        True, False, False, False, False, True, False, False,
+        True, False, False, False, False, False, False, True, False, False,
     )
 
 
