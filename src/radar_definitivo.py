@@ -462,6 +462,14 @@ def scan_source(source,budget,mode):
     institutional_root=(
         source.get("source_role") in institutional_sections
         and urlsplit(root).path.rstrip("/")=="" and not check["_listings"])
+    # Official institutional homepages sometimes link directly to an article
+    # without a /agenda section. Discover only already-linked SAME-host
+    # descriptive originals; keep a strict two-article budget and require
+    # the article extractor to prove its own dates. This is navigation, not
+    # automatic registration or admission of a cultural event.
+    if institutional_root:
+        links+=discover_original_posts_from_section(
+            root,page.links,existing=links,limit=2)
     if not check["_listings"] and not is_single_event_source(root):
         capacity=(MAX_DETAILS_FULL if mode=="full" else MAX_DETAILS_INCREMENTAL)
         available=max(0,capacity-len(links))
