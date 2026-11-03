@@ -5,7 +5,8 @@ ROOT=pathlib.Path(__file__).resolve().parents[1]
 SQL=(ROOT/"sql"/"20261103_editorial_observation_safe_batch_v1.sql").read_text(encoding="utf-8")
 class SafeBatchTests(unittest.TestCase):
     def test_explicit_two_ids_and_determinism(self):
-        self.assertEqual(SQL.count("('obs-stage-"), 2)
+        selected=SQL.split("WITH requested(observation_id) AS (VALUES",1)[1].split("), bridge AS (",1)[0]
+        self.assertEqual(selected.count("'obs-stage-"), 2)
         self.assertIn("obs-stage-f416b398b13ad999fc693019", SQL)
         self.assertIn("obs-stage-780e4b6e4e4c424c457034f7", SQL)
         self.assertIn("ON CONFLICT(observation_id) DO NOTHING",SQL)
