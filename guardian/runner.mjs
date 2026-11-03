@@ -76,11 +76,22 @@ async function editorial(site,notes){
 }
 async function audit(site,browser){
  const notes=[],origin=new URL(site.url).origin;
- const expected=baseline(await readFile(site.baseline,"utf8"));
- const expectedImages=baseline(await readFile(site.baseline.replace(".urls.txt",".images.txt"),"utf8"));
- if(!expected.length||!expectedImages.length)throw Error("baseline faltante");
+ const allowInitialBaseline=site.allowInitialBaseline===true;
+ async function readBaseline(path) {
+  try {return baseline(await readFile(path,"utf8"));}
+  catch(e) {if(allowInitialBaseline && e?.code==="ENOENT")return [];throw e;}
+ }
+ let expected=await readBaseline(site.baseline);
+ let expectedImages=await readBaseline(site.baseline.replace(".urls.txt",".images.txt"));
+ const bootstrapPending=!expected.length||!expectedImages.length;
+ if(bootstrapPending&&!allowInitialBaseline)throw Error("baseline faltante: no se permite auditoría sin inventario aprobado");
  let actual=[];
  try{actual=sitemap(await getText(new URL("/sitemap.xml",origin).href),origin);}catch(e){notes.push("Sitemap inaccesible: "+String(e));}
+ if(!expected.length&&allowInitialBaseline&&actual.length>=(site.minInitialPages||1)&&actual.length<=limit.pages&&new Set(actual).size===actual.length){
+  expected=[...actual];
+  notes.push("ALTA INICIAL: snapshot de sitemap pendiente de persistencia y revisión ("+expected.length+" URL)");
+ }
+ if(!expected.length)throw Error("No hay baseline aprobado ni sitemap inicial completo para "+site.id+" (observadas "+actual.length+")");
  const delta=reconcile(expected,actual);
  if(delta.duplicates)notes.push("URL duplicadas en sitemap: "+delta.duplicates);
  if(delta.missing.length)notes.push("Desaparecieron "+delta.missing.length+" URL canónicas");
@@ -106,6 +117,11 @@ async function audit(site,browser){
   try{jsonImages(JSON.parse(await getText(src)),src,/covers\.json(?:$|\?)/.test(name)).forEach(x=>imgs.add(x));}
   catch(e){notes.push("JSON de medios no inspeccionable "+src+": "+String(e.message||e));}
  }
+ if(!expectedImages.length&&allowInitialBaseline&&imgs.size>=(site.minInitialImages||1)&&imgs.size<=limit.images){
+  expectedImages=[...imgs].sort();
+  notes.push("ALTA INICIAL: inventario de imágenes descubiertas pendiente de revisión ("+expectedImages.length+")");
+ }
+ if(!expectedImages.length)throw Error("No existe baseline de imágenes suficiente para "+site.id+"; detectadas "+imgs.size);
  const imageList=[...new Set([...expectedImages,...imgs])],linkList=[...links].filter(x=>!pages.includes(x));
  if(imageList.length>limit.images)notes.push("Recorte de imágenes, total "+imageList.length+" > "+limit.images);
  if(linkList.length>limit.links)notes.push("Recorte de enlaces, total "+linkList.length+" > "+limit.links);
@@ -114,6 +130,11 @@ async function audit(site,browser){
  for(const item of linkChecks)item.foundAt=linkSources.get(item.url)||[];
  const imagesCoverage=coverage(imageList,imageChecks),linksCoverage=coverage(linkList,linkChecks),pagesCoverage=coverage(pages,htmlChecks);
  const foundBaselineImages=expectedImages.filter(u=>imgs.has(u)).length;
+ if(bootstrapPending&&allowInitialBaseline&&delta.missing.length===0&&delta.duplicates===0&&pagesCoverage.checked===pages.length&&htmlChecks.every(x=>x.state==="OK")&&imagesCoverage.checked===imageList.length){
+  await writeFile(site.baseline,"# Primera referencia pública; revisar tras el primer ciclo: "+started+"\\n"+[...expected].sort().join("\\n")+"\\n");
+  await writeFile(site.baseline.replace(".urls.txt",".images.txt"),"# Imágenes descubiertas (no garantiza las dinámicas); primera referencia: "+started+"\\n"+[...expectedImages].sort().join("\\n")+"\\n");
+  notes.push("ALTA INICIAL registrada en archivos del runner: necesita quedar persistida en GitHub para monitoreo mensual");
+ }else if(bootstrapPending){notes.push("ALTA INICIAL NO PERSISTIDA: cobertura HTTP incompleta o acceso al Atlas; no declarar VERDE");}
  if(foundBaselineImages!==expectedImages.length)notes.push('Imagen base no hallada en recursos de la versión actual: '+(expectedImages.length-foundBaselineImages));
  if(imageList.length<(site.expectedImagesAtLeast||1))notes.push("Menos imágenes de las esperadas");
  const editorialResult=await editorial(site,notes);

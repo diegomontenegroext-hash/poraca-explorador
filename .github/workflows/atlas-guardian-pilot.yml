@@ -11,14 +11,14 @@ on:
     - cron: "17 12 3 * *"
     - cron: "47 12 4 * *"
 permissions:
-  contents: read
+  contents: write
   issues: write
 concurrency:
   group: guardian-pilot-${{ github.ref }}
   cancel-in-progress: false
 jobs:
   verify:
-    name: Auditoría Babasónicos (NO publica)
+    name: Auditoría de los tres Atlas (NO publica)
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -49,6 +49,17 @@ jobs:
         id: audit
         continue-on-error: true
         run: node guardian/runner.mjs
+      - name: Persistir solo inventarios iniciales de Guardian (nunca editar Atlas)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.audit.outcome == 'success'
+        run: |
+          git add guardian/baselines/*.txt
+          if git diff --cached --quiet; then echo "Inventarios ya registrados"; exit 0; fi
+          test -s guardian/baselines/amplificada.urls.txt
+          test -s guardian/baselines/amplificada.images.txt
+          test -s guardian/baselines/albarn.urls.txt
+          test -s guardian/baselines/albarn.images.txt
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'chore(guardian): fijar primera referencia de Atlas públicos [skip ci]'
+          git push origin HEAD:main
       - name: Generar aviso breve y acciones
         if: always() && steps.cycle.outputs.audit == 'true' && hashFiles('guardian/out/report.json') != ''
         run: node guardian/digest.mjs

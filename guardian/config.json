@@ -26,6 +26,46 @@
       ],
       "musicbrainzArtistId": "e6e1e76f-afee-4990-aad0-056199d94918",
       "newsQuery": "Babasónicos"
+    },
+    {
+      "id": "amplificada",
+      "enabled": true,
+      "url": "https://la-plata-amplificada.vercel.app",
+      "baseline": "guardian/baselines/amplificada.urls.txt",
+      "allowInitialBaseline": true,
+      "minInitialPages": 600,
+      "minInitialImages": 3,
+      "expectedImagesAtLeast": 3,
+      "assetPaths": [],
+      "imageJsonPaths": [],
+      "browserRoutes": [
+        "/",
+        "/en/",
+        "/timeline/",
+        "/en/timeline/",
+        "/explore/",
+        "/en/stories/"
+      ],
+      "newsQuery": "música La Plata"
+    },
+    {
+      "id": "albarn",
+      "enabled": true,
+      "url": "https://damon-albarn-atlas.vercel.app",
+      "baseline": "guardian/baselines/albarn.urls.txt",
+      "allowInitialBaseline": true,
+      "minInitialPages": 1100,
+      "minInitialImages": 4,
+      "expectedImagesAtLeast": 4,
+      "assetPaths": [],
+      "imageJsonPaths": [],
+      "browserRoutes": [
+        "/",
+        "/en/",
+        "/catalogo.html",
+        "/en/catalogo.html"
+      ],
+      "newsQuery": "Damon Albarn"
     }
   ]
 }
