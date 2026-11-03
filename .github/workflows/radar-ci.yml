@@ -1,38 +1,24 @@
-name: Por Aca - QA de Radar sin escrituras
+name: Por Aca - QA histórico (manual, sin Neon)
+
+# Duplicate automatic QA retired 2026-11-03. Keep manual fallback for diagnosis.
+# All changes under src/tests/sql/data are covered by radar-definitivo-ci.yml.
 on:
-  push:
-    paths:
-      - 'src/radar_parallel.py'
-      - 'tests/test_radar_parallel.py'
-      - 'src/radar_integrity_verify.py'
-      - 'data/canonical_survival_ledger_20261101.json'
-      - 'src/radar_category_pulse.py'
-      - 'tests/test_radar_category_pulse.py'
-      - 'src/radar_executive_gates.py'
-      - 'tests/test_radar_integrity_verify.py'
-      - 'tests/test_radar_executive_gates.py'
-      - 'src/radar_agenda_adapters.py'
-      - 'tests/test_radar_agenda_adapters.py'
-      - 'sql/20261101_executive_readiness_gates_READ_ONLY.sql'
-      - 'sql/20261102_generic_field_provenance_v2.sql'
-      - 'sql/20261102_event_provenance_readback_READ_ONLY.sql'
-      - 'tests/test_radar_provenance_contract_v2.py'
-      - 'sql/20261102_editorial_candidate_chain_READ_ONLY.sql'
-      - 'sql/20261102_editorial_candidate_negative_gates_READ_ONLY.sql'
-      - 'tests/test_editorial_candidate_readonly_v1.py'
-      - '.github/workflows/radar-ci.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: poraca-radar-legacy-manual-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
-      - name: Compilar codigo Python
-        run: python3 -m compileall -q src
-      - name: Ejecutar tests sin Neon y sin red
-        run: python3 -m unittest discover -s tests -v
+      - name: Compilar y ejecutar pruebas locales
+        run: |
+          python3 -m compileall -q src
+          python3 -m unittest discover -s tests -v

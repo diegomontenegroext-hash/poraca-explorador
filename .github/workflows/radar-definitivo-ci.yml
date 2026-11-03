@@ -1,83 +1,38 @@
 name: Por Aca - QA Radar Definitivo
+
+# One non-writing CI workflow for code/contracts. Historical QA is manual-only.
+# Never cancel operational Radar: its own workflow serializes real ingestions.
 on:
   push:
+    branches: [main]
     paths:
-      - 'src/radar_adaptive_cadence.py'
-      - 'tests/test_radar_adaptive_cadence.py'
-      - 'src/radar_adaptive_discovery.py'
-      - 'tests/test_radar_adaptive_discovery.py'
-      - 'src/radar_adaptive_shadow.py'
-      - 'tests/test_radar_adaptive_shadow.py'
-      - 'sql/20261031_radar_adaptive_shadow_readonly_v1.sql'
-      - 'src/radar_definitivo.py'
-      - 'src/radar_certification_matrix.py'
-      - 'tests/test_radar_certification_matrix.py'
-      - 'sql/20261031_certificacion_punta_a_punta_readonly_v1.sql'
-      - 'src/radar_end_to_end.py'
-      - 'src/radar_integrity_verify.py'
-      - 'src/radar_direct_feed_verify.py'
-      - 'tests/test_radar_direct_feed_verify.py'
-      - 'tests/test_radar_integrity_verify.py'
-      - 'tests/test_radar_end_to_end.py'
-      - 'src/radar_source_recovery.py'
-      - 'data/historical-circuit-network-v1.json'
-      - 'tests/test_radar_source_recovery.py'
-      - 'src/radar_source_learning.py'
-      - 'tests/test_radar_source_learning.py'
-      - 'src/radar_editorial_preview.py'
-      - 'tests/test_radar_editorial_preview.py'
-      - 'sql/20261103_editorial_handoff_gap_READ_ONLY.sql'
-      - 'tests/test_radar_editorial_handoff_sql.py'
-      - 'src/radar_security_identity.py'
-      - 'tests/test_radar_security_identity.py'
-      - 'src/radar_o3_full_window.py'
-      - 'tests/test_radar_o3_full_window.py'
-      - 'src/radar_f5_shadow_recovery.py'
-      - 'tests/test_radar_f5_shadow_recovery.py'
-      - 'sql/20261103_f5_shadow_loss_by_scene_READ_ONLY.sql'
-      - 'sql/20261103_o3_seven_full_postcutover_READ_ONLY.sql'
-      - 'src/radar_category_pulse.py'
-      - 'src/radar_funnel_metrics.py'
-      - 'tests/test_radar_funnel_metrics.py'
-      - 'tests/test_radar_category_pulse.py'
-      - '.github/workflows/radar-definitivo.yml'
-      - 'src/instagram_seed_inbox.py'
+      - 'src/**'
+      - 'tests/**'
+      - 'sql/**'
+      - 'data/**'
       - 'ops/instagram-exact-seeds.json'
-      - 'tests/test_instagram_seed_inbox.py'
-      - 'src/radar_parallel.py'
-      - 'src/radar_agenda_adapters.py'
-      - 'src/radar_ical_generic.py'
-      - 'tests/test_radar_generic_ical.py'
-      - 'src/radar_ical_agenda.py'
-      - 'tests/test_radar_official_ics.py'
-      - 'src/radar_evidence_quality.py'
-      - 'src/radar_gate_alias_preflight.py'
-      - 'src/radar_function_gate_review.py'
-      - 'src/radar_health.py'
-      - 'src/radar_url_clock_review.py'
-      - 'tests/test_radar_reliability.py'
-      - 'tests/test_radar_function_gate_review.py'
-      - 'sql/20261029_function_identity_preflight_v2.sql'
-      - 'tests/test_radar_gate_alias_preflight.py'
-      - 'tests/test_radar_evidence_quality.py'
-      - 'src/radar_genda_browser.py'
-      - 'tests/test_radar_definitivo.py'
-      - 'tests/test_radar_agenda_adapters.py'
-      - 'tests/test_radar_institutional_prose.py'
-      - 'tests/test_radar_el_dia_agenda.py'
       - '.github/workflows/radar-definitivo-ci.yml'
+      - '.github/workflows/radar-ci.yml'
+      - '.github/workflows/radar-definitivo.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
+# Cancel only a previous code QA from a push to the same branch.
+# Explicit manual checks are separately grouped, and Radar ingestions untouched.
+concurrency:
+  group: poraca-radar-code-qa-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
 jobs:
   qa:
+    name: Compilacion y suite completa sin Neon
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
-      - name: Compilar y probar sin Neon
+      - name: Compilar y probar sin Neon ni servicios externos
         run: |
           python3 -m compileall -q src
           python3 -m unittest discover -s tests -v
