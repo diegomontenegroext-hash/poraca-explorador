@@ -131,8 +131,8 @@ async function audit(site,browser){
  const imagesCoverage=coverage(imageList,imageChecks),linksCoverage=coverage(linkList,linkChecks),pagesCoverage=coverage(pages,htmlChecks);
  const foundBaselineImages=expectedImages.filter(u=>imgs.has(u)).length;
  if(bootstrapPending&&allowInitialBaseline&&delta.missing.length===0&&delta.duplicates===0&&pagesCoverage.checked===pages.length&&htmlChecks.every(x=>x.state==="OK")&&imagesCoverage.checked===imageList.length){
-  await writeFile(site.baseline,"# Primera referencia pública; revisar tras el primer ciclo: "+started+"\\n"+[...expected].sort().join("\\n")+"\\n");
-  await writeFile(site.baseline.replace(".urls.txt",".images.txt"),"# Imágenes descubiertas (no garantiza las dinámicas); primera referencia: "+started+"\\n"+[...expectedImages].sort().join("\\n")+"\\n");
+  await writeFile(site.baseline,"# Primera referencia pública; revisar tras el primer ciclo: "+started+"\n"+[...expected].sort().join("\n")+"\n");
+  await writeFile(site.baseline.replace(".urls.txt",".images.txt"),"# Imágenes descubiertas (no garantiza las dinámicas); primera referencia: "+started+"\n"+[...expectedImages].sort().join("\n")+"\n");
   notes.push("ALTA INICIAL registrada en archivos del runner: necesita quedar persistida en GitHub para monitoreo mensual");
  }else if(bootstrapPending){notes.push("ALTA INICIAL NO PERSISTIDA: cobertura HTTP incompleta o acceso al Atlas; no declarar VERDE");}
  if(foundBaselineImages!==expectedImages.length)notes.push('Imagen base no hallada en recursos de la versión actual: '+(expectedImages.length-foundBaselineImages));
