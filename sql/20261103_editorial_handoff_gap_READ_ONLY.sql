@@ -53,9 +53,9 @@ WITH scope AS (
     WHERE o.observed_date=c.event_date
       AND public.poraca_fact_key_v1(o.observed_title)=c.title_key
       AND o.source_event_url=c.proof_url
-      AND (o.original_evidence->'editorialHandoff'->>'publication'='DO_NOT_APPROVE'
+      AND (o.original_evidence->'editorialHandoff'->>'publication' IN ('DO_NOT_APPROVE','DO_NOT_AUTO_APPROVE')
         OR o.reconciliation_state IN ('rejected','conflict','disputed')
-        OR o.original_evidence->>'conflict'='true'))
+        OR coalesce(o.original_evidence->>'conflict','false')<>'false'))
     AS explicit_editorial_hold,
   EXISTS (SELECT 1 FROM public.radar_agenda_events e
     WHERE e.event_date=c.event_date
@@ -68,6 +68,17 @@ WITH scope AS (
       AND public.poraca_fact_key_v1(e.title)=c.title_key
       AND left(coalesce(e.event_time,''),5)<>c.event_time)
     AS alternate_time_canonical,
+  -- Same original + event date but a different observed hour may be doors-vs-show.
+  -- Do not duplicate an already-reviewed event at the wrong clock.
+  EXISTS (SELECT 1 FROM public.radar_v3_source_observations o
+    WHERE o.observed_date=c.event_date
+      AND o.source_event_url=c.proof_url
+      AND public.poraca_fact_key_v1(o.observed_title)=c.title_key
+      AND left(coalesce(o.observed_time,''),5)<>c.event_time)
+    AS alternate_time_observation,
+  -- Extra tickets (meet/greet, upgrades) require editorial review and must
+  -- never be counted as standalone performances merely from a dated page.
+  (c.title ~* '^[[:space:]]*(meet[[:space:]]*(&|and|y)[[:space:]]*greet|upgrade[[:space:]]|entrada[[:space:]]+adicional)') AS possible_accessory_ticket,
   (SELECT count(*) FROM public.poraca_knowledge_entities v
     WHERE v.entity_kind='venue' AND v.editorial_state='approved_public'
       AND v.merged_into_id IS NULL
@@ -88,11 +99,14 @@ WITH scope AS (
 SELECT title,event_date,event_time,venue,proof_url,source_id,source_role,
        evidence_tier,exact_original_detail,proposed_observation_id,
        venue_labels,legacy_observation_count,explicit_editorial_hold,
-       possible_canonical,alternate_time_canonical,possible_approved_venue_count,
+       possible_canonical,alternate_time_canonical,alternate_time_observation,
+       possible_accessory_ticket,possible_approved_venue_count,
        CASE
          WHEN explicit_editorial_hold THEN 'HOLD_PRIOR_EDITORIAL_DECISION'
          WHEN possible_canonical THEN 'NOOP_POSSIBLE_CANONICAL'
          WHEN alternate_time_canonical THEN 'HOLD_SCHEDULE_COLLISION'
+         WHEN alternate_time_observation THEN 'HOLD_EXISTING_OBSERVATION_OTHER_TIME'
+         WHEN possible_accessory_ticket THEN 'HOLD_ACCESSORY_TICKET_NOT_SEPARATE_EVENT'
          WHEN NOT exact_original_detail THEN 'HOLD_ORIGINAL_DETAIL_REQUIRED'
          WHEN venue_labels>1 THEN 'HOLD_VENUE_VARIANTS'
          WHEN possible_approved_venue_count<>1 THEN 'HOLD_VENUE_IDENTITY'

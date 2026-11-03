@@ -26,6 +26,8 @@ on:
       - 'tests/test_radar_source_learning.py'
       - 'src/radar_editorial_preview.py'
       - 'tests/test_radar_editorial_preview.py'
+      - 'sql/20261103_editorial_handoff_gap_READ_ONLY.sql'
+      - 'tests/test_radar_editorial_handoff_sql.py'
       - 'src/radar_security_identity.py'
       - 'tests/test_radar_security_identity.py'
       - 'src/radar_o3_full_window.py'
