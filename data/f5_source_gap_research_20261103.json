@@ -1,0 +1,109 @@
+{
+  "schema": "poraca-f5-recovery-source-gap-research-v1",
+  "asOf": "2026-11-03",
+  "city": "La Plata y alrededores",
+  "status": "research_only_no_source_registry_writes",
+  "reason": "Four independent scenes need precise original-event fallback; source-host redundancy and index-only returns do not meet F5",
+  "targetScenes": [
+    "arte_y_cultura",
+    "musica",
+    "teatro",
+    "literatura"
+  ],
+  "shadowSnapshot": {
+    "primaryPreciseStrong": [
+      "arte_y_cultura"
+    ],
+    "compositeStrongButNotDistinct": [
+      "teatro_y_musica"
+    ],
+    "indexOnlyAlternatives": [
+      "musica",
+      "teatro",
+      "literatura"
+    ],
+    "notCountedAsIndependentOrganizer": "Different source IDs or ticket URLs on a shared root host",
+    "actualOutageInjected": false,
+    "f5Certified": false,
+    "scoreIncrement": 0
+  },
+  "findings": [
+    {
+      "scene": "literatura",
+      "identity": "Biblioteca Pública UNLP",
+      "proposal": "new_original_institutional_program_feed",
+      "sourceRoot": "https://biblio.unlp.edu.ar/",
+      "contentUrl": "https://biblio.unlp.edu.ar/feria-de-editoriales-noctambula/",
+      "eventTitle": "Feria de editoriales Noctámbula",
+      "eventDate": "2026-11-14",
+      "startTime": "19:00",
+      "endTime": "24:00",
+      "venue": "Biblioteca Pública UNLP, Plaza Rocha Nº137, La Plata",
+      "publicationDate": "2026-11-02",
+      "originalConfirmed": true,
+      "sourceAlreadyOperational": false,
+      "editorialDecision": "REVIEW_SOURCE_ADDITION_GENERIC_INSTITUTIONAL_PROGRAM",
+      "publicEventAdmissionApproved": false,
+      "circuitIndependentFrom": [
+        "feriaedita.com.ar",
+        "nochedelaslibrerias.com.ar"
+      ],
+      "constraints": [
+        "Confirm that website serves stable future individual-program posts, not only archival notices",
+        "Test generic date/time parser on fresh article and ensure annual archives do not create false future event",
+        "Add source via authorized operational source registry review, not by source-specific parser"
+      ]
+    },
+    {
+      "scene": "literatura",
+      "identity": "Noche de las Librerías Independientes La Plata",
+      "existingSourceId": "rd-web-e60bb2a8",
+      "officialUrl": "https://www.nochedelaslibrerias.com.ar/",
+      "eventDate": "2026-11-06",
+      "officialHours": "17:00-23:00",
+      "neonStoredStart": "18:00",
+      "stagingEvidenceTier": "structured_origin_unverified",
+      "sourceNameCollision": false,
+      "editorialDecision": "HOLD_ORIGINAL_VS_STRUCTURED_TIME_CONFLICT",
+      "publicEventAdmissionApproved": false,
+      "constraints": [
+        "Generic parser must preserve exact original-visible date/time rather than infer from structured metadata when contradictory",
+        "Do not rewrite source observations or public events manually in order to inflate precision",
+        "Reconcile source conflict and confirm if 17:00 doors vs 18:00 program before any event approval"
+      ]
+    },
+    {
+      "scene": "teatro",
+      "identity": "Teatro Cerca vs Alternativa",
+      "primaryHost": "alternativateatral.com",
+      "backupHost": "teatrocerca.com.ar",
+      "backupRole": "secondary_specialized_agenda",
+      "editorialDecision": "BACKUP_LEADS_ONLY",
+      "limitations": "A secondary publication may give a dated function but is not substitute original proof; follow each linked organizer or ticket detail for accurate venue/time"
+    },
+    {
+      "scene": "musica",
+      "identity": "Teatro Ópera and Passline",
+      "primaryHost": "operalp.com.ar",
+      "backupHost": "passline.com",
+      "backupRole": "event_index_and_ticket_listings",
+      "editorialDecision": "BACKUP_LEADS_ONLY",
+      "limitations": "Multiple Passline monitors share one root; schema_org date alone remains structured_origin_unverified; confirm via original event detail before treating as recovered"
+    },
+    {
+      "scene": "arte_y_cultura",
+      "identity": "Freezer + Lumen Artis",
+      "primaryHost": "festival.freezer.com.ar",
+      "backupHost": "lumenartis.org",
+      "editorialDecision": "SHADOW_SCENE_COVERAGE_ONLY",
+      "limitations": "Distinct valid upcoming originals for separate activities; this is SCENE continuity, not proof of same event or automated recovery"
+    }
+  ],
+  "guarantees": [
+    "Never equate fallback leads with confirmed recovered events",
+    "Never confuse same-ticketing-host duplicate monitors with independent sources",
+    "Do not count teatro_y_musica as an additional unrelated scene to inflate four-scene coverage",
+    "Existing sources continue to be discovered/checked by ordinary FULL; no new cron or forced FULL",
+    "No changes to Neon, canonical events, public directory, or active source statuses by this research"
+  ]
+}
