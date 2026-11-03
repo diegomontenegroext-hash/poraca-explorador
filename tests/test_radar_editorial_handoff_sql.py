@@ -23,6 +23,26 @@ class EditorialHandoffSqlTests(unittest.TestCase):
         self.assertIn("WHEN alternate_time_observation THEN 'HOLD_EXISTING_OBSERVATION_OTHER_TIME'", SQL)
         self.assertLess(SQL.index("WHEN alternate_time_observation THEN"), SQL.index("WHEN legacy_observation_count=0 THEN"))
 
+    def test_authorized_source_bridge_and_approved_venue(self):
+        # Radar internal source IDs are not editorial ingestion authority.
+        self.assertIn("public.radar_web_sources_v1", SQL)
+        self.assertIn("AS editorial_source_id", SQL)
+        self.assertIn("AS editorial_source_count", SQL)
+        self.assertIn("public.poraca_source_host_v1(e.proof_url)", SQL)
+        self.assertIn("AS editorial_venue_id", SQL)
+        self.assertIn("v.editorial_state='approved_public'", SQL)
+        self.assertIn("HOLD_AUTHORIZED_SOURCE_MAPPING", SQL)
+        self.assertIn("HOLD_APPROVED_VENUE_MAPPING", SQL)
+        self.assertIn("MANUAL_REVIEW_FOR_OBSERVATION_ONLY", SQL)
+        self.assertIn("false AS authorized_to_write", SQL)
+        self.assertIn("false AS publication_approved", SQL)
+
+    def test_no_privilege_expansion_or_automatic_publication(self):
+        self.assertIn("No ampliar privilegios de Radar", SQL)
+        self.assertNotIn("GRANT ", SQL.upper().replace("-- NO AMPLIAR", ""))
+        self.assertNotIn("CREATE FUNCTION", SQL.upper())
+        self.assertNotIn("CREATE TRIGGER", SQL.upper())
+
     def test_ancillary_ticket_must_not_become_separate_event(self):
         self.assertIn("AS possible_accessory_ticket", SQL)
         self.assertIn("meet[[:space:]]*(&|and|y)[[:space:]]*greet", SQL)

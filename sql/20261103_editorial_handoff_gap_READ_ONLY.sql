@@ -1,12 +1,15 @@
 -- POR ACA / 03-11-2026 / P0-A: handoff editorial seguro, SOLO SELECT.
 -- No crea observaciones, recibos, relaciones ni canónicos. La fila es una
 -- PROPUESTA de revisión, incluso cuando la fuente dice primary.
+-- REQUIERE LECTURA OWNER/EDITORIAL: las fuentes public.radar_web_sources_v1
+-- y entidades public.poraca_knowledge_entities NO son SELECT del rol
+-- poraca_definitivo_scope. No ampliar privilegios de Radar para este informe.
 -- Ejecutar en neondb / rama operativa; cada revisión requiere humano y
 -- escritor autorizado por separado. No usar esta vista como INSERT.
 WITH scope AS (
  SELECT (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date AS today
 ), candidates AS (
- SELECT l.listing_key,l.source_id,s.source_role,l.title,l.event_date,
+ SELECT l.listing_key,l.source_id,s.source_role,s.circuit AS source_circuit,l.title,l.event_date,
         l.event_time,l.venue,l.proof_url,l.proof_method,l.evidence_tier,
         l.last_seen_at,public.poraca_fact_key_v1(l.title) AS title_key,
         public.poraca_first_party_event_detail_v1(
@@ -96,11 +99,26 @@ WITH scope AS (
     AS possible_approved_venue_count
  FROM distinct_proposals c
 )
-SELECT title,event_date,event_time,venue,proof_url,source_id,source_role,
+SELECT title,event_date,event_time,venue,proof_url,e.source_id,source_role,
+       source_circuit,
        evidence_tier,exact_original_detail,proposed_observation_id,
        venue_labels,legacy_observation_count,explicit_editorial_hold,
        possible_canonical,alternate_time_canonical,alternate_time_observation,
        possible_accessory_ticket,possible_approved_venue_count,
+       reg.editorial_source_count,reg.editorial_source_id,reg.editorial_source_url,
+       vmatch.editorial_venue_id,
+       CASE
+         WHEN explicit_editorial_hold THEN 'HOLD_PRIOR_EDITORIAL_DECISION'
+         WHEN possible_canonical THEN 'NOOP_POSSIBLE_CANONICAL'
+         WHEN alternate_time_canonical OR alternate_time_observation THEN 'HOLD_CLOCK_CONFLICT'
+         WHEN possible_accessory_ticket THEN 'HOLD_ADDITIONAL_TICKET'
+         WHEN NOT exact_original_detail THEN 'HOLD_ORIGINAL_DETAIL'
+         WHEN venue_labels<>1 THEN 'HOLD_VENUE_VARIANTS'
+         WHEN legacy_observation_count>0 THEN 'OBSERVATION_ALREADY_PRESENT'
+         WHEN reg.editorial_source_count<>1 THEN 'HOLD_AUTHORIZED_SOURCE_MAPPING'
+         WHEN vmatch.editorial_venue_id IS NULL THEN 'HOLD_APPROVED_VENUE_MAPPING'
+         ELSE 'MANUAL_REVIEW_FOR_OBSERVATION_ONLY'
+       END AS editorial_bridge_state,
        CASE
          WHEN explicit_editorial_hold THEN 'HOLD_PRIOR_EDITORIAL_DECISION'
          WHEN possible_canonical THEN 'NOOP_POSSIBLE_CANONICAL'
@@ -114,5 +132,25 @@ SELECT title,event_date,event_time,venue,proof_url,source_id,source_role,
          ELSE 'OBSERVATION_PRESENT_REVIEW_REQUIRED'
        END AS handoff_gate,
        false AS authorized_to_write,false AS publication_approved
-FROM evaluated
+FROM evaluated e
+-- Same-host authority is for review only; multiple allowed sources = HOLD.
+LEFT JOIN LATERAL (
+ SELECT count(*)::int AS editorial_source_count,
+        CASE WHEN count(*)=1 THEN min(r.source_id) END AS editorial_source_id,
+        CASE WHEN count(*)=1 THEN min(r.source_url) END AS editorial_source_url
+ FROM public.radar_web_sources_v1 r
+ WHERE r.monitoring_state='enabled'
+   AND r.source_role IN ('original_venue','institutional_program','theatre_ticketing')
+   AND public.poraca_source_host_v1(r.source_url)=
+       public.poraca_source_host_v1(e.proof_url)
+) reg ON true
+-- Venue must match ONE previously approved identity. Do not create new nodes.
+LEFT JOIN LATERAL (
+ SELECT CASE WHEN count(*)=1 THEN min(v.entity_id) END AS editorial_venue_id
+ FROM public.poraca_knowledge_entities v
+ WHERE v.entity_kind='venue' AND v.editorial_state='approved_public'
+   AND v.merged_into_id IS NULL
+   AND v.lifecycle_state IS DISTINCT FROM 'closed_confirmed'
+   AND public.poraca_fact_key_v1(v.display_name)=public.poraca_fact_key_v1(e.venue)
+) vmatch ON true
 ORDER BY event_date,event_time,title,proof_url LIMIT 200;
