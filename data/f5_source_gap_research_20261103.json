@@ -2,7 +2,7 @@
   "schema": "poraca-f5-recovery-source-gap-research-v1",
   "asOf": "2026-11-03",
   "city": "La Plata y alrededores",
-  "status": "research_only_no_source_registry_writes",
+  "status": "ONE_OFFICIAL_SOURCE_OPERATIONALLY_REGISTERED;F5_NOT_CHECKED",
   "reason": "Four independent scenes need precise original-event fallback; source-host redundancy and index-only returns do not meet F5",
   "targetScenes": [
     "arte_y_cultura",
@@ -41,8 +41,8 @@
       "venue": "Biblioteca Pública UNLP, Plaza Rocha Nº137, La Plata",
       "publicationDate": "2026-11-02",
       "originalConfirmed": true,
-      "sourceAlreadyOperational": false,
-      "editorialDecision": "REVIEW_SOURCE_ADDITION_GENERIC_INSTITUTIONAL_PROGRAM",
+      "sourceAlreadyOperational": true,
+      "editorialDecision": "SOURCE_REGISTRY_APPROVED_GENERIC_INSTITUTIONAL_NOT_EVENT_APPROVED",
       "publicEventAdmissionApproved": false,
       "circuitIndependentFrom": [
         "feriaedita.com.ar",
@@ -51,8 +51,17 @@
       "constraints": [
         "Confirm that website serves stable future individual-program posts, not only archival notices",
         "Test generic date/time parser on fresh article and ensure annual archives do not create false future event",
-        "Add source via authorized operational source registry review, not by source-specific parser"
-      ]
+        "Add source via authorized operational source registry review, not by source-specific parser",
+        "Source has not yet passed first natural Radar HTTP fetch; synthetic parser QA cannot replace live verification.",
+        "Original 19–24 is the public fair time window, NOT an independently proved 19:00 stage performance.",
+        "Generic extractor returns review-only original and unknown venue until explicit proof, never a canonical event."
+      ],
+      "sourceId": "rd-web-biblio-unlp-20261103",
+      "registrationState": "FETCH_ENABLED_RECORDED_NOT_YET_OBSERVED",
+      "productionRegisteredAt": "2026-11-03",
+      "registeredRoot": "https://biblio.unlp.edu.ar/",
+      "operationalVerification": "Neon production SELECT readback: one registered source, zero source_checks, zero staged listings at first registration",
+      "publisher": "Biblioteca Pública de la Universidad Nacional de La Plata"
     },
     {
       "scene": "literatura",
@@ -105,5 +114,12 @@
     "Do not count teatro_y_musica as an additional unrelated scene to inflate four-scene coverage",
     "Existing sources continue to be discovered/checked by ordinary FULL; no new cron or forced FULL",
     "No changes to Neon, canonical events, public directory, or active source statuses by this research"
+  ],
+  "nextNaturalRunChecks": [
+    "source_checks HTTP status and real details_opened for new source",
+    "one original dated fair lead with unchanged 19–24 public window semantics",
+    "no false 19:00 theatrical start/venue inference",
+    "no historical original from 2025 reclassified future",
+    "F5 independent scene fallback reevaluation after full"
   ]
 }
