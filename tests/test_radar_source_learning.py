@@ -82,5 +82,41 @@ class YieldLearningTests(unittest.TestCase):
         self.assertEqual(r["learningState"],"DIAGNOSTIC_ONLY")
 
 
+
+SOURCE_PURPOSE_REVIEW=(pathlib.Path(__file__).resolve().parents[1]/
+    "sql/20261103_source_purpose_review_READ_ONLY.sql").read_text()
+
+class SourcePurposeReviewContractTests(unittest.TestCase):
+    def test_scope_review_is_non_mutating(self):
+        import re
+        code="\n".join(line.split("--",1)[0] for line in
+                       SOURCE_PURPOSE_REVIEW.splitlines())
+        for op in ("INSERT","UPDATE","DELETE","TRUNCATE","ALTER",
+                   "CREATE","DROP","GRANT","CALL"):
+            self.assertIsNone(re.search(r"\b"+op+r"\b",code,re.I),op)
+        self.assertIn("false AS source_mode_changed",SOURCE_PURPOSE_REVIEW)
+        self.assertIn("false AS failure_erased",SOURCE_PURPOSE_REVIEW)
+        self.assertIn("false AS alternative_entity_identity_verified",
+                      SOURCE_PURPOSE_REVIEW)
+
+    def test_source_check_counts_do_not_cross_multiply_listings(self):
+        self.assertIn("checks AS (",SOURCE_PURPOSE_REVIEW)
+        self.assertIn("upcoming AS (",SOURCE_PURPOSE_REVIEW)
+        self.assertIn("GROUP BY c.source_id",SOURCE_PURPOSE_REVIEW)
+        self.assertIn("GROUP BY l.source_id",SOURCE_PURPOSE_REVIEW)
+        self.assertIn("LEFT JOIN checks c",SOURCE_PURPOSE_REVIEW)
+        self.assertIn("LEFT JOIN upcoming u",SOURCE_PURPOSE_REVIEW)
+
+    def test_archive_purpose_is_review_not_suppressed_http_error(self):
+        for token in ("official_museum_archive",
+                      "historical_original_organizer_not_current_venue",
+                      "official_custodian","REVIEW_REFERENCE_SOURCE_MODE",
+                      "RECOVER_SOURCE_HTTP","REVIEW_INDEX_PURPOSE",
+                      "HUMAN_REVIEW_WITH_PROVENANCE_AND_ROLLBACK",
+                      "index_only7d+failed7d>=3"):
+            self.assertIn(token,SOURCE_PURPOSE_REVIEW)
+        self.assertIn("source_role IN",SOURCE_PURPOSE_REVIEW)
+        self.assertIn("dated_future_rows=0",SOURCE_PURPOSE_REVIEW)
+
 if __name__=="__main__":
     unittest.main()
