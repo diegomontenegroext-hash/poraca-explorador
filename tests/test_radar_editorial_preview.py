@@ -44,7 +44,12 @@ class EditorialPreviewTests(unittest.TestCase):
         self.assertIn("source_id",SQL)
         self.assertIn("event_time",SQL)
         self.assertIn("venue_variants>1",SQL)
-        self.assertNotIn("radar_v3_source_observations",SQL)
+        self.assertIn("public.radar_v3_source_observations",SQL)
+        self.assertIn("public.radar_agenda_events",SQL)
+        self.assertIn("DO_NOT_APPROVE",SQL)
+        self.assertIn("prior_editorial_hold",SQL)
+        self.assertIn("has_editorial_observation",SQL)
+        self.assertIn("likely_canonical",SQL)
 
     def test_06_only_select_not_canonical_write(self):
         self.assertTrue(SQL.strip().upper().startswith("WITH ELIGIBLE"))
@@ -54,6 +59,27 @@ class EditorialPreviewTests(unittest.TestCase):
         self.assertNotIn("INSERT INTO",SQL.upper())
         self.assertNotIn("UPDATE ",SQL.upper())
         self.assertNotIn("DELETE FROM",SQL.upper())
+
+    def test_07_cross_stage_probe_counts_are_not_publication(self):
+        # Live query adds three booleans to the old 13-column contract.
+        a=item(clock="21:00")+(False,False,False)
+        b=item(clock="22:00")+(True,True,False)
+        c=item(clock="23:00")+(False,False,True)
+        result=summarize([a,b,c])
+        d=result["handoffDiagnostic"]
+        self.assertEqual(d["groupsWithProbe"],3)
+        self.assertEqual(d["missingEditorialObservation"],2)
+        self.assertEqual(d["withEditorialObservation"],1)
+        self.assertEqual(d["priorEditorialHolds"],1)
+        self.assertEqual(d["possiblyCanonical"],1)
+        self.assertEqual(result["handoffDiagnosticState"],"READ_ONLY_NOT_AUTHORIZATION")
+        self.assertFalse(result["canonWriteApproved"])
+        self.assertFalse(result["publicationApproved"])
+
+    def test_08_old_fixture_contract_is_backward_compatible(self):
+        d=summarize([item()])["handoffDiagnostic"]
+        self.assertEqual(d["groupsWithProbe"],0)
+        self.assertEqual(d["missingEditorialObservation"],0)
 
     def test_07_unfamiliar_status_is_rejected(self):
         with self.assertRaises(ValueError):
