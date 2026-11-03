@@ -71,9 +71,13 @@ SELECT event_date,event_time,title,venue,proof_url,proof_method,evidence_tier,
            AND public.poraca_fact_key_v1(o.observed_title)=
                public.poraca_fact_key_v1(ranked.title)
            AND o.source_event_url=ranked.proof_url
-           AND (o.original_evidence->'editorialHandoff'->>'publication'='DO_NOT_APPROVE'
+           AND (o.original_evidence->'editorialHandoff'->>'publication'
+                 IN ('DO_NOT_APPROVE','DO_NOT_AUTO_APPROVE')
              OR o.reconciliation_state IN ('rejected','conflict','disputed')
-             OR o.original_evidence->>'conflict'='true'))
+             -- The existing canonical writer rejects ANY conflict value
+             -- other than exactly 'false'; a textual pending sentinel is
+             -- just as blocking as boolean true.
+             OR coalesce(o.original_evidence->>'conflict','false')<>'false'))
          AS prior_editorial_hold,
        EXISTS(SELECT 1 FROM public.radar_agenda_events e
          WHERE e.event_date=ranked.event_date
