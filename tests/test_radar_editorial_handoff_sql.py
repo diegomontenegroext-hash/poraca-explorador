@@ -1,6 +1,5 @@
 """Guard the read-only handoff contract: no phantom observations or add-on events."""
 from pathlib import Path
-import re
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -9,7 +8,7 @@ SQL = (ROOT / "sql" / "20261103_editorial_handoff_gap_READ_ONLY.sql").read_text(
 
 class EditorialHandoffSqlTests(unittest.TestCase):
     def test_read_only_and_no_writer_claim(self):
-        executable = re.sub(r"(?m)^\\s*--.*$", "", SQL).strip().upper()
+        executable = "\n".join(line for line in SQL.splitlines() if not line.lstrip().startswith("--")).strip().upper()
         self.assertTrue(executable.startswith("WITH SCOPE AS"))
         for mutation in ("INSERT INTO", "UPDATE ", "DELETE FROM", "TRUNCATE "):
             self.assertNotIn(mutation, executable)
