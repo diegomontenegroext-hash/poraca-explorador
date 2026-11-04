@@ -1,7 +1,9 @@
 """Pre-admisión de las funciones Radar, sin escribir ni aprobar información.
 
-Agrupa observaciones candidatas por título + fecha + horario (la sede puede
-diferir y se trata como conflicto). Monitores sobre el MISMO enlace no
+Agrupa observaciones candidatas por título + día del programa; la hora es
+opcional y las variantes horarias se informan, nunca se inventan. Una misma
+obra con funciones distintas requiere revisión sin auto-fusión ni auto-alta.
+La sede puede diferir y se trata como conflicto. Monitores sobre el MISMO enlace no
 equivalen a corroboración independiente. Toda decisión sigue siendo humana
 o de un flujo editorial expresamente autorizado.
 """
@@ -19,7 +21,9 @@ WITH eligible AS (
  JOIN radar_definitivo.sources s USING(source_id)
  WHERE l.event_date >= (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
    AND l.event_date <= (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date + 21
-   AND l.event_time ~ '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+   -- Contrato de descubrimiento: la hora NO es condición de elegibilidad.
+   -- Se necesita fecha, programa/actores, lugar y origen primario concreto.
+   AND l.proof_url ~ '^https://'
    AND nullif(btrim(l.venue),'') IS NOT NULL
    AND length(btrim(l.title)) >= 4
    AND l.evidence_tier IN (
@@ -30,17 +34,19 @@ WITH eligible AS (
       WHERE a.listing_key=l.listing_key)
 ),
 bundled AS (
- SELECT title_key,event_date,event_time,
+ SELECT title_key,event_date,
         count(DISTINCT listing_key)::int AS raw_observations,
         count(DISTINCT source_id)::int AS monitors,
         count(DISTINCT proof_url)::int AS different_proofs,
-        count(DISTINCT lower(btrim(venue)))::int AS venue_variants
+        count(DISTINCT lower(btrim(venue)))::int AS venue_variants,
+        count(DISTINCT event_time) FILTER (WHERE event_time IS NOT NULL)::int
+          AS time_variants
  FROM eligible
- GROUP BY title_key,event_date,event_time
+ GROUP BY title_key,event_date
 ),
 ranked AS (
- SELECT e.*,b.raw_observations,b.monitors,b.different_proofs,b.venue_variants,
-        row_number() OVER(PARTITION BY e.title_key,e.event_date,e.event_time
+ SELECT e.*,b.raw_observations,b.monitors,b.different_proofs,b.venue_variants,b.time_variants,
+        row_number() OVER(PARTITION BY e.title_key,e.event_date
           ORDER BY CASE e.evidence_tier
             WHEN 'primary_venue' THEN 0
             WHEN 'primary_program_ics' THEN 1
@@ -50,29 +56,24 @@ ranked AS (
           CASE WHEN e.proof_method ILIKE '%category_card%' THEN 1 ELSE 0 END,
           e.last_seen_at DESC,e.listing_key) AS choice
  FROM eligible e
- JOIN bundled b USING(title_key,event_date,event_time)
+ JOIN bundled b USING(title_key,event_date)
 )
 SELECT event_date,event_time,title,venue,proof_url,proof_method,evidence_tier,
        source_name,monitors,raw_observations,different_proofs,venue_variants,
        CASE
-          -- Different clock on the same original: prevent doors/show dupes.
-          WHEN EXISTS(SELECT 1 FROM public.radar_v3_source_observations o
-            WHERE o.observed_date=ranked.event_date
-              AND o.source_event_url=ranked.proof_url
-              AND public.poraca_fact_key_v1(o.observed_title)=
-                  public.poraca_fact_key_v1(ranked.title)
-              AND left(coalesce(o.observed_time,''),5)<>ranked.event_time)
-            THEN 'HOLD_EXISTING_OBSERVATION_OTHER_TIME'
           -- Accessory ticket/upgrade cannot create an independent show.
           WHEN ranked.title ~* '^[[:space:]]*(meet[[:space:]]*(&|and|y)[[:space:]]*greet|upgrade[[:space:]]|entrada[[:space:]]+adicional)'
             THEN 'HOLD_ACCESSORY_TICKET_NOT_SEPARATE_EVENT'
           WHEN venue_variants>1 THEN 'HOLD_VENUE_IDENTITY_VARIANTS'
+          -- Multiple explicit show slots stay in the source evidence, not
+          -- multiple automatic canons. No guess which is doors vs stage.
+          WHEN time_variants>1 THEN 'REVIEW_MULTIPLE_SLOTS_SAME_DAY'
           WHEN different_proofs>1 THEN 'REVIEW_MULTIPLE_PROOF_URLS'
           ELSE 'REVIEW_ORIGINAL_EVENT'
        END AS review_gate,
        EXISTS(SELECT 1 FROM public.radar_v3_source_observations o
          WHERE o.observed_date=ranked.event_date
-           AND left(coalesce(o.observed_time,''),5)=ranked.event_time
+           -- A source reporting doors != show time is NOT a second event.
            AND public.poraca_fact_key_v1(o.observed_title)=
                public.poraca_fact_key_v1(ranked.title)
            AND o.source_event_url=ranked.proof_url)
@@ -92,11 +93,11 @@ SELECT event_date,event_time,title,venue,proof_url,proof_method,evidence_tier,
          AS prior_editorial_hold,
        EXISTS(SELECT 1 FROM public.radar_agenda_events e
          WHERE e.event_date=ranked.event_date
-           AND left(coalesce(e.event_time,''),5)=ranked.event_time
-           AND (public.poraca_fact_key_v1(e.title)=
-                  public.poraca_fact_key_v1(ranked.title)
-             OR e.source_url=ranked.proof_url))
-         AS likely_canonical
+           AND e.source_url=ranked.proof_url
+           AND public.poraca_fact_key_v1(e.title)=
+               public.poraca_fact_key_v1(ranked.title))
+         AS likely_canonical,
+       time_variants
 FROM ranked WHERE choice=1
 ORDER BY event_date,event_time,title LIMIT 300
 """
@@ -104,8 +105,8 @@ ORDER BY event_date,event_time,title LIMIT 300
 
 def summarize(rows):
     seen={"HOLD_VENUE_IDENTITY_VARIANTS":0,
-          "HOLD_EXISTING_OBSERVATION_OTHER_TIME":0,
           "HOLD_ACCESSORY_TICKET_NOT_SEPARATE_EVENT":0,
+          "REVIEW_MULTIPLE_SLOTS_SAME_DAY":0,
           "REVIEW_MULTIPLE_PROOF_URLS":0,"REVIEW_ORIGINAL_EVENT":0}
     handoff={"groupsWithProbe":0,"withEditorialObservation":0,
              "missingEditorialObservation":0,"priorEditorialHolds":0,
@@ -118,6 +119,9 @@ def summarize(rows):
         # read-only cross-stage indicators, not a writer authorization.
         probed=len(row)>=16
         has_obs,prior_hold,likely_canon=(bool(x) for x in row[13:16]) if probed else (False,False,False)
+        time_variants=int(row[16]) if len(row)>=17 else (1 if clock else 0)
+        if time_variants<0:
+            raise ValueError("Invalid time variant count")
         if probed:
             handoff["groupsWithProbe"]+=1
             handoff["withEditorialObservation"]+=int(has_obs)
@@ -127,7 +131,13 @@ def summarize(rows):
         if gate not in seen:
             raise ValueError("Unrecognized review gate")
         seen[gate]+=1
-        items.append({"day":str(day),"time":clock,"title":title,
+        items.append({"day":str(day),
+             "time":clock if time_variants<=1 else None,
+             "timeVariants":time_variants,
+             "timeMeaning":"SOURCE_REPORTED_CHECK_ORIGINAL" if clock and time_variants==1
+                    else "MULTIPLE_SOURCE_CLOCKS_NOT_AUTO_RESOLVED" if time_variants>1
+                    else "NO_CLOCK_REQUIRED_FOR_DISCOVERY",
+             "title":title,
              "venue":venue,"proofUrl":proof,"proofMethod":method,
              "evidenceTier":tier,"source":source,"monitors":int(monitors),
              "observations":int(observations),

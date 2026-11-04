@@ -33,10 +33,22 @@ class EditorialPreviewTests(unittest.TestCase):
         self.assertEqual(output["sample"][0]["differentProofUrls"],1)
         self.assertEqual(output["independentCorroborationsVerified"],0)
 
-    def test_04_two_time_slots_remain_separate(self):
-        output=summarize([item(clock="19:30"),item(clock="20:30")])
-        self.assertEqual(output["reviewGroups"],2)
-        self.assertEqual([x["time"] for x in output["sample"]],["19:30","20:30"])
+    def test_04_two_time_slots_are_one_program_day_for_review_only(self):
+        # The SQL groups one title/day and reports multiple source clocks;
+        # it never creates two canonical sessions nor loses the original.
+        out=summarize([item(clock="19:30",gate="REVIEW_MULTIPLE_SLOTS_SAME_DAY")+
+                       (False,False,False,2)])
+        self.assertEqual(out["reviewGroups"],1)
+        self.assertEqual(out["sample"][0]["timeVariants"],2)
+        self.assertIsNone(out["sample"][0]["time"])
+        self.assertFalse(out["sample"][0]["publicationApproved"])
+        self.assertEqual(out["gates"]["REVIEW_MULTIPLE_SLOTS_SAME_DAY"],1)
+
+    def test_04b_null_time_eligible_without_invented_hour(self):
+        out=summarize([item(clock=None)])
+        self.assertEqual(out["sample"][0]["timeMeaning"],"NO_CLOCK_REQUIRED_FOR_DISCOVERY")
+        self.assertIsNone(out["sample"][0]["time"])
+        self.assertFalse(out["canonWriteApproved"])
 
     def test_05_preview_reads_live_staging_not_old_public_observations(self):
         self.assertIn("radar_definitivo.listing_occurrences",SQL)
@@ -44,6 +56,11 @@ class EditorialPreviewTests(unittest.TestCase):
         self.assertIn("source_id",SQL)
         self.assertIn("event_time",SQL)
         self.assertIn("venue_variants>1",SQL)
+        self.assertIn("GROUP BY title_key,event_date",SQL)
+        self.assertNotIn("GROUP BY title_key,event_date,event_time",SQL)
+        self.assertNotIn("AND l.event_time ~",SQL)
+        self.assertIn("AND l.proof_url ~ '^https://'",SQL)
+        self.assertIn("time_variants>1",SQL)
         self.assertIn("public.radar_v3_source_observations",SQL)
         self.assertIn("public.radar_agenda_events",SQL)
         self.assertIn("DO_NOT_APPROVE",SQL)
@@ -96,21 +113,23 @@ class EditorialPreviewTests(unittest.TestCase):
         self.assertFalse(out["sample"][0]["canonWriteApproved"])
         self.assertFalse(out["sample"][0]["publicationApproved"])
 
-    def test_10_readonly_report_prioritizes_existing_clock_and_addon(self):
-        self.assertIn("HOLD_EXISTING_OBSERVATION_OTHER_TIME", SQL)
+    def test_10_time_is_nonblocking_but_real_holds_remain(self):
+        self.assertNotIn("HOLD_EXISTING_OBSERVATION_OTHER_TIME", SQL)
         self.assertIn("HOLD_ACCESSORY_TICKET_NOT_SEPARATE_EVENT", SQL)
         self.assertIn("o.source_event_url=ranked.proof_url", SQL)
-        self.assertIn("left(coalesce(o.observed_time,''),5)<>ranked.event_time", SQL)
+        self.assertNotIn("left(coalesce(o.observed_time,''),5)<>ranked.event_time", SQL)
         self.assertIn("meet[[:space:]]*(&|and|y)[[:space:]]*greet", SQL)
+        self.assertIn("o.reconciliation_state IN ('rejected','conflict','disputed')",SQL)
         out=summarize([
-            item(gate="HOLD_EXISTING_OBSERVATION_OTHER_TIME")+(False,False,False),
-            item(gate="HOLD_ACCESSORY_TICKET_NOT_SEPARATE_EVENT")+(False,False,False),
-            item(gate="REVIEW_ORIGINAL_EVENT")+(False,False,False),
+            item(gate="REVIEW_MULTIPLE_SLOTS_SAME_DAY")+(False,False,False,2),
+            item(gate="HOLD_ACCESSORY_TICKET_NOT_SEPARATE_EVENT")+(False,False,False,1),
+            item(gate="HOLD_VENUE_IDENTITY_VARIANTS")+(False,True,False,1),
+            item(gate="REVIEW_ORIGINAL_EVENT")+(False,False,True,1),
         ])
-        self.assertEqual(out["reviewGroups"],3)
-        self.assertEqual(out["gates"]["HOLD_EXISTING_OBSERVATION_OTHER_TIME"],1)
-        self.assertEqual(out["gates"]["HOLD_ACCESSORY_TICKET_NOT_SEPARATE_EVENT"],1)
-        self.assertEqual(out["gates"]["REVIEW_ORIGINAL_EVENT"],1)
+        self.assertEqual(out["reviewGroups"],4)
+        self.assertEqual(out["gates"]["REVIEW_MULTIPLE_SLOTS_SAME_DAY"],1)
+        self.assertEqual(out["gates"]["HOLD_VENUE_IDENTITY_VARIANTS"],1)
+        self.assertTrue(out["sample"][2]["priorEditorialHold"])
         self.assertEqual(out["editorialObservationsWritten"],0)
         self.assertFalse(out["canonWriteApproved"])
         self.assertFalse(out["publicationApproved"])
