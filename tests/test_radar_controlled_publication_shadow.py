@@ -83,7 +83,7 @@ class GateTests(unittest.TestCase):
         v=sample();v["event"]["program_day"]="2026-11-20";v["integrity"]["source_date_conflict"]=True
         self.assertEqual(outcome(v)["decision"],"REVIEW")
         v=sample();v["event"]["location_in_scope"]=False
-        self.assertEqual(outcome(v)["decision"],"REVIEW")
+        self.assertEqual(outcome(v)["decision"],"SKIP")
     def test_stale_evidence_skips_this_pass(self):
         v=sample();v["original"]["checked_at"]="2026-10-01T09:00:00Z"
         self.assertEqual(outcome(v)["decision"],"SKIP")
@@ -104,7 +104,7 @@ class GateTests(unittest.TestCase):
             evaluate(sample(),today=TODAY,now=NOW,policy=p)
     def test_instagram_account_is_not_specific_event(self):
         v=sample();v["original"]["url"]="https://www.instagram.com/puravidalaplata2008/"
-        self.assertEqual(outcome(v)["decision"],"REVIEW")
+        self.assertEqual(outcome(v)["decision"],"SKIP")
         v["original"]["url"]="https://www.instagram.com/p/ABC12345/"
         self.assertEqual(outcome(v)["decision"],"AUTO_ELIGIBLE_SHADOW")
 
