@@ -28,6 +28,7 @@ from radar_parallel import (
 from radar_agenda_adapters import extract_listings, special_links, tidy
 from radar_adaptive_discovery import discover_sections, discover_original_posts_from_section
 from radar_original_root_candidate import root_review_candidate, suppress_unverified_cycle_root_sessions
+from radar_exact_original_read_receipt import attach_exact_original_receipts
 from radar_ical_generic import discover_calendar_links
 from radar_adaptive_cadence import cadence_hours as adaptive_cadence_hours
 from radar_evidence_quality import summarize as summarize_evidence_quality
@@ -442,7 +443,9 @@ def scan_source(source,budget,mode):
         return check,[]
     page=parse_html(body)
     # Source-specific evidence, including multiple sessions per theatre work.
-    check["_listings"]=extract_listings(body,root,source_role=source.get("source_role"))
+    check["_listings"]=attach_exact_original_receipts(
+        extract_listings(body,root,source_role=source.get("source_role")),
+        root,body,status,source_role=source.get("source_role"))
     root_candidates=root_review_candidate(source,root,page,status,make_candidate)
     check["_listings"]=suppress_unverified_cycle_root_sessions(
         check["_listings"],root,root_candidates)
@@ -536,7 +539,9 @@ def scan_source(source,budget,mode):
         detail=parse_html(data) if data else None
         if detail:
             check["details_opened"]+=1
-            check["_listings"].extend(extract_listings(data,url,source_role=source.get("source_role")))
+            check["_listings"].extend(attach_exact_original_receipts(
+                extract_listings(data,url,source_role=source.get("source_role")),
+                url,data,stat,source_role=source.get("source_role")))
             if (institutional_sections_root and label in section_labels
                     and len(selected_links)<max_details):
                 # One actual first-party article per visited section. The
@@ -810,14 +815,20 @@ def save_source_result(conn,run_id,source,check,candidates):
             listing_key=hashlib.sha256(signature.encode("utf-8")).hexdigest()
             cur.execute("""INSERT INTO radar_definitivo.listing_occurrences(
               listing_key,source_id,title,event_date,event_time,venue,
-              proof_url,proof_method,evidence_tier,first_run_id,last_run_id)
-              VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+              proof_url,proof_method,evidence_tier,first_run_id,last_run_id,
+              last_original_read_receipt)
+              VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb)
               ON CONFLICT(listing_key) DO UPDATE SET
                  last_seen_at=now(),seen_count=radar_definitivo.listing_occurrences.seen_count+1,
-                 last_run_id=EXCLUDED.last_run_id""",
+                 last_run_id=EXCLUDED.last_run_id,
+                 last_original_read_receipt=COALESCE(
+                   EXCLUDED.last_original_read_receipt,
+                   radar_definitivo.listing_occurrences.last_original_read_receipt)""",
                  (listing_key,source["source_id"],item["title"],
                   item["event_date"],item.get("event_time"),item.get("venue"),
-                  item["proof_url"],item["method"],item["evidence_tier"],run_id,run_id))
+                  item["proof_url"],item["method"],item["evidence_tier"],run_id,run_id,
+                  json.dumps(dict(item["_original_read_receipt"],run_id=run_id))
+                    if item.get("_original_read_receipt") else None))
         for c in candidates:
             cur.execute(
                 """INSERT INTO radar_definitivo.candidates
