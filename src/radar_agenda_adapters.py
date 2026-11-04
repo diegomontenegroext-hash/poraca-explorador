@@ -16,6 +16,7 @@ from urllib.parse import urlsplit, parse_qs, urljoin
 from radar_parallel import iso_event_fields
 from radar_ical_agenda import FEED_URL as OFFICIAL_ICS_FEED_URL, calendar_sessions
 from radar_ical_generic import is_calendar_url, calendar_sessions as generic_ical_sessions
+from radar_cultural_evidence import ArticleBlocks, article_metadata
 
 MONTHS={"enero":1,"febrero":2,"marzo":3,"abril":4,"mayo":5,"junio":6,
         "julio":7,"agosto":8,"septiembre":9,"setiembre":9,"octubre":10,
@@ -37,6 +38,8 @@ SCOPED_HOSTS={"agendalaplata.ar","www.agendalaplata.ar",
               "www.centrodearte.unlp.edu.ar","centrodearte.unlp.edu.ar",
               "www.casadionisio.com.ar","casadionisio.com.ar",
               "www.eldia.com","eldia.com",
+              "www.0221.com.ar","0221.com.ar",
+              "wevix.com.ar","www.wevix.com.ar",
               "teatrocerca.com.ar","www.teatrocerca.com.ar"}
 def tidy(s):
     return re.sub(r"\s+"," ",html.unescape(s or "")).strip()
@@ -772,6 +775,38 @@ def el_dia_editorial_agenda(raw, url, blocks=None, at=None):
             unique.append(record)
     return unique[:100]
 
+
+def press_0221_agenda(raw, url):
+    """Dated headings + literal list cards. NewsArticle date is a year anchor,
+    never the event day. A list item without its own title/venue is omitted.
+    """
+    host,path=scope(url)
+    if host not in ('www.0221.com.ar','0221.com.ar') or not re.fullmatch(r'/que-hago/[^/]+-n\d+/?',path): return []
+    meta=article_metadata(raw)
+    try: origin=date.fromisoformat(meta.get('datePublished','')[:10])
+    except ValueError: return []
+    if not active_date(origin): return []
+    parser=ArticleBlocks();parser.feed(raw)
+    current=None;out=[]
+    for tag,text in parser.blocks:
+        if tag in ('h2','h3'):
+            current=None
+            match=re.fullmatch(r'(?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)\s+(\d{1,2})\s+de\s+([a-z]+)(?:\s+de\s+(20\d{2}))?',tidy(text),re.I)
+            if match and match[2].lower() in MONTHS:
+                try: day=date(int(match[3] or origin.year),MONTHS[match[2].lower()],int(match[1]))
+                except ValueError: continue
+                if origin-timedelta(days=1)<=day<=origin+timedelta(days=14): current=day
+            continue
+        if tag!='li' or not current: continue
+        parts=[tidy(p) for p in text.split('\n') if tidy(p)]
+        if len(parts)!=2: continue
+        match=re.fullmatch(r'((?:[01]?\d|2[0-3]))(?:[.:]([0-5]\d))?\s*[-–]\s*(.{4,180})',parts[0])
+        if not match: continue
+        row=make_record(match[3],current,f'{int(match[1]):02d}:{match[2] or "00"}',parts[1],url,
+                        '0221_dated_editorial_list','secondary_press_agenda')
+        if row: out.append(row)
+    return out[:100]
+
 def teatro_cerca_listing_cards(raw, url, at=None):
     """Extract date/time-locality-specific theatre cards, SECONDARY only.
 
@@ -1027,6 +1062,23 @@ def extract_listings(raw,url,source_role=None):
     out=structured_sessions(raw,url)
     out.extend(source_specific_sessions(raw,url,blocks))
     out.extend(el_dia_editorial_agenda(raw,url,blocks))
+    out.extend(press_0221_agenda(raw,url))
+    if host in ('wevix.com.ar','www.wevix.com.ar') and re.fullmatch(r'/events/[a-z0-9-]+/?',path):
+        # Demonstrated loss: an individual organizer-linked ticket has no
+        # JSON-LD Event, but prints an explicit year, clock and place in hero.
+        hero=re.search(r'<div\b[^>]*class=[\"\'][^\"\']*wp-detail-hero__body[^\"\']*[\"\'][^>]*>(.*?)</div>',raw,re.I|re.S)
+        if hero:
+            card=visible_blocks(hero[1])
+            title=next((v for t,v in card.headings if t=='h1'),None)
+            paras=[v for t,v in card.chunks if t=='p']
+            if title and len(paras)>=2:
+                day=spanish_day_month_year(paras[0])
+                clock=re.search(r'\b(1[0-2]|0?[1-9]):([0-5]\d)\s*([ap])\.?\s*m\.?\s*hs\b',paras[0],re.I)
+                if day and clock:
+                    hour=int(clock[1])%12+(12 if clock[3].lower()=='p' else 0)
+                    row=make_record(title,day,f'{hour:02d}:{clock[2]}',paras[1].split(' · ')[0],url,
+                        'wevix_visible_ticket_session','primary_ticket_listing')
+                    if row:out.append(row)
     out.extend(teatro_cerca_listing_cards(raw,url))
     out.extend(centro_arte_unlp_original_session(raw,url))
     if "alternativateatral.com" in host and re.match(r"/obra\d+",path):
@@ -1183,6 +1235,21 @@ def extract_listings(raw,url,source_role=None):
 def special_links(url,page,at=None):
     """Verified source-specific discovery with near-date priority and rotation."""
     host,path=scope(url)
+    if host in ('www.0221.com.ar','0221.com.ar') and path.rstrip('/')=='/que-hago':
+        # Preserve editorial ordering; alphabetical URLs were starving the
+        # newest weekly agendas. Two agenda articles plus a rotating tail.
+        articles={}
+        for href,label in page.links:
+            target=urljoin(url,href);p=urlsplit(target)
+            if (p.scheme=='https' and p.hostname==host and not p.query and not p.fragment
+                and re.fullmatch(r'/(?:que-hago|la-plata)/[^/]+-n\d+/?',p.path)):
+                articles.setdefault(target,(target,label))
+        ordered=list(articles.values())
+        agendas=[x for x in ordered if 'agenda-cultural' in x[0]][:2]
+        rest=[x for x in ordered if x not in agendas]
+        now=at or datetime.now(ZoneInfo('America/Argentina/Buenos_Aires'))
+        offset=(now.date().toordinal()+now.hour//8)%max(1,len(rest))
+        return agendas+rest[offset:]+rest[:offset]
     # These institutions expose a handful of genuine one-level section links.
     # General discovery requires a two-level URL and was missing them.
     # Open ONLY URLs present as anchors in the source's own homepage; do not
@@ -1268,8 +1335,20 @@ def special_links(url,page,at=None):
             if (now.timestamp()-4*86400 <= stamp <= now.timestamp()+3600):
                 links.append((stamp, raw_link))
         links.sort(reverse=True)
-        return [(u, "nota real de agenda semanal El Dia") for _, u in
+        agendas=[(u, "nota real de agenda semanal El Dia") for _, u in
                 list(dict((u,(stamp,u)) for stamp,u in links).values())[:2]]
+        # Cultural interviews and singular experiences need not say 'agenda'
+        # in their slug. They remain document leads without invented dates.
+        cultural=[]
+        for href,label in page.links:
+            target=urljoin(url,href);p=urlsplit(target)
+            m=re.fullmatch(r'/espectaculos/[^/]+_(\d{10})',p.path)
+            if (p.scheme=='https' and p.hostname==host and not p.query and not p.fragment
+                and m and now.timestamp()-10*86400<=int(m[1])<=now.timestamp()+3600
+                and re.search(r'teatro|concierto|recital|m[uú]sica|cantante|cierre-de-ano|p[uú]blico-platense|muestra|festival|vuelve|llegan',label+' '+p.path,re.I)):
+                item=(target,'nota cultural secundaria; original pendiente')
+                if item not in cultural and target not in [u for u,_ in agendas]:cultural.append(item)
+        return agendas+cultural[:6]
     if host in ("teatrometrolp.com.ar","www.teatrometrolp.com.ar") and (
             (path.rstrip("/")=="/entradas/cartelera"
              and urlsplit(url).query in ("","mes=&anio=","anio=&mes="))

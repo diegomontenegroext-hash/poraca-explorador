@@ -26,6 +26,7 @@ from radar_parallel import (
     exact_instagram, fetch, make_candidate, parse_html, structured_event,
 )
 from radar_agenda_adapters import extract_listings, special_links, tidy
+from radar_cultural_evidence import press_evidence, cultural_yield
 from radar_adaptive_discovery import discover_sections, discover_original_posts_from_section
 from radar_original_root_candidate import root_review_candidate, suppress_unverified_cycle_root_sessions
 from radar_exact_original_read_receipt import attach_exact_original_receipts
@@ -342,19 +343,27 @@ def curator_multi_plan_preview(caption):
     weekdays=r"(?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)"
     plans=[]
     anchor_days=set()
+    context=None
+    sections=[]
     for raw_line in caption.splitlines()[:120]:
         line=tidy(raw_line).strip('"')
-        if len(line)<12 or len(line)>800:
+        if not line or len(line)>800:
             continue
+        literal=re.match(r"^"+weekdays+r"\b",line,re.I)
+        date_heading=re.search(r"\b\d{1,2}\s+de\s+(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\b",line,re.I)
+        if literal or date_heading:
+            context=line
+            sections.append({'heading':line,'fragments':[]})
+            anchor_days.add(literal.group(0).casefold() if literal else date_heading.group(0).casefold())
+        elif sections and len(sections[-1]['fragments'])<12:
+            sections[-1]['fragments'].append(line)
         handles=list(dict.fromkeys(re.findall(r"@([A-Za-z0-9._]{2,40})",line)))
         if not handles:
             continue
         # No interpretation of roles, format or implied calendar date.
-        literal=re.match(r"^"+weekdays+r"\b",line,re.I)
-        if literal:
-            anchor_days.add(literal.group(0).casefold())
         plans.append({"position":len(plans)+1,"fragment":line,
                       "mentioned_accounts":handles,
+                      "literal_context":context,
                       "literal_weekday":literal.group(0).casefold() if literal else None})
         if len(plans)>=25:
             break
@@ -366,6 +375,7 @@ def curator_multi_plan_preview(caption):
             "original_confirmation_required":True,
             "source_not_organizer":True,
             "date_or_venue_inferred":False,
+            "literal_sections":sections[:25],
             "leads":plans}
 
 
@@ -398,6 +408,30 @@ def scan_exact_instagram_seeds(source, budget):
         # disponible para poder separar varios anuncios con rigor posterior.
         full_meta = public_instagram_metadata(body)
         caption = full_meta.get("description") or full_meta.get("og:description") or ""
+        claimed_url = full_meta.get('og:url') or full_meta.get('canonical_url') or ''
+        attributed=(claimed_url.startswith('https://www.instagram.com/'+source['account']+'/')
+                    and urlsplit(claimed_url).path.rstrip('/').split('/')[-1]
+                        ==urlsplit(post).path.rstrip('/').split('/')[-1])
+        identity_mismatch=(bool(claimed_url) and
+            urlsplit(claimed_url).path.rstrip('/').split('/')[-1]
+                !=urlsplit(post).path.rstrip('/').split('/')[-1])
+        # A public login/shell page is not a read caption. Preserve the URL
+        # and reason as an unresolved observation; never report coverage.
+        readable = not identity_mismatch and len(caption.strip()) >= 40 and bool(attributed or
+            re.search(r"@[A-Za-z0-9_.]+|\bon\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\b", caption, re.I))
+        candidate["evidence"]["caption_readable"] = readable
+        # An attempted parse is also cooled down; this version marker is
+        # not a coverage claim (caption_readable is the separate outcome).
+        candidate['evidence']['public_caption_extraction']='html_meta_full_v2'
+        if not readable:
+            candidate["evidence"]["detail_opened"] = False
+            reason='PERMALINK_IDENTITY_MISMATCH' if identity_mismatch else 'PERMALINK_CONTENT_UNREADABLE'
+            candidate["evidence"]["detail_error"] = reason
+            candidate["title"] = None
+            candidate["summary"] = None
+            candidates.append(candidate)
+            check["error_type"] = reason+'_PROFILE_NOT_SCANNED'
+            continue
         if caption:
             candidate["evidence"]["public_caption_text"] = caption
             if source.get("source_role")=="curadora":
@@ -421,6 +455,7 @@ def scan_exact_instagram_seeds(source, budget):
         candidates.append(candidate)
         check["details_opened"] += 1
         check["status"] = "ok"
+    check['_cultural_yield']=cultural_yield(check,candidates)
     return check, candidates
 
 
@@ -462,11 +497,20 @@ def scan_source(source,budget,mode):
     if body is None:
         return check,[]
     page=parse_html(body)
+    if re.fullmatch(r'(?:site unavailable|access denied|just a moment[.!]*|login|log in)',page.title.strip(),re.I):
+        check.update(status='failed',error_type='CONTENT_UNAVAILABLE_HTTP_200')
+        check['_cultural_yield']=cultural_yield(check,[])
+        return check,[]
     # Source-specific evidence, including multiple sessions per theatre work.
     check["_listings"]=attach_exact_original_receipts(
         extract_listings(body,root,source_role=source.get("source_role")),
         root,body,status,source_role=source.get("source_role"))
     root_candidates=root_review_candidate(source,root,page,status,make_candidate)
+    root_press=press_evidence(body,root,page) if source.get('source_role')=='local_press' else None
+    if root_press:
+        root_record=make_candidate(root,source['source_id'],'secondary_cultural_article_opened',page,status)
+        root_record['evidence'].update(cultural_article_v1=root_press,source_root=root)
+        root_candidates.append(root_record)
     check["_listings"]=suppress_unverified_cycle_root_sessions(
         check["_listings"],root,root_candidates)
     links=special_links(root,page)+[(u,"baseline_watchlist_original") for u in source.get("seed_urls",[])]
@@ -539,6 +583,11 @@ def scan_source(source,budget,mode):
                   parsed.query,parsed.fragment)
         unique_links.setdefault(identity,(u,lab))
     links=list(unique_links.values())
+    if root_press:
+        # A single article is not a citywide index: follow its attributed
+        # external originals, not unrelated 'most read' news recommendations.
+        links=[(ref['url'],'linked_original_from_secondary') for ref in root_press['original_references']
+               if ref['kind']!='account_reference' and safe_public_link(ref['url'],root)]
     check["links_found"]=len(links)
     if not links and not check["_listings"]:
         check["status"]="index_only"
@@ -555,7 +604,9 @@ def scan_source(source,budget,mode):
     # This is generic by source_role, never by organizer domain.
     candidates=root_candidates
     known=set()
-    selected_links=list(links[:max_details])
+    press_root=(source.get('source_role')=='local_press' and urlsplit(root).path.rstrip('/') in ('/que-hago','/espectaculos','/ttags/espectaculos'))
+    # Reserve one existing slot to follow an article's linked original.
+    selected_links=list(links[:max_details-1 if press_root else max_details])
     for url,label in selected_links:
         if not budget.can_fetch(url):
             break
@@ -585,6 +636,16 @@ def scan_source(source,budget,mode):
         record["evidence"]["baseline_watchlist"]=label=="baseline_watchlist_original"
         record["evidence"]["linked_from"]=root
         if data:
+            cultural=press_evidence(data,url,detail)
+            if cultural:
+                record['evidence']['cultural_article_v1']=cultural
+                if press_root and len(selected_links)<max_details:
+                    for ref in sorted(cultural['original_references'],key=lambda r:not bool(re.search(r'/(?:eventos?|events?|tickets?)/',urlsplit(r['url']).path))):
+                        target=safe_public_link(ref['url'],url)
+                        if (target and ref['kind']!='account_reference' and
+                            target not in {u for u,_ in selected_links}):
+                            selected_links.append((target,'linked_original_from_secondary'))
+                            break
             image_url=extract_og_image(data,url)
             if image_url:
                 record["evidence"]["og_image_url"]=image_url
@@ -723,6 +784,7 @@ def scan_source(source,budget,mode):
         before_count=len(check["_listings"])
         check["_listings"]=prefer_doblet_original_detail(check["_listings"])
         check["_same_session_index_dropped"]=before_count-len(check["_listings"])
+    check['_cultural_yield']=cultural_yield(check,candidates)
     return check,candidates
 
 
@@ -1040,6 +1102,7 @@ def main():
                 status=check["status"],details_opened=check["details_opened"],
                 observed_sessions=len(check.get("_listings",[])),new_candidate_urls=new,
                 error=check["error_type"],exact_permalink_only=bool(check.get("_seed_only"))))
+            source_outcomes[-1]['cultural_yield']=check.get('_cultural_yield',cultural_yield(check,candidates))
             # Live persisted acknowledgement after EVERY source, including index-only/errors.
             with conn.cursor() as cur:
                 cur.execute("""UPDATE radar_definitivo.runs SET

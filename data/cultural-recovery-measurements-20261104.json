@@ -1,0 +1,395 @@
+{
+  "schema": "poraca-cultural-recovery-measurements-v1",
+  "beforeSha": "821758b8d8bb2c9a9fe4b3091d4969b814c81064",
+  "sameDocumentComparison": [
+    {
+      "document": "0221",
+      "url": "https://www.0221.com.ar/que-hago",
+      "listings": 0,
+      "special_links": 0,
+      "curator_leads": 0,
+      "after_listings": 0,
+      "after_special_links": 18,
+      "after_cultural_article": false,
+      "after_curator_leads": 0,
+      "after_literal_sections": 0,
+      "after_identity_document": false
+    },
+    {
+      "document": "muerde_ticket",
+      "url": "https://wevix.com.ar/events/la-plata-muerde-2026",
+      "listings": 0,
+      "special_links": 0,
+      "curator_leads": 0,
+      "after_listings": 1,
+      "after_special_links": 0,
+      "after_cultural_article": false,
+      "after_curator_leads": 0,
+      "after_literal_sections": 0,
+      "after_identity_document": false
+    },
+    {
+      "document": "weekly",
+      "url": "https://www.0221.com.ar/que-hago/massacre-y-las-armas-segundo-tiempo-y-mucho-mas-la-agenda-cultural-la-plata-n136584",
+      "listings": 0,
+      "special_links": 0,
+      "curator_leads": 0,
+      "after_listings": 28,
+      "after_special_links": 0,
+      "after_cultural_article": true,
+      "after_curator_leads": 0,
+      "after_literal_sections": 0,
+      "after_identity_document": false
+    },
+    {
+      "document": "miga",
+      "url": "https://www.passline.com/eventos/miga-el-festival-de-la-merienda-560412",
+      "listings": 1,
+      "special_links": 0,
+      "curator_leads": 0,
+      "after_listings": 1,
+      "after_special_links": 0,
+      "after_cultural_article": false,
+      "after_curator_leads": 0,
+      "after_literal_sections": 0,
+      "after_identity_document": false
+    },
+    {
+      "document": "yogi",
+      "url": "https://www.houseofyogis.com/casayogi",
+      "listings": 0,
+      "special_links": 0,
+      "curator_leads": 0,
+      "after_listings": 0,
+      "after_special_links": 0,
+      "after_cultural_article": false,
+      "after_curator_leads": 0,
+      "after_literal_sections": 0,
+      "after_identity_document": false
+    },
+    {
+      "document": "dionisio",
+      "url": "https://www.casadionisio.com.ar/",
+      "listings": 0,
+      "special_links": 4,
+      "curator_leads": 0,
+      "after_listings": 0,
+      "after_special_links": 4,
+      "after_cultural_article": false,
+      "after_curator_leads": 0,
+      "after_literal_sections": 0,
+      "after_identity_document": true
+    },
+    {
+      "document": "openhouse",
+      "url": "https://openhouselaplata.com.ar/",
+      "listings": 0,
+      "special_links": 0,
+      "curator_leads": 0,
+      "after_listings": 0,
+      "after_special_links": 0,
+      "after_cultural_article": false,
+      "after_curator_leads": 0,
+      "after_literal_sections": 0,
+      "after_identity_document": false
+    },
+    {
+      "document": "carmen",
+      "url": "https://www.eldia.com/espectaculos/carmen-sanchez-viamonte-y-un-cierre-de-ano-a-lo-grande-espectaculos_1793598042",
+      "listings": 0,
+      "special_links": 0,
+      "curator_leads": 0,
+      "after_listings": 0,
+      "after_special_links": 0,
+      "after_cultural_article": true,
+      "after_curator_leads": 0,
+      "after_literal_sections": 0,
+      "after_identity_document": false
+    },
+    {
+      "document": "trifulca",
+      "url": "https://www.0221.com.ar/la-plata/la-trifulca-creo-un-videojuego-recorrer-la-plata-antes-su-proxima-fiesta-medusa-n136047",
+      "listings": 0,
+      "special_links": 0,
+      "curator_leads": 0,
+      "after_listings": 0,
+      "after_special_links": 0,
+      "after_cultural_article": true,
+      "after_curator_leads": 0,
+      "after_literal_sections": 0,
+      "after_identity_document": false
+    },
+    {
+      "document": "luti_history",
+      "url": "https://www.instagram.com/p/DeXYqWISZod/",
+      "listings": 0,
+      "special_links": 0,
+      "curator_leads": 0,
+      "after_listings": 0,
+      "after_special_links": 0,
+      "after_cultural_article": false,
+      "after_curator_leads": 11,
+      "after_literal_sections": 9,
+      "after_identity_document": false
+    },
+    {
+      "document": "catar",
+      "url": "https://www.passline.com/eventos/feria-catar-v-edicion",
+      "listings": 1,
+      "special_links": 0,
+      "curator_leads": 0,
+      "after_listings": 1,
+      "after_special_links": 0,
+      "after_cultural_article": false,
+      "after_curator_leads": 0,
+      "after_literal_sections": 0,
+      "after_identity_document": false
+    },
+    {
+      "document": "reel",
+      "url": "https://www.instagram.com/reel/DfVEIVTSTGu/",
+      "listings": 0,
+      "special_links": 0,
+      "curator_leads": 0,
+      "after_listings": 0,
+      "after_special_links": 0,
+      "after_cultural_article": false,
+      "after_curator_leads": 13,
+      "after_literal_sections": 7,
+      "after_identity_document": false
+    },
+    {
+      "document": "eldia",
+      "url": "https://www.eldia.com/espectaculos",
+      "listings": 0,
+      "special_links": 0,
+      "curator_leads": 0,
+      "after_listings": 0,
+      "after_special_links": 4,
+      "after_cultural_article": false,
+      "after_curator_leads": 0,
+      "after_literal_sections": 0,
+      "after_identity_document": false
+    }
+  ],
+  "publicReadReceipts": [
+    {
+      "url": "https://www.eldia.com/espectaculos/chascomus-se-prepara-para-diez-dias-de-teatro-musica-y-humor-espectaculos_1793684999",
+      "http": 200,
+      "bodySha256": "781358ce05abf96b495ceda6db89e755a46a628b6a51993ac5506ccd7ca051a9",
+      "snapshotBytes": 218245,
+      "capturedAt": "2026-11-04T22:46:37.536005+00:00"
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago",
+      "http": 200,
+      "bodySha256": "5179861eaaa8afe958995a306efcb7f5dc66ee27310755f38152b6b08deabef1",
+      "snapshotBytes": 126795,
+      "capturedAt": "2026-11-04T22:37:22.519486+00:00"
+    },
+    {
+      "url": "https://openhouselaplata.com.ar/catalogo/teatro-coliseo-podesta/",
+      "http": 200,
+      "bodySha256": "e2ca0279ee6dcdb0c0549772ea4ead546f94f2ecd8ec7abf9938332211d77145",
+      "snapshotBytes": 104067,
+      "capturedAt": "2026-11-04T22:46:59.910392+00:00"
+    },
+    {
+      "url": "https://wevix.com.ar/events/la-plata-muerde-2026",
+      "http": 200,
+      "bodySha256": "498592b005a8438d6432b6fc45195edcbc5214c2b9ddea220bb3a53005777807",
+      "snapshotBytes": 23250,
+      "capturedAt": "2026-11-04T22:42:28.412681+00:00"
+    },
+    {
+      "url": "https://openhouselaplata.com.ar/catalogo/banco-provincia-casa-matriz/",
+      "http": 200,
+      "bodySha256": "2ffee983b6535f3e7b88c1994ead6193195e8b544626dc868efb9327e49ec443",
+      "snapshotBytes": 104682,
+      "capturedAt": "2026-11-04T22:46:43.946465+00:00"
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago/massacre-y-las-armas-segundo-tiempo-y-mucho-mas-la-agenda-cultural-la-plata-n136584",
+      "http": 200,
+      "bodySha256": "d817d2eadae143ce5764fd89cecb6c7543b83ecc150de838cd0f7da7c9ffde70",
+      "snapshotBytes": 118181,
+      "capturedAt": "2026-11-04T22:37:22.548289+00:00"
+    },
+    {
+      "url": "https://www.passline.com/eventos/miga-el-festival-de-la-merienda-560412",
+      "http": 200,
+      "bodySha256": "28f3eae4f3321c3b3a7faf528f15ed2eee80e63ccdc1250faa5be55ed8a1f941",
+      "snapshotBytes": 49601,
+      "capturedAt": "2026-11-04T22:37:25.051830+00:00"
+    },
+    {
+      "url": "https://laplatamuerde.com.ar/",
+      "http": 200,
+      "bodySha256": "b865506591743aa1d50530ca84304cbf6117496bc61720e3505daa4ea1fff8b6",
+      "snapshotBytes": 14976,
+      "capturedAt": "2026-11-04T22:41:28.017068+00:00"
+    },
+    {
+      "url": "https://www.houseofyogis.com/casayogi",
+      "http": 200,
+      "bodySha256": "5b131ca14aa96311d3432b0062c7443d3b0e6346ec279bd376a75f0a76bcd5d7",
+      "snapshotBytes": 195,
+      "capturedAt": "2026-11-04T22:37:26.964140+00:00"
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/",
+      "http": 200,
+      "bodySha256": "580422a004a1393920c16ab32ab617e9ece9bd8eb1a20e382f2fcbc7a64d8b92",
+      "snapshotBytes": 450000,
+      "capturedAt": "2026-11-04T22:37:27.668892+00:00"
+    },
+    {
+      "url": "https://openhouselaplata.com.ar/",
+      "http": 200,
+      "bodySha256": "f321bfc30b9c86027d42084318e6798e51c9971cbabe7ad13e52bf42c67be515",
+      "snapshotBytes": 165601,
+      "capturedAt": "2026-11-04T22:41:33.648491+00:00"
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/ferias",
+      "http": 200,
+      "bodySha256": "b0daab06f2b89e2d36e4f83ee543d5e826bb44e3ed8669ae6489e4278eb2fc00",
+      "snapshotBytes": 450000,
+      "capturedAt": "2026-11-04T22:47:13.690802+00:00"
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos/el-teatro-comunitario-de-abasto-almagro-llega-a-city-bell-espectaculos_1793773226",
+      "http": 200,
+      "bodySha256": "b6098e474b8b0c48f44589ddd503d040dfd4e1c5fcdb26715e393fc56b22dbf8",
+      "snapshotBytes": 214706,
+      "capturedAt": "2026-11-04T22:46:28.075653+00:00"
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos/carmen-sanchez-viamonte-y-un-cierre-de-ano-a-lo-grande-espectaculos_1793598042",
+      "http": 200,
+      "bodySha256": "e97afe9b1ca152ed9b5b8b42f093c6de1ec656f392b6ad507839bef002c6f681",
+      "snapshotBytes": 215037,
+      "capturedAt": "2026-11-04T22:37:22.772732+00:00"
+    },
+    {
+      "url": "https://www.0221.com.ar/la-plata/la-trifulca-creo-un-videojuego-recorrer-la-plata-antes-su-proxima-fiesta-medusa-n136047",
+      "http": 200,
+      "bodySha256": "11a6f25951681e7b2b08f0a12469a65494aaeac40fc50b379ab537125c1c330d",
+      "snapshotBytes": 109308,
+      "capturedAt": "2026-11-04T22:37:22.479860+00:00"
+    },
+    {
+      "url": "https://www.hipodromolaplata.gba.gov.ar/h/Publica/sliderNota/sliderP.php?dato=2260&tipo=Eventos",
+      "http": 200,
+      "bodySha256": "fb1b347b6f4d5107b084ba0f3f16e899260abe0b5bba43294db2b476c104d0cb",
+      "snapshotBytes": 16961,
+      "capturedAt": "2026-11-04T22:37:28.079831+00:00"
+    },
+    {
+      "url": "https://www.instagram.com/p/DeXYqWISZod/",
+      "http": 200,
+      "bodySha256": "1920083534e2e87fb1afc47b188fdca45754d21f2fab698818cbef696115601a",
+      "snapshotBytes": 450000,
+      "capturedAt": "2026-11-04T22:41:39.022125+00:00"
+    },
+    {
+      "url": "https://www.passline.com/eventos/feria-catar-v-edicion",
+      "http": 200,
+      "bodySha256": "f02122891163ba1c494694b7d8976e2e20f6a1b96a36d7b4d9bb8efe4c9a49cb",
+      "snapshotBytes": 49604,
+      "capturedAt": "2026-11-04T22:37:29.072266+00:00"
+    },
+    {
+      "url": "https://www.0221.com.ar/la-plata/vuelve-el-festival-hamburguesas-al-hipodromo-la-plata-y-los-visitantes-elegira-una-las-ganadoras-n134806",
+      "http": 200,
+      "bodySha256": "f8138c018422f64d16497631c2a07a8fec5ed894462040bfcfd73c1528dbac9b",
+      "snapshotBytes": 104362,
+      "capturedAt": "2026-11-04T22:37:29.811798+00:00"
+    },
+    {
+      "url": "https://enagenda.com.ar/nota/34381/la-plata-meridiano-v-deg-sera-sede-de-la-previa-del-festival-de-la-pizza-platense/",
+      "http": 200,
+      "bodySha256": "fb4739a030b4694e67173764560c9a52d63d10c6b96fd9ac612be4663db5399f",
+      "snapshotBytes": 45121,
+      "capturedAt": "2026-11-04T22:42:33.684115+00:00"
+    },
+    {
+      "url": "https://openhouselaplata.com.ar/catalogo/teatro-argentino/",
+      "http": 200,
+      "bodySha256": "4a3888933c7edf999a0674bc1a711d16b588efbdbd57d59f87cbe5a40d6b194c",
+      "snapshotBytes": 104479,
+      "capturedAt": "2026-11-04T22:46:54.329823+00:00"
+    },
+    {
+      "url": "https://openhouselaplata.com.ar/catalogo/casa-mariani-teruggi-espacio-de-memoria/",
+      "http": 200,
+      "bodySha256": "ac32de4f126e5de6db5d6ce336721ef5cf100007ebdad77c86f31f815f531e9a",
+      "snapshotBytes": 105618,
+      "capturedAt": "2026-11-04T22:46:49.132302+00:00"
+    },
+    {
+      "url": "https://www.0221.com.ar/la-plata/el-teatro-coliseo-podesta-reabrio-su-boleteria-el-cierre-la-remodelacion-y-puesta-valor-n136587",
+      "http": 200,
+      "bodySha256": "11b1c11a9df9cba499af1ed382c02a87ccd47409fff2c3e5dd7ae233109713ba",
+      "snapshotBytes": 105872,
+      "capturedAt": "2026-11-04T22:47:35.711725+00:00"
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/degustaciones",
+      "http": 200,
+      "bodySha256": "1b6a322b9c679d3e80d6692fab70550b445904a75f98c3f17ec819fcd3a6ec80",
+      "snapshotBytes": 450000,
+      "capturedAt": "2026-11-04T22:47:08.149636+00:00"
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/escuela-eas-lp",
+      "http": 200,
+      "bodySha256": "8209db07442ffc008006169cf8dd915fdf0cf2689e76ebea72ef283eb26adc61",
+      "snapshotBytes": 450000,
+      "capturedAt": "2026-11-04T22:47:20.010383+00:00"
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/expoarte",
+      "http": 200,
+      "bodySha256": "36c1dd625f3384f469f05fe9175785732dd5acf353221eeb9963ea74c17e762a",
+      "snapshotBytes": 450000,
+      "capturedAt": "2026-11-04T22:47:25.887638+00:00"
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago/fede-moura-juana-rozas-y-la-dupla-metalera-la-agenda-cultural-la-plata-n136575",
+      "http": 200,
+      "bodySha256": "8452058aa675865b4505c09e74ef10bac5673ea5b8da995a95d444a2425b752f",
+      "snapshotBytes": 127595,
+      "capturedAt": "2026-11-04T22:47:30.671624+00:00"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DfVEIVTSTGu/",
+      "http": 200,
+      "bodySha256": "a6857bc971270dc1d47cc8fddb082ce0ea980d157406f2b1e59244c601424048",
+      "snapshotBytes": 450000,
+      "capturedAt": "2026-11-04T22:37:28.048803+00:00"
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos/el-club-del-litoral-despide-el-ano-con-musica-baile-y-una-gran-fiesta-en-la-plata-espectaculos_1793773046",
+      "http": 200,
+      "bodySha256": "5d6a61b8d7b8a931b3e31521e93a34f459cc51c6bb4f966a38f9dd290fffa16d",
+      "snapshotBytes": 214909,
+      "capturedAt": "2026-11-04T22:46:32.621068+00:00"
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos",
+      "http": 200,
+      "bodySha256": "a4fb115581dae71bbad73a0e5e1cdbd593efbded970c31fd33f538c1c85618cf",
+      "snapshotBytes": 419099,
+      "capturedAt": "2026-11-04T22:37:22.800863+00:00"
+    }
+  ],
+  "replayRun": "manual-cultural-recovery-20261104-v1",
+  "autonomyClaim": false,
+  "testResult": {
+    "executed": 470,
+    "pass": 469,
+    "skipped": 1,
+    "fail": 0
+  }
+}

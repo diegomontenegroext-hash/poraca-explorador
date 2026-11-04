@@ -13,6 +13,7 @@ from urllib.parse import urlsplit
 _ALLOWED_SOURCE_ROLES = frozenset({
     "first_party_organizer", "first_party_ticketing",
     "original_cycle", "original_ticketing",
+    "original_venue", "original_project", "institutional_program",
 })
 
 def root_review_candidate(source, root, page, http_status, make_candidate):
@@ -44,6 +45,18 @@ def root_review_candidate(source, root, page, http_status, make_candidate):
         "auto_publish": False,
         "auto_accept": False,
     })
+    if source['source_role'] in ('original_venue','original_project','institutional_program'):
+        # A meaningful first-party place/project description is knowledge
+        # even without a future event. It remains a proposal, not freshness.
+        metadata=getattr(page,'meta',{})
+        description=metadata.get('og:description') or metadata.get('description') or ''
+        if len(description.strip())<40 or (getattr(page,'title','') or '').lower() in ('site unavailable','instagram','inicio'):
+            return []
+        item['evidence']['identity_review']={'state':'review_only',
+            'description':description[:500], 'current_program_verified':False}
+        if not item.get('event_date'):
+            item['kind']='cultural_identity_index'
+            item['event_time']=None
     if source["source_role"] == "original_cycle":
         # A distributed circuit is not one concert at every named bookstore.
         # Even a JSON-LD Event is reviewed as a cycle without a single venue.

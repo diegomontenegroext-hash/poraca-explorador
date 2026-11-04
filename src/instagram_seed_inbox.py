@@ -109,7 +109,13 @@ def choose_seed_sources(conn, path=INBOX, today=None):
                              consecutive_failures
                          FROM radar_definitivo.sources
                          WHERE source_id=ANY(%s) AND enabled
-                           AND monitoring_mode='discover_only'""", (ids,))
+                           AND monitoring_mode='discover_only'
+                           AND NOT EXISTS (
+                             SELECT 1 FROM radar_definitivo.source_checks cooldown
+                             WHERE cooldown.source_id=radar_definitivo.sources.source_id
+                               AND cooldown.http_status=429
+                               AND cooldown.checked_at>=now()-interval '36 hours'
+                           )""", (ids,))
         inventory = {row[0]: row for row in cur.fetchall()}
         cur.execute("""SELECT url FROM radar_definitivo.candidates
                        WHERE url=ANY(%s)
