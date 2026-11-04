@@ -130,6 +130,7 @@ class Parser(HTMLParser):
 def parse_html(body: str) -> Parser:
     p = Parser()
     p.feed(body)
+    p.body_sha256 = hashlib.sha256(body.encode("utf-8")).hexdigest()
     return p
 
 
@@ -196,6 +197,8 @@ def structured_event(page: Parser) -> dict:
                     "venue": name_of(loc) or None,
                     "organizer": name_of(org) or None,
                     "performers": performers[:8],
+                    "status": (str(node.get("eventStatus") or "").rsplit("/",1)[-1]),
+                    "previous_start": str(node.get("previousStartDate") or "")[:40] or None,
                 }
             graph = node.get("@graph")
             if isinstance(graph,list):
@@ -320,7 +323,15 @@ def make_candidate(url: str, source_id: str, label: str, detail: Parser | None,
         "metadata_keys": sorted(detail.meta) if detail else [],
         "announced_only": True,
     }
+    if detail is not None and http_status == 200:
+        evidence["originalOpenedAt"] = datetime.now(timezone.utc).isoformat()
+        evidence["originalBodySha256"] = getattr(detail,"body_sha256",None)
     if event:
+        event_status = {"EventCancelled":"cancelled", "EventPostponed":"postponed",
+                        "EventRescheduled":"rescheduled", "EventScheduled":"scheduled"}.get(event.get("status"))
+        evidence["lifecycle_v1"] = {"status":event_status, "day":date, "time":time,
+            "previousStart":event.get("previous_start"),
+            "checkedAt":evidence.get("originalOpenedAt"), "approval":False}
         # These are explicit JSON-LD ROLE labels, not inferred from title,
         # locality, a venue's page or popularity. Some sites assert no
         # cultural role at all; do not manufacture an empty "lead".

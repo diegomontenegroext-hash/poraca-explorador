@@ -850,7 +850,8 @@ def save_source_result(conn,run_id,source,check,candidates):
                 clock_from_original=bool(
                     c["evidence"].get("structured_event_found")
                     and c["evidence"].get("detail_opened")
-                    and c.get("event_date") and c.get("event_time"))
+                    and c["evidence"].get("detail_http")==200
+                    and c.get("event_date"))
                 cur.execute("""UPDATE radar_definitivo.candidates
                   SET seen_count=seen_count+1,last_seen_at=now(),
                       title=CASE WHEN %s::text IS NOT NULL AND %s::text<>'' THEN %s ELSE title END,
@@ -863,7 +864,7 @@ def save_source_result(conn,run_id,source,check,candidates):
                       organizer=COALESCE(organizer,%s::text),
                       evidence=CASE WHEN %s::boolean THEN
                         coalesce(evidence,'{}'::jsonb) ||
-                        (CASE WHEN %s::boolean AND event_time IS DISTINCT FROM %s::text
+                        (CASE WHEN %s::boolean AND (event_time IS DISTINCT FROM %s::text OR event_date IS DISTINCT FROM %s::date)
                           THEN jsonb_build_object('previousEventTime',event_time,
                             'previousEventDate',event_date,'eventTimeRecheckedAt',now())
                           ELSE '{}'::jsonb END) || %s::jsonb
@@ -875,7 +876,7 @@ def save_source_result(conn,run_id,source,check,candidates):
                      clock_from_original,c["event_time"],c["event_time"],
                      c["venue"],c["organizer"],
                      bool(c["evidence"].get("detail_opened")),
-                     clock_from_original,c["event_time"],
+                     clock_from_original,c["event_time"],c["event_date"],
                      json.dumps(c["evidence"]),c["original_url"]))
             source_page=c["evidence"].get("linked_from") or source["url"]
             if source_page != c["original_url"]:
@@ -1121,6 +1122,16 @@ def main():
         except Exception as exc:
             conn.rollback()
             stats["source_coverage"]={"status":"unavailable","reason":type(exc).__name__}
+        # One bounded aggregate, persisted in this existing run summary. This
+        # never writes canonical knowledge and needs no extra workflow or fetch.
+        if os.getenv("NEON_RADAR_OPERATIONAL_DATABASE_URL"):
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT public.poraca_functional_status_v1()")
+                    stats["functional_v1"]=cur.fetchone()[0]
+            except Exception as exc:
+                conn.rollback()
+                stats["functional_v1"]={"state":"unavailable","reason":type(exc).__name__}
         # Successful HTTP requests cannot conceal failed integrity controls.
         state=("complete" if stats["health"]["overall"]=="correcto" else "partial")
         try:
