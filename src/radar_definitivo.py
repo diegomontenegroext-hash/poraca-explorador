@@ -183,7 +183,27 @@ def choose_sources(conn, mode):
         # only. It is never copied into observations and cannot make a match.
         # The actual original page must still be opened by this run.
         if os.getenv("NEON_RADAR_OPERATIONAL_DATABASE_URL"):
+            # Generic future-original watch, rotated by oldest actual read.
+            # Uses one existing detail slot, including links removed from index.
+            cur.execute("""SELECT DISTINCT ON (cs.source_id) cs.source_id,e.source_url
+              FROM public.radar_agenda_events e
+              JOIN radar_definitivo.candidates c ON c.url=e.source_url
+              JOIN radar_definitivo.candidate_sources cs USING(candidate_key)
+              JOIN radar_definitivo.sources s ON s.source_id=cs.source_id
+              WHERE cs.source_id=ANY(%s) AND e.verification='confirmed' AND e.status='scheduled'
+               AND e.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
+                AND (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date+60
+               AND s.source_role IN ('original_venue','original_venue_program','original_venue_ticketing',
+                'venue_ticketing','theatre_ticketing','original_institutional','institutional_program')
+               AND public.poraca_source_host_v1(e.source_url)=public.poraca_source_host_v1(s.url)
+              ORDER BY cs.source_id,c.evidence->>'originalOpenedAt' ASC NULLS FIRST,
+               e.event_date,e.source_url""",([src["source_id"] for src in sources],))
+            watches=dict(cur.fetchall())
+            watched=set()
             for src in sources:
+                watch=watches.get(src["source_id"])
+                src["lifecycle_watch_url"]=watch if watch not in watched else None
+                if watch: watched.add(watch)
                 host=urlparse(src["url"]).hostname or ""
                 root=src["url"]
                 # Avoid duplicate watches of mirrored organizer URLs.
@@ -526,6 +546,10 @@ def scan_source(source,budget,mode):
     if "known_primary_details" in source:
         links=prioritize_unseen_official_details(
             links,source["known_primary_details"],max_details)
+    # Missing from index is not cancellation; re-open the original directly.
+    watch=source.get("lifecycle_watch_url")
+    if watch:
+        links=[(watch,"admitted_original_recheck")]+[(u,label) for u,label in links if u!=watch]
     # Persist the ACTUALLY OPENED original root as a review-only candidate.
     # A multi-venue cultural cycle is a lead, not N dated sessions.
     # This is generic by source_role, never by organizer domain.

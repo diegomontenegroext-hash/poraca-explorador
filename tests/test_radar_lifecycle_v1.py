@@ -28,4 +28,26 @@ class LifecycleTests(unittest.TestCase):
         c=self.candidate({'@type':'Event','name':'Obra'},503)
         self.assertNotIn('originalOpenedAt',c['evidence'])
 
+class OriginalWatchTests(unittest.TestCase):
+    def test_removed_index_link_is_reopened_within_detail_budget(self):
+        from radar_definitivo import scan_source,MAX_DETAILS_INCREMENTAL
+        original='https://example.org/event/known'
+        class Budget:
+            def __init__(self): self.urls=[]
+            def request(self,url):
+                self.urls.append(url)
+                if url==original:
+                    return 200,'<script type="application/ld+json">'+json.dumps({'@type':'Event','name':'Obra conocida','startDate':'2026-11-10','eventStatus':'https://schema.org/EventCancelled'})+'</script>',None
+                return 200,'<html><title>Cartelera</title></html>',None
+            def can_fetch(self,url): return True
+            def remaining(self): return 600
+        budget=Budget()
+        check,candidates=scan_source({'source_id':'test','url':'https://example.org/',
+            'source_role':'original_venue','lifecycle_watch_url':original},budget,'incremental')
+        self.assertIn(original,budget.urls)
+        self.assertLessEqual(len(budget.urls),MAX_DETAILS_INCREMENTAL+1)
+        found=next(c for c in candidates if c['original_url']==original)
+        self.assertEqual(found['evidence']['lifecycle_v1']['status'],'cancelled')
+        self.assertRegex(found['evidence']['originalBodySha256'],r'^[a-f0-9]{64}$')
+
 if __name__=='__main__': unittest.main()
