@@ -1,0 +1,54 @@
+{
+  "schema": "poraca-controlled-automatic-publication-policy-v1",
+  "version": "2026-11-03",
+  "mode": "SHADOW_ONLY",
+  "productionEnabled": false,
+  "maxFutureDays": 60,
+  "maxEvidenceAgeHours": 72,
+  "defaultDecision": "REVIEW",
+  "sourceRoles": [
+    "original_venue",
+    "original_venue_program",
+    "original_venue_ticketing",
+    "venue_ticketing",
+    "theatre_ticketing",
+    "original_festival_calendar_ics",
+    "original_institutional",
+    "institutional_program"
+  ],
+  "originalEvidenceMinimum": [
+    "title",
+    "date",
+    "venue"
+  ],
+  "time": {
+    "required": false,
+    "default": null,
+    "neverInfer": true,
+    "labelWhenMissing": "Horario a consultar",
+    "sameNightLineupAsSingleProgram": true
+  },
+  "publicationRule": "Only distinct events with exact original event/document URL, locally anchored day, named program, uniquely identified approved venue, primary evidence, no conflicting event/status or duplicate and audit receipt can leave shadow.",
+  "flow": [
+    "Radar ingestion (operational staging only)",
+    "Pure decision in shadow",
+    "Editorial controlled writer v2 on scoped credential after QA",
+    "Canonical table in Neon",
+    "Read-only API",
+    "SSO private web"
+  ],
+  "decisions": [
+    "AUTO_ELIGIBLE_SHADOW",
+    "LINK_EXISTING_SHADOW",
+    "REVIEW",
+    "DISCARD"
+  ],
+  "prohibited": [
+    "No broad host-only authorization for ticketing or Instagram",
+    "No default 20:00 or midnight",
+    "No revival of held/rejected/cancelled cases",
+    "No bypass of writer transaction/idempotency/receipts",
+    "No direct canonical writes from Radar ingest",
+    "No new cron/worker/service"
+  ]
+}
