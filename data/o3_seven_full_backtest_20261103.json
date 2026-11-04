@@ -1,0 +1,125 @@
+{
+  "schema": "poraca-radar-o3-historical-seven-full-v1",
+  "cut": "2026-11-03",
+  "source": "Neon radar_definitivo.runs JOIN source_checks, SELECT only, values preserved",
+  "readOnly": true,
+  "publishedStatusImmutable": true,
+  "runs": [
+    {
+      "id": "definitivo-20261103T075747Z-bcde1d",
+      "startedAt": "2026-11-03T07:57:47.903Z",
+      "persistedStatus": "partial",
+      "healthSchema": "poraca-health-v2",
+      "selected": 64,
+      "checked": 64,
+      "ok": 30,
+      "indexOnly": 33,
+      "failed": 1
+    },
+    {
+      "id": "definitivo-20261102T140653Z-1efe1c",
+      "startedAt": "2026-11-02T14:06:53.076Z",
+      "persistedStatus": "partial",
+      "healthSchema": "poraca-health-v2",
+      "selected": 62,
+      "checked": 62,
+      "ok": 30,
+      "indexOnly": 31,
+      "failed": 1
+    },
+    {
+      "id": "definitivo-20261102T085408Z-cc1833",
+      "startedAt": "2026-11-02T08:54:08.833Z",
+      "persistedStatus": "complete",
+      "healthSchema": "poraca-health-v2",
+      "selected": 63,
+      "checked": 63,
+      "ok": 31,
+      "indexOnly": 32,
+      "failed": 0
+    },
+    {
+      "id": "definitivo-20261101T212516Z-5bb102",
+      "startedAt": "2026-11-01T21:25:16.637Z",
+      "persistedStatus": "partial",
+      "healthSchema": "poraca-health-v1",
+      "selected": 62,
+      "checked": 62,
+      "ok": 30,
+      "indexOnly": 32,
+      "failed": 0
+    },
+    {
+      "id": "definitivo-20261101T075929Z-8d2774",
+      "startedAt": "2026-11-01T07:59:29.497Z",
+      "persistedStatus": "partial",
+      "healthSchema": "poraca-health-v1",
+      "selected": 62,
+      "checked": 62,
+      "ok": 29,
+      "indexOnly": 33,
+      "failed": 0
+    },
+    {
+      "id": "definitivo-20261101T012707Z-043c69",
+      "startedAt": "2026-11-01T01:27:07.367Z",
+      "persistedStatus": "partial",
+      "healthSchema": "poraca-health-v1",
+      "selected": 62,
+      "checked": 62,
+      "ok": 29,
+      "indexOnly": 33,
+      "failed": 0
+    },
+    {
+      "id": "definitivo-20261031T230247Z-928ed8",
+      "startedAt": "2026-10-31T23:02:47.903Z",
+      "persistedStatus": "partial",
+      "healthSchema": "poraca-health-v1",
+      "selected": 62,
+      "checked": 62,
+      "ok": 29,
+      "indexOnly": 33,
+      "failed": 0
+    }
+  ],
+  "suspectSource": {
+    "id": "rd-web-2f6489bc",
+    "name": "research-museo-pettoruti",
+    "url": "https://www.gba.gob.ar/museo_pettoruti/muestras",
+    "failuresObserved": [
+      {
+        "runId": "definitivo-20261103T075747Z-bcde1d",
+        "http": 503
+      },
+      {
+        "runId": "definitivo-20261102T140653Z-1efe1c",
+        "http": 503
+      }
+    ],
+    "intermittent200": "2026-11-02T19:28:05.529Z",
+    "action": "Investigar intermitencia y respaldo general; no eliminar fuente para maquillar O3"
+  },
+  "sourcePurpose": {
+    "vinos": {
+      "fetch": 2,
+      "withFutureDatedListing": 1,
+      "withDateBasedOriginal": 1
+    },
+    "yoga": {
+      "fetch": 2,
+      "withFutureDatedListing": 0,
+      "withDateBasedOriginal": 0
+    },
+    "talleres": {
+      "fetch": 3,
+      "withFutureDatedListing": 0,
+      "withDateBasedOriginal": 0
+    }
+  },
+  "limitations": [
+    "Older health-v1 partial runs are immutable and cannot be reassigned complete by retroactive v2 policy",
+    "All 7 runs persisted checks for all selected sources, but indexOnly does not mean sessions extracted",
+    "Counterfactual acquisition health does not satisfy O3 post-cutover 6/7 natural FULLs"
+  ]
+}
