@@ -69,3 +69,9 @@ La Trifulca conserva contexto y enlaces al juego propio/AllTickets, pero los ori
 3. Casa Yogi: canal alternativo; Open House: cuerpo truncado antes de contenido. Ambas limitaciones siguen en la muestra.
 4. Carmen: próxima relectura ordinaria del original y revisión del mismo ID con writer limitado; no cambio directo a 20:00.
 5. #30 queda a Chat: visibilidad DOM y experiencia. No declarar QA visual completado.
+
+## Control de las agendas fundacionales conservadas
+
+Lectura SQL posterior, sin cambiar adaptadores que ya producen datos: Genda conserva161 listings/74 futuros; TeatroCerca20/18; Alpedó119/33; Alternativa10/4. Son observaciones de fuente, no eventos canónicos distintos. Genda/TeatroCerca/Alpedó se conservaron sin parches.
+
+Alternativa requiere seguimiento específico: su raíz pública actual es una interfaz que muestra “Cargando”, sin enlaces obra en el HTML (39.146 caracteres, cero URLs de obra). Las cuatro aperturas del último check proceden de originales de la watchlist ya existente; no prueban descubrimiento de la cartelera completa. El bundle enlazado https://static.alternativateatral.com/js/cartelera2-min.js?1-6 devolvió HTTP200 con una página de195 caracteres “Site Unavailable”, no JavaScript utilizable. Se conserva el bloqueo exacto, sin inventar un endpoint ni desplegar navegador/plataforma adicional. No se incorporó esta revisión como sustituto de ningún caso de la muestra.
