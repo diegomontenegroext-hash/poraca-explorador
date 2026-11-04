@@ -41,6 +41,7 @@
     "AUTO_ELIGIBLE_SHADOW",
     "LINK_EXISTING_SHADOW",
     "REVIEW",
+    "SKIP",
     "DISCARD"
   ],
   "prohibited": [
@@ -50,5 +51,12 @@
     "No bypass of writer transaction/idempotency/receipts",
     "No direct canonical writes from Radar ingest",
     "No new cron/worker/service"
+  ],
+  "uncertainPolicy": "SKIP_THIS_CYCLE: unknown or non-specific items remain in historical staging but are not published, not placed in a perpetual editorial queue and never block the rest of the batch.",
+  "priorities": [
+    "Automatic continuity for high-confidence source/day/program/venue",
+    "Keep verified identity and duplicate controls",
+    "Preserve observations as possible historical research material",
+    "Curate a small diverse shortlist from accepted events, separate from admission"
   ]
 }

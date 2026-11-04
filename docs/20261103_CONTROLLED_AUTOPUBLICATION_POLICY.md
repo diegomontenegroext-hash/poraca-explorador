@@ -40,3 +40,8 @@ Radar solo observa y escribe a `radar_definitivo`. La decisión de publicación 
 
 ## Observabilidad y eficiencia
 Una ejecución natural de Radar alimenta staging y, cuando el publicador editorial certificado esté activado, procesa candidatos por lote. No reejecutar FULL de demostración, no crear segundo cron ni ampliar rol `poraca_radar_limited_prod`. Para código, un solo QA de GitHub Actions por lote, salvo fallo investigado; para docs, ninguna.
+
+## Cambio de prioridad 03/11 — perder una pista dudosa es aceptable
+El usuario explicita que un caso dudoso se **omite**, sin frenar Radar ni cargar una cola perpetua. El evaluador puro incorpora `SKIP` para fuente secundaria o genérica, falta de fecha/ubicación/identidad no acreditada o evidencia antigua; sigue conservando la pista en staging para historia/investigación. `REVIEW` queda reservado para conflictos reales, identidades múltiples y sesiones distintas verificables. `DISCARD` para cancelados/accesorios/vencidos. `AUTO_ELIGIBLE_SHADOW` exige los mismos controles originales; publicar automáticamente sigue OFF hasta certificar escritor editorial.
+
+**Curaduría posterior, no admisión:** la selección final puede destacar 6 de 50 planes confirmados usando variedad de circuito, relevancia local y motivo editorial documentado. No hace falta publicar 50 ni validar precio, puerta y minuto de cada banda. El sitio ya dispone de `home-selection.js` con selección diversa de 9, por lo que NO se crea un segundo ranker ni una API nueva. El ajuste de seis y su evaluación se concentrarán en esa misma función.

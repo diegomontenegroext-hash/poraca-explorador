@@ -59,23 +59,24 @@ class GateTests(unittest.TestCase):
         self.assertEqual(outcome(v)["decision"],"DISCARD")
         v=sample();v["original"]["accessory_ticket"]=True
         self.assertEqual(outcome(v)["decision"],"DISCARD")
-    def test_missing_individual_source_and_host_only_fail(self):
+    def test_missing_individual_source_and_host_only_skipped(self):
         v=sample();v["original"]["url"]="https://example.org/"
-        self.assertEqual(outcome(v)["decision"],"REVIEW")
+        self.assertEqual(outcome(v)["decision"],"SKIP")
         v=sample();v["original"]["exact_announcement"]=False
-        self.assertEqual(outcome(v)["decision"],"REVIEW")
-    def test_secondary_source_and_disabled_source(self):
+        self.assertEqual(outcome(v)["decision"],"SKIP")
+    def test_secondary_source_and_disabled_source_skips_not_queue(self):
         v=sample();v["source"]["role"]="secondary_agenda"
-        self.assertEqual(outcome(v)["decision"],"REVIEW")
+        self.assertEqual(outcome(v)["decision"],"SKIP")
         v=sample();v["source"]["enabled"]=False
+        self.assertEqual(outcome(v)["decision"],"SKIP")
+    def test_venue_identity_missing_skips_while_ambiguous_reviews(self):
+        v=sample();v["identity"]["approved_venue_matches"]=0
+        self.assertEqual(outcome(v)["decision"],"SKIP")
+        v=sample();v["identity"]["approved_venue_matches"]=2
         self.assertEqual(outcome(v)["decision"],"REVIEW")
-    def test_venue_identity_missing_or_many(self):
-        for count in (0,2):
-            v=sample();v["identity"]["approved_venue_matches"]=count
-            self.assertEqual(outcome(v)["decision"],"REVIEW")
     def test_missing_original_supported_day_never_autopublishes(self):
         v=sample();v["original"]["supports"]=["title","venue"]
-        self.assertEqual(outcome(v)["decision"],"REVIEW")
+        self.assertEqual(outcome(v)["decision"],"SKIP")
         v=sample();v["original"]["day_matches"]=False
         self.assertEqual(outcome(v)["decision"],"REVIEW")
     def test_date_ambiguous_or_out_of_scope(self):
@@ -83,12 +84,20 @@ class GateTests(unittest.TestCase):
         self.assertEqual(outcome(v)["decision"],"REVIEW")
         v=sample();v["event"]["location_in_scope"]=False
         self.assertEqual(outcome(v)["decision"],"REVIEW")
-    def test_stale_evidence_needs_refresh(self):
+    def test_stale_evidence_skips_this_pass(self):
         v=sample();v["original"]["checked_at"]="2026-10-01T09:00:00Z"
-        self.assertEqual(outcome(v)["decision"],"REVIEW")
+        self.assertEqual(outcome(v)["decision"],"SKIP")
     def test_no_collision_check_no_autopublication(self):
         v=sample();v["integrity"]["collision_check_complete"]=False
         self.assertEqual(outcome(v)["decision"],"REVIEW")
+    def test_one_uncertain_item_cannot_block_other_clear_events(self):
+        safe=sample();uncertain=sample()
+        uncertain["original"]["exact_announcement"]=False
+        outcomes=[outcome(c) for c in [uncertain,safe]]
+        self.assertEqual([o["decision"] for o in outcomes],
+                         ["SKIP","AUTO_ELIGIBLE_SHADOW"])
+        self.assertTrue(all(o["written"]==False for o in outcomes) if all("written" in o for o in outcomes) else
+                        all(o["writeAuthorized"] is False for o in outcomes))
     def test_fail_closed_even_if_config_toggled(self):
         p=copy.deepcopy(POLICY);p["productionEnabled"]=True
         with self.assertRaises(ValueError):
