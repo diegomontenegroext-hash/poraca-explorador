@@ -1,0 +1,243 @@
+{
+  "schema": "radar2-instagram-rotation-proof-v1",
+  "run_id": "radar2-ig-manual-20261105T094500Z",
+  "implementation_commit": "9fba86212eb0fa99ced2048fba2634336318e726",
+  "execution_context": "Work interactive",
+  "roster_count": 123,
+  "selected_usernames": [
+    "centrodearteunlp",
+    "ciudaddegatos",
+    "escenario40",
+    "guajira.bar",
+    "intra.prod",
+    "lutitravelguide",
+    "888casa",
+    "_rbcafe",
+    "asoc.mayo",
+    "astorbirra"
+  ],
+  "logical_queries": 20,
+  "searched_accounts": 10,
+  "direct_instagram_profiles_read": 0,
+  "instagram_index_results": 0,
+  "documents_persisted": 12,
+  "observations_persisted": 18,
+  "new_cultural_proposals": [
+    {
+      "id": "0f438bc6610a4bd3fe23724756119e7563faa061c4d4db860b743f10aec6350f",
+      "status": 200,
+      "title": "Cerounno, Vinyltracker, Juan 97",
+      "date": "2026-11-06",
+      "time": "20:00",
+      "venue": "Ciudad de Gatos",
+      "source": "elevenflow.app",
+      "origin_account": "ciudaddegatos",
+      "method": "public_search_then_http",
+      "review_state": "observado_agenda"
+    },
+    {
+      "id": "8f7dcbc14fadb8d405509f5526d6bf81d64db18690bb80b8be04e1fb31a6b7b0",
+      "status": 200,
+      "title": "Mujer Cebra",
+      "date": "2026-11-13",
+      "time": "20:00",
+      "venue": "Ciudad de Gatos",
+      "source": "elevenflow.app",
+      "origin_account": "ciudaddegatos",
+      "method": "public_search_then_http",
+      "review_state": "observado_agenda"
+    },
+    {
+      "id": "59684e30a84ddef6076b72e91c9cdea9c4d18702516e9ca10263481fb8b4fcab",
+      "status": 200,
+      "title": "Joaco Burgos",
+      "date": "2026-12-13",
+      "time": "20:00",
+      "venue": "Ciudad de Gatos",
+      "source": "elevenflow.app",
+      "origin_account": "ciudaddegatos",
+      "method": "public_search_then_http",
+      "review_state": "observado_agenda"
+    }
+  ],
+  "next_usernames": [
+    "aulavivafcnym.ok",
+    "baigon58.cerveza",
+    "barlaunion",
+    "barrio_meridianov",
+    "blondie.cultural",
+    "bocanada.bar",
+    "bonodori_laplata",
+    "buenosairescultura",
+    "c.f.josehernandez",
+    "cariniolibreria"
+  ],
+  "state_row": "radar2-instagram-rotation-state-v1",
+  "state_version_readback": 3,
+  "searches": [
+    {
+      "id": "ig-index-centrodearteunlp",
+      "q": "(\"centrodearteunlp\" OR \"Centro de Arte UNLP\") \"La Plata\" noviembre de 2026 -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "at": "2026-11-05T09:29:49.421Z",
+      "error": false,
+      "sha256": "233bae1ff9c72d71cd0d81651b3c7c490406ed32c565d907db2150c1afde28a0"
+    },
+    {
+      "id": "ig-index-ciudaddegatos",
+      "q": "(\"ciudaddegatos\" OR \"Ciudad de Gatos\") \"La Plata\" noviembre de 2026 -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "at": "2026-11-05T09:29:49.421Z",
+      "error": false,
+      "sha256": "f47901f4a9c8a2028ec5cfd59f762dcddf422f4cc3a975829c8b6f2a38ddd107"
+    },
+    {
+      "id": "ig-index-escenario40",
+      "q": "(\"escenario40\" OR \"Escenario 40\") \"La Plata\" noviembre de 2026 -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "at": "2026-11-05T09:29:49.421Z",
+      "error": false,
+      "sha256": "a1fef4aab83fcff1ff065ef06b5bb5c87246a7eb79ad55be17acd69156e15742"
+    },
+    {
+      "id": "ig-index-guajira.bar",
+      "q": "(\"guajira.bar\" OR \"Guajira\") \"La Plata\" noviembre de 2026 -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "at": "2026-11-05T09:29:52.247Z",
+      "error": false,
+      "sha256": "c7e72313f2af74b10611c12f7225f8a6a995866a03e533fda10c0496ff9825a1"
+    },
+    {
+      "id": "ig-index-intra.prod",
+      "q": "(\"intra.prod\" OR \"INTRA\") \"La Plata\" noviembre de 2026 -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "at": "2026-11-05T09:29:52.247Z",
+      "error": false,
+      "sha256": "3ee9d564724cdad75b05912786d7e5c9432229b24184abe471577b216582516b"
+    },
+    {
+      "id": "ig-index-lutitravelguide",
+      "q": "(\"lutitravelguide\" OR \"Luti\") \"La Plata\" noviembre de 2026 -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "at": "2026-11-05T09:29:52.247Z",
+      "error": false,
+      "sha256": "a030aa8b6d91ed4a112b33b0a8a62fcdc54d751120642903e78d05cf47f3237a"
+    },
+    {
+      "id": "ig-index-888casa",
+      "q": "(\"888casa\" OR \"888 Casa\") \"La Plata\" noviembre de 2026 -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "at": "2026-11-05T09:29:55.297Z",
+      "error": false,
+      "sha256": "ab890ab2d24683cd6d97b4bd31f8ec41aa0de8a961b43dc349198b917120a117"
+    },
+    {
+      "id": "ig-index-_rbcafe",
+      "q": "(\"_rbcafe\" OR \"R&B Café\") \"La Plata\" noviembre de 2026 -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "at": "2026-11-05T09:29:55.297Z",
+      "error": false,
+      "sha256": "7f71e6699833391fba40b05c5df8b42f2c2c7b968cf63f705e993467ea303374"
+    },
+    {
+      "id": "ig-index-asoc.mayo",
+      "q": "(\"asoc.mayo\" OR \"Asociación Mayo\") \"La Plata\" noviembre de 2026 -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "at": "2026-11-05T09:29:55.297Z",
+      "error": false,
+      "sha256": "0b96a45fb00a650c8af28c199344b479f27861f13fcc3b74ad4d597097baef2e"
+    },
+    {
+      "id": "ig-index-astorbirra",
+      "q": "(\"astorbirra\" OR \"Astor Birra\") \"La Plata\" noviembre de 2026 -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "at": "2026-11-05T09:29:58.260Z",
+      "error": false,
+      "sha256": "d5c93e40b52c200759da7d2c6f582e0759db046045ad5861cc92f90840fd33da"
+    },
+    {
+      "id": "ig-public-index-centrodearteunlp",
+      "q": "site:instagram.com \"centrodearteunlp\" noviembre de 2026",
+      "at": "2026-11-05T09:34:17.069Z",
+      "error": false,
+      "sha256": "7f0cd2a82779977249dd8561a805884fbe43077fc8b4f943e7968894329a66dd"
+    },
+    {
+      "id": "ig-public-index-ciudaddegatos",
+      "q": "site:instagram.com \"ciudaddegatos\" noviembre de 2026",
+      "at": "2026-11-05T09:34:17.069Z",
+      "error": false,
+      "sha256": "425e7835adbceeb26a677d4f17f76c4300a37ed09cdf23d0a97d2fafc629baa9"
+    },
+    {
+      "id": "ig-public-index-escenario40",
+      "q": "site:instagram.com \"escenario40\" noviembre de 2026",
+      "at": "2026-11-05T09:34:22.352Z",
+      "error": false,
+      "sha256": "e478c524f1ece0183a017985c96af89319441af07e62f603b9d5c1a0c122f525"
+    },
+    {
+      "id": "ig-public-index-guajira.bar",
+      "q": "site:instagram.com \"guajira.bar\" noviembre de 2026",
+      "at": "2026-11-05T09:34:22.352Z",
+      "error": false,
+      "sha256": "7b4f275706dcf414038b3db175b188b3954f32721afe51d58dde67721dd53017"
+    },
+    {
+      "id": "ig-public-index-intra.prod",
+      "q": "site:instagram.com \"intra.prod\" noviembre de 2026",
+      "at": "2026-11-05T09:34:22.352Z",
+      "error": false,
+      "sha256": "16ec7624db2ae01bffc621a7f02bf7da483925d597e602db957bc70f171833f1"
+    },
+    {
+      "id": "ig-public-index-lutitravelguide",
+      "q": "site:instagram.com \"lutitravelguide\" noviembre de 2026",
+      "at": "2026-11-05T09:34:27.570Z",
+      "error": false,
+      "sha256": "16ec7624db2ae01bffc621a7f02bf7da483925d597e602db957bc70f171833f1"
+    },
+    {
+      "id": "ig-public-index-888casa",
+      "q": "site:instagram.com \"888casa\" noviembre de 2026",
+      "at": "2026-11-05T09:34:27.570Z",
+      "error": false,
+      "sha256": "149ac2ce08442e0734660b8384c6b1625713c0d23aedfd3680ea3987a240b53b"
+    },
+    {
+      "id": "ig-public-index-_rbcafe",
+      "q": "site:instagram.com \"_rbcafe\" noviembre de 2026",
+      "at": "2026-11-05T09:34:27.570Z",
+      "error": false,
+      "sha256": "16ec7624db2ae01bffc621a7f02bf7da483925d597e602db957bc70f171833f1"
+    },
+    {
+      "id": "ig-public-index-asoc.mayo",
+      "q": "site:instagram.com \"asoc.mayo\" noviembre de 2026",
+      "at": "2026-11-05T09:34:32.984Z",
+      "error": false,
+      "sha256": "16ec7624db2ae01bffc621a7f02bf7da483925d597e602db957bc70f171833f1"
+    },
+    {
+      "id": "ig-public-index-astorbirra",
+      "q": "site:instagram.com \"astorbirra\" noviembre de 2026",
+      "at": "2026-11-05T09:34:32.985Z",
+      "error": false,
+      "sha256": "c0d937812b410ee39b717a7e72e587a92d0b97428f0e369b204da7face326d3e"
+    }
+  ],
+  "scheduler": {
+    "automation_id": "6ae17dc595d08191b5ec9a4ef0dcaa30",
+    "same_task_updated": true,
+    "immediate_run_result": "inline_run returned to current conversation; no independent worker started",
+    "scheduled_accepted": false,
+    "last_real_run_id": "3526031e-8bd0-8324-98b3-f2be2c63dd6c",
+    "last_real_slot": "radar2-slot-20261105-05",
+    "missing_dependencies": [
+      "search service",
+      "Python runtime bridge"
+    ]
+  },
+  "official_api": {
+    "status": "NOT_EXECUTED_MISSING_OFFICIAL_ACCESS",
+    "posts": 0,
+    "identity_eligibility_verified": false,
+    "required_config": [
+      "META_IG_USER_ID",
+      "META_ACCESS_TOKEN",
+      "META_GRAPH_VERSION"
+    ],
+    "source": "https://www.postman.com/meta/instagram/documentation/6yqw8pt/instagram-api"
+  },
+  "checked_at": "2026-11-05T09:42:49.278095+00:00"
+}

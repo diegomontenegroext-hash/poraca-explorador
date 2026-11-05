@@ -45,7 +45,9 @@ def claim(conn,run_id,limit=10):
         state=read(conn);version=state['version'];at=now()
         if run_id in state['batches']:
             batch=state['batches'][run_id]
-            return dict(run_id=run_id,accounts=[state['accounts'][u] for u in batch['usernames']],batch=batch,replayed=True)
+            owned=[state['accounts'][u] for u in batch['usernames'] if state['accounts'][u].get('lease_run_id')==run_id
+                   and (state['accounts'][u].get('lease_until') or '')>timestamp(at)]
+            return dict(run_id=run_id,accounts=owned if batch['status']!='completed' else [],batch=batch,replayed=True)
         selected=select(state,at,limit)
         for a in selected:a.update(lease_run_id=run_id,lease_until=timestamp(at+timedelta(hours=2)),last_attempt_at=timestamp(at))
         batch={'usernames':[a['username'] for a in selected],'claimed_at':timestamp(at),'status':'claimed'}
