@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One-off Radar 2 GitHub Actions pilot; never a new Radar or production scheduler.
+"""Radar 2 acquisition on the existing workflow: daily or explicit manual check.
 
 Uses the collector, reconciler and restricted writer already in radar2/.
 No Instagram HTML, no ChatGPT search tool, no admission of canonicals.
@@ -23,6 +23,30 @@ ORIGINS = {"agendalaplata.ar", "teatrocerca.com.ar", "0221.com.ar",
            "residenciacorazon.com.ar", "dynamoteatro.com"}
 ROOT = Path(__file__).resolve().parent.parent
 
+# Mirrors the EXISTING radar2.private_discoveries ranking, without requiring
+# SELECT privileges on that read-only API view. The limited Radar writer only
+# has SELECT on radar2.proposals. No migrations, new grants or canonical edits.
+NEW_DISCOVERY_METRICS_SQL = """
+WITH ranked AS (
+ SELECT p.proposal_id,p.last_run_id,p.first_seen_at,
+ ROW_NUMBER() OVER (
+  PARTITION BY lower(regexp_replace(p.title,'[^[:alnum:]]','','g')),
+    p.event_date,p.event_time,
+    lower(regexp_replace(coalesce(p.venue,''),'[^[:alnum:]]','','g'))
+  ORDER BY CASE WHEN p.review_state='fuente_original' THEN 0 ELSE 1 END,
+    p.first_seen_at,p.proposal_id
+ ) AS rn
+ FROM radar2.proposals p
+ WHERE coalesce(p.evidence->>'duplicate_of','')=''
+)
+SELECT
+ (SELECT count(*) FROM radar2.proposals
+  WHERE last_run_id=$1 AND first_seen_at >= $2::timestamptz) AS new_ids,
+ (SELECT count(*) FROM ranked
+  WHERE rn=1 AND last_run_id=$1 AND first_seen_at >= $2::timestamptz)
+  AS new_visible_unique
+"""
+
 def main():
     run_id = ("radar2-ghdaily-" if os.environ.get("GITHUB_EVENT_NAME") == "schedule" else "radar2-ghpilot-") + os.environ["GITHUB_RUN_ID"]
     connection = os.environ.get("NEON_RADAR_LIMITED_DATABASE_URL", "")
@@ -43,6 +67,9 @@ def main():
         raise RuntimeError("LIMITED_WRITER_MISSING_PERMISSION")
     if execute(connection, "SELECT run_id FROM radar2.runs WHERE run_id=$1", [run_id]).get("rows"):
         raise RuntimeError("RUN_ID_ALREADY_EXISTS_NO_REPLAY")
+    # Database clock avoids miscounting first_seen_at with the runner's clock.
+    started_at = execute(connection,
+        "SELECT clock_timestamp()::text AS started_at").get("rows", [{}])[0]["started_at"]
 
     with tempfile.TemporaryDirectory(prefix="radar2-gh-") as temp:
         work = Path(temp)
@@ -97,16 +124,42 @@ def main():
                   "status": check["run_status"], "proposals_readback":
                   int(check["proposals_readback"]), "source_origins": sorted(origins)}
         print(json.dumps(report))
+        # Technical observations, never automatically approved events. A single
+        # performance can have observations in Genda and Genda Teatro. Count
+        # unique proposals using the same exact-key ranking as the private view.
+        # Metrics failure is reported separately; it cannot undo a valid write.
+        metrics = None
+        try:
+            row = execute(connection, NEW_DISCOVERY_METRICS_SQL,
+                          [run_id, started_at]).get("rows", [{}])[0]
+            metrics = {"new_ids": int(row["new_ids"]),
+                       "new_visible_unique": int(row["new_visible_unique"])}
+            if not (0 <= metrics["new_visible_unique"] <= metrics["new_ids"]):
+                raise ValueError("INCONSISTENT_UNIQUE_COUNTS")
+            print(json.dumps({"phase": "new_discoveries", "run_id": run_id,
+                              **metrics}))
+        except Exception as exc:
+            print(json.dumps({"phase": "new_discoveries", "run_id": run_id,
+                              "status": "METRICS_UNAVAILABLE",
+                              "error": type(exc).__name__}))
         if os.environ.get("GITHUB_STEP_SUMMARY"):
             with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as stream:
-                stream.write("## Radar 2 pilot — GitHub Actions\n\n")
+                stream.write("## Radar 2 — GitHub Actions\n\n")
                 stream.write("Run: `" + run_id + "`. "
                              "Sources: " + ", ".join(sorted(origins)) +
                              ". Processed proposals: " + str(len(proposals)) +
                              " (not necessarily new). Neon same-run readback: " +
                              str(report["proposals_readback"]) + ".\n\n")
-                stream.write("**Not yet certified:** independent new discoveries, "
-                             "Vercel SSO API, scheduled continuity, direct Instagram.\n")
+                if metrics is not None:
+                    stream.write("New IDs: " + str(metrics["new_ids"]) +
+                                 ". **New unique visible proposals: " +
+                                 str(metrics["new_visible_unique"]) +
+                                 "** (including investigation documents; not "
+                                 "necessarily confirmed events).\n\n")
+                else:
+                    stream.write("New/unique metrics: **unavailable**; check run logs.\n\n")
+                stream.write("**Not yet certified:** Vercel SSO HTTP readback, "
+                             "seven scheduled days, direct Instagram.\n")
 
 if __name__ == "__main__":
     try:
