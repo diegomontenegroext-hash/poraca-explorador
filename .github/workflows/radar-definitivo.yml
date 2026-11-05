@@ -24,6 +24,7 @@ on:
           - incremental
           - full
           - verify_only
+          - radar2_pilot
       credential_probe:
         description: "Manual verify_only: current / limited (secret separado, nunca ingesta)"
         required: false
@@ -42,6 +43,7 @@ concurrency:
 
 jobs:
   definitivo:
+    if: ${{ !((github.event_name == 'workflow_dispatch' && inputs.mode == 'radar2_pilot') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[radar2-pilot]'))) }}
     name: Radar o certificacion puntual sin ingesta
     runs-on: ubuntu-latest
     timeout-minutes: 38
@@ -233,3 +235,25 @@ jobs:
               echo "Se produjeron los controles. Consultar estado Neon: GitHub success no implica agenda publicada."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+
+  # Unico piloto de Radar 2 sobre el workflow EXISTENTE; sin cron y sin
+  # ejecutar el antiguo Radar Definitivo en el mismo disparo.
+  # Las fuentes son los listados públicos que collector.py ya soporta;
+  # no se invoca búsqueda exclusiva de ChatGPT ni Instagram HTML.
+  radar2_pilot:
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.mode == 'radar2_pilot') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[radar2-pilot]')) }}
+    name: Radar 2 - piloto acotado (sin activacion permanente)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - name: Obtener codigo existente
+        uses: actions/checkout@v4
+      - name: Verificar sintaxis local sin dependencias
+        run: |
+          python3 -m py_compile radar2/actions_pilot.py radar2/collector.py radar2/extract.py radar2/reconcile.py radar2/persist.py
+      - name: Preflight, fuentes, escritor limitado y readback en Neon
+        env:
+          NEON_RADAR_LIMITED_DATABASE_URL: ${{ secrets.NEON_RADAR_LIMITED_DATABASE_URL }}
+        run: python3 radar2/actions_pilot.py
