@@ -138,6 +138,23 @@ def main():
                 raise ValueError("INCONSISTENT_UNIQUE_COUNTS")
             print(json.dumps({"phase": "new_discoveries", "run_id": run_id,
                               **metrics}))
+            # Persist today's snapshot for continuity audits: subsequent runs
+            # can update last_run_id, but must not change this historical count.
+            try:
+                saved = execute(connection,
+                    "UPDATE radar2.runs SET summary=summary || "
+                    "jsonb_build_object('discovery_metrics_v1',$2::jsonb) "
+                    "WHERE run_id=$1 AND summary->>'status'='completed' "
+                    "RETURNING run_id",
+                    [run_id, json.dumps(metrics)]).get("rows", [])
+                if len(saved) != 1:
+                    raise RuntimeError("RUN_SUMMARY_NOT_UPDATED")
+                print(json.dumps({"phase": "metrics_persistence",
+                                  "status": "saved", "run_id": run_id}))
+            except Exception as persist_exc:
+                print(json.dumps({"phase": "metrics_persistence",
+                                  "status": "METRICS_NOT_PERSISTED",
+                                  "error": type(persist_exc).__name__}))
         except Exception as exc:
             print(json.dumps({"phase": "new_discoveries", "run_id": run_id,
                               "status": "METRICS_UNAVAILABLE",
