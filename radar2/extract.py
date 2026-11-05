@@ -18,7 +18,7 @@ def account_links(text,accounts):
  for a in accounts:
   if a.get('identity')=='ambiguous':continue
   name=norm(a['entity']);handle=a['username'].lower()
-  if len(name)>4 and (' '+name+' ' in n or name.replace(' ','') in n.replace(' ','') or '@'+handle in text.lower()):
+  if len(name)>4 and (' '+name+' ' in n or ' '+name.replace(' ','')+' ' in n or '@'+handle in text.lower()):
    out.append({'username':a['username'],'entity':a['entity'],'basis':'explicit venue/name in acquired document','evidence':compact(text)[:1200]})
  return out
 
@@ -72,7 +72,14 @@ def extract_document(c,d,accounts,method):
     if ending.tzinfo:ending=ending.astimezone(ZoneInfo('America/Argentina/Buenos_Aires'))
     if ending>=dt:end=ending.date().isoformat()
    except (ValueError,TypeError):pass
-  key=add(item['name'],dt.date().isoformat(),dt.strftime('%H:%M') if 'T' in item['startDate'] else None,venue,ev,item.get('url'),org.get('name') if isinstance(org,dict) else None,end_date=end,category_label=label or category(item['name']+' '+item.get('description','')))
+  title=item['name']
+  if re.search(r'venta de (?:tickets|entradas)',norm(title)):
+   performers=item.get('performer') or [];performers=performers if isinstance(performers,list) else [performers]
+   names=[a['name'] for a in performers if isinstance(a,dict) and a.get('name')]
+   if names:title=', '.join(names)
+   else:
+    c.checks.append({'url':d['url'],'status':'generic_ticket_title_requires_review'});continue
+  key=add(title,dt.date().isoformat(),dt.strftime('%H:%M') if 'T' in item['startDate'] else None,venue,ev,item.get('url'),org.get('name') if isinstance(org,dict) else None,end_date=end,category_label=label or category(title+' '+item.get('description','')))
   if key:
    for field,role in [('performer','performer'),('director','director')]:
     actors=item.get(field) or [];actors=actors if isinstance(actors,list) else [actors]

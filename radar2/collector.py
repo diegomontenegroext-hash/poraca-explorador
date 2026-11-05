@@ -17,12 +17,14 @@ from urllib.robotparser import RobotFileParser
 UA = 'PorAcá/2.0 (+https://github.com/diegomontenegroext-hash/poraca-explorador; cultural research)'
 UA = UA.encode('ascii','ignore').decode()
 VOID = {'area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'}
-BLOCKED = {'instagram.com','www.instagram.com','facebook.com','www.facebook.com'}
+BLOCKED = {'instagram.com','facebook.com','imginn.com','pikory.com','pixnoy.com','pixwox.com'}
+
+def platform_host(host):return any(host==base or (host or '').endswith('.'+base) for base in BLOCKED)
 
 class PublicRedirects(HTTPRedirectHandler):
     def redirect_request(self,req,fp,code,msg,headers,newurl):
         p=urlsplit(newurl)
-        if p.scheme!='https' or p.hostname in BLOCKED:raise ValueError('PLATFORM_OR_INSECURE_REDIRECT')
+        if p.scheme!='https' or platform_host(p.hostname):raise ValueError('PLATFORM_OR_INSECURE_REDIRECT')
         return super().redirect_request(req,fp,code,msg,headers,newurl)
 
 public_open=build_opener(PublicRedirects()).open
@@ -67,7 +69,7 @@ class Collector:
         self.code_sha256=sha(Path(__file__).read_text())
     def allowed(self,url):
         p=urlsplit(url)
-        if p.scheme!='https' or p.hostname in BLOCKED:
+        if p.scheme!='https' or platform_host(p.hostname):
             self.policy_errors[url]='PLATFORM_PERMISSION_REQUIRED_OR_NON_HTTPS';return False
         root=f'https://{p.netloc}'
         if root not in self.robots:
@@ -94,7 +96,7 @@ class Collector:
             with public_open(Request(url,headers={'User-Agent':UA,'Accept':'text/html,application/xhtml+xml'}),timeout=20) as r:
                 raw=r.read(2500001)
                 if len(raw)>2500000:raise ValueError('BODY_LIMIT')
-                if urlsplit(r.url).hostname in BLOCKED:raise ValueError('PLATFORM_REDIRECT')
+                if platform_host(urlsplit(r.url).hostname):raise ValueError('PLATFORM_REDIRECT')
                 s=raw.decode('utf-8','replace');t=Tree(s).root
                 title=next((n.text() for n in t.walk() if n.tag=='title'),'')
                 text=t.text()
@@ -111,16 +113,27 @@ class Collector:
         key=sha('|'.join([d['url'],source_id or norm(title),day or '',hour or '']))
         self.proposals[key]={'id':key,'document_url':d['url'],'source':d['source'],'title':compact(title),'date':day,'time':hour,'venue':compact(venue) or None,'category':category,'state':state,'evidence':compact(evidence)[:8000],'origin_account':origin_account,'source_id':source_id,'discovered_at':d['fetched_at']}
         self.proposals[key]['entities']=([{'name':compact(venue),'role':'venue','evidence':compact(evidence)[:1000]}] if venue else [])
-        self.proposals[key]['mentions']=sorted(set(re.findall(r'(?<!\w)@([a-zA-Z0-9_.]{2,30})',evidence)))
+        self.proposals[key]['mentions']=sorted({m[1] for m in re.finditer(r'(?<!\w)@([a-zA-Z0-9_.]{2,30})',evidence) if not re.match(r'[\"\x27]\s*:',evidence[m.end():])})
         return key
     def discovery(self,manifest,accounts_path='radar2/accounts.json',limit_per_query=5):
         """Consume freshly executed search responses, not hand-entered event URLs."""
         from extract import extract_document
         from concurrent.futures import ThreadPoolExecutor
         accounts=json.loads(Path(accounts_path).read_text());selected={};per_query={}
+        roster={a['handle']:a for a in json.loads(Path(__file__).with_name('instagram_roster.json').read_text())}
         rejected=('wikipedia.org','reddit.com','scribd.com','vlex.com.co','twstalker.com','threadreaderapp.com','docsity.com','paperzz.com')
         for row in manifest['documents']:
             u=row['url'];host=urlsplit(u).hostname or '';q=row['searches'][0]['query_id']
+            if host=='instagram.com' or host.endswith('.instagram.com'):
+                self.indexed_instagram(row)
+                continue
+            targeted=[roster[u] for search in row['searches'] for u in search.get('accounts',[]) if u in roster and search['query_id'].startswith('ig-')]
+            if targeted:
+                content=norm(row['title']+' '+row.get('excerpt','')+' '+u)
+                identity=any(norm(a['handle']) in content or norm(a['name'].split(' — ')[0].split(' · ')[0]) in content for a in targeted)
+                cultural=re.search(r'teatro|recital|musica|electronic|fiesta|cultura|galeria|exposicion|\barte\b|taller|feria|vino|cata|yoga|ceramica',content)
+                if not identity or not cultural:
+                    self.checks.append({'url':u,'status':'discarded_unrelated_rotation_result','discovery':row['searches']});continue
             if any(host.endswith(x) for x in rejected) or re.search(r'/202[0-5](?:/|-)',urlsplit(u).path):
                 self.checks.append({'url':u,'status':'discarded_historical_or_not_announcement','discovery':row['searches']});continue
             if host in ('agendalaplata.ar','www.agendalaplata.ar','teatrocerca.com.ar','www.0221.com.ar','www.eldia.com'):
@@ -151,6 +164,26 @@ class Collector:
                             extract_document(self,child,accounts,'public_search_then_public_link')
         with ThreadPoolExecutor(max_workers=4) as ex:
             for result in ex.map(acquire,grouped.values()):pass
+    def indexed_instagram(self,row):
+        """Search-engine excerpt only. Never fetch IG or infer unseen caption/date."""
+        from extract import category
+        excerpt=row.get('excerpt','').strip()
+        if not excerpt:return
+        at=row['searches'][0]['searched_at'];url=row['url']
+        d={'url':url,'final_url':url,'source':'Instagram (índice público)',
+           'title':row['title'],'text':excerpt,'sha256':sha(excerpt),'text_sha256':sha(excerpt),
+           'fetched_at':at,'discovery':row['searches'],'acquisition_method':'public_search_index',
+           'direct_profile_read':False,'content_scope':'search_excerpt_only'}
+        self.docs[url]=d
+        path=urlsplit(url).path.strip('/').split('/')
+        profile=path[0] if path and path[0] not in ('p','reel','reels','explore','stories') else None
+        # A result matching a query does not prove that account authored a post.
+        key=self.add(d,row['title'],category=category(row['title']+' '+excerpt),state='investigable',evidence=excerpt)
+        self.proposals[key].update(kind='document',acquisition_method='public_search_index',
+            discovery=row['searches'],original_url=url,profile_username=profile,
+            date_basis='no event date asserted from search metadata',content_scope='search_excerpt_only',
+            direct_profile_read=False,related_accounts=[])
+        self.checks.append({'url':url,'status':'indexed_excerpt_preserved','checked_at':at,'direct_profile_read':False})
     def follow_ticket_originals(self,d,accounts,limit=3):
         """Read original ticket links published in public structured event data."""
         from extract import extract_document
@@ -161,7 +194,7 @@ class Collector:
         selected=[]
         for u in dict.fromkeys(links):
             if u in self.docs or not re.search(r'/eventos/|/evento/|gotticket|tuentrada',u):continue
-            if urlsplit(u).hostname in BLOCKED:continue
+            if platform_host(urlsplit(u).hostname):continue
             selected.append(u)
         for u in selected[:limit]:
             child=self.fetch(u,urlsplit(u).hostname,d['url'])
@@ -200,7 +233,7 @@ class Collector:
         t=self.tree(d); title=next((n.text() for n in t.walk() if n.tag=='h1'),d['title'])
         articles=[n.text() for n in t.walk() if n.tag=='article']
         body=max(articles,key=len) if articles else d['text']
-        d['original_links']=[u for u in self.links(d) if urlsplit(u).hostname in BLOCKED or any(x in u for x in ['ticket','bombo','evento-simple','dogma'])]
+        d['original_links']=[u for u in self.links(d) if platform_host(urlsplit(u).hostname) or any(x in u for x in ['ticket','bombo','evento-simple','dogma'])]
         d['instagram_permalinks']=sorted(set(re.findall(r'https?://(?:www\.)?instagram.com/(?:p|reel)/[\w-]+/?',html.unescape((self.out/d['html_file']).read_text()).replace('\\/','/'))))
         published=next((x.get('datePublished') for x in self.structured(d) if x.get('datePublished')),None)
         if published:d['published_at']=published
