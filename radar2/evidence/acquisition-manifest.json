@@ -1,0 +1,972 @@
+{
+  "run_id": "radar2-20261105T012758Z-corrected",
+  "finished_at": "2026-11-05T01:38:03.421351+00:00",
+  "checks": [
+    {
+      "url": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+      "error": "DYNAMIC_LISTING_NO_WORKS_IN_HTML"
+    },
+    {
+      "url": "https://linktr.ee/lutitravelguide",
+      "source": "Luti",
+      "error": "CAPTURE_NOT_AVAILABLE",
+      "origin": null
+    },
+    {
+      "url": "https://linktr.ee/circus_ofc",
+      "source": "Circus links",
+      "error": "CAPTURE_NOT_AVAILABLE",
+      "origin": null
+    },
+    {
+      "url": "https://linktr.ee/guajirabar",
+      "source": "Guajira",
+      "error": "CAPTURE_NOT_AVAILABLE",
+      "origin": null
+    }
+  ],
+  "documents": [
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "final_url": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "source": "Genda",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:28:11.270891+00:00",
+      "sha256": "667162be4ad715eee81e2ca8a4cdc93237907d09b5a6b9fb73d56faac296da11",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-05",
+      "final_url": "https://agendalaplata.ar/?fecha=2026-11-05",
+      "source": "Genda",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:28:18.601787+00:00",
+      "sha256": "ec93ad8cd14355657846c212abcc9f18e56221f408b7b300b268d420ad11bb82",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-06",
+      "final_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+      "source": "Genda",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:28:24.332584+00:00",
+      "sha256": "e5c2b95e4aaa32d58623f2c3a27c00076f9a0775fbad6333dbd4dcaef5954d59",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-07",
+      "final_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+      "source": "Genda",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:28:29.852697+00:00",
+      "sha256": "dda0c70e4756f03fa2a7fb4ebe5221fc3e259c4cd30c7739458c2fd713c155f7",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-08",
+      "final_url": "https://agendalaplata.ar/?fecha=2026-11-08",
+      "source": "Genda",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:28:35.171783+00:00",
+      "sha256": "b59e07de31bc2c45ece666c05c4078346706bdbb41446de01217ce816cd976b3",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-09",
+      "final_url": "https://agendalaplata.ar/?fecha=2026-11-09",
+      "source": "Genda",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:28:40.957522+00:00",
+      "sha256": "1784c84ca779fdfc8e9fd85fbab23b54e70c8dae5274cb2afa13ab8ec6f5be82",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-10",
+      "final_url": "https://agendalaplata.ar/?fecha=2026-11-10",
+      "source": "Genda",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:28:46.063393+00:00",
+      "sha256": "a2fba097d3a0f193b5c516d29378e67f5166b611abbb5d49c7d7a9648ac5c255",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://teatrocerca.com.ar/teatro-independiente",
+      "final_url": "https://teatrocerca.com.ar/teatro-independiente",
+      "source": "TeatroCerca",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:28:58.642154+00:00",
+      "sha256": "eae8477a2cc9c3c1c07d413d5e3d7b0a9c29f57dce06eb730c112146aa768738",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://teatrocerca.com.ar/obra/la-facunda/funcion/la-plata/viejo-almacen-el-obrero/7-noviembre-2026",
+      "final_url": "https://teatrocerca.com.ar/obra/la-facunda/funcion/la-plata/viejo-almacen-el-obrero/7-noviembre-2026",
+      "source": "TeatroCerca",
+      "origin": "https://teatrocerca.com.ar/teatro-independiente",
+      "fetched_at": "2026-11-05T01:29:04.832847+00:00",
+      "sha256": "5cc50359e68d2b0b20997b47c72133206e619a66108061e1803f5d80956d48db",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://teatrocerca.com.ar/obra/la-nona-del-teatro-unlp/funcion/la-plata/teatro-de-la-unlp/7-noviembre-2026",
+      "final_url": "https://teatrocerca.com.ar/obra/la-nona-del-teatro-unlp/funcion/la-plata/teatro-de-la-unlp/7-noviembre-2026",
+      "source": "TeatroCerca",
+      "origin": "https://teatrocerca.com.ar/teatro-independiente",
+      "fetched_at": "2026-11-05T01:29:09.912380+00:00",
+      "sha256": "80256235616daf3f0afe516c09b690301d73f42f83ad87f6c2ce067140a426e7",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://teatrocerca.com.ar/obra/actuen/funcion/la-plata/teatro-abierto/7-noviembre-2026",
+      "final_url": "https://teatrocerca.com.ar/obra/actuen/funcion/la-plata/teatro-abierto/7-noviembre-2026",
+      "source": "TeatroCerca",
+      "origin": "https://teatrocerca.com.ar/teatro-independiente",
+      "fetched_at": "2026-11-05T01:29:15.304636+00:00",
+      "sha256": "8b5d77e95bdd014ea77c980064ecef96fd5cea5d35de89f407c31d823b40ed85",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://teatrocerca.com.ar/obra/escrito-en-la-piel/funcion/la-plata/viejo-almacen-el-obrero/7-noviembre-2026",
+      "final_url": "https://teatrocerca.com.ar/obra/escrito-en-la-piel/funcion/la-plata/viejo-almacen-el-obrero/7-noviembre-2026",
+      "source": "TeatroCerca",
+      "origin": "https://teatrocerca.com.ar/teatro-independiente",
+      "fetched_at": "2026-11-05T01:29:19.794898+00:00",
+      "sha256": "f3d02df5c99327474f0af32befa212ab26cb48ffed97fd5a54efdca54f8ae426",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://teatrocerca.com.ar/obra/disforia/funcion/la-plata/c-115-no1467/8-noviembre-2026",
+      "final_url": "https://teatrocerca.com.ar/obra/disforia/funcion/la-plata/c-115-no1467/8-noviembre-2026",
+      "source": "TeatroCerca",
+      "origin": "https://teatrocerca.com.ar/teatro-independiente",
+      "fetched_at": "2026-11-05T01:29:25.156637+00:00",
+      "sha256": "baf605b71ff1a4358753d358bcf4cee832401853c2a46fbb02b336c644742bdd",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://teatrocerca.com.ar/obra/narices-negras/funcion/la-plata/viejo-almacen-el-obrero/8-noviembre-2026",
+      "final_url": "https://teatrocerca.com.ar/obra/narices-negras/funcion/la-plata/viejo-almacen-el-obrero/8-noviembre-2026",
+      "source": "TeatroCerca",
+      "origin": "https://teatrocerca.com.ar/teatro-independiente",
+      "fetched_at": "2026-11-05T01:29:30.017702+00:00",
+      "sha256": "a28a79acb0394c3f6e46eee0e950724213a1277af14f418a4ce507c3cc21ffb0",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://teatrocerca.com.ar/obra/criminal-obra/funcion/la-plata/telon-negro-teatro/14-noviembre-2026",
+      "final_url": "https://teatrocerca.com.ar/obra/criminal-obra/funcion/la-plata/telon-negro-teatro/14-noviembre-2026",
+      "source": "TeatroCerca",
+      "origin": "https://teatrocerca.com.ar/teatro-independiente",
+      "fetched_at": "2026-11-05T01:29:34.453962+00:00",
+      "sha256": "4d1066125e19416cc43ce5d9bc8731a3ee4833b25bd27126ff750bf3163d7fc9",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://teatrocerca.com.ar/obra/la-fiaca-la-plata/funcion/la-plata/teatro-el-escape/21-noviembre-2026",
+      "final_url": "https://teatrocerca.com.ar/obra/la-fiaca-la-plata/funcion/la-plata/teatro-el-escape/21-noviembre-2026",
+      "source": "TeatroCerca",
+      "origin": "https://teatrocerca.com.ar/teatro-independiente",
+      "fetched_at": "2026-11-05T01:29:39.228885+00:00",
+      "sha256": "ec37f462162a134fcf03907f53843b5897af35d86bbe86b06bece1c7257f3e63",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago",
+      "final_url": "https://www.0221.com.ar/que-hago",
+      "source": "0221",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:28:56.433819+00:00",
+      "sha256": "dabc13337e2db4579ef875e09e780f0bd07c649bd6e1a591ce44734e5d948799",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago/la-universidad-del-este-invita-una-noche-musica-vivo-el-dia-la-tradicion-n136847",
+      "final_url": "https://www.0221.com.ar/que-hago/la-universidad-del-este-invita-una-noche-musica-vivo-el-dia-la-tradicion-n136847",
+      "source": "0221",
+      "origin": "https://www.0221.com.ar/que-hago",
+      "fetched_at": "2026-11-05T01:29:02.152266+00:00",
+      "sha256": "7c39af02d092d55c306b32740779f5a4f3a1493e8dc314042855ea48d53fa4d7",
+      "published_at": "2026-11-03T14:18:00-03:00",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago/freezer-festival-2026-la-plata-reunira-referentes-la-fotografia-y-la-edicion-independiente-n136804",
+      "final_url": "https://www.0221.com.ar/que-hago/freezer-festival-2026-la-plata-reunira-referentes-la-fotografia-y-la-edicion-independiente-n136804",
+      "source": "0221",
+      "origin": "https://www.0221.com.ar/que-hago",
+      "fetched_at": "2026-11-05T01:29:08.287737+00:00",
+      "sha256": "582b84cb738b2874359cf1c83513a046fc3e52b67827648164bb7d7c7a5649cb",
+      "published_at": "2026-11-02T17:21:00-03:00",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago/manana-mi-coche-explotara-tocara-la-plata-su-cuarto-disco-estudio-n136643",
+      "final_url": "https://www.0221.com.ar/que-hago/manana-mi-coche-explotara-tocara-la-plata-su-cuarto-disco-estudio-n136643",
+      "source": "0221",
+      "origin": "https://www.0221.com.ar/que-hago",
+      "fetched_at": "2026-11-05T01:29:13.245997+00:00",
+      "sha256": "2bbe172d609ff962d67996b812d074e10451ddbd81fb36640d0279dff7bd0809",
+      "published_at": "2026-11-01T07:59:00-03:00",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago/vuelve-la-plata-el-festival-la-gastronomia-italiana-mas-grande-del-pais-n136713",
+      "final_url": "https://www.0221.com.ar/que-hago/vuelve-la-plata-el-festival-la-gastronomia-italiana-mas-grande-del-pais-n136713",
+      "source": "0221",
+      "origin": "https://www.0221.com.ar/que-hago",
+      "fetched_at": "2026-11-05T01:29:19.042061+00:00",
+      "sha256": "352b4180f5734bd8affee2970d6f8657cd62ed5889dae32cd7d0177c55c4b35a",
+      "published_at": "2026-10-31T18:10:00-03:00",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago/massacre-y-las-armas-segundo-tiempo-y-mucho-mas-la-agenda-cultural-la-plata-n136584",
+      "final_url": "https://www.0221.com.ar/que-hago/massacre-y-las-armas-segundo-tiempo-y-mucho-mas-la-agenda-cultural-la-plata-n136584",
+      "source": "0221",
+      "origin": "https://www.0221.com.ar/que-hago",
+      "fetched_at": "2026-11-05T01:29:24.115475+00:00",
+      "sha256": "69fae43b037f224ebdc0604cd19927a13cd66fb8e19ef70e2d80f5d289192c9d",
+      "published_at": "2026-10-31T11:23:00-03:00",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago/fede-moura-juana-rozas-y-la-dupla-metalera-la-agenda-cultural-la-plata-n136575",
+      "final_url": "https://www.0221.com.ar/que-hago/fede-moura-juana-rozas-y-la-dupla-metalera-la-agenda-cultural-la-plata-n136575",
+      "source": "0221",
+      "origin": "https://www.0221.com.ar/que-hago",
+      "fetched_at": "2026-11-05T01:29:31.156799+00:00",
+      "sha256": "150442e03862099213282e82e41610f727d92cfe1b725aa107d09a40603e9f52",
+      "published_at": "2026-10-30T13:47:00-03:00",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos",
+      "final_url": "https://www.eldia.com/espectaculos",
+      "source": "El Día",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:29:44.272155+00:00",
+      "sha256": "a4fb115581dae71bbad73a0e5e1cdbd593efbded970c31fd33f538c1c85618cf",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos/el-teatro-comunitario-de-abasto-almagro-llega-a-city-bell-espectaculos_1793773226",
+      "final_url": "https://www.eldia.com/espectaculos/el-teatro-comunitario-de-abasto-almagro-llega-a-city-bell-espectaculos_1793773226",
+      "source": "El Día",
+      "origin": "https://www.eldia.com/espectaculos",
+      "fetched_at": "2026-11-05T01:29:49.833351+00:00",
+      "sha256": "b6098e474b8b0c48f44589ddd503d040dfd4e1c5fcdb26715e393fc56b22dbf8",
+      "published_at": "2026-11-04T06:20:26.288Z",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos/el-club-del-litoral-despide-el-ano-con-musica-baile-y-una-gran-fiesta-en-la-plata-espectaculos_1793773046",
+      "final_url": "https://www.eldia.com/espectaculos/el-club-del-litoral-despide-el-ano-con-musica-baile-y-una-gran-fiesta-en-la-plata-espectaculos_1793773046",
+      "source": "El Día",
+      "origin": "https://www.eldia.com/espectaculos",
+      "fetched_at": "2026-11-05T01:29:55.120031+00:00",
+      "sha256": "5d6a61b8d7b8a931b3e31521e93a34f459cc51c6bb4f966a38f9dd290fffa16d",
+      "published_at": "2026-11-04T06:17:26.288Z",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos/chascomus-se-prepara-para-diez-dias-de-teatro-musica-y-humor-espectaculos_1793684999",
+      "final_url": "https://www.eldia.com/espectaculos/chascomus-se-prepara-para-diez-dias-de-teatro-musica-y-humor-espectaculos_1793684999",
+      "source": "El Día",
+      "origin": "https://www.eldia.com/espectaculos",
+      "fetched_at": "2026-11-05T01:30:02.798570+00:00",
+      "sha256": "781358ce05abf96b495ceda6db89e755a46a628b6a51993ac5506ccd7ca051a9",
+      "published_at": "2026-11-03T05:49:59.879Z",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos/horacio-lavandera-es-una-emocion-encontrarme-con-el-publico-platense-espectaculos_1793598342",
+      "final_url": "https://www.eldia.com/espectaculos/horacio-lavandera-es-una-emocion-encontrarme-con-el-publico-platense-espectaculos_1793598342",
+      "source": "El Día",
+      "origin": "https://www.eldia.com/espectaculos",
+      "fetched_at": "2026-11-05T01:30:08.078451+00:00",
+      "sha256": "0054d542947fea750056be0ebc9b6654bff286c33ffc5c6dcb30d1bb35a4b72f",
+      "published_at": "2026-11-02T05:45:00.000Z",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos/agenda-septimo-dia_1793514734",
+      "final_url": "https://www.eldia.com/espectaculos/agenda-septimo-dia_1793514734",
+      "source": "El Día",
+      "origin": "https://www.eldia.com/espectaculos",
+      "fetched_at": "2026-11-05T01:30:15.312910+00:00",
+      "sha256": "d84a03793b75d8f70e942b360342e86da3fce5e5fea8d9ae6aa57a8613d30a8b",
+      "published_at": "2026-11-01T05:52:00.000Z",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos/g-r-u-m-e-l-musica-experimental-y-autogestiva-en-escena-espectaculos_1793420812",
+      "final_url": "https://www.eldia.com/espectaculos/g-r-u-m-e-l-musica-experimental-y-autogestiva-en-escena-espectaculos_1793420812",
+      "source": "El Día",
+      "origin": "https://www.eldia.com/espectaculos",
+      "fetched_at": "2026-11-05T01:30:20.477360+00:00",
+      "sha256": "05403b210f69f297612fa515fff78c1c2266f351870718ddb4f1048d36880ab6",
+      "published_at": "2026-10-31T04:26:52.679Z",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+      "final_url": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+      "source": "Alternativa Teatral",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:28:58.982622+00:00",
+      "sha256": "1e15e6f822dc10e2598efe37f02233d001d5eb8fb05691d58a99b32c161934e2",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://www.alternativateatral.com/novedades.asp",
+      "final_url": "https://www.alternativateatral.com/novedades.asp",
+      "source": "Alternativa Teatral",
+      "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+      "fetched_at": "2026-11-05T01:29:05.152572+00:00",
+      "sha256": "daa7069c98ed38ca5c3318312ed7e94d9b5fe975cde1c0473fbe239ddf3eb1c6",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://www.alternativateatral.com/obra104077-ronda-de-cuentos-3",
+      "final_url": "https://www.alternativateatral.com/obra104077-ronda-de-cuentos-3",
+      "source": "Alternativa Teatral",
+      "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+      "fetched_at": "2026-11-05T01:29:09.526913+00:00",
+      "sha256": "1141aa421554f90551fc330f4e8054110654e82ad4a95a424190114d3ae5d0cc",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://www.alternativateatral.com/obra104075-vino-al-teatro-edicion-8-noche-de-comedia",
+      "final_url": "https://www.alternativateatral.com/obra104075-vino-al-teatro-edicion-8-noche-de-comedia",
+      "source": "Alternativa Teatral",
+      "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+      "fetched_at": "2026-11-05T01:29:15.550113+00:00",
+      "sha256": "ad4b106e640c2cd1357e48e7c5aaae56fe0046e3ae0792be8501aee3501a1b8c",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://www.alternativateatral.com/obra104074-hijos-del-ring-whattsapp",
+      "final_url": "https://www.alternativateatral.com/obra104074-hijos-del-ring-whattsapp",
+      "source": "Alternativa Teatral",
+      "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+      "fetched_at": "2026-11-05T01:29:19.734276+00:00",
+      "sha256": "5e618ef09584912e5e00e8325a65bb9ef77c556a0eb11f8f277c38ef63a48998",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://www.alternativateatral.com/obra104072-elton",
+      "final_url": "https://www.alternativateatral.com/obra104072-elton",
+      "source": "Alternativa Teatral",
+      "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+      "fetched_at": "2026-11-05T01:29:24.718019+00:00",
+      "sha256": "15f9d4eb25c07b6e9243dc30cace7c776bbec00306fe1ebe934d83230ec073c7",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://www.alternativateatral.com/obra104071-microdosis-de-noviembre",
+      "final_url": "https://www.alternativateatral.com/obra104071-microdosis-de-noviembre",
+      "source": "Alternativa Teatral",
+      "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+      "fetched_at": "2026-11-05T01:29:29.794470+00:00",
+      "sha256": "44c4f855f78bd632c5b27b167351e5bac4073bd2b0e2a2e94f0a823ca7c1cb20",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://www.alternativateatral.com/obra104070-passion-according-to-agnieszka",
+      "final_url": "https://www.alternativateatral.com/obra104070-passion-according-to-agnieszka",
+      "source": "Alternativa Teatral",
+      "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+      "fetched_at": "2026-11-05T01:29:34.369170+00:00",
+      "sha256": "7298f0e7580f9a84f12640efd3ffe5a6ecf8a59d36413565b42a0135ec774abb",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://www.alternativateatral.com/obra104069-bazofi-sin-cadenas",
+      "final_url": "https://www.alternativateatral.com/obra104069-bazofi-sin-cadenas",
+      "source": "Alternativa Teatral",
+      "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+      "fetched_at": "2026-11-05T01:29:39.373744+00:00",
+      "sha256": "eca9ea57d66a836384ba41e9056ed359a9cde055f74047c8340acb56fda7c5c6",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://www.alternativateatral.com/obra104068-mugre",
+      "final_url": "https://www.alternativateatral.com/obra104068-mugre",
+      "source": "Alternativa Teatral",
+      "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+      "fetched_at": "2026-11-05T01:29:44.562624+00:00",
+      "sha256": "f5711af1d458723706ab10600eeced1b3304f3f3115ebfc9ea97f26cb95662b1",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://compras.evento-simple.com/sunsetwinemix",
+      "final_url": "https://compras.evento-simple.com/sunsetwinemix",
+      "source": "Sunset Wine Mixology",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:29:02.913553+00:00",
+      "sha256": "a6dc7d5cc21396c11f309967f3997ae440f7f69b34524a66316b682d088165ee",
+      "published_at": null,
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://compras.evento-simple.com/sunsetwinemix/eventos/sunset-wine-mixology-4-e5",
+      "final_url": "https://compras.evento-simple.com/sunsetwinemix/eventos/sunset-wine-mixology-4-e5",
+      "source": "Sunset Wine Mixology",
+      "origin": "https://compras.evento-simple.com/sunsetwinemix",
+      "fetched_at": "2026-11-05T01:29:08.549560+00:00",
+      "sha256": "ae76d65c08078d83826c6ac9861256474ab72cdd87af999ddd6448acdb187853",
+      "published_at": null,
+      "instagram_permalinks": null
+    },
+    {
+      "url": "https://circusproduce.com/",
+      "final_url": "https://circusproduce.com/",
+      "source": "Circus",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:29:22.107297+00:00",
+      "sha256": "8ccd3c46ac9b0e5db91476d21803bbe64555d0ed75d1d227e4c627cafc277051",
+      "published_at": null,
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://residenciacorazon.com.ar/",
+      "final_url": "https://residenciacorazon.com.ar/",
+      "source": "Residencia Corazón",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:29:35.080550+00:00",
+      "sha256": "b0b307e125f3d1a87b0e5214ff79395561dcdaaf7d399e5aae651133754cc9e7",
+      "published_at": "2023-02-06T18:42:36+00:00",
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/",
+      "final_url": "https://www.casadionisio.com.ar/",
+      "source": "Casa Dionisio",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:29:48.848857+00:00",
+      "sha256": "862b25fc885bf17d00b1dd0c850a0b5b2f85b32bf457f72b43191a5405072123",
+      "published_at": null,
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://enesoestamosfc.wordpress.com/",
+      "final_url": "https://enesoestamosfc.wordpress.com/",
+      "source": "En Eso Estamos",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:30:05.422751+00:00",
+      "sha256": "67ca684aa7696d03f1df4f318722c20679be3f80e6f6555cba7acc1c551816cf",
+      "published_at": null,
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://www.dynamoteatro.com/",
+      "final_url": "https://www.dynamoteatro.com/",
+      "source": "Dynamo Teatro",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:30:19.387065+00:00",
+      "sha256": "798508ab33b5563bb0760d18c7a0966243c2bbcba90fa37c12ac2226e58d41c7",
+      "published_at": null,
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://jodify.com.ar/profiles/promoter/0244a70e-e89f-4adf-ac27-ae1ed2bce374",
+      "final_url": "https://jodify.com.ar/profiles/promoter/0244a70e-e89f-4adf-ac27-ae1ed2bce374",
+      "source": "Nómade",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:30:39.879001+00:00",
+      "sha256": "d07e30630c5a721fa041c661fc4a850d2901c6a2fbdde1a086e00a559353bca3",
+      "published_at": null,
+      "instagram_permalinks": []
+    },
+    {
+      "url": "https://agendalaplata.ar/teatro",
+      "final_url": "https://agendalaplata.ar/teatro",
+      "source": "Genda teatro",
+      "origin": null,
+      "fetched_at": "2026-11-05T01:32:44.348483+00:00",
+      "sha256": "924338871cbe665e01625d013750da6f41026870ab46ac6296bab18da76df646",
+      "published_at": null,
+      "instagram_permalinks": null
+    }
+  ],
+  "proposal_counts": {
+    "Genda": 50,
+    "TeatroCerca": 8,
+    "0221": 6,
+    "El Día": 6,
+    "Sunset Wine Mixology": 2,
+    "Circus": 1,
+    "Residencia Corazón": 1,
+    "Casa Dionisio": 1,
+    "En Eso Estamos": 1,
+    "Dynamo Teatro": 1,
+    "Nómade": 1,
+    "Genda teatro": 37
+  },
+  "repeat": {
+    "run_id": "radar2-20261105T013504Z",
+    "documents": 48,
+    "proposals": 107,
+    "unchanged_reused": 34,
+    "checks": [
+      {
+        "url": "https://agendalaplata.ar/?fecha=2026-11-04",
+        "source": "Genda",
+        "checked_at": "2026-11-05T01:35:04.545722+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "4babadefa296d27b12cefda261fa4bb562628afcb84822b03bfe65509b03bf58"
+      },
+      {
+        "url": "https://agendalaplata.ar/?fecha=2026-11-05",
+        "source": "Genda",
+        "checked_at": "2026-11-05T01:35:17.423534+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "afcb5a13e441da3d568a9a797a2359c2f5e361379674e38e3f4a4fffe574bd2d"
+      },
+      {
+        "url": "https://agendalaplata.ar/?fecha=2026-11-06",
+        "source": "Genda",
+        "checked_at": "2026-11-05T01:35:23.473566+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "7758c7ef7a5a0350a9313ab327934caffa8384d4622f7c4352ed1bb311209d61"
+      },
+      {
+        "url": "https://agendalaplata.ar/?fecha=2026-11-07",
+        "source": "Genda",
+        "checked_at": "2026-11-05T01:35:28.965593+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "51d7cea3d9c7fad730329472551e94d5eb51ffcd124eba61329cccb2b8f8a8d9"
+      },
+      {
+        "url": "https://agendalaplata.ar/?fecha=2026-11-08",
+        "source": "Genda",
+        "checked_at": "2026-11-05T01:35:34.243216+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "a7ee539a172890e8a334645c0ed76d523b67f18edc11898d569b51febeac633f"
+      },
+      {
+        "url": "https://agendalaplata.ar/?fecha=2026-11-09",
+        "source": "Genda",
+        "checked_at": "2026-11-05T01:35:40.868810+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "d96426fb12078fb9147cfa5a6bec90464536d304b553defa9315a6919e994da3"
+      },
+      {
+        "url": "https://agendalaplata.ar/?fecha=2026-11-10",
+        "source": "Genda",
+        "checked_at": "2026-11-05T01:35:50.547834+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "9088496be049bdc84ca998138f5d40a1d8ce1925e62cfae030114a4715bdbfd9"
+      },
+      {
+        "url": "https://www.0221.com.ar/que-hago",
+        "source": "0221",
+        "checked_at": "2026-11-05T01:35:57.811960+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "2bde0414030f19bfcd5e79ad1e5daffd5ad6826bc61af78bb0781b082de48101"
+      },
+      {
+        "url": "https://teatrocerca.com.ar/teatro-independiente",
+        "source": "TeatroCerca",
+        "checked_at": "2026-11-05T01:35:57.811246+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "f7608a5eec8d7b095416e1a9540fcfe80f6acd4388e2c5bb170a7185457c00ee"
+      },
+      {
+        "url": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+        "source": "Alternativa Teatral",
+        "checked_at": "2026-11-05T01:35:57.813941+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "1e15e6f822dc10e2598efe37f02233d001d5eb8fb05691d58a99b32c161934e2"
+      },
+      {
+        "url": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+        "error": "DYNAMIC_LISTING_NO_WORKS_IN_HTML"
+      },
+      {
+        "url": "https://www.0221.com.ar/que-hago/la-universidad-del-este-invita-una-noche-musica-vivo-el-dia-la-tradicion-n136847",
+        "source": "0221",
+        "checked_at": "2026-11-05T01:36:07.842225+00:00",
+        "origin": "https://www.0221.com.ar/que-hago",
+        "status": 200,
+        "sha256": "c16f964e8fb2d38fb79c9ec9e52f6bdfea3571273484a19323c39762021e5479"
+      },
+      {
+        "url": "https://teatrocerca.com.ar/obra/la-facunda/funcion/la-plata/viejo-almacen-el-obrero/7-noviembre-2026",
+        "source": "TeatroCerca",
+        "checked_at": "2026-11-05T01:36:08.380083+00:00",
+        "origin": "https://teatrocerca.com.ar/teatro-independiente",
+        "status": 200,
+        "sha256": "37c2b1a18107bbd108cceb11942741c148b2140210eb9370e1348c720def9dcd"
+      },
+      {
+        "url": "https://compras.evento-simple.com/sunsetwinemix",
+        "source": "Sunset Wine Mixology",
+        "checked_at": "2026-11-05T01:35:57.815961+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "a6dc7d5cc21396c11f309967f3997ae440f7f69b34524a66316b682d088165ee"
+      },
+      {
+        "url": "https://www.alternativateatral.com/novedades.asp",
+        "source": "Alternativa Teatral",
+        "checked_at": "2026-11-05T01:36:09.445285+00:00",
+        "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+        "status": 200,
+        "sha256": "daa7069c98ed38ca5c3318312ed7e94d9b5fe975cde1c0473fbe239ddf3eb1c6"
+      },
+      {
+        "url": "https://www.0221.com.ar/que-hago/freezer-festival-2026-la-plata-reunira-referentes-la-fotografia-y-la-edicion-independiente-n136804",
+        "source": "0221",
+        "checked_at": "2026-11-05T01:36:13.318928+00:00",
+        "origin": "https://www.0221.com.ar/que-hago",
+        "status": 200,
+        "sha256": "3de0ef46b56ff49d21305865d5289131a8d163440afe3ffbb78695742fea6cc5"
+      },
+      {
+        "url": "https://compras.evento-simple.com/sunsetwinemix/eventos/sunset-wine-mixology-4-e5",
+        "source": "Sunset Wine Mixology",
+        "checked_at": "2026-11-05T01:36:14.333493+00:00",
+        "origin": "https://compras.evento-simple.com/sunsetwinemix",
+        "status": 200,
+        "sha256": "ae76d65c08078d83826c6ac9861256474ab72cdd87af999ddd6448acdb187853"
+      },
+      {
+        "url": "https://teatrocerca.com.ar/obra/la-nona-del-teatro-unlp/funcion/la-plata/teatro-de-la-unlp/7-noviembre-2026",
+        "source": "TeatroCerca",
+        "checked_at": "2026-11-05T01:36:14.065588+00:00",
+        "origin": "https://teatrocerca.com.ar/teatro-independiente",
+        "status": 200,
+        "sha256": "be89766a0cefb295b97aa2dc410ec88642325f36680dc4dc4357f1f6f28e12e8"
+      },
+      {
+        "url": "https://www.alternativateatral.com/obra104077-ronda-de-cuentos-3",
+        "source": "Alternativa Teatral",
+        "checked_at": "2026-11-05T01:36:14.814451+00:00",
+        "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+        "status": 200,
+        "sha256": "1141aa421554f90551fc330f4e8054110654e82ad4a95a424190114d3ae5d0cc"
+      },
+      {
+        "url": "https://www.0221.com.ar/que-hago/manana-mi-coche-explotara-tocara-la-plata-su-cuarto-disco-estudio-n136643",
+        "source": "0221",
+        "checked_at": "2026-11-05T01:36:18.898534+00:00",
+        "origin": "https://www.0221.com.ar/que-hago",
+        "status": 200,
+        "sha256": "7c4c94a31caee53268e33485ccb183f62656742ff83c650908a90a7d6d64878c"
+      },
+      {
+        "url": "https://teatrocerca.com.ar/obra/actuen/funcion/la-plata/teatro-abierto/7-noviembre-2026",
+        "source": "TeatroCerca",
+        "checked_at": "2026-11-05T01:36:19.623046+00:00",
+        "origin": "https://teatrocerca.com.ar/teatro-independiente",
+        "status": 200,
+        "sha256": "21875bd6c32032efe6b4d5cfd5b4419927a284f9fa638aebf8d64b8f9e13f38c"
+      },
+      {
+        "url": "https://www.alternativateatral.com/obra104075-vino-al-teatro-edicion-8-noche-de-comedia",
+        "source": "Alternativa Teatral",
+        "checked_at": "2026-11-05T01:36:20.482633+00:00",
+        "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+        "status": 200,
+        "sha256": "ad4b106e640c2cd1357e48e7c5aaae56fe0046e3ae0792be8501aee3501a1b8c"
+      },
+      {
+        "url": "https://www.0221.com.ar/que-hago/vuelve-la-plata-el-festival-la-gastronomia-italiana-mas-grande-del-pais-n136713",
+        "source": "0221",
+        "checked_at": "2026-11-05T01:36:23.835569+00:00",
+        "origin": "https://www.0221.com.ar/que-hago",
+        "status": 200,
+        "sha256": "291e762c6892e228f2f90c95b91e93c86f0764254f0173ded0e13896adda65f9"
+      },
+      {
+        "url": "https://teatrocerca.com.ar/obra/escrito-en-la-piel/funcion/la-plata/viejo-almacen-el-obrero/7-noviembre-2026",
+        "source": "TeatroCerca",
+        "checked_at": "2026-11-05T01:36:24.703760+00:00",
+        "origin": "https://teatrocerca.com.ar/teatro-independiente",
+        "status": 200,
+        "sha256": "3689737e8073ec4e5e1a672a07a86f9ec7d4cbf282c29d4da310d2302872cdb7"
+      },
+      {
+        "url": "https://www.alternativateatral.com/obra104074-hijos-del-ring-whattsapp",
+        "source": "Alternativa Teatral",
+        "checked_at": "2026-11-05T01:36:24.989922+00:00",
+        "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+        "status": 200,
+        "sha256": "5e618ef09584912e5e00e8325a65bb9ef77c556a0eb11f8f277c38ef63a48998"
+      },
+      {
+        "url": "https://circusproduce.com/",
+        "source": "Circus",
+        "checked_at": "2026-11-05T01:36:19.376142+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "8ccd3c46ac9b0e5db91476d21803bbe64555d0ed75d1d227e4c627cafc277051"
+      },
+      {
+        "url": "https://www.0221.com.ar/que-hago/massacre-y-las-armas-segundo-tiempo-y-mucho-mas-la-agenda-cultural-la-plata-n136584",
+        "source": "0221",
+        "checked_at": "2026-11-05T01:36:28.943757+00:00",
+        "origin": "https://www.0221.com.ar/que-hago",
+        "status": 200,
+        "sha256": "fb7dc6540222b14d02acd714795f965f7fe0626d0128de3000ce4ac0562fa4cd"
+      },
+      {
+        "url": "https://teatrocerca.com.ar/obra/disforia/funcion/la-plata/c-115-no1467/8-noviembre-2026",
+        "source": "TeatroCerca",
+        "checked_at": "2026-11-05T01:36:29.816701+00:00",
+        "origin": "https://teatrocerca.com.ar/teatro-independiente",
+        "status": 200,
+        "sha256": "050458c8e78fe942c3981b14f30a1c4c2b5b9d7d7678f0de8181006f7b6106c9"
+      },
+      {
+        "url": "https://www.alternativateatral.com/obra104072-elton",
+        "source": "Alternativa Teatral",
+        "checked_at": "2026-11-05T01:36:31.030149+00:00",
+        "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+        "status": 200,
+        "sha256": "15f9d4eb25c07b6e9243dc30cace7c776bbec00306fe1ebe934d83230ec073c7"
+      },
+      {
+        "url": "https://teatrocerca.com.ar/obra/narices-negras/funcion/la-plata/viejo-almacen-el-obrero/8-noviembre-2026",
+        "source": "TeatroCerca",
+        "checked_at": "2026-11-05T01:36:36.248944+00:00",
+        "origin": "https://teatrocerca.com.ar/teatro-independiente",
+        "status": 200,
+        "sha256": "d8f7ccec1fdc543d9f0070541a3d04437ae329b39215e1d875af5f28070c4f2d"
+      },
+      {
+        "url": "https://www.0221.com.ar/que-hago/fede-moura-juana-rozas-y-la-dupla-metalera-la-agenda-cultural-la-plata-n136575",
+        "source": "0221",
+        "checked_at": "2026-11-05T01:36:35.344125+00:00",
+        "origin": "https://www.0221.com.ar/que-hago",
+        "status": 200,
+        "sha256": "af3838094a9de4de58eb642b72c8596559a38c2ee3224e057f3c605c2a3375bd"
+      },
+      {
+        "url": "https://www.alternativateatral.com/obra104071-microdosis-de-noviembre",
+        "source": "Alternativa Teatral",
+        "checked_at": "2026-11-05T01:36:36.405705+00:00",
+        "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+        "status": 200,
+        "sha256": "44c4f855f78bd632c5b27b167351e5bac4073bd2b0e2a2e94f0a823ca7c1cb20"
+      },
+      {
+        "url": "https://residenciacorazon.com.ar/",
+        "source": "Residencia Corazón",
+        "checked_at": "2026-11-05T01:36:33.194680+00:00",
+        "origin": null,
+        "error": "ROBOTS_OR_PLATFORM_PERMISSION"
+      },
+      {
+        "url": "https://teatrocerca.com.ar/obra/criminal-obra/funcion/la-plata/telon-negro-teatro/14-noviembre-2026",
+        "source": "TeatroCerca",
+        "checked_at": "2026-11-05T01:36:41.520122+00:00",
+        "origin": "https://teatrocerca.com.ar/teatro-independiente",
+        "status": 200,
+        "sha256": "8de0fb8526d50ecb5604b551333f21825c37d050d7f42e25988bad84f793e410"
+      },
+      {
+        "url": "https://www.alternativateatral.com/obra104070-passion-according-to-agnieszka",
+        "source": "Alternativa Teatral",
+        "checked_at": "2026-11-05T01:36:42.165457+00:00",
+        "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+        "status": 200,
+        "sha256": "7298f0e7580f9a84f12640efd3ffe5a6ecf8a59d36413565b42a0135ec774abb"
+      },
+      {
+        "url": "https://teatrocerca.com.ar/obra/la-fiaca-la-plata/funcion/la-plata/teatro-el-escape/21-noviembre-2026",
+        "source": "TeatroCerca",
+        "checked_at": "2026-11-05T01:36:46.917816+00:00",
+        "origin": "https://teatrocerca.com.ar/teatro-independiente",
+        "status": 200,
+        "sha256": "d21bed63e8f153e16d885a9d50e3f6d0934f2f502354a8b8a90a0fe7f27e8339"
+      },
+      {
+        "url": "https://www.eldia.com/espectaculos",
+        "source": "El Día",
+        "checked_at": "2026-11-05T01:36:41.622852+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "a4fb115581dae71bbad73a0e5e1cdbd593efbded970c31fd33f538c1c85618cf"
+      },
+      {
+        "url": "https://www.alternativateatral.com/obra104069-bazofi-sin-cadenas",
+        "source": "Alternativa Teatral",
+        "checked_at": "2026-11-05T01:36:48.083809+00:00",
+        "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+        "status": 200,
+        "sha256": "eca9ea57d66a836384ba41e9056ed359a9cde055f74047c8340acb56fda7c5c6"
+      },
+      {
+        "url": "https://www.casadionisio.com.ar/",
+        "source": "Casa Dionisio",
+        "checked_at": "2026-11-05T01:36:45.210133+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "862b25fc885bf17d00b1dd0c850a0b5b2f85b32bf457f72b43191a5405072123"
+      },
+      {
+        "url": "https://www.eldia.com/espectaculos/el-teatro-comunitario-de-abasto-almagro-llega-a-city-bell-espectaculos_1793773226",
+        "source": "El Día",
+        "checked_at": "2026-11-05T01:36:53.394126+00:00",
+        "origin": "https://www.eldia.com/espectaculos",
+        "status": 200,
+        "sha256": "b6098e474b8b0c48f44589ddd503d040dfd4e1c5fcdb26715e393fc56b22dbf8"
+      },
+      {
+        "url": "https://linktr.ee/lutitravelguide",
+        "source": "Luti",
+        "checked_at": "2026-11-05T01:36:54.880130+00:00",
+        "origin": null,
+        "error": "ROBOTS_OR_PLATFORM_PERMISSION"
+      },
+      {
+        "url": "https://linktr.ee/circus_ofc",
+        "source": "Circus links",
+        "checked_at": "2026-11-05T01:36:59.111873+00:00",
+        "origin": null,
+        "error": "ROBOTS_OR_PLATFORM_PERMISSION"
+      },
+      {
+        "url": "https://linktr.ee/guajirabar",
+        "source": "Guajira",
+        "checked_at": "2026-11-05T01:36:59.111936+00:00",
+        "origin": null,
+        "error": "ROBOTS_OR_PLATFORM_PERMISSION"
+      },
+      {
+        "url": "https://www.alternativateatral.com/obra104068-mugre",
+        "source": "Alternativa Teatral",
+        "checked_at": "2026-11-05T01:36:53.789906+00:00",
+        "origin": "https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires",
+        "status": 200,
+        "sha256": "f5711af1d458723706ab10600eeced1b3304f3f3115ebfc9ea97f26cb95662b1"
+      },
+      {
+        "url": "https://agendalaplata.ar/teatro",
+        "source": "Genda teatro",
+        "checked_at": "2026-11-05T01:36:52.340281+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "924338871cbe665e01625d013750da6f41026870ab46ac6296bab18da76df646"
+      },
+      {
+        "url": "https://www.eldia.com/espectaculos/el-club-del-litoral-despide-el-ano-con-musica-baile-y-una-gran-fiesta-en-la-plata-espectaculos_1793773046",
+        "source": "El Día",
+        "checked_at": "2026-11-05T01:36:58.406790+00:00",
+        "origin": "https://www.eldia.com/espectaculos",
+        "status": 200,
+        "sha256": "5d6a61b8d7b8a931b3e31521e93a34f459cc51c6bb4f966a38f9dd290fffa16d"
+      },
+      {
+        "url": "https://www.eldia.com/espectaculos/chascomus-se-prepara-para-diez-dias-de-teatro-musica-y-humor-espectaculos_1793684999",
+        "source": "El Día",
+        "checked_at": "2026-11-05T01:37:04.038213+00:00",
+        "origin": "https://www.eldia.com/espectaculos",
+        "status": 200,
+        "sha256": "781358ce05abf96b495ceda6db89e755a46a628b6a51993ac5506ccd7ca051a9"
+      },
+      {
+        "url": "https://enesoestamosfc.wordpress.com/",
+        "source": "En Eso Estamos",
+        "checked_at": "2026-11-05T01:36:59.111966+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "67ca684aa7696d03f1df4f318722c20679be3f80e6f6555cba7acc1c551816cf"
+      },
+      {
+        "url": "https://www.eldia.com/espectaculos/horacio-lavandera-es-una-emocion-encontrarme-con-el-publico-platense-espectaculos_1793598342",
+        "source": "El Día",
+        "checked_at": "2026-11-05T01:37:12.726559+00:00",
+        "origin": "https://www.eldia.com/espectaculos",
+        "status": 200,
+        "sha256": "0054d542947fea750056be0ebc9b6654bff286c33ffc5c6dcb30d1bb35a4b72f"
+      },
+      {
+        "url": "https://www.eldia.com/espectaculos/agenda-septimo-dia_1793514734",
+        "source": "El Día",
+        "checked_at": "2026-11-05T01:37:17.622996+00:00",
+        "origin": "https://www.eldia.com/espectaculos",
+        "status": 200,
+        "sha256": "d84a03793b75d8f70e942b360342e86da3fce5e5fea8d9ae6aa57a8613d30a8b"
+      },
+      {
+        "url": "https://www.dynamoteatro.com/",
+        "source": "Dynamo Teatro",
+        "checked_at": "2026-11-05T01:37:14.222949+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "798508ab33b5563bb0760d18c7a0966243c2bbcba90fa37c12ac2226e58d41c7"
+      },
+      {
+        "url": "https://www.eldia.com/espectaculos/g-r-u-m-e-l-musica-experimental-y-autogestiva-en-escena-espectaculos_1793420812",
+        "source": "El Día",
+        "checked_at": "2026-11-05T01:37:24.037052+00:00",
+        "origin": "https://www.eldia.com/espectaculos",
+        "status": 200,
+        "sha256": "05403b210f69f297612fa515fff78c1c2266f351870718ddb4f1048d36880ab6"
+      },
+      {
+        "url": "https://jodify.com.ar/profiles/promoter/0244a70e-e89f-4adf-ac27-ae1ed2bce374",
+        "source": "Nómade",
+        "checked_at": "2026-11-05T01:37:24.875814+00:00",
+        "origin": null,
+        "status": 200,
+        "sha256": "d07e30630c5a721fa041c661fc4a850d2901c6a2fbdde1a086e00a559353bca3"
+      }
+    ]
+  },
+  "web_publication_to_fetch_hours": {
+    "n": 12,
+    "min": 19.156540375277775,
+    "max": 128.7086546663889,
+    "mean": 72.20334460666668
+  },
+  "final_counts": {
+    "documents": 49,
+    "proposal_observations": 115,
+    "distinct_visible": 104,
+    "dated_sessions": 85,
+    "venue_labels": 45,
+    "new_vs_old_future_listings_exact_title_date_time": 17
+  }
+}

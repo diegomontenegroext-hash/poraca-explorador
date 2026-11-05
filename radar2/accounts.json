@@ -1,0 +1,22 @@
+[
+ {"entity":"Luti","username":"lutitravelguide","identity":"catalog_and_prior_public_profile","circuit":"curaduría","channel":"https://linktr.ee/lutitravelguide"},
+ {"entity":"Circus","username":"circus_ofc","identity":"official_website_and_news","circuit":"electrónica","channel":"https://circusproduce.com/"},
+ {"entity":"Nómade","username":"nomadecrew.arg","identity":"ambiguous","circuit":"electrónica","channel":"https://jodify.com.ar/profiles/promoter/0244a70e-e89f-4adf-ac27-ae1ed2bce374","note":"La productora platense está identificada; no está probada la vinculación oficial de este handle. No fusionar con Nómade 23."},
+ {"entity":"999","username":"999ciclo","identity":"artist_interview_and_prior_public_profile","circuit":"electrónica"},
+ {"entity":"INTRA","username":"intra.prod","identity":"catalog_and_prior_public_profile","circuit":"electrónica"},
+ {"entity":"Sunset Wine Mixology","username":"sunsetwine.mixology","identity":"organizer_ticket_site","circuit":"vino","channel":"https://compras.evento-simple.com/sunsetwinemix"},
+ {"entity":"Casa Dionisio","username":"dionisio_vinoteca","identity":"catalog_and_website","circuit":"vino","channel":"https://www.casadionisio.com.ar/"},
+ {"entity":"Villa Wine","username":"villawine","identity":"catalog_and_prior_public_profile","circuit":"vino"},
+ {"entity":"Terruño","username":"vinoteca_terruno_","identity":"catalog_and_prior_public_profile","circuit":"vino"},
+ {"entity":"Zonda Vinos","username":"zondavinos","identity":"catalog_and_prior_public_profile","circuit":"vino"},
+ {"entity":"Escenario 40","username":"escenario40","identity":"catalog_and_prior_public_profile","circuit":"teatro"},
+ {"entity":"En Eso Estamos","username":"en_eso_estamos","identity":"catalog_and_prior_public_profile","circuit":"teatro","channel":"https://enesoestamosfc.wordpress.com/"},
+ {"entity":"Residencia Corazón","username":"residenciacorazon","identity":"catalog_and_official_website","circuit":"arte","channel":"https://residenciacorazon.com.ar/"},
+ {"entity":"Guajira","username":"guajira.bar","identity":"catalog_and_prior_public_profile","circuit":"música","channel":"https://linktr.ee/guajirabar"},
+ {"entity":"La Selva","username":"laselva.yoga","identity":"catalog_and_prior_public_profile","circuit":"yoga"},
+ {"entity":"Genda","username":"agendalaplata.ar","identity":"official_website_footer","circuit":"agenda","channel":"https://agendalaplata.ar/"},
+ {"entity":"Ciudad de Gatos","username":"ciudaddegatos","identity":"existing_catalog","circuit":"música"},
+ {"entity":"Comunidad Ferroviaria","username":"comunidadferroviaria","identity":"existing_catalog","circuit":"independiente"},
+ {"entity":"Centro de Arte UNLP","username":"centrodearteunlp","identity":"existing_catalog","circuit":"arte"},
+ {"entity":"Casa Suiza","username":"casasuizalp","identity":"existing_catalog","circuit":"música"}
+]

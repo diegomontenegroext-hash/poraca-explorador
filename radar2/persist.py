@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+"""Run the collector's restricted Neon writer. Credential file stays outside repo.
+Uses the official Neon HTTP SQL endpoint; no dependency or owner credentials.
+"""
+import json,os,sys
+from pathlib import Path
+from urllib.parse import urlsplit
+from urllib.request import Request,urlopen
+
+def execute(conn,query,params=()):
+ host=urlsplit(conn).hostname
+ if not host or not host.endswith('.neon.tech'):raise ValueError('Expected Neon endpoint')
+ body=json.dumps({'query':query,'params':list(params)}).encode()
+ req=Request('https://'+host+'/sql',data=body,headers={'Content-Type':'application/json','Neon-Connection-String':conn,'Neon-Raw-Text-Output':'true','Neon-Array-Mode':'false'})
+ with urlopen(req,timeout=45) as r:return json.load(r)
+
+SQL="""
+WITH input AS (SELECT $1::jsonb AS j),
+r AS (
+ INSERT INTO radar2.runs(run_id,finished_at,summary)
+ SELECT j->>'run_id',(j->>'finished_at')::timestamptz,jsonb_build_object('documents',jsonb_array_length(j->'documents'),'proposals',jsonb_array_length(j->'proposals'),'checks',j->'checks') FROM input
+ ON CONFLICT(run_id) DO UPDATE SET finished_at=excluded.finished_at,summary=excluded.summary RETURNING run_id
+),d AS (
+ INSERT INTO radar2.documents(url,source,sha256,fetched_at,last_run_id,payload)
+ SELECT x->>'url',x->>'source',x->>'sha256',(x->>'fetched_at')::timestamptz,r.run_id,x
+ FROM input CROSS JOIN r CROSS JOIN LATERAL jsonb_array_elements(j->'documents') x
+ ON CONFLICT(url) DO UPDATE SET sha256=excluded.sha256,fetched_at=excluded.fetched_at,last_run_id=excluded.last_run_id,payload=excluded.payload
+ RETURNING url
+),p AS (
+ INSERT INTO radar2.proposals(proposal_id,document_url,title,event_date,event_time,venue,category,review_state,last_run_id,evidence)
+ SELECT x->>'id',x->>'document_url',x->>'title',NULLIF(x->>'date','')::date,x->>'time',x->>'venue',x->>'category',x->>'state',r.run_id,x
+ FROM input CROSS JOIN r CROSS JOIN LATERAL jsonb_array_elements(j->'proposals') x
+ JOIN d ON d.url=x->>'document_url'
+ ON CONFLICT(proposal_id) DO UPDATE SET title=excluded.title,event_date=excluded.event_date,event_time=excluded.event_time,venue=excluded.venue,category=excluded.category,review_state=excluded.review_state,last_seen_at=now(),last_run_id=excluded.last_run_id,evidence=excluded.evidence
+ RETURNING proposal_id
+) SELECT (SELECT count(*) FROM d) AS documents_written,(SELECT count(*) FROM p) AS proposals_written
+"""
+if __name__=='__main__':
+ result=json.loads(Path(sys.argv[1]).read_text());conn=json.loads(Path(os.environ['RADAR2_CONNECTION_FILE']).read_text())['url']
+ ident=execute(conn,"SELECT current_user AS role,has_table_privilege(current_user,'radar2.proposals','INSERT') AS can_write")
+ print(json.dumps({'identity':ident,'write':execute(conn,SQL,[json.dumps(result,ensure_ascii=False)])}))

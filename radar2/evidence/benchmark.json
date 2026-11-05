@@ -1,0 +1,971 @@
+{
+  "reference_method": "Independent cloud browser DOM, visible cards, 2026-11-05T01:18-01:19Z; Saturday inspected again after initial render was incomplete. Not supplied to collector. Includes completed Nov4 cards; excludes cross-day recommendations. Nov9 no cards.",
+  "daily": [
+    {
+      "date": "2026-11-04",
+      "visible": 7,
+      "recovered": 7,
+      "correct": 7,
+      "missing": 0,
+      "duplicates": 0,
+      "errors": 0
+    },
+    {
+      "date": "2026-11-05",
+      "visible": 5,
+      "recovered": 5,
+      "correct": 5,
+      "missing": 0,
+      "duplicates": 0,
+      "errors": 0
+    },
+    {
+      "date": "2026-11-06",
+      "visible": 14,
+      "recovered": 14,
+      "correct": 14,
+      "missing": 0,
+      "duplicates": 0,
+      "errors": 0
+    },
+    {
+      "date": "2026-11-07",
+      "visible": 17,
+      "recovered": 17,
+      "correct": 17,
+      "missing": 0,
+      "duplicates": 0,
+      "errors": 0
+    },
+    {
+      "date": "2026-11-08",
+      "visible": 6,
+      "recovered": 6,
+      "correct": 6,
+      "missing": 0,
+      "duplicates": 0,
+      "errors": 0
+    },
+    {
+      "date": "2026-11-09",
+      "visible": 0,
+      "recovered": 0,
+      "correct": 0,
+      "missing": 0,
+      "duplicates": 0,
+      "errors": 0
+    },
+    {
+      "date": "2026-11-10",
+      "visible": 1,
+      "recovered": 1,
+      "correct": 1,
+      "missing": 0,
+      "duplicates": 0,
+      "errors": 0
+    }
+  ],
+  "items": [
+    {
+      "date": "2026-11-04",
+      "id": "20261029120655",
+      "title": "El rol del showrunner: cuando los guionistas tienen la última palabra",
+      "expected_time": "10:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-04",
+          "title": "El rol del showrunner: cuando los guionistas tienen la última palabra",
+          "date": "2026-11-04",
+          "time": "10:00",
+          "venue": "Facultad de Bellas Artes - UNLP (Sede Central)",
+          "source_id": "20261029120655",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261029120655"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-04",
+      "id": "20261012224924",
+      "title": "La ragazza con la pistola (Dir. Mario Monicelli)",
+      "expected_time": "17:30",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-04",
+          "title": "La ragazza con la pistola (Dir. Mario Monicelli)",
+          "date": "2026-11-04",
+          "time": "17:30",
+          "venue": "Teatro Bar Cultural La Ferretería",
+          "source_id": "20261012224924",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261012224924"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-04",
+      "id": "20261028012405",
+      "title": "Susana Rinaldi, libre - Dir. Isabel Marcenaro Bouter",
+      "expected_time": "18:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-04",
+          "title": "Susana Rinaldi, libre - Dir. Isabel Marcenaro Bouter",
+          "date": "2026-11-04",
+          "time": "18:00",
+          "venue": "Cine Ecoselect (Espacio INCAA)",
+          "source_id": "20261028012405",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261028012405"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-04",
+      "id": "20261028011236",
+      "title": "La casa del minotauro - Dir. Federico Bongiorno",
+      "expected_time": "18:30",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-04",
+          "title": "La casa del minotauro - Dir. Federico Bongiorno",
+          "date": "2026-11-04",
+          "time": "18:30",
+          "venue": "Cine Select (Espacio INCAA)",
+          "source_id": "20261028011236",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261028011236"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-04",
+      "id": "20261028005540",
+      "title": "Concierto ORVI - Concierto de fin de año",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-04",
+          "title": "Concierto ORVI - Concierto de fin de año",
+          "date": "2026-11-04",
+          "time": "20:00",
+          "venue": "Conservatorio de Música Gilardo Gilardi",
+          "source_id": "20261028005540",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261028005540"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-04",
+      "id": "20261028013256",
+      "title": "Veneno para las hadas - Dir. Carlos Enrique Taboada",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-04",
+          "title": "Veneno para las hadas - Dir. Carlos Enrique Taboada",
+          "date": "2026-11-04",
+          "time": "20:00",
+          "venue": "Cine Ecoselect (Espacio INCAA)",
+          "source_id": "20261028013256",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261028013256"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-04",
+      "id": "20261028011903",
+      "title": "Boiling Point",
+      "expected_time": "20:30",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-04",
+          "title": "Boiling Point",
+          "date": "2026-11-04",
+          "time": "20:30",
+          "venue": "Cine Select (Espacio INCAA)",
+          "source_id": "20261028011903",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261028011903"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-05",
+      "id": "20261028005705",
+      "title": "Concierto \"De Italia a la Argentina\"",
+      "expected_time": "19:30",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-05",
+          "title": "Concierto \"De Italia a la Argentina\"",
+          "date": "2026-11-05",
+          "time": "19:30",
+          "venue": "Conservatorio de Música Gilardo Gilardi",
+          "source_id": "20261028005705",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261028005705"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-05",
+      "id": "20261028193456",
+      "title": "Salsa y no llores",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-05",
+          "title": "Salsa y no llores",
+          "date": "2026-11-05",
+          "time": "20:00",
+          "venue": "Espacio Doble-T",
+          "source_id": "20261028193456",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261028193456"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-05",
+      "id": "20261009005444",
+      "title": "EnRevistaDas: La Revista de Calle 51",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-05",
+          "title": "EnRevistaDas: La Revista de Calle 51",
+          "date": "2026-11-05",
+          "time": "20:00",
+          "venue": "Pasaje Dardo Rocha",
+          "source_id": "20261009005444",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261009005444"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-05",
+      "id": "20260908174931",
+      "title": "Nico de Tracy - Purga",
+      "expected_time": "21:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-05",
+          "title": "Nico de Tracy - Purga",
+          "date": "2026-11-05",
+          "time": "21:00",
+          "venue": null,
+          "source_id": "20260908174931",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20260908174931"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-05",
+      "id": "20260815144958",
+      "title": "Gabriel Rolón",
+      "expected_time": "21:30",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-05",
+          "title": "Gabriel Rolón",
+          "date": "2026-11-05",
+          "time": "21:30",
+          "venue": "Teatro y Museo Coliseo Podestá",
+          "source_id": "20260815144958",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20260815144958"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261027124753",
+      "title": "La Noche de las Librerías Platenses",
+      "expected_time": "09:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "La Noche de las Librerías Platenses",
+          "date": "2026-11-06",
+          "time": "09:00",
+          "venue": null,
+          "source_id": "20261027124753",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261027124753"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261028005917",
+      "title": "Piano - Concierto fin de ciclo",
+      "expected_time": "18:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "Piano - Concierto fin de ciclo",
+          "date": "2026-11-06",
+          "time": "18:00",
+          "venue": "Conservatorio de Música Gilardo Gilardi",
+          "source_id": "20261028005917",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261028005917"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261103144559",
+      "title": "Litertulia - Charla con Sergio Pujol",
+      "expected_time": "19:30",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "Litertulia - Charla con Sergio Pujol",
+          "date": "2026-11-06",
+          "time": "19:30",
+          "venue": "Rayuela",
+          "source_id": "20261103144559",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261103144559"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261028005818",
+      "title": "Canto Lírico - Concierto final de ciclo",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "Canto Lírico - Concierto final de ciclo",
+          "date": "2026-11-06",
+          "time": "20:00",
+          "venue": "Conservatorio de Música Gilardo Gilardi",
+          "source_id": "20261028005818",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261028005818"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261019033249",
+      "title": "Feria de vinos",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "Feria de vinos",
+          "date": "2026-11-06",
+          "time": "20:00",
+          "venue": "Club Argentino Juvenil",
+          "source_id": "20261019033249",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261019033249"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261015035240",
+      "title": "Las horas perdidas (Southland tales, Richard Kelly, 2006)",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "Las horas perdidas (Southland tales, Richard Kelly, 2006)",
+          "date": "2026-11-06",
+          "time": "20:00",
+          "venue": "Cine Ecoselect (Espacio INCAA)",
+          "source_id": "20261015035240",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261015035240"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261025164632",
+      "title": "Panchita está de festejo",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "Panchita está de festejo",
+          "date": "2026-11-06",
+          "time": "20:00",
+          "venue": "Refugio 62",
+          "source_id": "20261025164632",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261025164632"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261006025846",
+      "title": "Esencia de blues - Ecos de Sarah Vaughan",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "Esencia de blues - Ecos de Sarah Vaughan",
+          "date": "2026-11-06",
+          "time": "20:00",
+          "venue": "Desafinado Club",
+          "source_id": "20261006025846",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261006025846"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20260908175131",
+      "title": "Habitación Macbeth",
+      "expected_time": "21:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "Habitación Macbeth",
+          "date": "2026-11-06",
+          "time": "21:00",
+          "venue": "Teatro Metro",
+          "source_id": "20260908175131",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20260908175131"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261023182419",
+      "title": "Tío Valen",
+      "expected_time": "21:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "Tío Valen",
+          "date": "2026-11-06",
+          "time": "21:00",
+          "venue": "Centro Cultural Omar Favero",
+          "source_id": "20261023182419",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261023182419"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261027142627",
+      "title": "Shitstem - Idioma de infancia",
+      "expected_time": "21:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "Shitstem - Idioma de infancia",
+          "date": "2026-11-06",
+          "time": "21:00",
+          "venue": "Calle UNO, Casa de Cultura",
+          "source_id": "20261027142627",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261027142627"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261030182409",
+      "title": "El Robo - Un policial metafísico",
+      "expected_time": "21:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "El Robo - Un policial metafísico",
+          "date": "2026-11-06",
+          "time": "21:00",
+          "venue": "Plaza Rocha",
+          "source_id": "20261030182409",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261030182409"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261103004714",
+      "title": "Solo Cerati",
+      "expected_time": "21:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "Solo Cerati",
+          "date": "2026-11-06",
+          "time": "21:00",
+          "venue": "El Teatro BAR",
+          "source_id": "20261103004714",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261103004714"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-06",
+      "id": "20261020164738",
+      "title": "Queen + Elton John",
+      "expected_time": "21:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-06",
+          "title": "Queen + Elton John",
+          "date": "2026-11-06",
+          "time": "21:00",
+          "venue": "Espacio Live",
+          "source_id": "20261020164738",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261020164738"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20261023183739",
+      "title": "Festival por los Derechos de las Infancias",
+      "expected_time": "14:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Festival por los Derechos de las Infancias",
+          "date": "2026-11-07",
+          "time": "14:00",
+          "venue": "Biblioteca Popular Del otro lado del árbol",
+          "source_id": "20261023183739",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261023183739"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20260826142508",
+      "title": "Los Espiritus",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Los Espiritus",
+          "date": "2026-11-07",
+          "time": "20:00",
+          "venue": "Ciudad de Gatos",
+          "source_id": "20260826142508",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20260826142508"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20261015194324",
+      "title": "Las aventuras del príncipe Achmed, de Lotte Reiniger",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Las aventuras del príncipe Achmed, de Lotte Reiniger",
+          "date": "2026-11-07",
+          "time": "20:00",
+          "venue": "Teatro de Cámara City Bell",
+          "source_id": "20261015194324",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261015194324"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20261021131304",
+      "title": "La Mississippi",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "La Mississippi",
+          "date": "2026-11-07",
+          "time": "20:00",
+          "venue": "Teatro René Favaloro",
+          "source_id": "20261021131304",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261021131304"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20261023125627",
+      "title": "Diego Frenkel",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Diego Frenkel",
+          "date": "2026-11-07",
+          "time": "20:00",
+          "venue": "Desafinado Club",
+          "source_id": "20261023125627",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261023125627"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20261026232727",
+      "title": "Bicicletero Indie club vol. 4",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Bicicletero Indie club vol. 4",
+          "date": "2026-11-07",
+          "time": "20:00",
+          "venue": "La Bicicletería creación colectiva",
+          "source_id": "20261026232727",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261026232727"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20260914164351",
+      "title": "Víctor Medina - Nanutria",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Víctor Medina - Nanutria",
+          "date": "2026-11-07",
+          "time": "20:00",
+          "venue": "Teatro Argentino - Centro Provincial de las Artes",
+          "source_id": "20260914164351",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20260914164351"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20260914155629",
+      "title": "Cármen Sánchez Viamonte",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Cármen Sánchez Viamonte",
+          "date": "2026-11-07",
+          "time": "20:00",
+          "venue": "Teatro Opera",
+          "source_id": "20260914155629",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20260914155629"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20261028194056",
+      "title": "Nosotras Dos",
+      "expected_time": "20:30",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Nosotras Dos",
+          "date": "2026-11-07",
+          "time": "20:30",
+          "venue": "Teatro Espacio 44",
+          "source_id": "20261028194056",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261028194056"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20260908182028",
+      "title": "Alorsa Eterno",
+      "expected_time": "21:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Alorsa Eterno",
+          "date": "2026-11-07",
+          "time": "21:00",
+          "venue": "Espacio Doble-T",
+          "source_id": "20260908182028",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20260908182028"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20260827013949",
+      "title": "¡Actúen!",
+      "expected_time": "21:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "¡Actúen!",
+          "date": "2026-11-07",
+          "time": "21:00",
+          "venue": "Teatro Abierto",
+          "source_id": "20260827013949",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20260827013949"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20261024024051",
+      "title": "Noelia Sinkunas Cuarteto",
+      "expected_time": "21:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Noelia Sinkunas Cuarteto",
+          "date": "2026-11-07",
+          "time": "21:00",
+          "venue": "Pasaje Dardo Rocha",
+          "source_id": "20261024024051",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261024024051"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20261006034541",
+      "title": "Natario",
+      "expected_time": "21:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Natario",
+          "date": "2026-11-07",
+          "time": "21:00",
+          "venue": "Esquina América",
+          "source_id": "20261006034541",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261006034541"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20261020164527",
+      "title": "Fulanas Trío + El Engrupe",
+      "expected_time": "21:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Fulanas Trío + El Engrupe",
+          "date": "2026-11-07",
+          "time": "21:00",
+          "venue": "Espacio Live",
+          "source_id": "20261020164527",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261020164527"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20261018213613",
+      "title": "Ciudad violenta, antropología urbana",
+      "expected_time": "21:30",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Ciudad violenta, antropología urbana",
+          "date": "2026-11-07",
+          "time": "21:30",
+          "venue": "Teatro Estudio",
+          "source_id": "20261018213613",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261018213613"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20261015022511",
+      "title": "Pura cumbia",
+      "expected_time": "23:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Pura cumbia",
+          "date": "2026-11-07",
+          "time": "23:00",
+          "venue": "Estadio UNO Jorge Luis Hirschi - Estudiantes de la Plata",
+          "source_id": "20261015022511",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261015022511"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-07",
+      "id": "20261019031831",
+      "title": "Bocanada cumple años",
+      "expected_time": "23:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-07",
+          "title": "Bocanada cumple años",
+          "date": "2026-11-07",
+          "time": "23:00",
+          "venue": "El Galpón de las Artes",
+          "source_id": "20261019031831",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261019031831"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-08",
+      "id": "20260927230818",
+      "title": "Edición n°23 Neón Tokyo",
+      "expected_time": "13:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-08",
+          "title": "Edición n°23 Neón Tokyo",
+          "date": "2026-11-08",
+          "time": "13:00",
+          "venue": "La Salamanca Centro de Cultura y Peña",
+          "source_id": "20260927230818",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20260927230818"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-08",
+      "id": "20261026233231",
+      "title": "Yaku Malón",
+      "expected_time": "19:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-08",
+          "title": "Yaku Malón",
+          "date": "2026-11-08",
+          "time": "19:00",
+          "venue": "Pasaje Dardo Rocha",
+          "source_id": "20261026233231",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261026233231"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-08",
+      "id": "20261025230227",
+      "title": "Dementes vagas: homecoming",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-08",
+          "title": "Dementes vagas: homecoming",
+          "date": "2026-11-08",
+          "time": "20:00",
+          "venue": "Mush Room",
+          "source_id": "20261025230227",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261025230227"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-08",
+      "id": "20261024023409",
+      "title": "Elisa Marenis + Elías Ciambotti + Amor Revolver",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-08",
+          "title": "Elisa Marenis + Elías Ciambotti + Amor Revolver",
+          "date": "2026-11-08",
+          "time": "20:00",
+          "venue": "La Bicicletería creación colectiva",
+          "source_id": "20261024023409",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261024023409"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-08",
+      "id": "20261006033821",
+      "title": "Luna Sujatovich e Inbal Comedi",
+      "expected_time": "20:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-08",
+          "title": "Luna Sujatovich e Inbal Comedi",
+          "date": "2026-11-08",
+          "time": "20:00",
+          "venue": "Casa Suiza",
+          "source_id": "20261006033821",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261006033821"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-08",
+      "id": "20261013185740",
+      "title": "Círculo Íntimo: ¿cuantos secretos tenes?",
+      "expected_time": "20:30",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-08",
+          "title": "Círculo Íntimo: ¿cuantos secretos tenes?",
+          "date": "2026-11-08",
+          "time": "20:30",
+          "venue": "Espacio Doble-T",
+          "source_id": "20261013185740",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261013185740"
+        }
+      ],
+      "correct": true
+    },
+    {
+      "date": "2026-11-10",
+      "id": "20261024022309",
+      "title": "Mestre Esguleba - Batuque dos Ancestrais",
+      "expected_time": "19:00",
+      "actual": [
+        {
+          "document_url": "https://agendalaplata.ar/?fecha=2026-11-10",
+          "title": "Mestre Esguleba - Batuque dos Ancestrais",
+          "date": "2026-11-10",
+          "time": "19:00",
+          "venue": "Espacio Sudaka",
+          "source_id": "20261024022309",
+          "original_url": "https://agendalaplata.ar/agendalaplata.ar/evento.php?apli=agenda&id=20261024022309"
+        }
+      ],
+      "correct": true
+    }
+  ],
+  "recall": 1.0
+}
