@@ -1,6 +1,6 @@
-# POR ACA - RADAR DEFINITIVO
-# Disparo por Guardia GPT - orquestador principal.
-trigger_date=2026-11-04
-trigger_slot=13
-trigger_mode=incremental
-trigger_reason=user_authorized_recovery_missed_13
+# POR ACA - RADAR 2: piloto GitHub acotado, sin cron nuevo
+# Unica corrida de aceptacion (NO reactivar Radar Definitivo).
+trigger_date=2026-11-05
+trigger_slot=bootstrap
+trigger_mode=radar2_pilot
+trigger_reason=single_actions_runner_pilot
