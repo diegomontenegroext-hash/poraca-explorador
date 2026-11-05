@@ -24,7 +24,7 @@ ORIGINS = {"agendalaplata.ar", "teatrocerca.com.ar", "0221.com.ar",
 ROOT = Path(__file__).resolve().parent.parent
 
 def main():
-    run_id = "radar2-ghpilot-" + os.environ["GITHUB_RUN_ID"]
+    run_id = ("radar2-ghdaily-" if os.environ.get("GITHUB_EVENT_NAME") == "schedule" else "radar2-ghpilot-") + os.environ["GITHUB_RUN_ID"]
     connection = os.environ.get("NEON_RADAR_LIMITED_DATABASE_URL", "")
     if not connection:
         raise RuntimeError("MISSING_LIMITED_NEON_SECRET")
