@@ -1,8 +1,8 @@
-name: Por Aca - Radar Definitivo (Neon operativo)
+name: Por Aca - Radar operativo (Radar 2 diario; legado manual)
 
-# Orquestador temporal: Guardia GPT en 05:00 / 13:00 / 21:00 ART.
-# Cada commit a ops/radar-fallback-trigger.txt dispara un unico job.
-# Sin cron GitHub hasta verificar por separado su confiabilidad.
+# Cutover Radar 2: cron GitHub diario 05:27 ART; tarea ChatGPT anterior pausada 05/11/2026.
+# El job Radar Definitivo legado se omite en schedule; solo funciona por despacho manual explícito.
+# Push de ops/radar-fallback-trigger.txt conserva modo piloto acotado bajo commit-tag.
 # Cutover validado por workflow_dispatch #62 (2026-11-01): cuenta SQL
 # poraca_radar_limited_prod de alcance restringido; el secreto anterior
 # sigue protegido en GitHub para rollback explícito, nunca fallback silencioso.
@@ -13,6 +13,9 @@ on:
     paths:
       - 'ops/radar-fallback-trigger.txt'
       - 'ops/e2e-verification-trigger.txt'
+  schedule:
+    # Una corrida diaria: 05:27 ART (Argentina UTC-3), sin segundo cron.
+    - cron: '27 8 * * *'
   workflow_dispatch:
     inputs:
       mode:
@@ -43,7 +46,7 @@ concurrency:
 
 jobs:
   definitivo:
-    if: ${{ !((github.event_name == 'workflow_dispatch' && inputs.mode == 'radar2_pilot') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[radar2-pilot]'))) }}
+    if: ${{ !((github.event_name == 'schedule') || (github.event_name == 'workflow_dispatch' && inputs.mode == 'radar2_pilot') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[radar2-pilot]'))) }}
     name: Radar o certificacion puntual sin ingesta
     runs-on: ubuntu-latest
     timeout-minutes: 38
@@ -241,8 +244,8 @@ jobs:
   # Las fuentes son los listados públicos que collector.py ya soporta;
   # no se invoca búsqueda exclusiva de ChatGPT ni Instagram HTML.
   radar2_pilot:
-    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.mode == 'radar2_pilot') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[radar2-pilot]')) }}
-    name: Radar 2 - piloto acotado (sin activacion permanente)
+    if: ${{ (github.event_name == 'schedule') || (github.event_name == 'workflow_dispatch' && inputs.mode == 'radar2_pilot') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[radar2-pilot]')) }}
+    name: Radar 2 - adquisicion diaria limitada
     runs-on: ubuntu-latest
     timeout-minutes: 35
     permissions:
