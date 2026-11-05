@@ -1,6 +1,7 @@
-# POR ACA - RADAR 2: piloto GitHub acotado, sin cron nuevo
-# Unica corrida de aceptacion (NO reactivar Radar Definitivo).
+# POR ACA - RADAR 2: disparo manual controlado (GitHub Actions)
+# Work creo el codigo; el job radar2_pilot ejecuta collector.py + persist.py.
+# Este cambio dispara SOLO el job Radar 2; legacy Radar Definitivo se omite.
 trigger_date=2026-11-05
 trigger_slot=bootstrap
 trigger_mode=radar2_pilot
-trigger_reason=single_actions_runner_pilot
+trigger_reason=user_requested_manual_verify_20261105_1538_art
