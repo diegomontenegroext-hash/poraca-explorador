@@ -1,0 +1,2132 @@
+{
+  "verdict": "GO LIMITADO",
+  "run_id": "radar2-20261105T023739Z",
+  "finished_at": "2026-11-05T03:16:28.384348+00:00",
+  "documents": 102,
+  "observations": 207,
+  "direct_authorized_instagram_posts": 0,
+  "minimum_verified": [
+    {
+      "id": "9dcca528bacfbfaa1f5bc86f1b214d969a6279e59c7fb3bd0c1b2486c5d0e6ac",
+      "title": "Panter en Guajira",
+      "date": "2026-11-13",
+      "time": "21:00",
+      "venue": "Guajira",
+      "organizer": "Limon Producciones",
+      "account_links": [
+        {
+          "username": "guajira.bar",
+          "entity": "Guajira",
+          "basis": "explicit venue/name in acquired document"
+        }
+      ],
+      "source": "https://www.passline.com/eventos/panter-en-guajira",
+      "method": "public_search_then_http",
+      "discovery": [
+        {
+          "query_id": "network-guajira",
+          "query": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:39.359Z",
+          "ref": "turn51search0",
+          "accounts": [
+            "guajira.bar"
+          ]
+        }
+      ],
+      "sha256": "3d157873a9be27acb551b7ef410e21c49d01f9a938d1d1e88087aef8036c536d",
+      "private_url": "https://poraca-lp-privado.vercel.app/api/radar2?format=html&id=9dcca528bacfbfaa1f5bc86f1b214d969a6279e59c7fb3bd0c1b2486c5d0e6ac"
+    },
+    {
+      "id": "ea4fabeaceebc183d1aff9ac0f047d76a5837a011ce5e9ad1da7ff2da4766fc1",
+      "title": "Joystick presenta Diarios de Humo en La Plata (Junto a Ktacumbas y Cikes)",
+      "date": "2026-11-21",
+      "time": "20:00",
+      "venue": "Guajira",
+      "organizer": "Nuevos Vientos",
+      "account_links": [
+        {
+          "username": "guajira.bar",
+          "entity": "Guajira",
+          "basis": "explicit venue/name in acquired document"
+        }
+      ],
+      "source": "https://www.passline.com/eventos/joystick-presenta-diarios-de-humo-en-la-plata-junto-a-ktacumbas-y-cikes",
+      "method": "public_search_then_http",
+      "discovery": [
+        {
+          "query_id": "network-guajira",
+          "query": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:39.359Z",
+          "ref": "turn51search1",
+          "accounts": [
+            "guajira.bar"
+          ]
+        }
+      ],
+      "sha256": "e74f08c934c078276c707e9ae5d91f12b487ffd77eb240bcb8e881e2925c95d5",
+      "private_url": "https://poraca-lp-privado.vercel.app/api/radar2?format=html&id=ea4fabeaceebc183d1aff9ac0f047d76a5837a011ce5e9ad1da7ff2da4766fc1"
+    },
+    {
+      "id": "a91f8e4ab42850f2f673fb1d73bc854921ec911b0b794444cb97a7f28c65624e",
+      "title": "La industria del amo(r)",
+      "date": "2026-11-06",
+      "time": "21:30",
+      "venue": "ESCENARIO-40",
+      "organizer": null,
+      "account_links": [
+        {
+          "username": "escenario40",
+          "entity": "Escenario 40",
+          "basis": "explicit venue/name in acquired document"
+        },
+        {
+          "username": "agendalaplata.ar",
+          "entity": "Genda",
+          "basis": "explicit venue/name in acquired document"
+        }
+      ],
+      "source": "https://www.quehacemos.com.ar/eventos/la-industria-del-amo-r-67227",
+      "method": "public_search_then_http",
+      "discovery": [
+        {
+          "query_id": "network-escenario",
+          "query": "\"Escenario 40\" \"La Plata\" noviembre de 2026 teatro -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:39.359Z",
+          "ref": "turn52search3",
+          "accounts": [
+            "escenario40"
+          ]
+        }
+      ],
+      "sha256": "4298ce56db8fc4fea7b11ce5a6fad1f98e8fa58a586f25c29e1e9a9f2768ec59",
+      "private_url": "https://poraca-lp-privado.vercel.app/api/radar2?format=html&id=a91f8e4ab42850f2f673fb1d73bc854921ec911b0b794444cb97a7f28c65624e"
+    },
+    {
+      "id": "48fd583566f8673b0b1c54292557cd87a7356dd5902f1c5f7a33c8c9839a6fbe",
+      "title": "Doble Par + Maratón a Tokio",
+      "date": "2026-11-07",
+      "time": "21:00",
+      "venue": "Guajira",
+      "organizer": "",
+      "account_links": [
+        {
+          "username": "guajira.bar",
+          "entity": "Guajira",
+          "basis": "explicit venue/name in acquired document"
+        }
+      ],
+      "source": "https://www.passline.com/eventos/doble-par-maraton-a-tokio",
+      "method": "public_search_then_published_ticket_link",
+      "discovery": [
+        {
+          "via_link": "https://elevenflow.app/eventos-en-guajira-la-plata",
+          "searches": [
+            {
+              "query_id": "network-guajira",
+              "query": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:31:39.359Z",
+              "ref": "turn51search2",
+              "accounts": [
+                "guajira.bar"
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "0770ab6cfc8ee20908fceccd2efe4f681a881700474b6205653cf95a1de2949e",
+      "private_url": "https://poraca-lp-privado.vercel.app/api/radar2?format=html&id=48fd583566f8673b0b1c54292557cd87a7356dd5902f1c5f7a33c8c9839a6fbe"
+    },
+    {
+      "id": "50a19515143ef42dd365ade0d0767133598b837cf2d606a852bd4cdbdb8ece11",
+      "title": "El Caribefunk en La Plata - 23 Nov",
+      "date": "2026-11-23",
+      "time": "20:00",
+      "venue": "Guajira",
+      "organizer": "COCO AND FUNK S.A.S",
+      "account_links": [
+        {
+          "username": "guajira.bar",
+          "entity": "Guajira",
+          "basis": "explicit venue/name in acquired document"
+        }
+      ],
+      "source": "https://www.passline.com/eventos/el-caribefunk-en-la-plata-23-nov",
+      "method": "public_search_then_published_ticket_link",
+      "discovery": [
+        {
+          "via_link": "https://elevenflow.app/eventos-en-guajira-la-plata",
+          "searches": [
+            {
+              "query_id": "network-guajira",
+              "query": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:31:39.359Z",
+              "ref": "turn51search2",
+              "accounts": [
+                "guajira.bar"
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "3927baa26336916e6260e1ea01059e1fd2e4c11aa6a9782eca0681d4cb5a7492",
+      "private_url": "https://poraca-lp-privado.vercel.app/api/radar2?format=html&id=50a19515143ef42dd365ade0d0767133598b837cf2d606a852bd4cdbdb8ece11"
+    },
+    {
+      "id": "e87f765774391d36b26590592d9d992836ce4d515e91d39b1e7fabe76ed32604",
+      "title": "Sofa y Vicky Puga en La Plata",
+      "date": "2026-11-29",
+      "time": "20:00",
+      "venue": "Guajira",
+      "organizer": "Nuevos Vientos",
+      "account_links": [
+        {
+          "username": "guajira.bar",
+          "entity": "Guajira",
+          "basis": "explicit venue/name in acquired document"
+        }
+      ],
+      "source": "https://www.passline.com/eventos/sofa-y-vicky-puga-en-la-plata",
+      "method": "public_search_then_published_ticket_link",
+      "discovery": [
+        {
+          "via_link": "https://elevenflow.app/eventos-en-guajira-la-plata",
+          "searches": [
+            {
+              "query_id": "network-guajira",
+              "query": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:31:39.359Z",
+              "ref": "turn51search2",
+              "accounts": [
+                "guajira.bar"
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "60772b3ebb221b5fe977a106dbc395a7b2df481e8b19f5a8b1472c24cc102ca5",
+      "private_url": "https://poraca-lp-privado.vercel.app/api/radar2?format=html&id=e87f765774391d36b26590592d9d992836ce4d515e91d39b1e7fabe76ed32604"
+    },
+    {
+      "id": "8e0895ebfae95df18f960f857137d1d1607edf6a82c01d9a6876d38c98f6bd33",
+      "title": "EXPOSICIÓN CIUDAD ABIERTA",
+      "date": "2026-11-08",
+      "time": "15:00",
+      "venue": "CAUBAUNO",
+      "organizer": null,
+      "account_links": [],
+      "source": "https://caubauno.org/2026/10/29/exposicion-ciudad-abierta/",
+      "method": "public_search_then_http",
+      "discovery": [
+        {
+          "query_id": "open-art",
+          "query": "\"La Plata\" noviembre de 2026 inauguración exposición galería residencia -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:41.708Z",
+          "ref": "turn43search3",
+          "accounts": []
+        }
+      ],
+      "sha256": "9ae9bb9eb17ea718b82cca612f304d0b25446ef116ecc766a7a11de38e4461de",
+      "private_url": "https://poraca-lp-privado.vercel.app/api/radar2?format=html&id=8e0895ebfae95df18f960f857137d1d1607edf6a82c01d9a6876d38c98f6bd33"
+    }
+  ],
+  "searches": [
+    {
+      "query": {
+        "id": "open-art",
+        "q": "\"La Plata\" noviembre de 2026 inauguración exposición galería residencia -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com"
+      },
+      "searched_at": "2026-11-05T02:28:41.708Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "open-wine",
+        "q": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com"
+      },
+      "searched_at": "2026-11-05T02:28:41.709Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "open-theatre",
+        "q": "\"La Plata\" noviembre de 2026 teatro independiente programación funciones -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com"
+      },
+      "searched_at": "2026-11-05T02:28:41.709Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "open-music",
+        "q": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com"
+      },
+      "searched_at": "2026-11-05T02:28:44.726Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "network-circus",
+        "accounts": [
+          "circus_ofc"
+        ],
+        "q": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com"
+      },
+      "searched_at": "2026-11-05T02:28:44.726Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "network-intra",
+        "accounts": [
+          "intra.prod"
+        ],
+        "q": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com"
+      },
+      "searched_at": "2026-11-05T02:28:44.726Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "network-999",
+        "accounts": [
+          "999ciclo"
+        ],
+        "q": "\"999ciclo\" noviembre de 2026 \"La Plata\" -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com"
+      },
+      "searched_at": "2026-11-05T02:28:47.908Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "network-guajira",
+        "accounts": [
+          "guajira.bar"
+        ],
+        "q": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com"
+      },
+      "searched_at": "2026-11-05T02:31:39.359Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "network-escenario",
+        "accounts": [
+          "escenario40"
+        ],
+        "q": "\"Escenario 40\" \"La Plata\" noviembre de 2026 teatro -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com"
+      },
+      "searched_at": "2026-11-05T02:31:39.359Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "network-corazon",
+        "accounts": [
+          "residenciacorazon"
+        ],
+        "q": "\"Residencia Corazón\" noviembre de 2026 -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com"
+      },
+      "searched_at": "2026-11-05T02:31:41.667Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "network-centroarte",
+        "accounts": [
+          "centrodearteunlp"
+        ],
+        "q": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com"
+      },
+      "searched_at": "2026-11-05T02:31:41.667Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "network-luti",
+        "accounts": [
+          "lutitravelguide"
+        ],
+        "q": "\"lutitravelguide\" noviembre de 2026 planes eventos -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com"
+      },
+      "searched_at": "2026-11-05T02:28:47.908Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "network-sunset",
+        "accounts": [
+          "sunsetwine.mixology"
+        ],
+        "q": "\"Sunset Wine Mixology\" noviembre 2026 La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com"
+      },
+      "searched_at": "2026-11-05T03:12:13.741Z",
+      "error": false
+    },
+    {
+      "query": {
+        "id": "network-dionisio",
+        "accounts": [
+          "dionisio_vinoteca"
+        ],
+        "q": "\"Casa Dionisio\" noviembre 2026 cata vinos La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com"
+      },
+      "searched_at": "2026-11-05T03:12:13.742Z",
+      "error": false
+    }
+  ],
+  "acquisitions": [
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "sha256": "c7504dd9eec28e887683d109b98b26b8ab9a19ec2f45f0075f3cbf6dd6c22118",
+      "fetched_at": "2026-11-05T02:37:51.871992+00:00",
+      "origin": null,
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/agendalaplata.ar/components/buscador_result.php?search=El+rol+del+showrunner%3A+cuando+los+guionistas+tienen+la+%C3%BAltima+palabra",
+      "sha256": "9b139fbab090a6151925dfff7c2b5cf2fdfa6252655c048b94f6e730180a0e71",
+      "fetched_at": "2026-11-05T02:37:56.914880+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/evento/el-rol-del-showrunner-cuando-los-guionistas-tienen-la-ultima-palabra-facultad-de-bellas-artes-unlp-sede-central-20261029120655",
+      "sha256": "e870f0fe002652c5fb98ef93f8a0aebe73729ee427cb00b5bde1f1fac9e7471e",
+      "fetched_at": "2026-11-05T02:38:02.058412+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/agendalaplata.ar/components/buscador_result.php?search=La+ragazza+con+la+pistola+%28Dir.+Mario+Monicelli%29",
+      "sha256": "7da0cffce77089fb55ee64a5ea88746b6d4705678a9e73483a526145a0321b0d",
+      "fetched_at": "2026-11-05T02:38:07.143677+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/evento/la-ragazza-con-la-pistola-dir-mario-monicelli-teatro-bar-cultural-la-ferreteria-20261012224924",
+      "sha256": "6d321f14f50bb7a0e5ebdbc013f4e0690add93f2a7d733e75bef4dac3068ad3f",
+      "fetched_at": "2026-11-05T02:38:12.982113+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/agendalaplata.ar/components/buscador_result.php?search=Susana+Rinaldi%2C+libre+-+Dir.+Isabel+Marcenaro+Bouter",
+      "sha256": "88ebcde436b6d5437ffc96c756ea0ba8943422c339a6198fb8a8a5e17b590714",
+      "fetched_at": "2026-11-05T02:38:20.901739+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/evento/susana-rinaldi-libre-dir-isabel-marcenaro-bouter-cine-ecoselect-espacio-incaa-20261028012405",
+      "sha256": "fc4b4b117561b2ca2368198a2a059694332db89f91669137e071fda20e6e6bf1",
+      "fetched_at": "2026-11-05T02:38:25.999943+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/agendalaplata.ar/components/buscador_result.php?search=La+casa+del+minotauro+-+Dir.+Federico+Bongiorno",
+      "sha256": "5072d016522636121d1adc0b0d3061435c2ff8862a73fea7117b80e3efe8e411",
+      "fetched_at": "2026-11-05T02:38:32.464867+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/evento/la-casa-del-minotauro-dir-federico-bongiorno-cine-select-espacio-incaa-20261028011236",
+      "sha256": "203b1ceac95d28701aa140616b66e73079f51c3babc98f4d98e3ec11a2a030c5",
+      "fetched_at": "2026-11-05T02:38:37.469193+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/agendalaplata.ar/components/buscador_result.php?search=Concierto+ORVI+-+Concierto+de+fin+de+a%C3%B1o",
+      "sha256": "29b4752cc66186c4e81c575daef6dab320ce29ae350d31ec534db112181a249d",
+      "fetched_at": "2026-11-05T02:38:42.385501+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/evento/concierto-orvi-concierto-de-fin-de-ano-conservatorio-de-musica-gilardo-gilardi-20261028005540",
+      "sha256": "126693b53a76bafe729bf0e25c48732964ffecc62fee546e27b9b09dd09637a3",
+      "fetched_at": "2026-11-05T02:38:47.352162+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/agendalaplata.ar/components/buscador_result.php?search=Veneno+para+las+hadas+-+Dir.+Carlos+Enrique+Taboada",
+      "sha256": "126ed19db252ede6deba002f94347277ba266d0f6e65cfcbda62a891abac80ce",
+      "fetched_at": "2026-11-05T02:38:52.393520+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/evento/veneno-para-las-hadas-dir-carlos-enrique-taboada-cine-ecoselect-espacio-incaa-20261028013256",
+      "sha256": "82a6460d9e737c45fdb2788ca2ef222b6a847524d774ed4cfda84181392480c0",
+      "fetched_at": "2026-11-05T02:38:57.434377+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/agendalaplata.ar/components/buscador_result.php?search=Boiling+Point",
+      "sha256": "b31c2c7d341ec3a05b2cdddd1f5df1b31ada7d330e81b90b79ec59130b870fb4",
+      "fetched_at": "2026-11-05T02:39:02.423332+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/evento/boiling-point-cine-select-espacio-incaa-20261028011903",
+      "sha256": "10e87b122cc922de5adf411273256a319af7cd71529b002c500f106e31d4a603",
+      "fetched_at": "2026-11-05T02:39:07.462187+00:00",
+      "origin": "https://agendalaplata.ar/?fecha=2026-11-04",
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-05",
+      "sha256": "f9716f1482971215fc11aa48c4660d7fe1d416a4fbc9ea5aaf591acf909390f1",
+      "fetched_at": "2026-11-05T02:39:12.774862+00:00",
+      "origin": null,
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-06",
+      "sha256": "3bd58a3648acc0f716e47f762869063cd496821329770661c84d580a157b520a",
+      "fetched_at": "2026-11-05T02:39:19.595572+00:00",
+      "origin": null,
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-07",
+      "sha256": "03fe5f9b1243f48e1495ccc5a11f80d857cb321e294ef1aa60b718da085eebe5",
+      "fetched_at": "2026-11-05T02:39:25.582909+00:00",
+      "origin": null,
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-08",
+      "sha256": "5c9fbd4f5758695746841b4fe40c200e5ab9bddb024bd156ce7c20a3a2f4d9e4",
+      "fetched_at": "2026-11-05T02:39:31.075800+00:00",
+      "origin": null,
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-09",
+      "sha256": "9b5142bf5b690f130e99c102de783a88876ce296a408a1b9c8ef955b101a78a8",
+      "fetched_at": "2026-11-05T02:39:37.296356+00:00",
+      "origin": null,
+      "discovery": null
+    },
+    {
+      "url": "https://agendalaplata.ar/?fecha=2026-11-10",
+      "sha256": "246b254912b6585ce395792dcca9fbc49675e3de4480a697d34987c49c58480b",
+      "fetched_at": "2026-11-05T02:39:42.739867+00:00",
+      "origin": null,
+      "discovery": null
+    },
+    {
+      "url": "https://www.meteored.com.ar/noticias/ocio/noviembre-en-la-plata-7-eventos-para-disfrutar-la-capital-bonaerense-escapada-turismo.html",
+      "sha256": "b4822f8be14f3847175811455d1b30d449c30470f18d5f05354c2957f3b3ff07",
+      "fetched_at": "2026-11-05T02:39:52.481499+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 inauguración exposición galería residencia -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-art",
+          "query": "\"La Plata\" noviembre de 2026 inauguración exposición galería residencia -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:41.708Z",
+          "ref": "turn43search1",
+          "accounts": []
+        },
+        {
+          "query_id": "open-music",
+          "query": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn44search8",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://festival.freezer.com.ar/2026/programacion/",
+      "sha256": "bffbb51a50c79cefca82b8c2b41162070e42445466e39744bd207619dfbbdaf5",
+      "fetched_at": "2026-11-05T02:39:52.612664+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 inauguración exposición galería residencia -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-art",
+          "query": "\"La Plata\" noviembre de 2026 inauguración exposición galería residencia -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:41.708Z",
+          "ref": "turn43search2",
+          "accounts": []
+        },
+        {
+          "query_id": "open-wine",
+          "query": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:41.709Z",
+          "ref": "turn41search5",
+          "accounts": []
+        },
+        {
+          "query_id": "open-music",
+          "query": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn44search4",
+          "accounts": []
+        },
+        {
+          "query_id": "network-centroarte",
+          "query": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:41.667Z",
+          "ref": "turn54search0",
+          "accounts": [
+            "centrodearteunlp"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://openhouselaplata.com.ar/",
+      "sha256": "f321bfc30b9c86027d42084318e6798e51c9971cbabe7ad13e52bf42c67be515",
+      "fetched_at": "2026-11-05T02:39:53.563714+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 inauguración exposición galería residencia -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-art",
+          "query": "\"La Plata\" noviembre de 2026 inauguración exposición galería residencia -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:41.708Z",
+          "ref": "turn43search0",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://caubauno.org/2026/10/29/exposicion-ciudad-abierta/",
+      "sha256": "9ae9bb9eb17ea718b82cca612f304d0b25446ef116ecc766a7a11de38e4461de",
+      "fetched_at": "2026-11-05T02:39:53.664277+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 inauguración exposición galería residencia -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-art",
+          "query": "\"La Plata\" noviembre de 2026 inauguración exposición galería residencia -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:41.708Z",
+          "ref": "turn43search3",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://festival.freezer.com.ar/2026/convocatorias/",
+      "sha256": "6e66dde821df87a122f7dd4c25b904e5cbc879b69cc1bf86cb3ce0db6eed2b26",
+      "fetched_at": "2026-11-05T02:39:57.166028+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-music",
+          "query": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn44search5",
+          "accounts": []
+        },
+        {
+          "query_id": "network-centroarte",
+          "query": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:41.667Z",
+          "ref": "turn54search1",
+          "accounts": [
+            "centrodearteunlp"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://portal.ejes.com/noticias/informacion-general/tessellis-2026-plata-vuelve-ser-sede-encuentro-nacional-mosaico-19842",
+      "sha256": "336848eb7c2be1ac44b5c9abd5991759ffcf0b5867f6300e2935fdab8cb9491f",
+      "fetched_at": "2026-11-05T02:40:01.901672+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 inauguración exposición galería residencia -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-art",
+          "query": "\"La Plata\" noviembre de 2026 inauguración exposición galería residencia -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:41.708Z",
+          "ref": "turn43search4",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://saleplan.ar/buenos-aires/la-plata/planes/2050VAFZDC0T/club-de-copas-feria-de-vinos-a-beneficio-de-los-clubes",
+      "sha256": "cb62a30a02c1d955cd8d6641480a192c4bcece98dfa6a869e0ea33f68cd3d151",
+      "fetched_at": "2026-11-05T02:40:02.009347+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-wine",
+          "query": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:41.709Z",
+          "ref": "turn41search1",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://www.passline.com/eventos/feria-catar-v-edicion",
+      "sha256": "9babbfc30cb1820e7daa1235a772f3936ea9d4634528f1c9bdbd235d17023ca3",
+      "fetched_at": "2026-11-05T02:40:04.752644+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-wine",
+          "query": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:41.709Z",
+          "ref": "turn41search0",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://festival.freezer.com.ar/2026/talleres/cianotipia-antotipia",
+      "sha256": "13e97f554b8253efc193094af4eb68621171f4884203cc6d34941b88cb381319",
+      "fetched_at": "2026-11-05T02:40:07.759093+00:00",
+      "origin": "https://festival.freezer.com.ar/2026/convocatorias/",
+      "discovery": [
+        {
+          "via_link": "https://festival.freezer.com.ar/2026/convocatorias/",
+          "searches": [
+            {
+              "query_id": "open-music",
+              "query": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn44search5",
+              "accounts": []
+            },
+            {
+              "query_id": "network-centroarte",
+              "query": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:31:41.667Z",
+              "ref": "turn54search1",
+              "accounts": [
+                "centrodearteunlp"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://saleplan.ar/agenda?categoria%5B0%5D=ferias-y-mercados&fecha=2026-11-08&localidad=0644103015&vista=semana",
+      "sha256": "d087a81e04f1e8ea98ea24f80f36e34e55614d18daff5667c9c6efdf4173bf12",
+      "fetched_at": "2026-11-05T02:40:12.970860+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-wine",
+          "query": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:41.709Z",
+          "ref": "turn41search3",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://www.passline.com/eventos/panter-en-guajira",
+      "sha256": "3d157873a9be27acb551b7ef410e21c49d01f9a938d1d1e88087aef8036c536d",
+      "fetched_at": "2026-11-05T02:40:16.196049+00:00",
+      "origin": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-guajira",
+          "query": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:39.359Z",
+          "ref": "turn51search0",
+          "accounts": [
+            "guajira.bar"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/feria-de-degustacion",
+      "sha256": "cede1f88f9745116b5d8c2098ea2be6dc355ebbbec355a86232f1b7deaf696fd",
+      "fetched_at": "2026-11-05T02:40:18.800975+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-dionisio",
+          "query": "\"Casa Dionisio\" noviembre 2026 cata vinos La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+          "searched_at": "2026-11-05T03:12:13.742Z",
+          "ref": "turn60search4",
+          "accounts": [
+            "dionisio_vinoteca"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://saleplan.ar/eventos/musica",
+      "sha256": "9815fdc3856e2526e6e3cddc7d28ff55dfac1d4818c7fadb492ac5b77587b4bc",
+      "fetched_at": "2026-11-05T02:40:19.327567+00:00",
+      "origin": "https://saleplan.ar/agenda?categoria%5B0%5D=ferias-y-mercados&fecha=2026-11-08&localidad=0644103015&vista=semana",
+      "discovery": [
+        {
+          "via_link": "https://saleplan.ar/agenda?categoria%5B0%5D=ferias-y-mercados&fecha=2026-11-08&localidad=0644103015&vista=semana",
+          "searches": [
+            {
+              "query_id": "open-wine",
+              "query": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:41.709Z",
+              "ref": "turn41search3",
+              "accounts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://festival.freezer.com.ar/2026/talleres/proyecto-calle",
+      "sha256": "f4d65d2ae75f498516c49afbf2113d1b39058d8646327fdcbf4effd316000370",
+      "fetched_at": "2026-11-05T02:40:20.659335+00:00",
+      "origin": "https://festival.freezer.com.ar/2026/convocatorias/",
+      "discovery": [
+        {
+          "via_link": "https://festival.freezer.com.ar/2026/convocatorias/",
+          "searches": [
+            {
+              "query_id": "open-music",
+              "query": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn44search5",
+              "accounts": []
+            },
+            {
+              "query_id": "network-centroarte",
+              "query": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:31:41.667Z",
+              "ref": "turn54search1",
+              "accounts": [
+                "centrodearteunlp"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.passline.com/eventos/joystick-presenta-diarios-de-humo-en-la-plata-junto-a-ktacumbas-y-cikes",
+      "sha256": "e74f08c934c078276c707e9ae5d91f12b487ffd77eb240bcb8e881e2925c95d5",
+      "fetched_at": "2026-11-05T02:40:24.065049+00:00",
+      "origin": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-guajira",
+          "query": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:39.359Z",
+          "ref": "turn51search1",
+          "accounts": [
+            "guajira.bar"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://saleplan.ar/eventos/teatro-y-espectaculos",
+      "sha256": "09e76e81118a5196337fe143ae7ff234a48b99333eab6f1ed74920fda2c08560",
+      "fetched_at": "2026-11-05T02:40:24.213898+00:00",
+      "origin": "https://saleplan.ar/agenda?categoria%5B0%5D=ferias-y-mercados&fecha=2026-11-08&localidad=0644103015&vista=semana",
+      "discovery": [
+        {
+          "via_link": "https://saleplan.ar/agenda?categoria%5B0%5D=ferias-y-mercados&fecha=2026-11-08&localidad=0644103015&vista=semana",
+          "searches": [
+            {
+              "query_id": "open-wine",
+              "query": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:41.709Z",
+              "ref": "turn41search3",
+              "accounts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://festival.freezer.com.ar/2026/talleres/ciudad-mirada-dronica",
+      "sha256": "4e8dce752b2a90db0f580097fbdcb18ecba6d8a6136c699317055f5ee5d9011e",
+      "fetched_at": "2026-11-05T02:40:30.618571+00:00",
+      "origin": "https://festival.freezer.com.ar/2026/convocatorias/",
+      "discovery": [
+        {
+          "via_link": "https://festival.freezer.com.ar/2026/convocatorias/",
+          "searches": [
+            {
+              "query_id": "open-music",
+              "query": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn44search5",
+              "accounts": []
+            },
+            {
+              "query_id": "network-centroarte",
+              "query": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:31:41.667Z",
+              "ref": "turn54search1",
+              "accounts": [
+                "centrodearteunlp"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://agenciazonanorte.com.ar/enoturismo-calendario-de-eventos-vinos-buenos-aires/",
+      "sha256": "cbf876a3f5053f6de326a7c6edd08d875487bf06c8fbb86055d93218aaf0f905",
+      "fetched_at": "2026-11-05T02:40:30.954255+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-wine",
+          "query": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:41.709Z",
+          "ref": "turn41search6",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://saleplan.ar/eventos/cine",
+      "sha256": "5d36015eb89b083c3cbe58082598611ecc603bd5ae3916a5a3c1a6c3dedab278",
+      "fetched_at": "2026-11-05T02:40:32.301564+00:00",
+      "origin": "https://saleplan.ar/agenda?categoria%5B0%5D=ferias-y-mercados&fecha=2026-11-08&localidad=0644103015&vista=semana",
+      "discovery": [
+        {
+          "via_link": "https://saleplan.ar/agenda?categoria%5B0%5D=ferias-y-mercados&fecha=2026-11-08&localidad=0644103015&vista=semana",
+          "searches": [
+            {
+              "query_id": "open-wine",
+              "query": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:41.709Z",
+              "ref": "turn41search3",
+              "accounts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://festival.freezer.com.ar/2026/talleres/proyecto-calle/",
+      "sha256": "f4d65d2ae75f498516c49afbf2113d1b39058d8646327fdcbf4effd316000370",
+      "fetched_at": "2026-11-05T02:40:35.585293+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-music",
+          "query": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn44search6",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://saleplan.ar/buenos-aires/la-plata/planes/3RAEE2Z2TEMP/actuen",
+      "sha256": "5f44687f2cdb2a71964bcf934bf658cad76b65c9ffb3d98b2a8219eaae229ba9",
+      "fetched_at": "2026-11-05T02:40:36.855504+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 teatro independiente programación funciones -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-theatre",
+          "query": "\"La Plata\" noviembre de 2026 teatro independiente programación funciones -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:41.709Z",
+          "ref": "turn42search4",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://festival.freezer.com.ar/2026/talleres/fotografia-moda-analogica",
+      "sha256": "f18c86d63e51df4c663a926d411f70cca9d609f9ad09ab9144257fed4c0c1d59",
+      "fetched_at": "2026-11-05T02:40:45.712298+00:00",
+      "origin": "https://festival.freezer.com.ar/2026/talleres/proyecto-calle/",
+      "discovery": [
+        {
+          "via_link": "https://festival.freezer.com.ar/2026/talleres/proyecto-calle/",
+          "searches": [
+            {
+              "query_id": "open-music",
+              "query": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn44search6",
+              "accounts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.passline.com/eventos/feria-catar-iv-2025#contenedor-funciones",
+      "sha256": "90bfb58b9c2be03d005663e0f3ef91dc12841dd5350b0139fdba7395b457d916",
+      "fetched_at": "2026-11-05T02:40:50.422364+00:00",
+      "origin": "https://agenciazonanorte.com.ar/enoturismo-calendario-de-eventos-vinos-buenos-aires/",
+      "discovery": [
+        {
+          "via_link": "https://agenciazonanorte.com.ar/enoturismo-calendario-de-eventos-vinos-buenos-aires/",
+          "searches": [
+            {
+              "query_id": "open-wine",
+              "query": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:41.709Z",
+              "ref": "turn41search6",
+              "accounts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://festival.freezer.com.ar/2026/talleres/",
+      "sha256": "2c347f7afb4b3735b03992f132d2a09daf629bedf47a6a7423222b725b57c07b",
+      "fetched_at": "2026-11-05T02:40:50.817970+00:00",
+      "origin": "https://festival.freezer.com.ar/2026/talleres/proyecto-calle/",
+      "discovery": [
+        {
+          "via_link": "https://festival.freezer.com.ar/2026/talleres/proyecto-calle/",
+          "searches": [
+            {
+              "query_id": "open-music",
+              "query": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn44search6",
+              "accounts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://pogo.ar/ciudad/la-plata/",
+      "sha256": "804e38516929d168444553954d9da429dc9c984d2334b0d0636fa45be92e71a7",
+      "fetched_at": "2026-11-05T02:40:53.604582+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-music",
+          "query": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn44search1",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://conciertosyrecitales.com/recitales/la-plata",
+      "sha256": "9e46b3f3e6c8a5b276d339905d70a916de229d8e1db9b6c86a7b8898b73546f5",
+      "fetched_at": "2026-11-05T02:40:53.950143+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-music",
+          "query": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn44search2",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://loteria.gba.gob.ar/institucional/noticias/volvieron-las-noches-capitales-al-hipodromo-de-la-plata",
+      "sha256": "bdbd89e096be70170c617951a634fba5421b59e8f63f37e9b6155db4bb516163",
+      "fetched_at": "2026-11-05T02:41:01.494233+00:00",
+      "origin": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "open-music",
+          "query": "\"La Plata\" noviembre de 2026 recital festival ciclo talleres especiales -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn44search3",
+          "accounts": []
+        }
+      ]
+    },
+    {
+      "url": "https://circusproduce.com/",
+      "sha256": "8ccd3c46ac9b0e5db91476d21803bbe64555d0ed75d1d227e4c627cafc277051",
+      "fetched_at": "2026-11-05T02:41:04.349543+00:00",
+      "origin": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-circus",
+          "query": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn46search0",
+          "accounts": [
+            "circus_ofc"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.vamoseventos.com/venue/circus-la-plata",
+      "sha256": "a9bb9ce5681c37a598c945e34ec6406afd350594499ba6432c3dbd80c0dcf2a6",
+      "fetched_at": "2026-11-05T02:41:04.927524+00:00",
+      "origin": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-circus",
+          "query": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn46search1",
+          "accounts": [
+            "circus_ofc"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.passline.com/eventos/vinarte-10-anos",
+      "sha256": "53c5141fe118976d1e47a1699101ea24c8eef37a03d67828202d3a35809d9928",
+      "fetched_at": "2026-11-05T02:41:09.658224+00:00",
+      "origin": "https://agenciazonanorte.com.ar/enoturismo-calendario-de-eventos-vinos-buenos-aires/",
+      "discovery": [
+        {
+          "via_link": "https://agenciazonanorte.com.ar/enoturismo-calendario-de-eventos-vinos-buenos-aires/",
+          "searches": [
+            {
+              "query_id": "open-wine",
+              "query": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:41.709Z",
+              "ref": "turn41search6",
+              "accounts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://neotrax.app/booking-graph/events/ezequiel-arias-circus-la-plata-2026-11-07?return_to=%2Fscene-radar%2Fagenda",
+      "sha256": "2762cbb1a925a15a6261d72550d24e8c25f01617beeffbccb98ab112ef205ee7",
+      "fetched_at": "2026-11-05T02:41:13.318466+00:00",
+      "origin": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-circus",
+          "query": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn46search3",
+          "accounts": [
+            "circus_ofc"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://wearebombo.com/evento/ginkgo-x-circus-carlos-willengton-valdovinos-maiti-merlino-jano-gurruchaga-6ad13cf073b18d0e51af7765",
+      "sha256": "3a78b05de4a24e13f1f011cefc91793bbd1ddd17c994b286da9b8f31bc8f7ac8",
+      "fetched_at": "2026-11-05T02:41:14.949960+00:00",
+      "origin": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-circus",
+          "query": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn46search2",
+          "accounts": [
+            "circus_ofc"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.quehacemos.com.ar/eventos/intra-el-filo-de-la-verdad-55462",
+      "sha256": "680ecd0af3c5429866025207cd2f2059b21ec7924bbc2b643fea26f9a9e3037d",
+      "fetched_at": "2026-11-05T02:41:15.693301+00:00",
+      "origin": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-intra",
+          "query": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn45search0",
+          "accounts": [
+            "intra.prod"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://agenciazonanorte.com.ar/tag/eventos/",
+      "sha256": "e6f09a6e7e0e0d5a2fb578a0f5923f3d22b2008d4c911b146c730c713fa2cd84",
+      "fetched_at": "2026-11-05T02:41:16.602215+00:00",
+      "origin": "https://agenciazonanorte.com.ar/enoturismo-calendario-de-eventos-vinos-buenos-aires/",
+      "discovery": [
+        {
+          "via_link": "https://agenciazonanorte.com.ar/enoturismo-calendario-de-eventos-vinos-buenos-aires/",
+          "searches": [
+            {
+              "query_id": "open-wine",
+              "query": "\"La Plata\" noviembre de 2026 cata vinos degustación feria -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:41.709Z",
+              "ref": "turn41search6",
+              "accounts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://neotrax.app/scene-radar/este-finde",
+      "sha256": "39824a71c635f925579308caf16c04b50c0e589190dd7ee60d9279fab22f3941",
+      "fetched_at": "2026-11-05T02:41:18.585191+00:00",
+      "origin": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-circus",
+          "query": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn46search4",
+          "accounts": [
+            "circus_ofc"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.quehacemos.com.ar/eventos/intra-el-filo-de-la-verdad-55462#main-content",
+      "sha256": "680ecd0af3c5429866025207cd2f2059b21ec7924bbc2b643fea26f9a9e3037d",
+      "fetched_at": "2026-11-05T02:41:19.587651+00:00",
+      "origin": "https://www.quehacemos.com.ar/eventos/intra-el-filo-de-la-verdad-55462",
+      "discovery": [
+        {
+          "via_link": "https://www.quehacemos.com.ar/eventos/intra-el-filo-de-la-verdad-55462",
+          "searches": [
+            {
+              "query_id": "network-intra",
+              "query": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn45search0",
+              "accounts": [
+                "intra.prod"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://radioestacionsur.org/category/cultura-platense/",
+      "sha256": "700b13a6bd80d6506aa531f5c36474f1a4e27f1ae67d96be42d586077d7d1b0d",
+      "fetched_at": "2026-11-05T02:41:23.950221+00:00",
+      "origin": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-intra",
+          "query": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn45search2",
+          "accounts": [
+            "intra.prod"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.quehacemos.com.ar/eventos/todo-queen-y-elton-john-por-martin-babenco-70007",
+      "sha256": "d6252b8e9b67fc2791cf70ab3f4259e41ccebad753a99e84ec1471661d46f786",
+      "fetched_at": "2026-11-05T02:41:25.562277+00:00",
+      "origin": "https://www.quehacemos.com.ar/eventos/intra-el-filo-de-la-verdad-55462",
+      "discovery": [
+        {
+          "via_link": "https://www.quehacemos.com.ar/eventos/intra-el-filo-de-la-verdad-55462",
+          "searches": [
+            {
+              "query_id": "network-intra",
+              "query": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn45search0",
+              "accounts": [
+                "intra.prod"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.blaenvivo.com/nota-musica--instalaciones-interactivas--patio-gastronomico-y-mas-en-la-3ra-edicion-de-intra-fe-68016",
+      "sha256": "1875004f1c17b72124846c1e2ff020bc6ae145624be986247fbbbabebc5418aa",
+      "fetched_at": "2026-11-05T02:41:26.361740+00:00",
+      "origin": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-intra",
+          "query": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn45search3",
+          "accounts": [
+            "intra.prod"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.paseshow.com.ar/eventos/indira-la-fabrica-6-de-noviembre",
+      "sha256": "5b3a68b27d94bd737377ead7ebbc46818272fc0574455d7a8e7f813dcfca5423",
+      "fetched_at": "2026-11-05T02:41:28.212993+00:00",
+      "origin": "https://neotrax.app/scene-radar/este-finde",
+      "discovery": [
+        {
+          "via_link": "https://neotrax.app/scene-radar/este-finde",
+          "searches": [
+            {
+              "query_id": "network-circus",
+              "query": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn46search4",
+              "accounts": [
+                "circus_ofc"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.quehacemos.com.ar/eventos/por-que-somos-asi-la-plata-6-11-21hs-68203",
+      "sha256": "adf1376c4decfdfeb20b99f72baec863c6d9b7ef17a7b157157d613a978ccb7e",
+      "fetched_at": "2026-11-05T02:41:30.241363+00:00",
+      "origin": "https://www.quehacemos.com.ar/eventos/intra-el-filo-de-la-verdad-55462",
+      "discovery": [
+        {
+          "via_link": "https://www.quehacemos.com.ar/eventos/intra-el-filo-de-la-verdad-55462",
+          "searches": [
+            {
+              "query_id": "network-intra",
+              "query": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn45search0",
+              "accounts": [
+                "intra.prod"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://cyberfunk.com.ar/del-under-platense-a-la-capital-intra-presenta-friccion/",
+      "sha256": "7ed0cb4d040cac9be5a2a726eee5f156cad63089b8b379dff2570a6a50dd118b",
+      "fetched_at": "2026-11-05T02:41:32.994289+00:00",
+      "origin": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-intra",
+          "query": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn45search5",
+          "accounts": [
+            "intra.prod"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.paseshow.com.ar/eventos/adam-la-fabrica-7-de-noviembre",
+      "sha256": "5b3a68b27d94bd737377ead7ebbc46818272fc0574455d7a8e7f813dcfca5423",
+      "fetched_at": "2026-11-05T02:41:33.083951+00:00",
+      "origin": "https://neotrax.app/scene-radar/este-finde",
+      "discovery": [
+        {
+          "via_link": "https://neotrax.app/scene-radar/este-finde",
+          "searches": [
+            {
+              "query_id": "network-circus",
+              "query": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn46search4",
+              "accounts": [
+                "circus_ofc"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.quehacemos.com.ar/eventos/la-industria-del-amo-r-67227",
+      "sha256": "4298ce56db8fc4fea7b11ce5a6fad1f98e8fa58a586f25c29e1e9a9f2768ec59",
+      "fetched_at": "2026-11-05T02:41:34.666448+00:00",
+      "origin": "\"Escenario 40\" \"La Plata\" noviembre de 2026 teatro -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-escenario",
+          "query": "\"Escenario 40\" \"La Plata\" noviembre de 2026 teatro -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:39.359Z",
+          "ref": "turn52search3",
+          "accounts": [
+            "escenario40"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.tripadvisor.com.ar/Attractions-g312747-Activities-c62-La_Plata_Province_of_Buenos_Aires_Central_Argentina.html",
+      "sha256": "24bc6a880415759497e1c430507111a525d40593f887d5e9364e691667bbe80e",
+      "fetched_at": "2026-11-05T02:41:36.015786+00:00",
+      "origin": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-intra",
+          "query": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:44.726Z",
+          "ref": "turn45search6",
+          "accounts": [
+            "intra.prod"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://cyberfunk.com.ar/eventos/",
+      "sha256": "7701ba1883060c988be25b9099d0e47d5d4985f4986dad09e985a8c5f66c1e18",
+      "fetched_at": "2026-11-05T02:41:38.013583+00:00",
+      "origin": "https://cyberfunk.com.ar/del-under-platense-a-la-capital-intra-presenta-friccion/",
+      "discovery": [
+        {
+          "via_link": "https://cyberfunk.com.ar/del-under-platense-a-la-capital-intra-presenta-friccion/",
+          "searches": [
+            {
+              "query_id": "network-intra",
+              "query": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn45search5",
+              "accounts": [
+                "intra.prod"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.quehacemos.com.ar/eventos/fabrica-de-chicas-70353",
+      "sha256": "9678e86a29ef463383e842ec289ca585ddcfe44cf774c2c0f6cdf5c506a78bc2",
+      "fetched_at": "2026-11-05T02:41:40.023107+00:00",
+      "origin": "\"Escenario 40\" \"La Plata\" noviembre de 2026 teatro -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-escenario",
+          "query": "\"Escenario 40\" \"La Plata\" noviembre de 2026 teatro -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:39.359Z",
+          "ref": "turn52search4",
+          "accounts": [
+            "escenario40"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://planout.ar/eventos/es/adam-beyer-x-endless-sound",
+      "sha256": "db07ab5af3f41ccbed48eb53d33eef5efee4fdb2c6cca9c152f3605d8f9fb268",
+      "fetched_at": "2026-11-05T02:41:41.712688+00:00",
+      "origin": "https://neotrax.app/scene-radar/este-finde",
+      "discovery": [
+        {
+          "via_link": "https://neotrax.app/scene-radar/este-finde",
+          "searches": [
+            {
+              "query_id": "network-circus",
+              "query": "\"Circus\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn46search4",
+              "accounts": [
+                "circus_ofc"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.quehacemos.com.ar/eventos/fabrica-de-chicas-70351",
+      "sha256": "a1c3fd2a33beaf71ba268d4b02b12f407d2d68d5f2c45a509a189d3f43c4fb8b",
+      "fetched_at": "2026-11-05T02:41:45.593118+00:00",
+      "origin": "\"Escenario 40\" \"La Plata\" noviembre de 2026 teatro -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-escenario",
+          "query": "\"Escenario 40\" \"La Plata\" noviembre de 2026 teatro -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:39.359Z",
+          "ref": "turn52search5",
+          "accounts": [
+            "escenario40"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://enagenda.com.ar/nota/34111/septiembre-en-comunidad-ferroviaria-la-agenda-de-actividades-para-este-mes/",
+      "sha256": "f322d3b59061a7358bf3854f21a67371f9292502d612c465210f5bb9a6e80f02",
+      "fetched_at": "2026-11-05T02:41:46.145492+00:00",
+      "origin": "\"999ciclo\" noviembre de 2026 \"La Plata\" -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-999",
+          "query": "\"999ciclo\" noviembre de 2026 \"La Plata\" -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:47.908Z",
+          "ref": "turn47search0",
+          "accounts": [
+            "999ciclo"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://fliphtml5.com/movida/MOVIDA/",
+      "sha256": "a283b6cc334f745fa08de3e961f00b34989fd04f8be1042a07b5f35f279f6647",
+      "fetched_at": "2026-11-05T02:41:51.422917+00:00",
+      "origin": "\"999ciclo\" noviembre de 2026 \"La Plata\" -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-999",
+          "query": "\"999ciclo\" noviembre de 2026 \"La Plata\" -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:47.908Z",
+          "ref": "turn47search3",
+          "accounts": [
+            "999ciclo"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://elevenflow.app/eventos-en-guajira-la-plata",
+      "sha256": "52850c78b9d71ffd7e238b9c7dce0fc054855677676445be57bfd0c381fafdf6",
+      "fetched_at": "2026-11-05T02:41:55.854247+00:00",
+      "origin": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-guajira",
+          "query": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:39.359Z",
+          "ref": "turn51search2",
+          "accounts": [
+            "guajira.bar"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.passline.com/eventos/intra-friccion",
+      "sha256": "99bc4f9e87cf5a4a2ec3b0728f00f03bd667644c8fc8c4fbf008e2ce93954e92",
+      "fetched_at": "2026-11-05T02:41:56.973840+00:00",
+      "origin": "https://cyberfunk.com.ar/del-under-platense-a-la-capital-intra-presenta-friccion/",
+      "discovery": [
+        {
+          "via_link": "https://cyberfunk.com.ar/del-under-platense-a-la-capital-intra-presenta-friccion/",
+          "searches": [
+            {
+              "query_id": "network-intra",
+              "query": "\"INTRA\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:28:44.726Z",
+              "ref": "turn45search5",
+              "accounts": [
+                "intra.prod"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://fliphtml5.com/movida/ilovepdf_merged/",
+      "sha256": "dc5311d5ac724b9a5dfa335891ba11d901505c55ad8505ca2809aa705dafca03",
+      "fetched_at": "2026-11-05T02:41:58.576256+00:00",
+      "origin": "\"999ciclo\" noviembre de 2026 \"La Plata\" -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-999",
+          "query": "\"999ciclo\" noviembre de 2026 \"La Plata\" -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:47.908Z",
+          "ref": "turn47search7",
+          "accounts": [
+            "999ciclo"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://cyberfunk.com.ar/999ciclo-comienza-su-2024-con-un-festival-audiovisual-unico/",
+      "sha256": "8b03ff05562444807671dcf5a242cd5ed3dab6ef3aa2946511c03424b970b9e5",
+      "fetched_at": "2026-11-05T02:42:01.292501+00:00",
+      "origin": "\"999ciclo\" noviembre de 2026 \"La Plata\" -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-999",
+          "query": "\"999ciclo\" noviembre de 2026 \"La Plata\" -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:47.908Z",
+          "ref": "turn47search2",
+          "accounts": [
+            "999ciclo"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.porlamusica.com.ar/",
+      "sha256": "91d42bbf573484601e2d8efdd6bf05928f2f37b44bbe0fcdbe33b86b3c9605ac",
+      "fetched_at": "2026-11-05T02:42:04.348057+00:00",
+      "origin": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-guajira",
+          "query": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:39.359Z",
+          "ref": "turn51search6",
+          "accounts": [
+            "guajira.bar"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.marquesina.com.ar/producciones/fabrica-de-chicas-alt88170",
+      "sha256": "a27fb35be7f3eb5a92917f226d76e405f35d786906c9bf0f22cefa4bbf627463",
+      "fetched_at": "2026-11-05T02:42:06.748363+00:00",
+      "origin": "\"Escenario 40\" \"La Plata\" noviembre de 2026 teatro -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-escenario",
+          "query": "\"Escenario 40\" \"La Plata\" noviembre de 2026 teatro -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:39.359Z",
+          "ref": "turn52search1",
+          "accounts": [
+            "escenario40"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.marquesina.com.ar/producciones/cronopios-x-cronopios-2-alt102526",
+      "sha256": "024e9ffbf02fb5592f6f5dc8b0142a7a332cc204905f5656a82604646e84cee8",
+      "fetched_at": "2026-11-05T02:42:11.774313+00:00",
+      "origin": "\"Escenario 40\" \"La Plata\" noviembre de 2026 teatro -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-escenario",
+          "query": "\"Escenario 40\" \"La Plata\" noviembre de 2026 teatro -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:39.359Z",
+          "ref": "turn52search7",
+          "accounts": [
+            "escenario40"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://colegiodeenfermeros.org.ar/bolsa-de-trabajo/",
+      "sha256": "f385d46683c00a93360ac8e27eb5174366bcb3b79573a4da8fa9746b2ec1ba36",
+      "fetched_at": "2026-11-05T02:42:12.388227+00:00",
+      "origin": "\"Residencia Corazón\" noviembre de 2026 -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-corazon",
+          "query": "\"Residencia Corazón\" noviembre de 2026 -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:41.667Z",
+          "ref": "turn53search1",
+          "accounts": [
+            "residenciacorazon"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://residenciacorazon.com.ar/",
+      "sha256": "b0b307e125f3d1a87b0e5214ff79395561dcdaaf7d399e5aae651133754cc9e7",
+      "fetched_at": "2026-11-05T02:42:13.407153+00:00",
+      "origin": "\"Residencia Corazón\" noviembre de 2026 -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-corazon",
+          "query": "\"Residencia Corazón\" noviembre de 2026 -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:41.667Z",
+          "ref": "turn53search0",
+          "accounts": [
+            "residenciacorazon"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://redquincho.ar/residencia/residencia-corazon/",
+      "sha256": "7e1fb630e37950810397b264f2cac4d3b8a5fbc974d309a79ec7738f5b451e5b",
+      "fetched_at": "2026-11-05T02:42:15.388177+00:00",
+      "origin": "\"Residencia Corazón\" noviembre de 2026 -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-corazon",
+          "query": "\"Residencia Corazón\" noviembre de 2026 -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:41.667Z",
+          "ref": "turn53search2",
+          "accounts": [
+            "residenciacorazon"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://artistcommunities.org/directory/open-calls/your-art-residency-argentina",
+      "sha256": "ee97644e215f6815a4e9645e67beed4b3c4b99bff1072f6729f66fb486274236",
+      "fetched_at": "2026-11-05T02:42:20.056164+00:00",
+      "origin": "\"Residencia Corazón\" noviembre de 2026 -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-corazon",
+          "query": "\"Residencia Corazón\" noviembre de 2026 -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:41.667Z",
+          "ref": "turn53search4",
+          "accounts": [
+            "residenciacorazon"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.proyectoace.org/actividades/beca-constelaciones-2026/",
+      "sha256": "c0fa7a0b181c90c3db6b7d5b913b75708025270ba3f6ffe6a60cd760dcfa6bca",
+      "fetched_at": "2026-11-05T02:42:21.684381+00:00",
+      "origin": "\"Residencia Corazón\" noviembre de 2026 -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-corazon",
+          "query": "\"Residencia Corazón\" noviembre de 2026 -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:41.667Z",
+          "ref": "turn53search3",
+          "accounts": [
+            "residenciacorazon"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.arte-online.net/Agenda/Exposiciones_Muestras/Alicia-Herrero3",
+      "sha256": "7a61c51f8e1013cbf7f9522cd666808fc5aa656bbf33c0664457bf8718e49bb6",
+      "fetched_at": "2026-11-05T02:42:26.938621+00:00",
+      "origin": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-centroarte",
+          "query": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:41.667Z",
+          "ref": "turn54search4",
+          "accounts": [
+            "centrodearteunlp"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.centrodearte.unlp.edu.ar/artes-visuales/",
+      "sha256": "85bdc50d353faba5047aabb4120c3c3b3d9d2438b88eee84ec61656b4f2723e0",
+      "fetched_at": "2026-11-05T02:42:27.014409+00:00",
+      "origin": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-centroarte",
+          "query": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:41.667Z",
+          "ref": "turn54search2",
+          "accounts": [
+            "centrodearteunlp"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://teapawt.org/matiborra",
+      "sha256": "7805e203c2e110254de81fb50f59f24189eed3cbd3bfa2c9d31291c215c8717b",
+      "fetched_at": "2026-11-05T02:42:29.700221+00:00",
+      "origin": "\"lutitravelguide\" noviembre de 2026 planes eventos -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-luti",
+          "query": "\"lutitravelguide\" noviembre de 2026 planes eventos -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:28:47.908Z",
+          "ref": "turn49search1",
+          "accounts": [
+            "lutitravelguide"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.centrodearte.unlp.edu.ar/informacion-util/",
+      "sha256": "63c2389949a94049d6fa3c5b2f42d07f85149cbf91dee242ba5dd9a74ab719a2",
+      "fetched_at": "2026-11-05T02:42:33.033169+00:00",
+      "origin": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-centroarte",
+          "query": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:41.667Z",
+          "ref": "turn54search3",
+          "accounts": [
+            "centrodearteunlp"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.centrodearte.unlp.edu.ar/literatura/",
+      "sha256": "6dfa1fda079640e1ac9ada753694641a8952afdb5ac1bc838a6c12ad38edcd6a",
+      "fetched_at": "2026-11-05T02:42:39.504059+00:00",
+      "origin": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+      "discovery": [
+        {
+          "query_id": "network-centroarte",
+          "query": "\"Centro de Arte UNLP\" noviembre de 2026 exposición talleres -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+          "searched_at": "2026-11-05T02:31:41.667Z",
+          "ref": "turn54search5",
+          "accounts": [
+            "centrodearteunlp"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.passline.com/eventos/doble-par-maraton-a-tokio",
+      "sha256": "0770ab6cfc8ee20908fceccd2efe4f681a881700474b6205653cf95a1de2949e",
+      "fetched_at": "2026-11-05T02:57:35.259293+00:00",
+      "origin": "https://elevenflow.app/eventos-en-guajira-la-plata",
+      "discovery": [
+        {
+          "via_link": "https://elevenflow.app/eventos-en-guajira-la-plata",
+          "searches": [
+            {
+              "query_id": "network-guajira",
+              "query": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:31:39.359Z",
+              "ref": "turn51search2",
+              "accounts": [
+                "guajira.bar"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.passline.com/eventos/el-caribefunk-en-la-plata-23-nov",
+      "sha256": "3927baa26336916e6260e1ea01059e1fd2e4c11aa6a9782eca0681d4cb5a7492",
+      "fetched_at": "2026-11-05T02:57:44.116326+00:00",
+      "origin": "https://elevenflow.app/eventos-en-guajira-la-plata",
+      "discovery": [
+        {
+          "via_link": "https://elevenflow.app/eventos-en-guajira-la-plata",
+          "searches": [
+            {
+              "query_id": "network-guajira",
+              "query": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:31:39.359Z",
+              "ref": "turn51search2",
+              "accounts": [
+                "guajira.bar"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.passline.com/eventos/sofa-y-vicky-puga-en-la-plata",
+      "sha256": "60772b3ebb221b5fe977a106dbc395a7b2df481e8b19f5a8b1472c24cc102ca5",
+      "fetched_at": "2026-11-05T02:57:52.423717+00:00",
+      "origin": "https://elevenflow.app/eventos-en-guajira-la-plata",
+      "discovery": [
+        {
+          "via_link": "https://elevenflow.app/eventos-en-guajira-la-plata",
+          "searches": [
+            {
+              "query_id": "network-guajira",
+              "query": "\"Guajira\" \"La Plata\" noviembre de 2026 entradas -site:instagram.com -site:imginn.com -site:pikory.com -site:pixnoy.com -site:pixwox.com -site:facebook.com",
+              "searched_at": "2026-11-05T02:31:39.359Z",
+              "ref": "turn51search2",
+              "accounts": [
+                "guajira.bar"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.tienda.dionisioonline.com.ar/productos/club-del-queso-noviembre-2026-zfppj/",
+      "sha256": "e290f7052c48ca35fb4962c937c6894fc531218608ed61dae2b36223d153c7bc",
+      "fetched_at": "2026-11-05T03:12:42.200361+00:00",
+      "origin": "\"Casa Dionisio\" noviembre 2026 cata vinos La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+      "discovery": [
+        {
+          "query_id": "network-dionisio",
+          "query": "\"Casa Dionisio\" noviembre 2026 cata vinos La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+          "searched_at": "2026-11-05T03:12:13.742Z",
+          "ref": "turn60search1",
+          "accounts": [
+            "dionisio_vinoteca"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://tucoweb.info/degustar-brindar-descubrir-las-ferias-de-vinos-que-no-te-podes-perder/",
+      "sha256": "eb5ad55eb10f68cefc3409600069164b3b99b0ad648d0027081b18737281eb42",
+      "fetched_at": "2026-11-05T03:12:43.490134+00:00",
+      "origin": "\"Sunset Wine Mixology\" noviembre 2026 La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+      "discovery": [
+        {
+          "query_id": "network-sunset",
+          "query": "\"Sunset Wine Mixology\" noviembre 2026 La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+          "searched_at": "2026-11-05T03:12:13.741Z",
+          "ref": "turn59search4",
+          "accounts": [
+            "sunsetwine.mixology"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/maridaje-vinos-espumosos",
+      "sha256": "5202459b7fb2a0a19a7f7620ff7e682f7301a2c36e861648f90f8561f9edc5a6",
+      "fetched_at": "2026-11-05T03:12:45.197683+00:00",
+      "origin": "\"Sunset Wine Mixology\" noviembre 2026 La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+      "discovery": [
+        {
+          "query_id": "network-sunset",
+          "query": "\"Sunset Wine Mixology\" noviembre 2026 La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+          "searched_at": "2026-11-05T03:12:13.741Z",
+          "ref": "turn59search0",
+          "accounts": [
+            "sunsetwine.mixology"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.tienda.dionisioonline.com.ar/",
+      "sha256": "4d4ff7be32eb11db966d7eb148e4b6a3ab50e3e9412489f8d874cc6fe73329af",
+      "fetched_at": "2026-11-05T03:12:46.699658+00:00",
+      "origin": "\"Casa Dionisio\" noviembre 2026 cata vinos La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+      "discovery": [
+        {
+          "query_id": "network-dionisio",
+          "query": "\"Casa Dionisio\" noviembre 2026 cata vinos La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+          "searched_at": "2026-11-05T03:12:13.742Z",
+          "ref": "turn60search2",
+          "accounts": [
+            "dionisio_vinoteca"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/sunset-wine-mixology",
+      "sha256": "83ed7c64ca38ff1948761992a9d5a545b278671c3286df8767c67c2a4fffddc9",
+      "fetched_at": "2026-11-05T03:12:51.750422+00:00",
+      "origin": "\"Sunset Wine Mixology\" noviembre 2026 La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+      "discovery": [
+        {
+          "query_id": "network-sunset",
+          "query": "\"Sunset Wine Mixology\" noviembre 2026 La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+          "searched_at": "2026-11-05T03:12:13.741Z",
+          "ref": "turn59search1",
+          "accounts": [
+            "sunsetwine.mixology"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://compras.evento-simple.com/sunsetwinemix/eventos/sunset-wine-mixology-3-e4/v1",
+      "sha256": "dd6008d2fef57b2d4f5850ebee9637b1c82ee2d5c91c913b1e183048b0651edf",
+      "fetched_at": "2026-11-05T03:13:18.010633+00:00",
+      "origin": "https://www.casadionisio.com.ar/sunset-wine-mixology",
+      "discovery": [
+        {
+          "via_link": "https://www.casadionisio.com.ar/sunset-wine-mixology",
+          "searches": [
+            {
+              "query_id": "network-sunset",
+              "query": "\"Sunset Wine Mixology\" noviembre 2026 La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+              "searched_at": "2026-11-05T03:12:13.741Z",
+              "ref": "turn59search1",
+              "accounts": [
+                "sunsetwine.mixology"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/masterclass-cocteleria",
+      "sha256": "89b0a22acfea1ae425e809591b4355f2ac4a0151fe343e779684e0e412e2e38f",
+      "fetched_at": "2026-11-05T03:13:25.423758+00:00",
+      "origin": "\"Sunset Wine Mixology\" noviembre 2026 La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+      "discovery": [
+        {
+          "query_id": "network-sunset",
+          "query": "\"Sunset Wine Mixology\" noviembre 2026 La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+          "searched_at": "2026-11-05T03:12:13.741Z",
+          "ref": "turn59search2",
+          "accounts": [
+            "sunsetwine.mixology"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/ferias",
+      "sha256": "8b5b965d15e27993e22eda6d2961654d76e5751b90be9f9af47ce395b29ba493",
+      "fetched_at": "2026-11-05T03:13:32.237148+00:00",
+      "origin": "\"Sunset Wine Mixology\" noviembre 2026 La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+      "discovery": [
+        {
+          "query_id": "network-sunset",
+          "query": "\"Sunset Wine Mixology\" noviembre 2026 La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+          "searched_at": "2026-11-05T03:12:13.741Z",
+          "ref": "turn59search3",
+          "accounts": [
+            "sunsetwine.mixology"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/",
+      "sha256": "ec6d9447ad724d9200d966df1ee11eb780ca434f4b3095e1513364310f3119d5",
+      "fetched_at": "2026-11-05T03:13:39.446283+00:00",
+      "origin": "\"Casa Dionisio\" noviembre 2026 cata vinos La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+      "discovery": [
+        {
+          "query_id": "network-dionisio",
+          "query": "\"Casa Dionisio\" noviembre 2026 cata vinos La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+          "searched_at": "2026-11-05T03:12:13.742Z",
+          "ref": "turn60search0",
+          "accounts": [
+            "dionisio_vinoteca"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.casadionisio.com.ar/bodega-del-mes",
+      "sha256": "dc24ed86ed120222a1b591cdbdb7eb9f9b48a171e0d15c6e6c319c41351084cf",
+      "fetched_at": "2026-11-05T03:13:45.903139+00:00",
+      "origin": "\"Casa Dionisio\" noviembre 2026 cata vinos La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+      "discovery": [
+        {
+          "query_id": "network-dionisio",
+          "query": "\"Casa Dionisio\" noviembre 2026 cata vinos La Plata -site:instagram.com -site:facebook.com -site:pixnoy.com -site:imginn.com",
+          "searched_at": "2026-11-05T03:12:13.742Z",
+          "ref": "turn60search3",
+          "accounts": [
+            "dionisio_vinoteca"
+          ]
+        }
+      ]
+    }
+  ],
+  "reconciliation": [
+    {
+      "id": "2d97fccadc1a65b669a306bff1360b9ab516330468809cdd37a78de5c4709a9a",
+      "duplicate_of": "9dcca528bacfbfaa1f5bc86f1b214d969a6279e59c7fb3bd0c1b2486c5d0e6ac",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "Panter"
+    },
+    {
+      "id": "6b794b194bf31f65377f7a0d1bccd8895ff94d11b4e45f2fd4413803f6c88c77",
+      "duplicate_of": "ea4fabeaceebc183d1aff9ac0f047d76a5837a011ce5e9ad1da7ff2da4766fc1",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "Joystick presenta Diarios de Humo en La Plata (Junto a Ktacumbas y Cikes)"
+    },
+    {
+      "id": "87bca05847559b3218fc52c80fec88aaf0c1f0cd2daa87d80e18fc6e329eed50",
+      "duplicate_of": "48fd583566f8673b0b1c54292557cd87a7356dd5902f1c5f7a33c8c9839a6fbe",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "Doble Par + Maratón a Tokio"
+    },
+    {
+      "id": "b263d1c8c4a27922c042ec76d5f8efdf0df73e4f3370ffff71ec84a1f84602bf",
+      "duplicate_of": "50a19515143ef42dd365ade0d0767133598b837cf2d606a852bd4cdbdb8ece11",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "El Caribefunk"
+    },
+    {
+      "id": "d6f9ca76f4eea39c1d437194697d33ab6306d712de9ac0425104858618ac8d12",
+      "duplicate_of": "e87f765774391d36b26590592d9d992836ce4d515e91d39b1e7fabe76ed32604",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "Sofa y Vicky Puga"
+    },
+    {
+      "id": "342f9ac64ed04028867f78f78c3404989f42c4011549e9648fab0cf2991c77ed",
+      "duplicate_of": "45da17c5e090a492db4f708aa28bbe105d5f722ea94852a1143841c7271a0dc0",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "Luna Sujatovich + Inbal Comedi"
+    },
+    {
+      "id": "f7df2eec31fa9f8c5ec8f3d6d8cd3d9ea48ff72249155f2b756515d761c0698e",
+      "duplicate_of": "50a19515143ef42dd365ade0d0767133598b837cf2d606a852bd4cdbdb8ece11",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "El Caribefunk"
+    },
+    {
+      "id": "ff04972273b8a045627fa99a08afa5a111c5f4e50c730934e9b01edee46ebd93",
+      "duplicate_of": "d98ae87c0d68db41c7cb29a43f2e8905c6a2324fded1bfa4e89c4c03bdff8297",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "Carmen Sánchez Viamonte"
+    },
+    {
+      "id": "15a093487ea54d5d086bb363901d4b1f11c82ce1b65e80dae0ad3c2123b5dbb3",
+      "duplicate_of": "2203ab47ebf125fb6fa02f775c6a4a16b1289d21a7b99b6dd68aa9b870a41757",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "CLUB DE COPAS - FERIA DE VINOS - A BENEFICIO DE LOS CLUBES"
+    },
+    {
+      "id": "3835138b3922f2db1a7fcc83d43c2f26d75dd645e21dd6225871695fba19cf67",
+      "duplicate_of": "e6ffb423973f9d690e78779a9eca1aa10919bc46cf77d0f40a831fdfe5ef4578",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "¡ACTÚEN!"
+    },
+    {
+      "id": "713f43505c4a992cf2dd2785927cbfba9be54c8a93a7ed9669163d14b89ebd34",
+      "duplicate_of": "2247a3d69477cec41f6ebb72b634a009e23126172e1d75d9e0aaa7cce0774358",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "Fábrica de chicas"
+    },
+    {
+      "id": "7c30e36d86d24c6ce416062b237e04afb7e6cbc0e6b7fc629d949b30639a6cb4",
+      "duplicate_of": "e6e77131c42b8b0d38fa1a305b631173a71aa3fbfbce737dc4b03f57867e13a0",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "Fábrica de chicas"
+    },
+    {
+      "id": "e2c701efc59c59f90b21e2d96bf4a533f55457507458440f16e8d2dfd6880450",
+      "duplicate_of": "1e5eb1e0a4aaa1bb54712b2462abd791af04aa810debf32f3cb1448cca0af621",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "Fábrica de chicas"
+    },
+    {
+      "id": "38a743e8d5099bece5471d4cb47eec28552ccfc2df68b4e1571063c8b5bfa5ba",
+      "duplicate_of": "1e5eb1e0a4aaa1bb54712b2462abd791af04aa810debf32f3cb1448cca0af621",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "Fábrica de chicas"
+    },
+    {
+      "id": "f89ffe166382fa6f859b7d512b3c7b438076fc1b2414e59727b32385af25b9e4",
+      "duplicate_of": "2247a3d69477cec41f6ebb72b634a009e23126172e1d75d9e0aaa7cce0774358",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "title": "Fábrica de chicas"
+    }
+  ],
+  "errors": [
+    "{\"url\": \"https://www.voyveo.art/exposiciones/centro-de-arte-unlp-modulaciones-sensibles-y-ficciones-performativas\", \"error\": \"HTTPError: HTTP Error 404: Not Found\"}",
+    "{\"url\": \"https://teatrina.com/salas/teatro-opera-la-plata\", \"error\": \"HTTPError: HTTP Error 403: Forbidden\"}",
+    "{\"url\": \"https://teatrometrolp.com.ar/entradas/cartelera/?anio=&mes=\", \"error\": \"ROBOTS_DISALLOW\"}",
+    "{\"url\": \"https://www.teatrometrolp.com.ar/entradas/cartelera/\", \"error\": \"ROBOTS_DISALLOW\"}",
+    "{\"url\": \"https://teatrina.com/salas/teatro-metro-la-plata\", \"error\": \"HTTPError: HTTP Error 403: Forbidden\"}",
+    "{\"url\": \"https://ra.co/dj/mabelarg/biography\", \"error\": \"HTTPError: HTTP Error 403: Forbidden\"}",
+    "{\"url\": \"https://linktr.ee/guajirabar\", \"error\": \"ROBOTS_DISALLOW\"}"
+  ]
+}

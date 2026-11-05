@@ -1,0 +1,348 @@
+{
+  "purpose": "Extraction precision only; independent public page readings manually annotated after acquisition. Convenience sample biased toward one arts festival, not representative city recall. No IG-origin denominator.",
+  "reference_count": 20,
+  "correct": 20,
+  "explicit_facts": 79,
+  "items": [
+    {
+      "reference": {
+        "title": "Feria Catar V Edición",
+        "date": "2026-11-27",
+        "time": "19:00",
+        "venue": "Paseo Mitre",
+        "url": "https://www.passline.com/eventos/feria-catar-v-edicion"
+      },
+      "proposal_id": "6d8e7f3b1ba4eff94cba43993e5ee129e22fbb15001342db20858d11f25a304a",
+      "correct": true,
+      "actual": {
+        "title": "Feria Catar V Edición",
+        "date": "2026-11-27",
+        "time": "19:00",
+        "venue": "Paseo Mitre"
+      }
+    },
+    {
+      "reference": {
+        "title": "Panter en Guajira",
+        "date": "2026-11-13",
+        "time": "21:00",
+        "venue": "Guajira",
+        "url": "https://www.passline.com/eventos/panter-en-guajira"
+      },
+      "proposal_id": "9dcca528bacfbfaa1f5bc86f1b214d969a6279e59c7fb3bd0c1b2486c5d0e6ac",
+      "correct": true,
+      "actual": {
+        "title": "Panter en Guajira",
+        "date": "2026-11-13",
+        "time": "21:00",
+        "venue": "Guajira"
+      }
+    },
+    {
+      "reference": {
+        "title": "Joystick presenta Diarios de Humo en La Plata (Junto a Ktacumbas y Cikes)",
+        "date": "2026-11-21",
+        "time": "20:00",
+        "venue": "Guajira",
+        "url": "https://www.passline.com/eventos/joystick-presenta-diarios-de-humo-en-la-plata-junto-a-ktacumbas-y-cikes"
+      },
+      "proposal_id": "ea4fabeaceebc183d1aff9ac0f047d76a5837a011ce5e9ad1da7ff2da4766fc1",
+      "correct": true,
+      "actual": {
+        "title": "Joystick presenta Diarios de Humo en La Plata (Junto a Ktacumbas y Cikes)",
+        "date": "2026-11-21",
+        "time": "20:00",
+        "venue": "Guajira"
+      }
+    },
+    {
+      "reference": {
+        "title": "La industria del amo(r)",
+        "date": "2026-11-06",
+        "time": "21:30",
+        "venue": "Escenario 40",
+        "url": "https://www.quehacemos.com.ar/eventos/la-industria-del-amo-r-67227"
+      },
+      "proposal_id": "a91f8e4ab42850f2f673fb1d73bc854921ec911b0b794444cb97a7f28c65624e",
+      "correct": true,
+      "actual": {
+        "title": "La industria del amo(r)",
+        "date": "2026-11-06",
+        "time": "21:30",
+        "venue": "ESCENARIO-40"
+      }
+    },
+    {
+      "reference": {
+        "title": "Inauguración de Exposiciones",
+        "date": "2026-11-05",
+        "time": "17:00",
+        "venue": "Pasaje Dardo Rocha",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "a8dc2ae986702a21e3242e4012a8b994fdeb43302299f11e1b36677fe80bf583",
+      "correct": true,
+      "actual": {
+        "title": "Inauguración de Exposiciones",
+        "date": "2026-11-05",
+        "time": "17:00",
+        "venue": "Pasaje Dardo Rocha"
+      }
+    },
+    {
+      "reference": {
+        "title": "Brindis de Inauguración Freezer Festival 2026",
+        "date": "2026-11-05",
+        "time": "20:30",
+        "venue": "Ciudad de gatos",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "9f139b2a293a5004a0320e4e175bf3efe2ff4582dbe1b596452b802115bc2c5b",
+      "correct": true,
+      "actual": {
+        "title": "Brindis de Inauguración Freezer Festival 2026",
+        "date": "2026-11-05",
+        "time": "20:30",
+        "venue": "Ciudad de gatos"
+      }
+    },
+    {
+      "reference": {
+        "title": "Un Libro de (Naturaleza)",
+        "date": "2026-11-06",
+        "time": "15:00",
+        "venue": "Museo de La Plata",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "11b4d11594cbef69351fb07664ddb35aaddcf30af1b292a67e7e44e17c9367ae",
+      "correct": true,
+      "actual": {
+        "title": "Un Libro de (Naturaleza)",
+        "date": "2026-11-06",
+        "time": "15:00",
+        "venue": "Museo de La Plata (FCNyM, UNLP) Paseo del Bosque s/n, La Plata"
+      }
+    },
+    {
+      "reference": {
+        "title": "Taller de Cianotipia con Graduados Fotografía FDA UNLP",
+        "date": "2026-11-08",
+        "time": "14:00",
+        "venue": "Beressia",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "781dbe574d434794aafa11190fe4253e6a19990f16a4ebbfebcec97c7525f11c",
+      "correct": true,
+      "actual": {
+        "title": "Taller de Cianotipia con Graduados Fotografía FDA UNLP",
+        "date": "2026-11-08",
+        "time": "14:00",
+        "venue": "Beressia Berisso"
+      }
+    },
+    {
+      "reference": {
+        "title": "Pre-Inauguración CDA",
+        "date": "2026-11-11",
+        "time": "",
+        "venue": "Centro de Arte",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "02e98290eb5404bef9e13fc5fd58f026d79f462a6928fcf146d7a62cbfd2378d",
+      "correct": true,
+      "actual": {
+        "title": "Pre-Inauguración CDA",
+        "date": "2026-11-11",
+        "time": null,
+        "venue": "Centro de Arte · Edificio Karakachoff 48 entre 6 y 7, La Plata"
+      }
+    },
+    {
+      "reference": {
+        "title": "Programa de Proyectos Fotográficos 2026",
+        "date": "2026-11-12",
+        "time": "20:30",
+        "venue": "Casa 62",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "5a4795202c54163f21a2c5001bb4db41a86df39c724644c55c72bdea7cfe6994",
+      "correct": true,
+      "actual": {
+        "title": "Programa de Proyectos Fotográficos 2026",
+        "date": "2026-11-12",
+        "time": "20:30",
+        "venue": "Casa 62 62 entre 9 y 10, La Plata"
+      }
+    },
+    {
+      "reference": {
+        "title": "Abre Centro de Arte",
+        "date": "2026-11-13",
+        "time": "10:00",
+        "venue": "Centro de Arte",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "eec7c82a18930e3d64a37e9c9bda66748a0ec00993028dc0c2d19d51b3a4c71b",
+      "correct": true,
+      "actual": {
+        "title": "Abre Centro de Arte",
+        "date": "2026-11-13",
+        "time": "10:00",
+        "venue": "Centro de Arte · Edificio Karakachoff 48 entre 6 y 7, La Plata"
+      }
+    },
+    {
+      "reference": {
+        "title": "Fotografía de moda y procesos analógicos",
+        "date": "2026-11-13",
+        "time": "10:00",
+        "venue": "Espacio Dickinson",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "5b6861c9c92a70a4507fe544da0fba27d942f880a0586c1a54fb3242c8b2451b",
+      "correct": true,
+      "actual": {
+        "title": "Fotografía de moda y procesos analógicos",
+        "date": "2026-11-13",
+        "time": "10:00",
+        "venue": "Espacio Dickinson · Edificio Karakachoff 48 entre 6 y 7, La Plata"
+      }
+    },
+    {
+      "reference": {
+        "title": "Feria de fotografía y afines",
+        "date": "2026-11-13",
+        "time": "14:00",
+        "venue": "Espacio Dickinson",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "e7d6bebb616ebc7ea1e899eac2fc9c95ff24f8cee321de35ea0a68abee0812f4",
+      "correct": true,
+      "actual": {
+        "title": "Feria de fotografía y afines",
+        "date": "2026-11-13",
+        "time": "14:00",
+        "venue": "Espacio Dickinson · Edificio Karakachoff 48 entre 6 y 7, La Plata"
+      }
+    },
+    {
+      "reference": {
+        "title": "La ciudad en la mirada drónica",
+        "date": "2026-11-13",
+        "time": "17:00",
+        "venue": "Espacio Dickinson",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "f1bcd70971babd49774dc32d78f4f789d5568be31ee5317f6cc50d4725334e16",
+      "correct": true,
+      "actual": {
+        "title": "La ciudad en la mirada drónica",
+        "date": "2026-11-13",
+        "time": "17:00",
+        "venue": "Espacio Dickinson · Edificio Karakachoff 48 entre 6 y 7, La Plata"
+      }
+    },
+    {
+      "reference": {
+        "title": "Turrxs con Mote + Luciana Demichelis",
+        "date": "2026-11-13",
+        "time": "20:00",
+        "venue": "Dirección por inbox",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "88b9028a73b79a4b1b006ace5d56ede8f0bf42d34d9f6a7a1617b9af4f9a6b0b",
+      "correct": true,
+      "actual": {
+        "title": "Turrxs con Mote + Luciana Demichelis",
+        "date": "2026-11-13",
+        "time": "20:00",
+        "venue": "Dirección por inbox"
+      }
+    },
+    {
+      "reference": {
+        "title": "Taller con Proyecto Calle",
+        "date": "2026-11-14",
+        "time": "11:00",
+        "venue": "Sputnik Var",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "5c74209babb89a14ee332a0d36ed62ed671717f709b61a31c49a07ef84722b2c",
+      "correct": true,
+      "actual": {
+        "title": "Taller con Proyecto Calle",
+        "date": "2026-11-14",
+        "time": "11:00",
+        "venue": "Sputnik Var 48 entre 11 y 12, La Plata"
+      }
+    },
+    {
+      "reference": {
+        "title": "Ausencias",
+        "date": "2026-11-14",
+        "time": "14:30",
+        "venue": "Auditorio Centro de Arte UNLP",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "dd048559f154f8c5b8b552c0bc18ea6a0f7fd1406e07b6bc44c9fcff2a46337a",
+      "correct": true,
+      "actual": {
+        "title": "Ausencias",
+        "date": "2026-11-14",
+        "time": "14:30",
+        "venue": "Auditorio · Centro de Arte UNLP 48 entre 6 y 7, La Plata"
+      }
+    },
+    {
+      "reference": {
+        "title": "Inauguración Selección Fotolibros + Exhibición 2026 + Gustavo Germano",
+        "date": "2026-11-14",
+        "time": "15:00",
+        "venue": "Centro de Arte",
+        "url": "https://festival.freezer.com.ar/2026/programacion/"
+      },
+      "proposal_id": "2535a9047c193823b7c9408002a326439385078fa94eed33f93bfbcce005c1a3",
+      "correct": true,
+      "actual": {
+        "title": "Inauguración Selección Fotolibros + Exhibición 2026 + Gustavo Germano",
+        "date": "2026-11-14",
+        "time": "15:00",
+        "venue": "Centro de Arte · Edificio Karakachoff · Sala A 48 entre 6 y 7, La Plata"
+      }
+    },
+    {
+      "reference": {
+        "title": "Da Skate en La Plata",
+        "date": "2026-11-06",
+        "time": "19:00",
+        "venue": "Casa Unclan",
+        "url": "https://pogo.ar/ciudad/la-plata/"
+      },
+      "proposal_id": "544eca9f770ae41d9d6d88387b794c1112d5941573374cbb0e2479de4e5c33f8",
+      "correct": true,
+      "actual": {
+        "title": "DA SKATE - EN LA PLATA",
+        "date": "2026-11-06",
+        "time": "19:00",
+        "venue": "Casa Unclan"
+      }
+    },
+    {
+      "reference": {
+        "title": "Tallando el Elefante",
+        "date": "2026-11-06",
+        "time": "21:00",
+        "venue": "La Ferreteria Bar Cultural",
+        "url": "https://pogo.ar/ciudad/la-plata/"
+      },
+      "proposal_id": "609b1763de5b2068e3f0f03b87ac02f7e6c6c6b8a94edc457fcdd1ab16d54936",
+      "correct": true,
+      "actual": {
+        "title": "Tallando el Elefante",
+        "date": "2026-11-06",
+        "time": "21:00",
+        "venue": "La Ferreteria Bar Cultural"
+      }
+    }
+  ]
+}

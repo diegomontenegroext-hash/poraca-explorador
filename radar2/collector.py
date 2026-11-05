@@ -112,8 +112,68 @@ class Collector:
         self.proposals[key]={'id':key,'document_url':d['url'],'source':d['source'],'title':compact(title),'date':day,'time':hour,'venue':compact(venue) or None,'category':category,'state':state,'evidence':compact(evidence)[:8000],'origin_account':origin_account,'source_id':source_id,'discovered_at':d['fetched_at']}
         self.proposals[key]['entities']=([{'name':compact(venue),'role':'venue','evidence':compact(evidence)[:1000]}] if venue else [])
         self.proposals[key]['mentions']=sorted(set(re.findall(r'(?<!\w)@([a-zA-Z0-9_.]{2,30})',evidence)))
+        return key
+    def discovery(self,manifest,accounts_path='radar2/accounts.json',limit_per_query=5):
+        """Consume freshly executed search responses, not hand-entered event URLs."""
+        from extract import extract_document
+        from concurrent.futures import ThreadPoolExecutor
+        accounts=json.loads(Path(accounts_path).read_text());selected={};per_query={}
+        rejected=('wikipedia.org','reddit.com','scribd.com','vlex.com.co','twstalker.com','threadreaderapp.com','docsity.com','paperzz.com')
+        for row in manifest['documents']:
+            u=row['url'];host=urlsplit(u).hostname or '';q=row['searches'][0]['query_id']
+            if any(host.endswith(x) for x in rejected) or re.search(r'/202[0-5](?:/|-)',urlsplit(u).path):
+                self.checks.append({'url':u,'status':'discarded_historical_or_not_announcement','discovery':row['searches']});continue
+            if host in ('agendalaplata.ar','www.agendalaplata.ar','teatrocerca.com.ar','www.0221.com.ar','www.eldia.com'):
+                self.checks.append({'url':u,'status':'known_agenda_not_open_discovery'});continue
+            if per_query.get(q,0)>=limit_per_query:continue
+            selected[u]=row;per_query[q]=per_query.get(q,0)+1
+        grouped={}
+        for row in selected.values():grouped.setdefault(urlsplit(row['url']).hostname,[]).append(row)
+        def acquire(rows):
+            for row in rows:
+                d=self.fetch(row['url'],urlsplit(row['url']).hostname,row['searches'][0]['query'])
+                if not d:continue
+                d['discovery']=row['searches'];d['acquisition_method']='public_search_then_http'
+                if not self.reuse(d):extract_document(self,d,accounts,'public_search_then_http')
+                event_items=[x for x in self.structured(d) if re.search(r'Event$',str(x.get('@type',''))) and x.get('startDate')]
+                if len(event_items)>1:self.follow_ticket_originals(d,accounts,limit=2)
+                # Follow a few publicly linked originals/program entries. No new
+                # domain or permalink is supplied by a human to this step.
+                if not any(p.get('kind')=='event' and p['document_url']==d['url'] for p in self.proposals.values()):
+                    candidates=[]
+                    for u in self.links(d):
+                        if u==row['url'] or u in self.docs:continue
+                        if re.search(r'/eventos/|/2026/talleres/|/2026/programacion/',u):candidates.append(u)
+                    for u in candidates[:3]:
+                        child=self.fetch(u,urlsplit(u).hostname,d['url'])
+                        if child:
+                            child['discovery']=[{'via_link':d['url'],'searches':row['searches']}]
+                            extract_document(self,child,accounts,'public_search_then_public_link')
+        with ThreadPoolExecutor(max_workers=4) as ex:
+            for result in ex.map(acquire,grouped.values()):pass
+    def follow_ticket_originals(self,d,accounts,limit=3):
+        """Read original ticket links published in public structured event data."""
+        from extract import extract_document
+        links=self.links(d)
+        for item in self.structured(d):
+            offers=item.get('offers') or [];offers=offers if isinstance(offers,list) else [offers]
+            links += [o['url'] for o in offers if isinstance(o,dict) and isinstance(o.get('url'),str)]
+        selected=[]
+        for u in dict.fromkeys(links):
+            if u in self.docs or not re.search(r'/eventos/|/evento/|gotticket|tuentrada',u):continue
+            if urlsplit(u).hostname in BLOCKED:continue
+            selected.append(u)
+        for u in selected[:limit]:
+            child=self.fetch(u,urlsplit(u).hostname,d['url'])
+            if child:
+                child['discovery']=[{'via_link':d['url'],'searches':d.get('discovery',[])}]
+                child['acquisition_method']='public_search_then_published_ticket_link'
+                extract_document(self,child,accounts,child['acquisition_method'])
     def tree(self,d):return Tree((self.out/d['html_file']).read_text()).root
     def reuse(self,d):
+        if self.previous.get('collector_sha256')!=self.code_sha256:return False
+        processor=Path(__file__).with_name('extract.py')
+        if processor.exists() and self.previous.get('processor_sha256')!=sha(processor.read_text()):return False
         prev=self.previous_docs.get(d['url'])
         if not prev or sha(prev['text'])!=sha(d['text']):return False
         for p in self.previous.get('proposals',[]):
@@ -243,8 +303,27 @@ class Collector:
                 # the selected day have no evento-ID and cannot contaminate this set.
                 self.add(d,title,day,hour[1] if hour else None,venue,cats,'observado_agenda',evidence,source_id=ident)
                 key=sha('|'.join([d['url'],ident,day,hour[1] if hour else '']))
-                if key in self.proposals and info.a.get('data-url'):
-                    self.proposals[key]['original_url']=urljoin(d['final_url'],info.a['data-url'])
+                if key in self.proposals:
+                    # Public modal data-url contains an obsolete filesystem prefix.
+                    # Use the site's own share link or its public search response.
+                    pretty=next((m[0] for x in nodes for v in x.a.values() if isinstance(v,str) for m in [re.search(r'https://agendalaplata\.ar/evento/[a-z0-9-]+',v)] if m),None)
+                    if not pretty:
+                        lookup='https://agendalaplata.ar/agendalaplata.ar/components/buscador_result.php?'+urlencode({'search':title})
+                        found=self.fetch(lookup,'Genda public search',d['url'])
+                        if found:
+                            try:
+                                payload=json.loads((self.out/found['html_file']).read_text())
+                                match=next((x for x in payload.get('eventos',[]) if str(x.get('id'))==ident),None)
+                                if match:pretty=urljoin('https://agendalaplata.ar/',match.get('url') or ('/evento/'+match['slug']))
+                            except (ValueError,KeyError):pass
+                    self.proposals[key]['original_url']=pretty or d['url']
+                    self.proposals[key]['kind']='event';self.proposals[key]['acquisition_method']='genda_seven_consecutive_days'
+                    if pretty and not cats:
+                        detail=self.fetch(pretty,'Genda detail',d['url'])
+                        if detail:
+                            cats=' '.join(x.text() for x in self.tree(detail).walk() if x.cls('tag-evento'))
+                            self.proposals[key]['category']=cats or None
+                    self.proposals[key]['link_resolution']='source_share_url' if pretty else 'listing_fallback_no_verified_detail'
     def genda_theatre(self):
         d=self.fetch('https://agendalaplata.ar/teatro','Genda teatro')
         if not d:return
@@ -271,18 +350,30 @@ class Collector:
             if key in self.proposals:self.proposals[key]['original_url']=n.a.get('href')
     def save(self):
         result={'run_id':self.run_id,'collector_sha256':self.code_sha256,'finished_at':utc(),'documents':list(self.docs.values()),'proposals':list(self.proposals.values()),'checks':self.checks}
+        processor=Path(__file__).with_name('extract.py')
+        if processor.exists():result['processor_sha256']=sha(processor.read_text())
         (self.out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));return result
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--out',default='radar2-run');p.add_argument('--start');p.add_argument('--web',action='store_true');p.add_argument('--previous');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--out',default='radar2-run');p.add_argument('--start');p.add_argument('--web',action='store_true');p.add_argument('--previous');p.add_argument('--discovery');p.add_argument('--baseline');p.add_argument('--legacy-baseline');p.add_argument('--run-id');a=p.parse_args()
     start=datetime.fromisoformat(a.start).date() if a.start else datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date()
     previous=json.loads(Path(a.previous).read_text()) if a.previous else None
-    c=Collector(a.out,previous);c.genda(start);c.save()
+    c=Collector(a.out,previous)
+    if a.run_id:c.run_id=a.run_id
+    c.genda(start);c.save()
+    if a.discovery:c.discovery(json.loads(Path(a.discovery).read_text()));c.save()
     if a.web:
         from concurrent.futures import ThreadPoolExecutor
         with ThreadPoolExecutor(max_workers=4) as ex:
             tasks=[ex.submit(f) for f in [c.teatrocerca,c.media_sources,c.alternativa,c.cultural_channels,c.genda_theatre]]
             for t in tasks:t.result();c.save()
     r=c.save()
+    if a.baseline:
+        from reconcile import reconcile
+        r=reconcile(r,json.loads(Path(a.baseline).read_text()))
+        if a.legacy_baseline:
+            from reconcile import mark_previous_knowledge
+            r=mark_previous_knowledge(r,json.loads(Path(a.legacy_baseline).read_text()))
+        (c.out/'result.json').write_text(json.dumps(r,ensure_ascii=False,indent=2))
     print(json.dumps({'run_id':r['run_id'],'documents':len(r['documents']),'proposals':len(r['proposals']),'errors':[x for x in r['checks'] if x.get('error')]},ensure_ascii=False))
 if __name__=='__main__':main()
