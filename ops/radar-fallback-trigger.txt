@@ -2,6 +2,6 @@
 trigger_date=2026-11-05
 trigger_slot=bootstrap
 trigger_mode=radar2_pilot
-trigger_reason=certify_cultural_frontier_filter_and_identity_references
+trigger_reason=final_verify_organizer_api_and_credit_persistence
 trigger_scope=frontier_corrective
 certification_batches=1

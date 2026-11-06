@@ -315,7 +315,9 @@ def carry_forward(result,baseline):
         entities={((e.get('node_id') or norm(e.get('name'))),e.get('role')):dict(e) for e in previous.get('entities',[])}
         entities.update({((e.get('node_id') or norm(e.get('name'))),e.get('role')):e for e in p.get('entities',[])})
         p['entities']=list(entities.values())
-        if previous.get('supporting_evidence'):p['supporting_evidence']=previous['supporting_evidence']
+        if previous.get('supporting_evidence'):
+            p['supporting_evidence']=previous['supporting_evidence']
+            if not p.get('organizer') and previous.get('organizer'):p['organizer']=previous['organizer']
     return result
 
 
@@ -335,6 +337,8 @@ def supplement_representatives(conn,result):
             for e in alias['entities']:entities[((e.get('node_id') or norm(e.get('name'))),e.get('role'))]=e
             proofs[alias['id']]={'proposal_id':alias['id'],'url':alias['document_url'],'basis':'same date, time, equivalent venue and title; roles explicitly credited by source'}
         addition={'entities':list(entities.values()),'supporting_evidence':list(proofs.values())}
+        organizers={norm(e['name']):e['name'] for e in entities.values() if e.get('role')=='organizer'}
+        if not evidence.get('organizer') and len(organizers)==1:addition['organizer']=next(iter(organizers.values()))
         execute(conn,'UPDATE radar2.proposals SET evidence=evidence || $2::jsonb WHERE proposal_id=$1',[target,json.dumps(addition,ensure_ascii=False)])
     return list(supplements)
 

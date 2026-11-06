@@ -31,12 +31,13 @@ class Capabilities(unittest.TestCase):
   reconcile({'proposals':[p]},old);self.assertNotIn('duplicate_of',p)
  def test_next_agenda_read_preserves_original_credit_evidence(self):
   from capabilities import carry_forward
-  old=[{'proposal_id':'agenda','evidence':{'entities':[{'name':'Artista Prueba','role':'performer','evidence':'Musicaliza Artista Prueba','evidence_url':'https://original.example/show'}],'supporting_evidence':[{'proposal_id':'alias','url':'https://original.example/show'}]}}]
+  old=[{'proposal_id':'agenda','evidence':{'entities':[{'name':'Artista Prueba','role':'performer','evidence':'Musicaliza Artista Prueba','evidence_url':'https://original.example/show'}],'organizer':'Colectivo Prueba','supporting_evidence':[{'proposal_id':'alias','url':'https://original.example/show'}]}}]
   p={'id':'agenda','title':'Film','document_url':'https://agenda.example/show','date':'2026-11-07','state':'observado_agenda','entities':[]}
   result=carry_forward({'proposals':[p]},old);enrich_graph(result,old)
   self.assertEqual(p['entities'][0]['evidence_url'],'https://original.example/show')
   self.assertEqual(p['entities'][0]['event_relationship']['evidence_url'],'https://original.example/show')
   self.assertEqual(len(p['supporting_evidence']),1)
+  self.assertEqual(p['organizer'],'Colectivo Prueba')
  def test_original_film_and_agenda_are_one_performance(self):
   old=[{'proposal_id':'agenda','title':'Las aventuras del príncipe Achmed, de Lotte Reiniger','event_date':'2026-11-07','event_time':'20:00','venue':'Teatro de Cámara City Bell','evidence':{}}]
   p={'id':'original','title':'Las mil y una noches: Las aventuras del príncipe Achmed','date':'2026-11-07','time':'20:00','venue':'Teatro de Cámara de City Bell','kind':'event'}
@@ -64,5 +65,14 @@ class Capabilities(unittest.TestCase):
    self.assertFalse(cultural_link(url,label),(url,label))
   for url,label in [('https://new.example/?post_type=funcion&p=2','Entradas'),('https://new.example/proximos-eventos/','Programación'),('https://publico.alternativateatral.com/entradas123','Ir a comprar entradas')]:
    self.assertTrue(cultural_link(url,label),(url,label))
+ def test_original_organizer_reaches_representative_without_resolving_conflicts(self):
+  from capabilities import supplement_representatives
+  for names in (['Colectivo Sur'],['Colectivo Sur','Colectivo Norte']):
+   result={'proposals':[{'id':'alias','duplicate_of':'agenda','document_url':'https://original.example/show','entities':[{'name':n,'role':'organizer'} for n in names]}]}
+   with patch('capabilities.execute',side_effect=[{'rows':[{'evidence':{}}]},{'rows':[]}]) as sql:
+    supplement_representatives('limited',result)
+    saved=json.loads(sql.call_args_list[1].args[2][1])
+    if len(names)==1:self.assertEqual(saved['organizer'],'Colectivo Sur')
+    else:self.assertNotIn('organizer',saved)
 
 if __name__=='__main__':unittest.main()
