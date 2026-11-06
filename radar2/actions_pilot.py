@@ -88,7 +88,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     if excluded:
         sources=excluded[0]['sources'];sources=json.loads(sources) if isinstance(sources,str) else sources
         rejected=[u for u,x in sources.items() if x['status'].startswith('rejected_')]
-        archived=execute(conn,"UPDATE radar2.proposals SET review_state='historico',evidence=evidence || jsonb_build_object('state','historico','kind','rejected_document','editorial_exclusion','not a local cultural source','exclusion_run_id',$2::text) WHERE document_url IN (SELECT jsonb_array_elements_text($1::jsonb)) AND evidence->>'acquisition_method'='autonomous_public_link_frontier' AND review_state<>'historico' RETURNING proposal_id",[json.dumps(rejected),run_id])['rows']
+        archived=execute(conn,"UPDATE radar2.proposals SET review_state='historico',evidence=evidence || jsonb_build_object('state','historico','kind','rejected_document','editorial_exclusion','not a local cultural source','exclusion_run_id',$2::text) WHERE event_date IS NULL AND document_url IN (SELECT jsonb_array_elements_text($1::jsonb)) AND evidence->>'acquisition_method'='autonomous_public_link_frontier' AND review_state<>'historico' RETURNING proposal_id",[json.dumps(rejected),run_id])['rows']
     result=c.save();result=reconcile(result,old);result=carry_forward(result,old)
     # Collect graph evidence before writing proposals so the API sees the same
     # node IDs and event relationships persisted in the cultural memory ledger.

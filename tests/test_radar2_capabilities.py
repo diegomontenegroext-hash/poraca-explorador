@@ -58,4 +58,11 @@ class Capabilities(unittest.TestCase):
   p.cache['https://www.instagram.com']=(rp,{'permission_notice':'Requires express written permission'})
   self.assertFalse(p.policy('https://www.instagram.com/example/')['allowed'])
 
+ def test_frontier_rejects_utility_links_in_existing_and_new_sources(self):
+  from capabilities import cultural_link
+  for url,label in [('https://wa.me/123','Reservas'),('https://t.me/share/url?url=cultura','Compartir'),('https://automattic.com/cookies/','Cookie Policy'),('https://funebres.eldia.com/','Fúnebres'),('https://sponsor.example/',''),('https://www.dbyz.com.ar/','Design')]:
+   self.assertFalse(cultural_link(url,label),(url,label))
+  for url,label in [('https://new.example/?post_type=funcion&p=2','Entradas'),('https://new.example/proximos-eventos/','Programación'),('https://publico.alternativateatral.com/entradas123','Ir a comprar entradas')]:
+   self.assertTrue(cultural_link(url,label),(url,label))
+
 if __name__=='__main__':unittest.main()

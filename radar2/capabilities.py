@@ -27,6 +27,22 @@ LOCAL = re.compile(r'la plata|platense|berisso|ensenada|gonnet|gorina|city bell|
 REJECT = re.compile(r'/admin(?:/|$)|login|sign.?in|checkout|carrito|privacy|privacidad|terminos|terms|contact|/share/|/sharer|t\.me/|cookies|clasificad|funebre|tiendanube|mustang\.cloud|creativecommons|afip\.gov|\.pdf$|\.jpg$|\.png$|\.mp4$|\.zip$|/wp-json|/feed(?:/|$)', re.I)
 
 
+# A link must carry its own cultural evidence; the page's subject alone cannot
+# turn sponsors, footer services or sharing buttons into cultural sources.
+UTILITY_HOSTS={'x.com','twitter.com','wa.me','t.me','telegram.me','wp.me','vimeo.com',
+    'creativecommons.org','automattic.com','afip.gov.ar','argentina.gob.ar',
+    'mustang.cloud','dosalcubo.com','dbyz.com.ar','solumedia.com','fanz.com.ar'}
+UTILITY_TEXT=re.compile(r'cookie|privacidad|privacy|licen[cs]|legal|clasificado|funebre|publi(?:que|car)|cms|design|sponsor|auspici|share|compartir|contact|staff|estadistic|asociate|donar',re.I)
+
+def cultural_link(url,label):
+    p=urlsplit(url);host=p.hostname or ''
+    if p.scheme!='https' or p.username or p.password or platform_host(host):return False
+    if REJECT.search(url) or UTILITY_TEXT.search(norm(label)+' '+p.path):return False
+    if any(host==h or host.endswith('.'+h) for h in UTILITY_HOSTS):return False
+    if re.search(r'^(?:clasificados|funebres|club)\.',host):return False
+    return bool(CULTURAL.search(norm(label)+' '+p.path+' '+host))
+
+
 def safe_url(url):
     try:
         p = urlsplit(url)
@@ -203,16 +219,7 @@ def discover_links(c,conn,known_urls,limit=12,refresh_candidates=False):
             if n.tag!='a' or not n.a.get('href'):continue
             url=normalized_url(urljoin(doc['final_url'],n.a['href']));p=urlsplit(url)
             label=compact(n.text() or n.a.get('aria-label') or n.a.get('title') or ' '.join(x.a.get('alt','') for x in n.walk()))[:240]
-            foreign=p.hostname!=urlsplit(doc['url']).hostname
-            context=label+' '+p.path+' '+p.netloc
-            # Empty-label ticket buttons and artist websites still constitute
-            # linked source candidates when published by a cultural space.
-            parent=n.parent;navigation=False
-            while parent:
-                if parent.tag in ('footer','header','nav') or re.search(r'footer|navigation|navbar',parent.a.get('class',''),re.I):navigation=True;break
-                parent=parent.parent
-            contextual=foreign and not navigation and CULTURAL.search(norm(doc.get('title',''))) and not re.search(r'twitter|youtube|linkedin|vimeo|wordpress|themeisle|google|whatsapp|spotify|apple|tiktok|cloudflare|mercadopago',p.netloc,re.I)
-            if url in seen or platform_host(p.hostname) or REJECT.search(url) or not (CULTURAL.search(norm(context)) or contextual):continue
+            if url in seen or not cultural_link(url,label):continue
             if p.scheme!='https' or p.username or p.password:continue
             foreign=p.hostname!=urlsplit(doc['url']).hostname
             score=5*int(p.hostname not in known_hosts)+2*int(foreign)+2*int(bool(LOCAL.search(norm(doc['text'][:10000]))))+int(bool(re.search(r'event|obra|program|cartel|ticket|festival',p.path,re.I)))
@@ -221,7 +228,9 @@ def discover_links(c,conn,known_urls,limit=12,refresh_candidates=False):
     for doc in list(c.docs.values()):harvest(doc)
     # Previously discovered sources are revisited; productive does not imply
     # editorial authority. Unknown-domain candidates get a bounded fair turn.
-    due=[s for s in frontier.values() if s['url'] not in c.docs and not REJECT.search(s['url']) and (not s.get('next_check_at') or s['next_check_at']<=at or (refresh_candidates and s['status'] in ('cultural_candidate','productive_observed')))]
+    for item in frontier.values():
+        if not cultural_link(item['url'],item.get('link_label','')):item.update(status='rejected_non_cultural_link',next_check_at='9999',monitoring_certified=False)
+    due=[s for s in frontier.values() if s['url'] not in c.docs and not s['status'].startswith('rejected_') and cultural_link(s['url'],s.get('link_label','')) and (not s.get('next_check_at') or s['next_check_at']<=at or (refresh_candidates and s['status'] in ('cultural_candidate','productive_observed')))]
     due.sort(key=lambda s:(0 if (refresh_candidates and s['status'] in ('cultural_candidate','productive_observed')) or s['status']=='productive_observed' else 1,s['checks'],-s['score'],s['first_discovered_at'],s['url']))
     checked=[]
     # At most two pages per domain; not a crawl of the open web.
@@ -237,12 +246,12 @@ def discover_links(c,conn,known_urls,limit=12,refresh_candidates=False):
             d['discovery']=[{'via_link':item['via_url'],'link_label':item['link_label'],'discovered_at':item['first_discovered_at'],'method':'autonomous_public_link_frontier'}]
             d['acquisition_method']='autonomous_public_link_frontier'
             before=set(c.proposals)
-            cultural_local=bool(CULTURAL.search(norm(d['text'][:24000])) and LOCAL.search(norm(d['text'][:24000])))
+            cultural_local=bool(CULTURAL.search(norm(d.get('title',''))) and LOCAL.search(norm(d['text'][:24000])))
             if cultural_local:extract_document(c,d,accounts,d['acquisition_method'])
             else:c.checks.append({'url':d['url'],'status':'rejected_no_local_cultural_evidence'})
             produced=[c.proposals[k] for k in set(c.proposals)-before]
             events=[p for p in produced if p.get('date') and p.get('kind') in ('event','program')]
-            cultural_local=bool(CULTURAL.search(norm(d['text'][:24000])) and LOCAL.search(norm(d['text'][:24000])))
+            cultural_local=bool(CULTURAL.search(norm(d.get('title',''))) and LOCAL.search(norm(d['text'][:24000])))
             item.update(status='productive_observed' if events else 'cultural_candidate' if cultural_local else 'rejected_no_local_cultural_evidence',http_status=d['http_status'],sha256=d['sha256'],event_proposals=len(events),proposal_ids=[p['id'] for p in produced])
             if cultural_local:
                 harvest(d)
@@ -257,8 +266,6 @@ def discover_links(c,conn,known_urls,limit=12,refresh_candidates=False):
             item.update(status='inaccessible',error=last.get('error','FETCH_FAILED'),monitoring_certified=False)
         item['next_check_at']=(datetime.now(timezone.utc)+timedelta(hours=24 if item['status']=='productive_observed' else 96)).isoformat()
         checked.append(dict(item))
-    for item in frontier.values():
-        if REJECT.search(item['url']):item.update(status='rejected_non_cultural_link',next_check_at='9999')
     # Persist the evaluated frontier even when all sources are inaccessible.
     save_state(conn,SOURCE_STATE,state)
     return {'candidates_discovered':len(candidates),'candidates_total':len(frontier),'checked':checked,'new_domains_observed':sorted({urlsplit(s['url']).hostname for s in checked if s['new_domain_at_discovery'] and s['status'] in ('cultural_candidate','productive_observed')}),'productive_sources':[s['url'] for s in checked if s['status']=='productive_observed']}
@@ -335,8 +342,12 @@ def supplement_representatives(conn,result):
 def persist_graph(conn,run_id,graph):
     state=load_state(conn,GRAPH_STATE,'cultural_memory_control');nodes=state.setdefault('nodes',{});edges=state.setdefault('relationships',{})
     from reconcile import venue_name
+    identities={}
+    for item in execute(conn,'SELECT entity_key,name,entity_type FROM radar_definitivo.entities')['rows']:
+        identities.setdefault(norm(item['name']),[]).append({'entity_key':item['entity_key'],'entity_type':item['entity_type'],'basis':'normalized_name_candidate_requires_review'})
     new=0;new_edges=0
     for n in graph['nodes']:
+        n['existing_identity_candidates']=identities.get(norm(n['name']),[])
         key=n['node_id'];new+=int(key not in nodes)
         if n['role']=='venue':
             for oldkey,oldnode in nodes.items():
