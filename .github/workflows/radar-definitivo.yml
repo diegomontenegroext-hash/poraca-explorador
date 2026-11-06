@@ -241,8 +241,8 @@ jobs:
 
   # Unico piloto de Radar 2 sobre el workflow EXISTENTE; sin cron y sin
   # ejecutar el antiguo Radar Definitivo en el mismo disparo.
-  # Las fuentes son los listados públicos que collector.py ya soporta;
-  # no se invoca búsqueda exclusiva de ChatGPT ni Instagram HTML.
+  # El mismo job integra rotación persistente, frontera de enlaces, memoria
+  # cultural y acceso público condicionado; no depende de herramientas de Work.
   radar2_pilot:
     if: ${{ (github.event_name == 'schedule') || (github.event_name == 'workflow_dispatch' && inputs.mode == 'radar2_pilot') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[radar2-pilot]')) }}
     name: Radar 2 - adquisicion diaria limitada
@@ -255,7 +255,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Verificar sintaxis local sin dependencias
         run: |
-          python3 -m py_compile radar2/actions_pilot.py radar2/collector.py radar2/extract.py radar2/reconcile.py radar2/persist.py
+          python3 -m py_compile radar2/actions_pilot.py radar2/capabilities.py radar2/rotation.py radar2/collector.py radar2/extract.py radar2/reconcile.py radar2/persist.py
+          python3 -m unittest discover -s tests -p "test_radar2*.py" -v
       - name: Preflight, fuentes, escritor limitado y readback en Neon
         env:
           NEON_RADAR_LIMITED_DATABASE_URL: ${{ secrets.NEON_RADAR_LIMITED_DATABASE_URL }}

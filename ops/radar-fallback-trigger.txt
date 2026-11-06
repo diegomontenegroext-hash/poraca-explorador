@@ -1,7 +1,6 @@
-# POR ACA - RADAR 2: disparo manual controlado (GitHub Actions)
-# Work creo el codigo; el job radar2_pilot ejecuta collector.py + persist.py.
-# Este cambio dispara SOLO el job Radar 2; legacy Radar Definitivo se omite.
+# Misión final autorizada: dos lotes de Instagram en un solo job.
 trigger_date=2026-11-05
 trigger_slot=bootstrap
 trigger_mode=radar2_pilot
-trigger_reason=user_requested_manual_verify_20261105_1538_art
+trigger_reason=final_mission_controlled_certification
+certification_batches=2

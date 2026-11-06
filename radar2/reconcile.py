@@ -17,6 +17,7 @@ def title_name(t,v):
  s=re.sub(r'\s+en la plata$','',s)
  return s.strip()
 def reconcile(result,baseline):
+ baseline=[p for p in baseline if not ((json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}).get('duplicate_of'))]
  old=[dict(p,date=(p.get('event_date') or '')[:10] or None,time=p.get('event_time'),id=p.get('proposal_id'),kind='event' if p.get('event_date') else 'document') for p in baseline]
  def priority(p):return (0 if p.get('source')=='www.passline.com' else 1,p.get('document_url',''),p['id'])
  known=list(old);decisions=[]

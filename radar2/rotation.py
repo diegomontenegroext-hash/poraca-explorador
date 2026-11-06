@@ -24,7 +24,7 @@ def select(state,at,limit=10):
     eligible=[a for a in state['accounts'].values() if (not a.get('next_review_at') or a['next_review_at']<=timestamp(at))
         and (not a.get('lease_until') or a['lease_until']<=timestamp(at))]
     # Fairness first: all accounts in a sweep, cultural priority within a sweep.
-    return sorted(eligible,key=lambda a:(a['review_count'],a['priority'],a.get('last_review_at') or '',a['username']))[:max(0,min(limit,10))]
+    return sorted(eligible,key=lambda a:(a.get('attempt_count',a['review_count']),a['priority'],a.get('last_review_at') or '',a['username']))[:max(0,min(limit,10))]
 
 def read(conn):
     rows=execute(conn,'SELECT summary FROM radar2.runs WHERE run_id=$1',[STATE_ID])['rows']
@@ -71,8 +71,8 @@ def complete(conn,run_id,manifest):
         for u in batch['usernames']:
             a=state['accounts'][u]
             if a.get('lease_run_id')!=run_id:continue # expired/reclaimed lease cannot be finalized by an old worker
-            searches=[s for s in manifest['searches'] if u in s['query'].get('accounts',[])]
-            docs=[d for d in manifest['documents'] if any(u in s.get('accounts',[]) for s in d['searches'])]
+            searches=[s for s in manifest.get('searches',[]) if u in s['query'].get('accounts',[])]
+            docs=[d for d in manifest.get('documents',[]) if any(u in s.get('accounts',[]) for s in d['searches'])]
             success=any(not s.get('error') for s in searches)
             ig_docs=[d for d in docs if d.get('acquisition_method')=='public_search_index']
             index_searches=[s for s in searches if s['query']['id'].startswith('ig-public-index-')]
@@ -87,7 +87,19 @@ def complete(conn,run_id,manifest):
                     'instagram_results':len(ig_docs),'instagram_index_status':index_status,
                     'failed_queries':sum(bool(s.get('error')) for s in searches),
                     'urls':[d['url'] for d in docs],'direct_profiles_read':0})
-            results.append(dict(username=u,**a['last_result'],result=status,next_review_at=a['next_review_at']))
+            attempt=next((x for x in manifest.get('instagram_attempts',[]) if x['username']==u),None)
+            a['attempt_count']=a.get('attempt_count',a['review_count']-int(success))+1
+            if attempt is not None:
+                a['last_visit_at']=attempt['checked_at']
+                a['result']=attempt['result'] if not ig_docs else 'instagram_indexed'
+                a['last_result'].update(direct_access=attempt,posts_recovered=attempt['posts_recovered'],
+                    direct_profiles_read=int(attempt['profile_accessible']))
+                # An unsuccessful access check advances the rotation, but is not
+                # called a successful source review or publication acquisition.
+                if attempt['posts_recovered']:
+                    a['last_successful_post_at']=attempt['checked_at']
+                a['next_review_at']=timestamp(at+timedelta(hours=24 if attempt['posts_recovered'] else 96))
+            results.append(dict(username=u,**a['last_result'],result=a['result'],next_review_at=a['next_review_at']))
         batch.update(status='completed',finished_at=timestamp(at),results=results)
         if cas(conn,state,version):return batch
     raise RuntimeError('ROTATION_CONCURRENT_UPDATE_RETRY_LATER')

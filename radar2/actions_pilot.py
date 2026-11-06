@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Radar 2 acquisition on the existing workflow: daily or explicit manual check.
-
-Uses the collector, reconciler and restricted writer already in radar2/.
-No Instagram HTML, no ChatGPT search tool, no admission of canonicals.
-"""
+"""The existing daily job: acquire, rotate, explore, interpret, persist, read back."""
 import json
 import os
 import subprocess
@@ -11,177 +7,130 @@ import sys
 import tempfile
 from pathlib import Path
 from urllib.parse import urlsplit
+from concurrent.futures import ThreadPoolExecutor
 
-from persist import execute
+from persist import execute, SQL
+from collector import Collector, sha, utc
+from reconcile import reconcile
+import rotation
+from capabilities import PublicAccess, instagram_batch, public_search, discover_links, enrich_graph, persist_graph
 
-PROJECT = "frosty-union-52906378"
-BRANCH = "br-mute-recipe-b4odj2bl"
-ROLE = "poraca_radar_limited_prod"
-ORIGINS = {"agendalaplata.ar", "teatrocerca.com.ar", "0221.com.ar",
-           "eldia.com", "evento-simple.com", "alternativateatral.com",
-           "circusproduce.com", "casadionisio.com.ar",
-           "residenciacorazon.com.ar", "dynamoteatro.com"}
-ROOT = Path(__file__).resolve().parent.parent
+PROJECT='frosty-union-52906378'
+BRANCH='br-mute-recipe-b4odj2bl'
+ROLE='poraca_radar_limited_prod'
+ROOT=Path(__file__).resolve().parent.parent
 
-# Mirrors the EXISTING radar2.private_discoveries ranking, without requiring
-# SELECT privileges on that read-only API view. The limited Radar writer only
-# has SELECT on radar2.proposals. No migrations, new grants or canonical edits.
-NEW_DISCOVERY_METRICS_SQL = """
+# Mirrors private_discoveries exact-key ranking. The existing fuzzy reconciliation
+# additionally points cross-source aliases at their visible representative.
+NEW_DISCOVERY_METRICS_SQL="""
 WITH ranked AS (
- SELECT p.proposal_id,p.last_run_id,p.first_seen_at,
+ SELECT p.proposal_id,p.last_run_id,p.first_seen_at,p.event_date,p.evidence,
  ROW_NUMBER() OVER (
   PARTITION BY lower(regexp_replace(p.title,'[^[:alnum:]]','','g')),
-    p.event_date,p.event_time,
-    lower(regexp_replace(coalesce(p.venue,''),'[^[:alnum:]]','','g'))
-  ORDER BY CASE WHEN p.review_state='fuente_original' THEN 0 ELSE 1 END,
-    p.first_seen_at,p.proposal_id
- ) AS rn
- FROM radar2.proposals p
- WHERE coalesce(p.evidence->>'duplicate_of','')=''
+  p.event_date,p.event_time,lower(regexp_replace(coalesce(p.venue,''),'[^[:alnum:]]','','g'))
+  ORDER BY CASE WHEN p.review_state='fuente_original' THEN 0 ELSE 1 END,p.first_seen_at,p.proposal_id
+ ) rn FROM radar2.proposals p WHERE coalesce(p.evidence->>'duplicate_of','')=''
 )
 SELECT
- (SELECT count(*) FROM radar2.proposals
-  WHERE last_run_id=$1 AND first_seen_at >= $2::timestamptz) AS new_ids,
- (SELECT count(*) FROM ranked
-  WHERE rn=1 AND last_run_id=$1 AND first_seen_at >= $2::timestamptz)
-  AS new_visible_unique
+ (SELECT count(*) FROM radar2.proposals WHERE last_run_id=$1 AND first_seen_at >= $2::timestamptz) new_ids,
+ count(*) FILTER(WHERE rn=1 AND last_run_id=$1 AND first_seen_at >= $2::timestamptz) new_visible_unique,
+ count(*) FILTER(WHERE rn=1 AND last_run_id=$1 AND first_seen_at >= $2::timestamptz AND event_date IS NOT NULL AND evidence->>'kind' IN ('event','program')) new_unique_dated_proposals
+ FROM ranked
 """
 
-def main():
-    run_id = ("radar2-ghdaily-" if os.environ.get("GITHUB_EVENT_NAME") == "schedule" else "radar2-ghpilot-") + os.environ["GITHUB_RUN_ID"]
-    connection = os.environ.get("NEON_RADAR_LIMITED_DATABASE_URL", "")
-    if not connection:
-        raise RuntimeError("MISSING_LIMITED_NEON_SECRET")
-    if not (urlsplit(connection).hostname or "").endswith(".neon.tech"):
-        raise RuntimeError("NOT_NEON_ENDPOINT")
 
-    # Preflight happens before opening external sources or touching persistent data.
-    identification = execute(connection,
-        "SELECT current_user AS role, current_setting('neon.project_id',true) AS project, "
-        "current_setting('neon.branch_id',true) AS branch, "
-        "has_table_privilege(current_user,'radar2.proposals','INSERT') AS can_write")
-    row = identification.get("rows", [{}])[0]
-    if (row.get("role"), row.get("project"), row.get("branch")) != (ROLE, PROJECT, BRANCH):
-        raise RuntimeError("LIMITED_WRITER_IDENTITY_FENCE")
-    if row.get("can_write") not in ("t", True):
-        raise RuntimeError("LIMITED_WRITER_MISSING_PERMISSION")
-    if execute(connection, "SELECT run_id FROM radar2.runs WHERE run_id=$1", [run_id]).get("rows"):
-        raise RuntimeError("RUN_ID_ALREADY_EXISTS_NO_REPLAY")
-    # Database clock avoids miscounting first_seen_at with the runner's clock.
-    started_at = execute(connection,
-        "SELECT clock_timestamp()::text AS started_at").get("rows", [{}])[0]["started_at"]
+def baseline(conn):
+    return execute(conn,"SELECT proposal_id,title,to_char(event_date,'YYYY-MM-DD') event_date,event_time,venue,document_url,evidence FROM radar2.proposals ORDER BY first_seen_at,proposal_id LIMIT 10000")['rows']
 
-    with tempfile.TemporaryDirectory(prefix="radar2-gh-") as temp:
-        work = Path(temp)
-        cfg = work / "connection.json"
-        cfg.write_text(json.dumps({"url": connection}))
-        cfg.chmod(0o600)
-        output = work / "acquired"
-        output.mkdir()
-        env = os.environ.copy()
-        env["RADAR2_CONNECTION_FILE"] = str(cfg)
-        cmd = [sys.executable, "radar2/collector.py", "--out", str(output),
-               "--web", "--run-id", run_id]
-        acquired = subprocess.run(cmd, cwd=ROOT, env=env,
-                                  capture_output=True, text=True, timeout=1500)
-        if acquired.returncode:
-            raise RuntimeError("COLLECTOR_FAILED_" + str(acquired.returncode) +
-                               " " + acquired.stderr[-450:])
 
-        result = json.loads((output / "result.json").read_text())
-        documents = result.get("documents", [])
-        proposals = result.get("proposals", [])
-        origins = set()
-        for document in documents:
-            host = (urlsplit(document.get("url", "")).hostname or "").lower()
-            for origin in ORIGINS:
-                if host == origin or host.endswith("." + origin):
-                    origins.add(origin)
-        errors = sum(bool(row.get("error")) for row in result.get("checks", []))
-        print(json.dumps({"phase": "acquisition", "run_id": run_id,
-            "source_origins": sorted(origins), "documents": len(documents),
-            "proposals_processed_not_new": len(proposals), "source_errors": errors}))
-        if len(origins) < 2 or not proposals:
-            raise RuntimeError("SOURCE_COVERAGE_GATE_FAILED_NO_PERSISTENCE")
+def certification_batches():
+    # A single authorized push groups two ten-account batches, not two FULLs.
+    # Daily schedule and workflow_dispatch always keep one batch.
+    if os.environ.get('GITHUB_EVENT_NAME')!='push':return 1
+    trigger=dict(line.split('=',1) for line in (ROOT/'ops/radar-fallback-trigger.txt').read_text().splitlines() if '=' in line and not line.startswith('#'))
+    return 2 if trigger.get('certification_batches')=='2' else 1
 
-        persisted = subprocess.run([sys.executable, "radar2/persist.py",
-                                    str(output / "result.json")],
-                                   cwd=ROOT, env=env, capture_output=True,
-                                   text=True, timeout=120)
-        if persisted.returncode:
-            raise RuntimeError("PERSISTENCE_FAILED_" + str(persisted.returncode) +
-                               " " + persisted.stderr[-450:])
-        # This control must read the SAME run back from Neon, not infer success
-        # from a previous batch or GitHub's own job status.
-        check = execute(connection,
-            "SELECT (SELECT count(*) FROM radar2.proposals WHERE last_run_id=$1) "
-            "AS proposals_readback, "
-            "(SELECT summary->>'status' FROM radar2.runs WHERE run_id=$1) AS run_status",
-            [run_id]).get("rows", [{}])[0]
-        if check.get("run_status") != "completed" or int(check.get("proposals_readback") or 0) < 1:
-            raise RuntimeError("SAME_RUN_NEON_READBACK_FAILED")
-        report = {"phase": "restricted_neon_readback", "run_id": run_id,
-                  "status": check["run_status"], "proposals_readback":
-                  int(check["proposals_readback"]), "source_origins": sorted(origins)}
-        print(json.dumps(report))
-        # Technical observations, never automatically approved events. A single
-        # performance can have observations in Genda and Genda Teatro. Count
-        # unique proposals using the same exact-key ranking as the private view.
-        # Metrics failure is reported separately; it cannot undo a valid write.
-        metrics = None
-        try:
-            row = execute(connection, NEW_DISCOVERY_METRICS_SQL,
-                          [run_id, started_at]).get("rows", [{}])[0]
-            metrics = {"new_ids": int(row["new_ids"]),
-                       "new_visible_unique": int(row["new_visible_unique"])}
-            if not (0 <= metrics["new_visible_unique"] <= metrics["new_ids"]):
-                raise ValueError("INCONSISTENT_UNIQUE_COUNTS")
-            print(json.dumps({"phase": "new_discoveries", "run_id": run_id,
-                              **metrics}))
-            # Persist today's snapshot for continuity audits: subsequent runs
-            # can update last_run_id, but must not change this historical count.
-            try:
-                saved = execute(connection,
-                    "UPDATE radar2.runs SET summary=summary || "
-                    "jsonb_build_object('discovery_metrics_v1',$2::jsonb) "
-                    "WHERE run_id=$1 AND summary->>'status'='completed' "
-                    "RETURNING run_id",
-                    [run_id, json.dumps(metrics)]).get("rows", [])
-                if len(saved) != 1:
-                    raise RuntimeError("RUN_SUMMARY_NOT_UPDATED")
-                print(json.dumps({"phase": "metrics_persistence",
-                                  "status": "saved", "run_id": run_id}))
-            except Exception as persist_exc:
-                print(json.dumps({"phase": "metrics_persistence",
-                                  "status": "METRICS_NOT_PERSISTED",
-                                  "error": type(persist_exc).__name__}))
-        except Exception as exc:
-            print(json.dumps({"phase": "new_discoveries", "run_id": run_id,
-                              "status": "METRICS_UNAVAILABLE",
-                              "error": type(exc).__name__}))
-        if os.environ.get("GITHUB_STEP_SUMMARY"):
-            with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as stream:
-                stream.write("## Radar 2 — GitHub Actions\n\n")
-                stream.write("Run: `" + run_id + "`. "
-                             "Sources: " + ", ".join(sorted(origins)) +
-                             ". Processed proposals: " + str(len(proposals)) +
-                             " (not necessarily new). Neon same-run readback: " +
-                             str(report["proposals_readback"]) + ".\n\n")
-                if metrics is not None:
-                    stream.write("New IDs: " + str(metrics["new_ids"]) +
-                                 ". **New unique visible proposals: " +
-                                 str(metrics["new_visible_unique"]) +
-                                 "** (including investigation documents; not "
-                                 "necessarily confirmed events).\n\n")
-                else:
-                    stream.write("New/unique metrics: **unavailable**; check run logs.\n\n")
-                stream.write("**Not yet certified:** Vercel SSO HTTP readback, "
-                             "seven scheduled days, direct Instagram.\n")
 
-if __name__ == "__main__":
+def run_batch(conn,run_id,work,full,access):
+    if execute(conn,'SELECT run_id FROM radar2.runs WHERE run_id=$1',[run_id])['rows']:raise RuntimeError('RUN_ID_ALREADY_EXISTS_NO_REPLAY')
+    started_at=execute(conn,'SELECT clock_timestamp()::text started_at')['rows'][0]['started_at']
+    old=baseline(conn)
+    known_urls={r['url'] for r in execute(conn,'SELECT url FROM radar2.documents')['rows']}
+    out=work/run_id;out.mkdir()
+    c=Collector(out);c.run_id=run_id
+    # Preserve working daily acquisition. The second certification batch only
+    # explores the frontier and Instagram, never repeats the full agenda sweep.
+    if full:
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        c.genda(datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date())
+        with ThreadPoolExecutor(max_workers=4) as ex:
+            for f in ex.map(lambda f:f(),[c.teatrocerca,c.media_sources,c.alternativa,c.cultural_channels,c.genda_theatre]):pass
+        if len(c.docs)<2 or not c.proposals:raise RuntimeError('BASE_ACQUISITION_FAILED')
+    rotation_status={'status':'not_executed'};batch={'accounts':[]}
     try:
-        main()
+        rotation.initialize(conn,json.loads((ROOT/'radar2/instagram_roster.json').read_text()))
+        batch=rotation.claim(conn,run_id,10)
+        manifest=instagram_batch(c,batch,access)
+        search=public_search(c,access,batch)
+        manifest['searches']=search['searches'];manifest['documents']=search['documents']
+        rotation_status={'status':'acquired_or_blocked_with_receipts','accounts':len(batch['accounts'])}
+    except Exception as e:
+        manifest={'searches':[],'documents':[],'instagram_attempts':[]}
+        rotation_status={'status':'phase_failed','error':type(e).__name__+': '+str(e)[:160]}
+    try:source_report=discover_links(c,conn,known_urls,limit=12 if full else 6)
+    except Exception as e:source_report={'status':'phase_failed','error':type(e).__name__+': '+str(e)[:160]}
+    result=c.save();result=reconcile(result,old)
+    # Collect graph evidence before writing proposals so the API sees the same
+    # node IDs and event relationships persisted in the cultural memory ledger.
+    graph=enrich_graph(result,old)
+    result['finished_at']=utc()
+    write=execute(conn,SQL,[json.dumps(result,ensure_ascii=False)])['rows'][0]
+    read=execute(conn,"SELECT (SELECT count(*) FROM radar2.proposals WHERE last_run_id=$1) proposals,(SELECT count(*) FROM radar2.documents WHERE last_run_id=$1) documents,(SELECT summary->>'status' FROM radar2.runs WHERE run_id=$1) status",[run_id])['rows'][0]
+    if read['status']!='completed' or int(read['proposals'])!=int(write['proposals_written']) or int(read['documents'])!=int(write['documents_written']):raise RuntimeError('SAME_RUN_READBACK_MISMATCH')
+    try:graph_report=persist_graph(conn,run_id,graph)
+    except Exception as e:graph_report={'status':'memory_write_failed','error':type(e).__name__}
+    if batch['accounts']:
+        try:
+            completed=rotation.complete(conn,run_id,manifest)
+            rotation_status.update(status=completed['status'],results=completed.get('results',[]))
+        except Exception as e:rotation_status.update(status='completion_failed',error=type(e).__name__+': '+str(e)[:160])
+    m=execute(conn,NEW_DISCOVERY_METRICS_SQL,[run_id,started_at])['rows'][0]
+    metrics={k:int(v) for k,v in m.items()}
+    attempts=manifest['instagram_attempts']
+    ig={'accounts_attempted':len(attempts),'accounts_with_profile_http_request':sum(bool(a.get('profile_http_requested')) for a in attempts),'profiles_accessible':sum(bool(a['profile_accessible']) for a in attempts),'accounts_with_posts':sum(a['posts_recovered']>0 for a in attempts),'posts_recovered':sum(a['posts_recovered'] for a in attempts),'errors_or_restrictions':sum(bool(a.get('error')) for a in attempts),'receipts':attempts,'index_searches':len(manifest['searches']),'search_failures':sum(bool(s.get('error')) for s in manifest['searches']),'search_receipts':manifest['searches']}
+    report={'execution_context':'GitHub Actions','github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'scope':'daily_acquisition_and_exploration' if full else 'bounded_second_rotation_and_frontier','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'rotation':rotation_status,'source_discovery':source_report,'cultural_memory':graph_report,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0}
+    saved=execute(conn,"UPDATE radar2.runs SET summary=summary || $2::jsonb WHERE run_id=$1 RETURNING run_id",[run_id,json.dumps(report,ensure_ascii=False)])['rows']
+    if len(saved)!=1:raise RuntimeError('RUN_SUMMARY_NOT_SAVED')
+    print(json.dumps({k:v for k,v in report.items() if k not in ('proposal_ids','rotation','instagram','source_discovery')}))
+    print(json.dumps({'run_id':run_id,'instagram':{k:v for k,v in ig.items() if 'receipts' not in k},'new_sources':source_report.get('new_domains_observed',[]),'rotation_status':rotation_status['status']}))
+    (out/'verification.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+    if os.environ.get('GITHUB_STEP_SUMMARY'):
+        with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
+            f.write('## Radar 2: '+run_id+'\n\n')
+            f.write('Neon readback: '+json.dumps(read)+'. New unique proposals: '+str(metrics['new_visible_unique'])+'; dated: '+str(metrics['new_unique_dated_proposals'])+'.\n\n')
+            f.write('Instagram: '+str(ig['accounts_attempted'])+' policy/access attempts, '+str(ig['profiles_accessible'])+' accessible profiles, '+str(ig['posts_recovered'])+' actual posts. Rotation: '+rotation_status['status']+'.\n\n')
+            f.write('New source domains observed: '+', '.join(source_report.get('new_domains_observed',[]))+'. Graph: '+json.dumps(graph_report)+'.\n\n')
+            f.write('No editorial promotion. API HTTP verification is a separate authenticated check.\n\n')
+    return report
+
+
+def main():
+    conn=os.environ.get('NEON_RADAR_LIMITED_DATABASE_URL','')
+    if not conn or not (urlsplit(conn).hostname or '').endswith('.neon.tech'):raise RuntimeError('MISSING_OR_INVALID_LIMITED_NEON_SECRET')
+    row=execute(conn,"SELECT current_user role,current_setting('neon.project_id',true) project,current_setting('neon.branch_id',true) branch,has_table_privilege(current_user,'radar2.proposals','INSERT') can_write")['rows'][0]
+    if (row['role'],row['project'],row['branch'])!=(ROLE,PROJECT,BRANCH) or row['can_write'] not in ('t',True):raise RuntimeError('LIMITED_WRITER_IDENTITY_FENCE')
+    prefix='radar2-ghdaily-' if os.environ.get('GITHUB_EVENT_NAME')=='schedule' else 'radar2-ghpilot-'
+    run_id=prefix+os.environ['GITHUB_RUN_ID'];access=PublicAccess();reports=[]
+    with tempfile.TemporaryDirectory(prefix='radar2-gh-') as temp:
+        for i in range(certification_batches()):reports.append(run_batch(conn,run_id+('-batch2' if i else ''),Path(temp),i==0,access))
+    if len(reports)==2:
+        sets=[{x['username'] for x in r['instagram']['receipts']} for r in reports]
+        if sets[0]&sets[1] or any(len(s)!=10 for s in sets):raise RuntimeError('TWO_BATCH_ROTATION_ACCEPTANCE_FAILED')
+        print(json.dumps({'certification':'two_distinct_ten_account_batches','accounts':20,'overlap':0,'github_run_id':os.environ['GITHUB_RUN_ID']}))
+
+
+if __name__=='__main__':
+    try:main()
     except Exception as exc:
-        print("RADAR2_PILOT_BLOCKED: " + type(exc).__name__ + " " + str(exc),
-              file=sys.stderr)
-        sys.exit(1)
+        print('RADAR2_BLOCKED: '+type(exc).__name__+' '+str(exc),file=sys.stderr);sys.exit(1)
