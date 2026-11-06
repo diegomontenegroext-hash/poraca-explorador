@@ -21,6 +21,7 @@ class OfficialInstagramPilot(unittest.TestCase):
         self.assertEqual(outcome["queries_sent"], 0)
         self.assertEqual(outcome["new_documents"], 0)
         self.assertEqual(len(outcome["accounts"]), 4)
+        self.assertIn("teatroargentinopba", outcome["accounts"])
         discover.assert_not_called()
 
     def test_configured_limits_to_four_official_requests(self):

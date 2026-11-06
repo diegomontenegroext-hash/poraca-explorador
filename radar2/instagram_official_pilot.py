@@ -11,7 +11,7 @@ from instagram import discover
 from capabilities import CULTURAL, norm
 
 # Four cultural reference accounts, unchanged across days for a comparable sample.
-ACCOUNTS = ("guajira.bar", "lutitravelguide", "escenario40", "circus_ofc")
+ACCOUNTS = ("guajira.bar", "lutitravelguide", "escenario40", "teatroargentinopba")
 REQUIRED = ("META_IG_USER_ID", "META_ACCESS_TOKEN", "META_GRAPH_VERSION")
 PERMALINK = re.compile(r"https://(?:www\.)?instagram\.com/(?:p|reel)/[A-Za-z0-9_-]+/?\Z")
 

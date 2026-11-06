@@ -15,12 +15,12 @@ def discover(username):
         return {'username':username,'checked_at':utc(),'status':'NOT_EXECUTED_MISSING_OFFICIAL_ACCESS','posts':[],
           'requirement':'Own eligible professional Instagram account, Meta app, token with instagram_basic, instagram_manage_insights, pages_read_engagement, applicable Page access and access level. Facebook Login implementation; version supplied explicitly from app configuration.'}
     if not __import__('re').fullmatch(r'[A-Za-z0-9_.]{1,30}',username):raise ValueError('USERNAME')
-    fields='business_discovery.username('+username+'){id,username,media.limit(25){id,caption,permalink,timestamp,media_type,media_product_type,children{id,media_type}}}'
+    fields='business_discovery.username('+username+'){username,media.limit(12){id,caption,permalink,timestamp}}'
     url=f'https://graph.facebook.com/{version}/{own}?'+urlencode({'fields':fields})
     try:
         with urlopen(Request(url,headers={'Authorization':'Bearer '+token}),timeout=20) as r:data=json.load(r)
         bd=data.get('business_discovery',{});media=bd.get('media',{})
-        return {'username':username,'checked_at':utc(),'status':'MEDIA_RETURNED' if media.get('data') else 'NO_MEDIA_RETURNED','posts':media.get('data',[]),'has_more':bool(media.get('paging',{}).get('next')),'limit':25,'stories':'THIRD_PARTY_STORIES_NOT_SUPPORTED'}
+        return {'username':username,'checked_at':utc(),'status':'MEDIA_RETURNED' if media.get('data') else 'NO_MEDIA_RETURNED','posts':media.get('data',[]),'has_more':bool(media.get('paging',{}).get('next') or media.get('paging',{}).get('cursors',{}).get('after')),'limit':12,'stories':'THIRD_PARTY_STORIES_NOT_SUPPORTED'}
     except Exception as e:
         return {'username':username,'checked_at':utc(),'status':'OFFICIAL_API_ERROR','error_type':type(e).__name__,'posts':[]}
 
