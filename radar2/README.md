@@ -46,3 +46,13 @@ python3 -m unittest discover -s tests -v
 ```
 
 Al cierre: 483 pruebas, 482 aprobadas y una omitida. La prueba natural del cron, la continuidad de varios días y la adquisición de publicaciones de Instagram no están certificadas.
+
+## Piloto Instagram oficial de cuatro cuentas — 06/11/2026
+
+Se integró a la **misma corrida GitHub de las 05:27 ART**, sin crear tareas, ramas, cron ni servicios adicionales. Referentes fijos de comparación: `guajira.bar`, `lutitravelguide`, `escenario40`, `circus_ofc`. Código: `instagram_official_pilot.py`; pruebas offline: `tests/test_radar2_official_pilot.py`.
+
+El piloto es **exclusivamente Meta Business Discovery**, no reproduce las peticiones HTTP HTML del experimento interactivo del 04/11 ni utiliza Chromium. Los resultados quedan diferenciados en `radar2.runs.summary.instagram_official_pilot` con estado, cuentas, cantidad de llamadas, documentos y candidatos. Las publicaciones verificables se registran únicamente en staging `investigable`, nunca como eventos automáticamente admitidos. Se omiten permalinks ya conocidos y se limita a 12 medios por cuenta.
+
+Sin configurar `META_IG_USER_ID` y `META_ACCESS_TOKEN` en **GitHub Secrets**, y `META_GRAPH_VERSION` en **GitHub Variables**, el piloto guarda `NOT_CONFIGURED` y **realiza cero llamadas** a Meta. No se han suministrado esas credenciales ni se acreditaron permisos de terceros; por lo tanto, el próximo cron podrá verificar la integración, pero **no demostrará extracción Instagram** hasta completar el acceso oficial. Los 10 referentes que rotan diariamente siguen sirviendo para búsqueda de referencias web, pero sus comprobaciones no se confunden con las 4 consultas oficiales fijas. Fallos de Meta no detienen agendas ni fuentes web.
+
+El método HTTP directo ejecutado desde GitHub sobre `guajira.bar` y `lutitravelguide` devolvió 429 en ambos casos en la prueba puntual. No se programa el reintento automático de ese método después de la restricción, aunque haya funcionado desde Work el 04/11.
