@@ -255,9 +255,13 @@ jobs:
         uses: actions/checkout@v4
       - name: Verificar sintaxis local sin dependencias
         run: |
-          python3 -m py_compile radar2/actions_pilot.py radar2/capabilities.py radar2/rotation.py radar2/collector.py radar2/extract.py radar2/reconcile.py radar2/persist.py
+          python3 -m py_compile radar2/instagram_official_pilot.py radar2/instagram.py radar2/actions_pilot.py radar2/capabilities.py radar2/rotation.py radar2/collector.py radar2/extract.py radar2/reconcile.py radar2/persist.py
           python3 -m unittest discover -s tests -p "test_radar2*.py" -v
       - name: Preflight, fuentes, escritor limitado y readback en Neon
         env:
           NEON_RADAR_LIMITED_DATABASE_URL: ${{ secrets.NEON_RADAR_LIMITED_DATABASE_URL }}
+          # Optional, official Meta API; missing values disable the pilot without failing Radar.
+          META_IG_USER_ID: ${{ secrets.META_IG_USER_ID }}
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          META_GRAPH_VERSION: ${{ vars.META_GRAPH_VERSION }}
         run: python3 radar2/actions_pilot.py
