@@ -158,7 +158,8 @@ def instagram_batch(c,batch,access):
         u=account['username'];url='https://www.instagram.com/'+u+'/'
         raw,receipt=access.get(url)
         posts=parse_profile(raw,u) if raw else []
-        official=meta_discover(u)
+        # Official API queries are limited to the separate four-account daily pilot.
+        official={'status':'OFFICIAL_HANDLED_BY_DAILY_FOUR_ACCOUNT_PILOT','posts':[]}
         if official.get('posts'):posts+=official['posts']
         received=[]
         for post in posts:
