@@ -1,4 +1,4 @@
-name: Por Aca - Instagram diagnostico HTTP puntual
+name: Por Aca - Instagram HTTP original puntual
 
 on:
   workflow_dispatch:
