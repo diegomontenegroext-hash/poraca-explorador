@@ -14,6 +14,7 @@ from collector import Collector, sha, utc
 from reconcile import reconcile
 import rotation
 from capabilities import PublicAccess, instagram_batch, public_search, discover_links, enrich_graph, persist_graph, carry_forward, supplement_representatives
+from instagram_official_pilot import acquire as official_ig_pilot
 
 PROJECT='frosty-union-52906378'
 BRANCH='br-mute-recipe-b4odj2bl'
@@ -67,6 +68,11 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
         with ThreadPoolExecutor(max_workers=4) as ex:
             for f in ex.map(lambda f:f(),[c.teatrocerca,c.media_sources,c.alternativa,c.cultural_channels,c.genda_theatre]):pass
         if len(c.docs)<2 or not c.proposals:raise RuntimeError('BASE_ACQUISITION_FAILED')
+    # One fixed, four-account experiment in the existing daily run; never in corrections.
+    official_pilot={'status':'SKIPPED_NOT_DAILY'}
+    if full and not corrective:
+        try:official_pilot=official_ig_pilot(c,known_urls)
+        except Exception as e:official_pilot={'status':'FAILED','error_type':type(e).__name__}
     rotation_status={'status':'not_executed'};batch={'accounts':[]}
     try:
         if corrective:raise RuntimeError('ROTATION_NOT_REPEATED_IN_FRONTIER_CORRECTION')
@@ -113,7 +119,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     metrics={k:int(v) for k,v in m.items()}
     attempts=manifest['instagram_attempts']
     ig={'accounts_attempted':len(attempts),'accounts_with_profile_http_request':sum(bool(a.get('profile_http_requested')) for a in attempts),'profiles_accessible':sum(bool(a['profile_accessible']) for a in attempts),'accounts_with_posts':sum(a['posts_recovered']>0 for a in attempts),'posts_recovered':sum(a['posts_recovered'] for a in attempts),'errors_or_restrictions':sum(bool(a.get('error')) for a in attempts),'receipts':attempts,'index_searches':len(manifest['searches']),'search_failures':sum(bool(s.get('error')) for s in manifest['searches']),'search_receipts':manifest['searches']}
-    report={'execution_context':'GitHub Actions','github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'scope':'daily_acquisition_and_exploration' if full else 'bounded_frontier_parser_correction' if corrective else 'bounded_second_rotation_and_frontier','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'rotation':rotation_status,'source_discovery':source_report,'cultural_memory':graph_report,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'supplemented_representatives':supplemented,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0}
+    report={'execution_context':'GitHub Actions','github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'scope':'daily_acquisition_and_exploration' if full else 'bounded_frontier_parser_correction' if corrective else 'bounded_second_rotation_and_frontier','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'instagram_official_pilot':official_pilot,'rotation':rotation_status,'source_discovery':source_report,'cultural_memory':graph_report,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'supplemented_representatives':supplemented,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0}
     saved=execute(conn,"UPDATE radar2.runs SET summary=summary || $2::jsonb WHERE run_id=$1 RETURNING run_id",[run_id,json.dumps(report,ensure_ascii=False)])['rows']
     if len(saved)!=1:raise RuntimeError('RUN_SUMMARY_NOT_SAVED')
     print(json.dumps({k:v for k,v in report.items() if k not in ('proposal_ids','rotation','instagram','source_discovery')}))
@@ -124,6 +130,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
             f.write('## Radar 2: '+run_id+'\n\n')
             f.write('Neon readback: '+json.dumps(read)+'. New unique proposals: '+str(metrics['new_visible_unique'])+'; dated: '+str(metrics['new_unique_dated_proposals'])+'.\n\n')
             f.write('Instagram: '+str(ig['accounts_attempted'])+' policy/access attempts, '+str(ig['profiles_accessible'])+' accessible profiles, '+str(ig['posts_recovered'])+' actual posts. Rotation: '+rotation_status['status']+'.\n\n')
+            f.write('Instagram piloto Meta (4 cuentas): '+str(official_pilot.get('status'))+', nuevos documentos '+str(official_pilot.get('new_documents',0))+'.\\n\\n')
             f.write('New source domains observed: '+', '.join(source_report.get('new_domains_observed',[]))+'. Graph: '+json.dumps(graph_report)+'.\n\n')
             f.write('No editorial promotion. API HTTP verification is a separate authenticated check.\n\n')
     return report
