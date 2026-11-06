@@ -51,7 +51,7 @@ def certification_batches():
     return 2 if trigger.get('certification_batches')=='2' else 1
 
 
-def run_batch(conn,run_id,work,full,access):
+def run_batch(conn,run_id,work,full,access,corrective=False):
     if execute(conn,'SELECT run_id FROM radar2.runs WHERE run_id=$1',[run_id])['rows']:raise RuntimeError('RUN_ID_ALREADY_EXISTS_NO_REPLAY')
     started_at=execute(conn,'SELECT clock_timestamp()::text started_at')['rows'][0]['started_at']
     old=baseline(conn)
@@ -69,6 +69,7 @@ def run_batch(conn,run_id,work,full,access):
         if len(c.docs)<2 or not c.proposals:raise RuntimeError('BASE_ACQUISITION_FAILED')
     rotation_status={'status':'not_executed'};batch={'accounts':[]}
     try:
+        if corrective:raise RuntimeError('ROTATION_NOT_REPEATED_IN_FRONTIER_CORRECTION')
         rotation.initialize(conn,json.loads((ROOT/'radar2/instagram_roster.json').read_text()))
         batch=rotation.claim(conn,run_id,10)
         manifest=instagram_batch(c,batch,access)
@@ -77,14 +78,26 @@ def run_batch(conn,run_id,work,full,access):
         rotation_status={'status':'acquired_or_blocked_with_receipts','accounts':len(batch['accounts'])}
     except Exception as e:
         manifest={'searches':[],'documents':[],'instagram_attempts':[]}
-        rotation_status={'status':'phase_failed','error':type(e).__name__+': '+str(e)[:160]}
-    try:source_report=discover_links(c,conn,known_urls,limit=12 if full else 6)
+        rotation_status={'status':'not_repeated_in_corrective' if corrective else 'phase_failed','error':type(e).__name__+': '+str(e)[:160]}
+    try:source_report=discover_links(c,conn,known_urls,limit=12 if full else 6,refresh_candidates=corrective)
     except Exception as e:source_report={'status':'phase_failed','error':type(e).__name__+': '+str(e)[:160]}
+    # Rejected non-cultural documents remain auditable but leave the private
+    # active feed, using its existing archive state. No row is deleted.
+    excluded=execute(conn,"SELECT summary->'sources' sources FROM radar2.runs WHERE run_id='radar2-source-discovery-state-v1'")['rows']
+    archived=[]
+    if excluded:
+        sources=excluded[0]['sources'];sources=json.loads(sources) if isinstance(sources,str) else sources
+        rejected=[u for u,x in sources.items() if x['status'].startswith('rejected_')]
+        archived=execute(conn,"UPDATE radar2.proposals SET review_state='historico',evidence=evidence || jsonb_build_object('state','historico','kind','rejected_document','editorial_exclusion','not a local cultural source','exclusion_run_id',$2::text) WHERE document_url IN (SELECT jsonb_array_elements_text($1::jsonb)) AND evidence->>'acquisition_method'='autonomous_public_link_frontier' AND review_state<>'historico' RETURNING proposal_id",[json.dumps(rejected),run_id])['rows']
     result=c.save();result=reconcile(result,old)
     # Collect graph evidence before writing proposals so the API sees the same
     # node IDs and event relationships persisted in the cultural memory ledger.
     graph=enrich_graph(result,old)
     result['finished_at']=utc()
+    # If a formerly unparsed page is now an individual dated event, archive
+    # only its same-title undated precursor; preserve the original evidence.
+    dated=[p for p in result['proposals'] if p.get('date')]
+    superseded=execute(conn,"WITH incoming AS (SELECT x->>'document_url' url,x->>'title' title,x->>'id' id FROM jsonb_array_elements($1::jsonb) x) UPDATE radar2.proposals p SET review_state='historico',evidence=p.evidence || jsonb_build_object('kind','superseded_document','superseded_by',i.id) FROM incoming i WHERE p.document_url=i.url AND p.title=i.title AND p.event_date IS NULL AND p.review_state='investigable' RETURNING p.proposal_id",[json.dumps(dated,ensure_ascii=False)])['rows']
     write=execute(conn,SQL,[json.dumps(result,ensure_ascii=False)])['rows'][0]
     read=execute(conn,"SELECT (SELECT count(*) FROM radar2.proposals WHERE last_run_id=$1) proposals,(SELECT count(*) FROM radar2.documents WHERE last_run_id=$1) documents,(SELECT summary->>'status' FROM radar2.runs WHERE run_id=$1) status",[run_id])['rows'][0]
     if read['status']!='completed' or int(read['proposals'])!=int(write['proposals_written']) or int(read['documents'])!=int(write['documents_written']):raise RuntimeError('SAME_RUN_READBACK_MISMATCH')
@@ -99,7 +112,7 @@ def run_batch(conn,run_id,work,full,access):
     metrics={k:int(v) for k,v in m.items()}
     attempts=manifest['instagram_attempts']
     ig={'accounts_attempted':len(attempts),'accounts_with_profile_http_request':sum(bool(a.get('profile_http_requested')) for a in attempts),'profiles_accessible':sum(bool(a['profile_accessible']) for a in attempts),'accounts_with_posts':sum(a['posts_recovered']>0 for a in attempts),'posts_recovered':sum(a['posts_recovered'] for a in attempts),'errors_or_restrictions':sum(bool(a.get('error')) for a in attempts),'receipts':attempts,'index_searches':len(manifest['searches']),'search_failures':sum(bool(s.get('error')) for s in manifest['searches']),'search_receipts':manifest['searches']}
-    report={'execution_context':'GitHub Actions','github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'scope':'daily_acquisition_and_exploration' if full else 'bounded_second_rotation_and_frontier','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'rotation':rotation_status,'source_discovery':source_report,'cultural_memory':graph_report,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0}
+    report={'execution_context':'GitHub Actions','github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'scope':'daily_acquisition_and_exploration' if full else 'bounded_frontier_parser_correction' if corrective else 'bounded_second_rotation_and_frontier','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'rotation':rotation_status,'source_discovery':source_report,'cultural_memory':graph_report,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0}
     saved=execute(conn,"UPDATE radar2.runs SET summary=summary || $2::jsonb WHERE run_id=$1 RETURNING run_id",[run_id,json.dumps(report,ensure_ascii=False)])['rows']
     if len(saved)!=1:raise RuntimeError('RUN_SUMMARY_NOT_SAVED')
     print(json.dumps({k:v for k,v in report.items() if k not in ('proposal_ids','rotation','instagram','source_discovery')}))
@@ -122,8 +135,9 @@ def main():
     if (row['role'],row['project'],row['branch'])!=(ROLE,PROJECT,BRANCH) or row['can_write'] not in ('t',True):raise RuntimeError('LIMITED_WRITER_IDENTITY_FENCE')
     prefix='radar2-ghdaily-' if os.environ.get('GITHUB_EVENT_NAME')=='schedule' else 'radar2-ghpilot-'
     run_id=prefix+os.environ['GITHUB_RUN_ID'];access=PublicAccess();reports=[]
+    corrective=os.environ.get('GITHUB_EVENT_NAME')=='push' and 'trigger_scope=frontier_corrective' in (ROOT/'ops/radar-fallback-trigger.txt').read_text()
     with tempfile.TemporaryDirectory(prefix='radar2-gh-') as temp:
-        for i in range(certification_batches()):reports.append(run_batch(conn,run_id+('-batch2' if i else ''),Path(temp),i==0,access))
+        for i in range(1 if corrective else certification_batches()):reports.append(run_batch(conn,run_id+('-batch2' if i else ''),Path(temp),i==0 and not corrective,access,corrective))
     if len(reports)==2:
         sets=[{x['username'] for x in r['instagram']['receipts']} for r in reports]
         if sets[0]&sets[1] or any(len(s)!=10 for s in sets):raise RuntimeError('TWO_BATCH_ROTATION_ACCEPTANCE_FAILED')

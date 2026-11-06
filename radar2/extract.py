@@ -85,6 +85,35 @@ def extract_document(c,d,accounts,method):
     actors=item.get(field) or [];actors=actors if isinstance(actors,list) else [actors]
     for actor in actors:
      if isinstance(actor,dict) and actor.get('name'):c.proposals[key]['entities'].append({'name':actor['name'],'role':role,'evidence':json.dumps(actor,ensure_ascii=False)})
+ # Single-announcement pages with labeled scheduling (not a list of nearby
+ # recommendations). The year is explicitly inferred from the live program,
+ # and the weekday must agree; historic film years are never used as event years.
+ label=re.search(r'FECHA Y HORA\s+((?:lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo)\s+\d{1,2}\s+de\s+\w+(?:\s+de\s+20\d{2})?[, ]+\s*\d{1,2}:\d{2})',d['text'],re.I)
+ if label and not produced:
+  day=day_from(label[1],now.year);clock=re.search(r'(\d{1,2}):([0-5]\d)',label[1])
+  weekdays=['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
+  weekday=norm(label[1]).split()[0]
+  title=next((n.text() for n in tree.walk() if n.tag=='h1'),None)
+  if day and title and weekdays[datetime.fromisoformat(day).weekday()]==weekday:
+   place=re.search(r'–\s*((?:Teatro|Centro|Sala|Galería|Espacio)[^|]+)',d['title'],re.I)
+   venue=place[1].strip() if place else None
+   org=next((m for n in tree.walk() if n.tag=='p' for m in [re.search(r'^([A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑ-]*(?: [A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑ-]*){0,3}) presenta\b',n.text())] if m),None)
+   key=add(title,day,clock[0] if clock else None,venue,d['text'],organizer=org[1] if org else None,category_label='Cine' if re.search(r'pel[ií]cula|proyecci[oó]n',d['text'],re.I) else None)
+   if key:c.proposals[key]['date_basis']='labeled live program day/month/time; year inferred from acquisition year; weekday verified; not publication or historic work year'
+ # Named credits are evidence even when the page remains an undated document.
+ credits=[]
+ for node in tree.walk():
+  if node.tag not in ('p','li'):continue
+  text=node.text()
+  credit=re.search(r'^(Musicalizan|Actúan|Interpretes|Intérpretes|Dirección|Organiza):\s*(.{3,450})',text,re.I)
+  if not credit:continue
+  role='director' if norm(credit[1])=='direccion' else 'organizer' if norm(credit[1])=='organiza' else 'performer'
+  names=re.split(r'\s*,\s*|\s+y\s+',credit[2].strip().rstrip('.'))
+  for name in names:
+   name=name.strip()
+   if re.fullmatch(r'[A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑáéíóúñ-]*(?: [A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑáéíóúñ-]*){1,4}',name):credits.append({'name':name,'role':role,'evidence':text})
+ for key in produced:
+  c.proposals[key]['entities'].extend(credits)
  # Public programs commonly group multiple <li><h3> events below a dated section.
  for section in tree.walk():
   if section.tag!='section':continue
@@ -164,6 +193,7 @@ def extract_document(c,d,accounts,method):
   c.document_lead(d,state='historico' if historical else 'investigable')
   for key,p in c.proposals.items():
    if p['document_url']==d['url']:
+    p['entities'].extend(credits)
     p.update(kind='historical' if historical else 'document',acquisition_method=method,discovery=d.get('discovery'),related_accounts=[])
     produced.add(key)
  return [c.proposals[k] for k in produced]

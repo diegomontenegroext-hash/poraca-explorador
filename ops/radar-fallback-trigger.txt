@@ -1,6 +1,7 @@
-# Misión final autorizada: dos lotes de Instagram en un solo job.
+# Corrección acotada: releer fuentes candidatas, sin FULL ni otro lote Instagram.
 trigger_date=2026-11-05
 trigger_slot=bootstrap
 trigger_mode=radar2_pilot
-trigger_reason=final_mission_controlled_certification
-certification_batches=2
+trigger_reason=verify_labeled_program_and_non_cultural_exclusions
+trigger_scope=frontier_corrective
+certification_batches=1

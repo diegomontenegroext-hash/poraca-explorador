@@ -29,6 +29,17 @@ class Capabilities(unittest.TestCase):
   old=[{'proposal_id':'old','title':'Concierto','event_date':'2026-11-08','event_time':'20:00','venue':'Sala A','evidence':{'duplicate_of':'new'}}]
   p={'id':'new','title':'Concierto','date':'2026-11-08','time':'20:00','venue':'Sala A','kind':'event'}
   reconcile({'proposals':[p]},old);self.assertNotIn('duplicate_of',p)
+ def test_labeled_program_uses_live_year_and_paragraph_credits(self):
+  import tempfile
+  from collector import Collector,Tree
+  from extract import extract_document
+  raw='<title>Film – Teatro de Cámara de City Bell | Asociación Lumen Artis</title><h1>Príncipe Achmed</h1><p>Videodromo presenta una película de 1926 en City Bell.</p><p>Musicalizan: Nacho Stoppani, Sebastián Piatti y Lucas Muñoz.</p><h2>FECHA Y HORA</h2><p>sábado 7 de noviembre, 20:00</p>'
+  with tempfile.TemporaryDirectory() as out:
+   c=Collector(out);Path(out,'page.html').write_text(raw)
+   d={'url':'https://example.org/film','final_url':'https://example.org/film','source':'Example','title':'Film – Teatro de Cámara de City Bell | Asociación Lumen Artis','text':Tree(raw).root.text(),'fetched_at':'2026-11-05T22:00:00+00:00','html_file':'page.html'}
+   extract_document(c,d,[],'test');p=next(iter(c.proposals.values()))
+   self.assertEqual(p['date'],'2026-11-07');self.assertEqual(p['time'],'20:00');self.assertEqual(p['organizer'],'Videodromo')
+   self.assertEqual([e['name'] for e in p['entities'] if e['role']=='performer'],['Nacho Stoppani','Sebastián Piatti','Lucas Muñoz'])
  def test_instagram_explicit_permission_notice_blocks_even_allow_path(self):
   from urllib.robotparser import RobotFileParser
   p=PublicAccess();rp=RobotFileParser();rp.parse(['User-agent: *','Allow: /'])
