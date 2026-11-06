@@ -1,7 +1,8 @@
-# Corrección acotada: releer fuentes candidatas, sin FULL ni otro lote Instagram.
-trigger_date=2026-11-05
+# Verificacion acotada de Radar 2: un unico lote diario fuera del slot natural faltante.
+# Se utiliza la infraestructura existente; no hay scheduler/cron adicional.
+trigger_date=2026-11-06
 trigger_slot=bootstrap
 trigger_mode=radar2_pilot
-trigger_reason=final_verify_organizer_api_and_credit_persistence
-trigger_scope=frontier_corrective
+trigger_reason=first_official_instagram_four_account_pilot_readback
+trigger_scope=standard_daily_acquisition
 certification_batches=1
