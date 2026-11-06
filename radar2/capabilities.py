@@ -260,7 +260,11 @@ def discover_links(c,conn,known_urls,limit=12,refresh_candidates=False):
                 item['last_productive_at']=utc() if events else item.get('last_productive_at')
                 runs=item.setdefault('productive_runs',[])
                 if events and c.run_id not in runs:runs.append(c.run_id)
-                item['monitoring_certified']=len(runs)>=2
+                days=item.setdefault('productive_days',[])
+                day=datetime.now(timezone.utc).astimezone(__import__('zoneinfo').ZoneInfo('America/Argentina/Buenos_Aires')).date().isoformat()
+                if events and day not in days:days.append(day)
+                item['extraction_verified_repeatedly']=len(runs)>=2
+                item['monitoring_certified']=len(days)>=2
         else:
             last=next((x for x in reversed(c.checks) if x.get('url')==item['url']),{})
             item.update(status='inaccessible',error=last.get('error','FETCH_FAILED'),monitoring_certified=False)

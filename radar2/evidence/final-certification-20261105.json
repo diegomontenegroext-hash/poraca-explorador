@@ -1,0 +1,117 @@
+{
+  "decision": "GO_PARCIAL",
+  "verified_at": "Fri, 06 Nov 2026 01:56:34 GMT",
+  "github_runs": [
+    42145502319,
+    42146038206,
+    42146423167,
+    42146682368,
+    42146830199
+  ],
+  "runtime_commit": "fc45232861abddcbb187a9c8bddb62a080605be9",
+  "neon": {
+    "new_document_urls": 50,
+    "new_observation_ids": 12,
+    "active_new_unique_investigation_documents": 6,
+    "new_unique_events_after_reconciliation": 0,
+    "non_cultural_archived": 4,
+    "superseded_document": 1,
+    "event_alias": 1
+  },
+  "instagram": {
+    "roster": 123,
+    "accounts_policy_checked": 20,
+    "profile_http_requests": 0,
+    "accessible_profiles": 0,
+    "posts_recovered": 0,
+    "disjoint_batches": true,
+    "restriction": "Instagram robots.txt explicit written permission required; policy SHA256 3a62d0ddf2d87aa7cef3d1b7facf0bc49c10f7f4580755c0230fd2f89a679da5",
+    "official_meta": "missing owner app/account/token/version; not executed"
+  },
+  "cultural_memory": {
+    "active_nodes": 57,
+    "active_relationships": 112,
+    "new_protagonists": 7,
+    "venue_spelling_aliases": 1
+  },
+  "api": {
+    "status": 200,
+    "cache_control": "private, no-store",
+    "robots": "noindex, nofollow, noarchive",
+    "count": 1,
+    "publication_approved": false,
+    "event_id": "703b02b9cf6b6a77b2f3372e6437df3bba67562dbf894607796057753ea4f223",
+    "entities": [
+      {
+        "name": "Teatro de Cámara de City Bell",
+        "role": "venue",
+        "node_id": "fd5345d137bc2f815619f6dffa43217c9e6ca4494ae03645351856a7b1298d19",
+        "evidence_url": "https://lumenartis.org/?post_type=funcion&p=2904",
+        "predicate": "takes_place_at"
+      },
+      {
+        "name": "Videodromo",
+        "role": "organizer",
+        "node_id": "0ba38a0247ec69ae8a4c7b739999d4ee986667642ffaf2ce525c4db2c1ab4e7a",
+        "evidence_url": "https://lumenartis.org/?post_type=funcion&p=2904",
+        "predicate": "organized_by"
+      },
+      {
+        "name": "Nacho Stoppani",
+        "role": "performer",
+        "node_id": "b2251bf6d16bbc6ee2dd6ca9273795c90276f662ba2e00293abb04915c090fe5",
+        "evidence_url": "https://lumenartis.org/?post_type=funcion&p=2904",
+        "predicate": "features"
+      },
+      {
+        "name": "Sebastián Piatti",
+        "role": "performer",
+        "node_id": "0af568c3d0b143d4ecca6f086d3cf35acdc4c6e20d6196cd06a088c0dced3321",
+        "evidence_url": "https://lumenartis.org/?post_type=funcion&p=2904",
+        "predicate": "features"
+      },
+      {
+        "name": "Lucas Muñoz",
+        "role": "performer",
+        "node_id": "f8655a0f4076e3d70203a89cd579ac450b8edc82f88a557ac2e15aee9facb423",
+        "evidence_url": "https://lumenartis.org/?post_type=funcion&p=2904",
+        "predicate": "features"
+      },
+      {
+        "name": "Tomás Szelagowski",
+        "role": "performer",
+        "node_id": "d156caa0e201e064c01c71b53d9b8bfdda67c8d55f35250cca7bd51987c350cc",
+        "evidence_url": "https://lumenartis.org/?post_type=funcion&p=2904",
+        "predicate": "features"
+      },
+      {
+        "name": "Rob Astami",
+        "role": "performer",
+        "node_id": "8df40f0f86c51bad5c5255bba63c01a1462a5eae9802394b9d8294e03ff551ce",
+        "evidence_url": "https://lumenartis.org/?post_type=funcion&p=2904",
+        "predicate": "features"
+      },
+      {
+        "name": "Rodrigo Runco",
+        "role": "performer",
+        "node_id": "354d332813f184d6608c999711219badeb978f8268ba9be405463d4f5be53efa",
+        "evidence_url": "https://lumenartis.org/?post_type=funcion&p=2904",
+        "predicate": "features"
+      }
+    ],
+    "organizer": "Videodromo"
+  },
+  "daily": {
+    "cron_utc": "27 8 * * *",
+    "time_art": "05:27",
+    "next_local_date": "2026-11-06",
+    "natural_scheduled_run_observed": false,
+    "one_existing_workflow": true
+  },
+  "limitations": [
+    "No Instagram publications acquired",
+    "Bing public RSS search disallowed by robots; no autonomous general search API configured",
+    "Sustained source monitoring and first updated scheduled run unobserved",
+    "Cultural graph remains acquisition memory in radar2; canonical public knowledge tables unchanged"
+  ]
+}
