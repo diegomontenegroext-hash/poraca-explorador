@@ -24,7 +24,7 @@ SOURCE_STATE = 'radar2-source-discovery-state-v1'
 GRAPH_STATE = 'radar2-cultural-memory-state-v1'
 CULTURAL = re.compile(r'teatro|musica|music|recital|festival|cultur|galeria|exposici|arte\b|taller|ceramica|yoga|vino|wine|cata\b|fiesta|ciclo|entradas|tickets|eventos?|cartelera|agenda|programaci|residenc|artista|concierto', re.I)
 LOCAL = re.compile(r'la plata|platense|berisso|ensenada|gonnet|gorina|city bell|villa elisa|tolosa', re.I)
-REJECT = re.compile(r'/admin(?:/|$)|login|sign.?in|checkout|carrito|privacy|privacidad|terminos|terms|contact|cookies|clasificad|funebre|tiendanube|mustang\.cloud|creativecommons|afip\.gov|\.pdf$|\.jpg$|\.png$|\.mp4$|\.zip$|/wp-json|/feed(?:/|$)', re.I)
+REJECT = re.compile(r'/admin(?:/|$)|login|sign.?in|checkout|carrito|privacy|privacidad|terminos|terms|contact|/share/|/sharer|t\.me/|cookies|clasificad|funebre|tiendanube|mustang\.cloud|creativecommons|afip\.gov|\.pdf$|\.jpg$|\.png$|\.mp4$|\.zip$|/wp-json|/feed(?:/|$)', re.I)
 
 
 def safe_url(url):
@@ -221,8 +221,8 @@ def discover_links(c,conn,known_urls,limit=12,refresh_candidates=False):
     for doc in list(c.docs.values()):harvest(doc)
     # Previously discovered sources are revisited; productive does not imply
     # editorial authority. Unknown-domain candidates get a bounded fair turn.
-    due=[s for s in frontier.values() if s['url'] not in c.docs and not REJECT.search(s['url']) and (not s.get('next_check_at') or s['next_check_at']<=at or (refresh_candidates and s['status']=='cultural_candidate'))]
-    due.sort(key=lambda s:(0 if (refresh_candidates and s['status']=='cultural_candidate') or s['status']=='productive_observed' else 1,s['checks'],-s['score'],s['first_discovered_at'],s['url']))
+    due=[s for s in frontier.values() if s['url'] not in c.docs and not REJECT.search(s['url']) and (not s.get('next_check_at') or s['next_check_at']<=at or (refresh_candidates and s['status'] in ('cultural_candidate','productive_observed')))]
+    due.sort(key=lambda s:(0 if (refresh_candidates and s['status'] in ('cultural_candidate','productive_observed')) or s['status']=='productive_observed' else 1,s['checks'],-s['score'],s['first_discovered_at'],s['url']))
     checked=[]
     # At most two pages per domain; not a crawl of the open web.
     per_host={}
@@ -266,10 +266,12 @@ def discover_links(c,conn,known_urls,limit=12,refresh_candidates=False):
 
 def enrich_graph(result,baseline):
     """Identity within explicit type; handles/mentions alone never prove a role."""
+    from reconcile import venue_name
+    def identity(role,name):return venue_name(name) if role=='venue' else norm(name)
     known=set()
     for p in baseline:
         e=p.get('evidence') or {};e=json.loads(e) if isinstance(e,str) else e
-        known.update((n.get('role'),norm(n.get('name'))) for n in e.get('entities',[]) if n.get('name'))
+        known.update((n.get('role'),identity(n.get('role'),n.get('name'))) for n in e.get('entities',[]) if n.get('name'))
     nodes={};edges={}
     for p in result['proposals']:
         p.setdefault('kind','event' if p.get('date') else 'actor' if p['state']=='actor' else 'document')
@@ -286,26 +288,66 @@ def enrich_graph(result,baseline):
             if not name or len(name)<2 or len(name)>160 or role not in ('venue','organizer','performer','director'):continue
             # Only explicit parser evidence can create nodes and role edges.
             if norm(name) not in norm(evidence):continue
-            nid=sha(role+'|'+norm(name));e.update(node_id=nid,evidence_url=p['document_url'],identity_status='normalized_name_within_role_pending_identity_review')
+            proof_url=e.get('evidence_url') or p['document_url']
+            nid=sha(role+'|'+identity(role,name));e.update(node_id=nid,evidence_url=proof_url,identity_status='normalized_name_within_role_pending_identity_review')
             accepted.append(e)
-            n=nodes.setdefault(nid,{'node_id':nid,'name':name,'role':role,'new_to_radar_evidence':(role,norm(name)) not in known,'evidence':[]})
-            n['evidence'].append({'proposal_id':p['id'],'url':p['document_url'],'excerpt':compact(evidence)[:1000]})
+            n=nodes.setdefault(nid,{'node_id':nid,'name':name,'role':role,'new_to_radar_evidence':(role,identity(role,name)) not in known,'evidence':[]})
+            n['evidence'].append({'proposal_id':p['id'],'url':proof_url,'excerpt':compact(evidence)[:1000]})
             if p.get('kind') not in ('event','program') or not p.get('date'):continue
             predicate={'venue':'takes_place_at','organizer':'organized_by','performer':'features','director':'directed_by'}[role]
-            edge={'subject':event_id,'predicate':predicate,'object':nid,'proposal_id':p['id'],'evidence_url':p['document_url'],'excerpt':compact(evidence)[:1000],'status':'observed_pending_editorial_review'}
+            edge={'subject':event_id,'predicate':predicate,'object':nid,'proposal_id':p['id'],'evidence_url':proof_url,'excerpt':compact(evidence)[:1000],'status':'observed_pending_editorial_review'}
             e['event_relationship']=edge;p['relationships'].append(edge);edges[sha(event_id+predicate+nid)]=edge
-        p['entities']=accepted
+        p['entities']=list({(e['node_id'],e['role']):e for e in accepted}.values())
     return {'nodes':list(nodes.values()),'relationships':list(edges.values()),'new_nodes':sum(n['new_to_radar_evidence'] for n in nodes.values())}
+
+
+def carry_forward(result,baseline):
+    old={p['proposal_id']:(json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}) for p in baseline}
+    for p in result['proposals']:
+        previous=old.get(p['id'],{})
+        entities={((e.get('node_id') or norm(e.get('name'))),e.get('role')):dict(e) for e in previous.get('entities',[])}
+        entities.update({((e.get('node_id') or norm(e.get('name'))),e.get('role')):e for e in p.get('entities',[])})
+        p['entities']=list(entities.values())
+        if previous.get('supporting_evidence'):p['supporting_evidence']=previous['supporting_evidence']
+    return result
+
+
+def supplement_representatives(conn,result):
+    supplements={}
+    for p in result['proposals']:
+        target=p.get('duplicate_of')
+        if not target or not p.get('entities'):continue
+        supplements.setdefault(target,[]).append(p)
+    for target,aliases in supplements.items():
+        rows=execute(conn,'SELECT evidence FROM radar2.proposals WHERE proposal_id=$1',[target])['rows']
+        if not rows:raise RuntimeError('MISSING_ALIAS_REPRESENTATIVE')
+        evidence=rows[0]['evidence'];evidence=json.loads(evidence) if isinstance(evidence,str) else evidence
+        entities={((e.get('node_id') or norm(e.get('name'))),e.get('role')):e for e in evidence.get('entities',[])}
+        proofs={x['proposal_id']:x for x in evidence.get('supporting_evidence',[])}
+        for alias in aliases:
+            for e in alias['entities']:entities[((e.get('node_id') or norm(e.get('name'))),e.get('role'))]=e
+            proofs[alias['id']]={'proposal_id':alias['id'],'url':alias['document_url'],'basis':'same date, time, equivalent venue and title; roles explicitly credited by source'}
+        addition={'entities':list(entities.values()),'supporting_evidence':list(proofs.values())}
+        execute(conn,'UPDATE radar2.proposals SET evidence=evidence || $2::jsonb WHERE proposal_id=$1',[target,json.dumps(addition,ensure_ascii=False)])
+    return list(supplements)
 
 
 def persist_graph(conn,run_id,graph):
     state=load_state(conn,GRAPH_STATE,'cultural_memory_control');nodes=state.setdefault('nodes',{});edges=state.setdefault('relationships',{})
+    from reconcile import venue_name
     new=0;new_edges=0
     for n in graph['nodes']:
         key=n['node_id'];new+=int(key not in nodes)
+        if n['role']=='venue':
+            for oldkey,oldnode in nodes.items():
+                if oldkey!=key and oldnode['role']=='venue' and venue_name(oldnode['name'])==venue_name(n['name']):oldnode.update(alias_of=key,identity_status='equivalent_venue_spelling')
         old=nodes.get(key,{});n['first_run_id']=old.get('first_run_id',run_id);n['last_run_id']=run_id
         proofs={x['proposal_id']:x for x in old.get('evidence',[])+n['evidence']};n['evidence']=list(proofs.values())[-20:];nodes[key]=n
     for e in graph['relationships']:
-        key=sha(e['subject']+e['predicate']+e['object']);new_edges+=int(key not in edges);edges[key]=dict(e,last_run_id=run_id)
+        key=sha(e['subject']+e['predicate']+e['object'])
+        for oldkey,old in list(edges.items()):
+            if oldkey!=key and old.get('proposal_id')==e['proposal_id'] and old.get('predicate')==e['predicate'] and nodes.get(old.get('object'),{}).get('alias_of',old.get('object'))==e['object']:
+                old.update(status='superseded_by_reconciliation',superseded_by=key)
+        new_edges+=int(key not in edges);edges[key]=dict(e,last_run_id=run_id)
     save_state(conn,GRAPH_STATE,state)
-    return {'nodes_observed':len(graph['nodes']),'new_to_radar_evidence':graph['new_nodes'],'new_to_memory':new,'relationships_observed':len(graph['relationships']),'new_relationships_in_memory':new_edges,'total_nodes':len(nodes),'total_relationships':len(edges)}
+    return {'nodes_observed':len(graph['nodes']),'new_to_radar_evidence':graph['new_nodes'],'new_to_memory':new,'relationships_observed':len(graph['relationships']),'new_relationships_in_memory':new_edges,'total_nodes':len(nodes),'active_nodes':sum(not n.get('alias_of') for n in nodes.values()),'total_relationships':len(edges),'active_relationships':sum(e.get('status')!='superseded_by_reconciliation' for e in edges.values())}

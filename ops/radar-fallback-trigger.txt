@@ -2,6 +2,6 @@
 trigger_date=2026-11-05
 trigger_slot=bootstrap
 trigger_mode=radar2_pilot
-trigger_reason=verify_labeled_program_and_non_cultural_exclusions
+trigger_reason=verify_cross_source_film_alias_and_final_metrics
 trigger_scope=frontier_corrective
 certification_batches=1

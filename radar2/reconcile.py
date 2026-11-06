@@ -8,10 +8,10 @@ from urllib.parse import urlsplit
 from collector import norm
 
 def venue_name(x):
- s=norm(x or '')
+ s=re.sub(r'\bde (city bell|la plata)\b',r'\1',norm(x or ''))
  return s.replace('sede ','').replace('club argentino juvenil','argentino juvenil').replace('sede argentino juvenil club','argentino juvenil').replace('escenario40','escenario 40')
 def title_name(t,v):
- s=norm(t or '');v=venue_name(v)
+ s=norm(re.sub(r',\s+de\s+[A-ZÁÉÍÓÚÑ].*$','',t or ''));v=venue_name(v)
  if v:s=s.replace(' en '+v,'')
  s=re.sub(r'\s+\d{1,2}\s+(?:ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic)(?:iembre|ubre)?(?:\s+20\d{2})?$','',s)
  s=re.sub(r'\s+en la plata$','',s)

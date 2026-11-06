@@ -29,6 +29,18 @@ class Capabilities(unittest.TestCase):
   old=[{'proposal_id':'old','title':'Concierto','event_date':'2026-11-08','event_time':'20:00','venue':'Sala A','evidence':{'duplicate_of':'new'}}]
   p={'id':'new','title':'Concierto','date':'2026-11-08','time':'20:00','venue':'Sala A','kind':'event'}
   reconcile({'proposals':[p]},old);self.assertNotIn('duplicate_of',p)
+ def test_next_agenda_read_preserves_original_credit_evidence(self):
+  from capabilities import carry_forward
+  old=[{'proposal_id':'agenda','evidence':{'entities':[{'name':'Artista Prueba','role':'performer','evidence':'Musicaliza Artista Prueba','evidence_url':'https://original.example/show'}],'supporting_evidence':[{'proposal_id':'alias','url':'https://original.example/show'}]}}]
+  p={'id':'agenda','title':'Film','document_url':'https://agenda.example/show','date':'2026-11-07','state':'observado_agenda','entities':[]}
+  result=carry_forward({'proposals':[p]},old);enrich_graph(result,old)
+  self.assertEqual(p['entities'][0]['evidence_url'],'https://original.example/show')
+  self.assertEqual(p['entities'][0]['event_relationship']['evidence_url'],'https://original.example/show')
+  self.assertEqual(len(p['supporting_evidence']),1)
+ def test_original_film_and_agenda_are_one_performance(self):
+  old=[{'proposal_id':'agenda','title':'Las aventuras del príncipe Achmed, de Lotte Reiniger','event_date':'2026-11-07','event_time':'20:00','venue':'Teatro de Cámara City Bell','evidence':{}}]
+  p={'id':'original','title':'Las mil y una noches: Las aventuras del príncipe Achmed','date':'2026-11-07','time':'20:00','venue':'Teatro de Cámara de City Bell','kind':'event'}
+  reconcile({'proposals':[p]},old);self.assertEqual(p.get('duplicate_of'),'agenda')
  def test_labeled_program_uses_live_year_and_paragraph_credits(self):
   import tempfile
   from collector import Collector,Tree
