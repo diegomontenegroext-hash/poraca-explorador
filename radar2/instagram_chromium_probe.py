@@ -29,7 +29,7 @@ def one(browser, username):
         page.wait_for_timeout(2500)  # initial rendering only, no scrolling
         result["final_host"] = urlsplit(page.url).hostname
         html = page.content()[:MAX_HTML]
-        result["html_post_markers"] = len(re.findall(r'["\\\']shortcode["\\\']\\s*:', html))
+        result["html_post_markers"] = len(re.findall(r'"shortcode"\s*:', html))
         cards = page.locator('a[href*="/p/"], a[href*="/reel/"]')
         links = []
         captions = 0
