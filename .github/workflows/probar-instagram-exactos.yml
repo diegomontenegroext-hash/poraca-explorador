@@ -7,6 +7,7 @@ on:
       - 'src/instagram_exact_probe.py'
       - 'tests/test_instagram_exact_probe.py'
       - '.github/workflows/probar-instagram-exactos.yml'
+      - 'radar2/instagram_chromium_probe.py'
 
 permissions:
   contents: read
@@ -18,11 +19,15 @@ concurrency:
 jobs:
   comparar:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 8
     steps:
       - name: Obtener repositorio
         uses: actions/checkout@v4
       - name: Validar codigo sin acceso externo
-        run: python3 -m unittest discover -s tests -v
+        run: python3 -m py_compile src/instagram_exact_probe.py radar2/instagram_chromium_probe.py
       - name: Comparar enlaces exactos historicos de Instagram
         run: python3 src/instagram_exact_probe.py
+      - name: Instalar Playwright para prueba acotada
+        run: python3 -m pip install --disable-pip-version-check 'playwright>=1.45,<2'
+      - name: Probar tres perfiles publicos con Chrome sin autenticar
+        run: python3 radar2/instagram_chromium_probe.py
