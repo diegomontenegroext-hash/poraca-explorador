@@ -74,7 +74,6 @@ class Maturity(unittest.TestCase):
   graph=enrich_graph({'proposals':ps},[])
   self.assertIn('part_of_cycle',[e['predicate'] for e in graph['relationships']])
 
-if __name__=='__main__':unittest.main()
 
 class SourceDiscovery(unittest.TestCase):
  def test_structured_local_organizer_link_and_nonlocal_rejection(self):
@@ -84,3 +83,19 @@ class SourceDiscovery(unittest.TestCase):
   self.assertEqual(list(source_hints([p])),['salasur'])
   event['location']['address']['addressLocality']='Otra Ciudad';p['evidence']['entities'][0]['evidence']=json.dumps(event)
   self.assertEqual(source_hints([p]),{})
+
+class FinalSemanticGuards(unittest.TestCase):
+ parse=Maturity.parse
+ def test_relative_retail_publication_is_not_a_cultural_event(self):
+  ps=self.parse('Cerámica: mañana los subo a la tienda. Vení al taller a ver esmaltes')
+  self.assertTrue(all(p.get('kind')!='event' for p in ps))
+ def test_narrative_children_do_not_inherit_parent_start_time(self):
+  ps=self.parse('Festival en Sala Sur. 7/11 a las 17 hs\nUn rato más tarde llega Ana a conversar sobre sus libros.\nPara terminar la noche viene Pedro con su música.')
+  children=[p for p in ps if p.get('kind')=='program_component']
+  self.assertEqual(len(children),2);self.assertTrue(all(p['date'] is None and p['time'] is None for p in children));self.assertTrue(all(p['parent_announced_date']=='2026-11-07' for p in children))
+ def test_structured_work_url_groups_functions(self):
+  ps=[{'id':str(i),'title':'Lazos','document_url':'https://teatro.test/obra/lazos','date':'2026-11-0'+str(i),'state':'observado_agenda','kind':'event','venue':'Sala Sur','entities':[]} for i in (7,8)]
+  enrich_graph({'proposals':ps},[])
+  self.assertEqual(ps[0]['work_identity_key'],ps[1]['work_identity_key'])
+
+if __name__=='__main__':unittest.main()

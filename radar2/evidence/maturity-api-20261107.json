@@ -1,0 +1,340 @@
+[
+  {
+    "label": "work",
+    "url": "https://poraca-lp-privado.vercel.app/api/radar2?resource=events&limit=1&after=event%3A0dee1d859f0b69e6501e60f8c7f6bcfcac258576f319ea67e188fa356ecf2a3b",
+    "status": 200,
+    "cache_control": "private, no-store",
+    "robots": "noindex, nofollow, noarchive",
+    "payload": {
+      "schema": "poraca-cultural",
+      "version": 1,
+      "resource": "events",
+      "publication_approved": false,
+      "count": 1,
+      "has_more": true,
+      "next_cursor": "event:0dee1d859f0b69e6501e60f8c7f6bcfcac258576f319ea67e188fa356ecf2a3c",
+      "items": [
+        {
+          "id": "event:0dee1d859f0b69e6501e60f8c7f6bcfcac258576f319ea67e188fa356ecf2a3c",
+          "work": {
+            "id": "work:0dee1d859f0b69e6501e60f8c7f6bcfcac258576f319ea67e188fa356ecf2a3c",
+            "title": "Reunión de padres",
+            "identity_status": "document_scoped_work_pending_review"
+          },
+          "stage": "structured_unapproved_event",
+          "state": "historico",
+          "title": "Reunión de padres",
+          "category": "Teatro",
+          "document_ids": [
+            "document:https://www.instagram.com/p/DdSlzs2xAGT/"
+          ],
+          "occurrence_ids": [
+            "occurrence:56d2f251315c19c7f9961a98240dc4bd6f40a5fe26768333f68009e45e1bc32f",
+            "occurrence:da9a2b041daab5993db2d135411bdb76be9422476fe37872f2360833c13cec00",
+            "occurrence:1664c8cfc966f69a4bb6c3ff2e9bb1856b67222706679b54da49987dd01add29"
+          ],
+          "identity_policy": "same_document_title_venue_pending_editorial_review",
+          "publication_approved": false
+        }
+      ]
+    }
+  },
+  {
+    "label": "midnight",
+    "url": "https://poraca-lp-privado.vercel.app/api/radar2?resource=occurrences&limit=1&after=occurrence%3A80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749c",
+    "status": 200,
+    "cache_control": "private, no-store",
+    "robots": "noindex, nofollow, noarchive",
+    "payload": {
+      "schema": "poraca-cultural",
+      "version": 1,
+      "resource": "occurrences",
+      "publication_approved": false,
+      "count": 1,
+      "has_more": true,
+      "next_cursor": "occurrence:80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+      "items": [
+        {
+          "id": "occurrence:80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+          "date": null,
+          "time": null,
+          "stage": "structured_unapproved_event",
+          "state": "incompleto",
+          "venue": "Guajira",
+          "event_id": "event:eebea56d700f5b0d62a680d67eb77151f1c464c7a2da4721a4881ca7a77b801b",
+          "evidence": {
+            "id": "80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+            "date": "2026-11-06",
+            "kind": "event",
+            "time": null,
+            "state": "incompleto",
+            "title": "Ciclo Ardiente djurielgm",
+            "venue": "Guajira",
+            "source": "Instagram",
+            "category": "Música",
+            "entities": [
+              {
+                "name": "Guajira",
+                "role": "venue",
+                "node_id": "a34c5331fcbe1e639fdf0d81ee61f700a4b311c8bfd6edffc2002646f6387747",
+                "evidence": "Empieza NOVIEMBRE en Guajira💥 ✧JUEVES 5.11 ⊹ 21 h | chaza_pena ✧VIERNES 6.11 ⊹ 20 h | ciudadpantano temblores.banda lasarpias.musica // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 7.11 ⊹ 21 h | doblepar_oficial maratonatokio // 00 h 🌼 gauchitokill + djlimonsonidero ⸻—————————————————— ✧VIERNES 13.11 ⊹ 21 h | panter_giuliano // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 14.11 ⊹ 21 h | paramo_sur delaorillarock // 00 h | Noche Tramposa 🌹 denisylasperlas ✧DOMINGO 15.11 ⊹ | loloomorales 20 h //",
+                "evidence_url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+                "identity_status": "normalized_name_within_role_pending_identity_review",
+                "event_relationship": {
+                  "object": "a34c5331fcbe1e639fdf0d81ee61f700a4b311c8bfd6edffc2002646f6387747",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "Empieza NOVIEMBRE en Guajira💥 ✧JUEVES 5.11 ⊹ 21 h | chaza_pena ✧VIERNES 6.11 ⊹ 20 h | ciudadpantano temblores.banda lasarpias.musica // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 7.11 ⊹ 21 h | doblepar_oficial maratonatokio // 00 h 🌼 gauchitokill + djlimonsonidero ⸻—————————————————— ✧VIERNES 13.11 ⊹ 21 h | panter_giuliano // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 14.11 ⊹ 21 h | paramo_sur delaorillarock // 00 h | Noche Tramposa 🌹 denisylasperlas ✧DOMINGO 15.11 ⊹ | loloomorales 20 h //",
+                  "subject": "event:80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+                  "predicate": "takes_place_at",
+                  "proposal_id": "80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+                  "evidence_url": "https://www.instagram.com/p/DfQOVDWmRMd/"
+                }
+              },
+              {
+                "name": "Ciclo Ardiente",
+                "role": "cycle",
+                "node_id": "00b53182a3bc634f02765f2d39b136e41b31a00d82824f843334562f07de6567",
+                "evidence": "Ciclo Ardiente djurielgm",
+                "evidence_url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+                "identity_status": "normalized_name_within_role_pending_identity_review",
+                "event_relationship": {
+                  "object": "00b53182a3bc634f02765f2d39b136e41b31a00d82824f843334562f07de6567",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "Ciclo Ardiente djurielgm",
+                  "subject": "event:80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+                  "predicate": "part_of_cycle",
+                  "proposal_id": "80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+                  "evidence_url": "https://www.instagram.com/p/DfQOVDWmRMd/"
+                }
+              }
+            ],
+            "evidence": "Empieza NOVIEMBRE en Guajira💥 ✧JUEVES 5.11 ⊹ 21 h | chaza_pena ✧VIERNES 6.11 ⊹ 20 h | ciudadpantano temblores.banda lasarpias.musica // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 7.11 ⊹ 21 h | doblepar_oficial maratonatokio // 00 h 🌼 gauchitokill + djlimonsonidero ⸻—————————————————— ✧VIERNES 13.11 ⊹ 21 h | panter_giuliano // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 14.11 ⊹ 21 h | paramo_sur delaorillarock // 00 h | Noche Tramposa 🌹 denisylasperlas ✧DOMINGO 15.11 ⊹ | loloomorales 20 h //",
+            "mentions": [],
+            "validity": {
+              "date_end": null,
+              "date_known": true,
+              "time_known": false,
+              "observed_at": "2026-11-07T01:58:14.067387+00:00"
+            },
+            "certainty": "source_observed_pending_editorial_review",
+            "source_id": null,
+            "date_basis": "day_month_year_from_publication",
+            "ambiguities": [
+              "midnight_calendar_day_requires_review"
+            ],
+            "content_type": "program",
+            "document_url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+            "event_status": "scheduled_pending_review",
+            "discovered_at": "2026-11-07T01:58:14.067387+00:00",
+            "relationships": [
+              {
+                "object": "a34c5331fcbe1e639fdf0d81ee61f700a4b311c8bfd6edffc2002646f6387747",
+                "status": "observed_pending_editorial_review",
+                "excerpt": "Empieza NOVIEMBRE en Guajira💥 ✧JUEVES 5.11 ⊹ 21 h | chaza_pena ✧VIERNES 6.11 ⊹ 20 h | ciudadpantano temblores.banda lasarpias.musica // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 7.11 ⊹ 21 h | doblepar_oficial maratonatokio // 00 h 🌼 gauchitokill + djlimonsonidero ⸻—————————————————— ✧VIERNES 13.11 ⊹ 21 h | panter_giuliano // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 14.11 ⊹ 21 h | paramo_sur delaorillarock // 00 h | Noche Tramposa 🌹 denisylasperlas ✧DOMINGO 15.11 ⊹ | loloomorales 20 h //",
+                "subject": "event:80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+                "predicate": "takes_place_at",
+                "proposal_id": "80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+                "evidence_url": "https://www.instagram.com/p/DfQOVDWmRMd/"
+              },
+              {
+                "object": "00b53182a3bc634f02765f2d39b136e41b31a00d82824f843334562f07de6567",
+                "status": "observed_pending_editorial_review",
+                "excerpt": "Ciclo Ardiente djurielgm",
+                "subject": "event:80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+                "predicate": "part_of_cycle",
+                "proposal_id": "80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+                "evidence_url": "https://www.instagram.com/p/DfQOVDWmRMd/"
+              },
+              {
+                "object": "a34c5331fcbe1e639fdf0d81ee61f700a4b311c8bfd6edffc2002646f6387747",
+                "status": "observed_pending_editorial_review",
+                "excerpt": "Empieza NOVIEMBRE en Guajira💥 ✧JUEVES 5.11 ⊹ 21 h | chaza_pena ✧VIERNES 6.11 ⊹ 20 h | ciudadpantano temblores.banda lasarpias.musica // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 7.11 ⊹ 21 h | doblepar_oficial maratonatokio // 00 h 🌼 gauchitokill + djlimonsonidero ⸻—————————————————— ✧VIERNES 13.11 ⊹ 21 h | panter_giuliano // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 14.11 ⊹ 21 h | paramo_sur delaorillarock // 00 h | Noche Tramposa 🌹 denisylasperlas ✧DOMINGO 15.11 ⊹ | loloomorales 20 h //",
+                "subject": "event:80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+                "predicate": "takes_place_at",
+                "proposal_id": "80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+                "evidence_url": "https://www.instagram.com/p/DfQOVDWmRMd/"
+              },
+              {
+                "object": "00b53182a3bc634f02765f2d39b136e41b31a00d82824f843334562f07de6567",
+                "status": "observed_pending_editorial_review",
+                "excerpt": "Ciclo Ardiente djurielgm",
+                "subject": "event:80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+                "predicate": "part_of_cycle",
+                "proposal_id": "80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d",
+                "evidence_url": "https://www.instagram.com/p/DfQOVDWmRMd/"
+              }
+            ],
+            "announced_date": "2026-11-06",
+            "announced_time": "00:00",
+            "evidence_spans": {
+              "date": {
+                "end": 78,
+                "quote": "6.11",
+                "start": 74
+              },
+              "time": {
+                "end": 144,
+                "quote": "00 h",
+                "start": 140
+              },
+              "title": {
+                "end": 175,
+                "quote": "Ciclo Ardiente djurielgm",
+                "start": 151
+              }
+            },
+            "field_evidence": {
+              "date": "6.11",
+              "time": "00 h",
+              "title": "Ciclo Ardiente djurielgm",
+              "venue": "Empieza NOVIEMBRE en Guajira💥\n\n✧JUEVES 5.11 ⊹ 21 h | chaza_pena\n\n✧VIERNES 6.11 ⊹ 20 h | ciudadpantano temblores.banda lasarpias.musica \n // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm \n\n✧SÁBADO 7.11 ⊹ 21 h | doblepar_oficial maratonatokio // 00 h 🌼 gauchitokill + djlimonsonidero \n\n⸻——————————————————\n\n✧VIERNES 13.11 ⊹ 21 h |  panter_giuliano // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm \n\n✧SÁBADO 14.11 ⊹ 21 h | paramo_sur  delaorillarock // 00 h | Noche Tramposa 🌹 denisylasperlas \n\n✧DOMINGO 15.11 ⊹ | loloomorales 20 h //"
+            },
+            "identity_scope": "same_document_title_venue_pending_editorial_review",
+            "origin_account": "guajira.bar",
+            "parser_version": "caption-v2.1",
+            "temporal_state": "today",
+            "work_identity_key": null,
+            "acquisition_method": "official_meta_api",
+            "event_identity_key": "eebea56d700f5b0d62a680d67eb77151f1c464c7a2da4721a4881ca7a77b801b",
+            "publication_approved": false
+          },
+          "timezone": "America/Argentina/Buenos_Aires",
+          "event_status": "scheduled_pending_review",
+          "announced_date": "2026-11-06",
+          "announced_time": "00:00",
+          "time_precision": "unknown",
+          "date_resolution": "announced_day_requires_midnight_review",
+          "publication_approved": false
+        }
+      ]
+    }
+  },
+  {
+    "label": "cycle",
+    "url": "https://poraca-lp-privado.vercel.app/api/radar2?resource=actors&limit=1&after=entity%3A00b53182a3bc634f02765f2d39b136e41b31a00d82824f843334562f07de6566",
+    "status": 200,
+    "cache_control": "private, no-store",
+    "robots": "noindex, nofollow, noarchive",
+    "payload": {
+      "schema": "poraca-cultural",
+      "version": 1,
+      "resource": "actors",
+      "publication_approved": false,
+      "count": 1,
+      "has_more": true,
+      "next_cursor": "entity:00b53182a3bc634f02765f2d39b136e41b31a00d82824f843334562f07de6567",
+      "items": [
+        {
+          "id": "entity:00b53182a3bc634f02765f2d39b136e41b31a00d82824f843334562f07de6567",
+          "name": "Ciclo Ardiente",
+          "role": "cycle",
+          "stage": "identified_name_candidate",
+          "node_id": "00b53182a3bc634f02765f2d39b136e41b31a00d82824f843334562f07de6567",
+          "evidence": [
+            {
+              "url": "https://www.instagram.com/p/DedD9_PjRrD/",
+              "excerpt": "El Ciclo Ardiente 🔥 tu perreito de confianza",
+              "proposal_id": "682a88e919f03758855530f1fca1096a5384d8f8418a37313088195f8fbf5b81"
+            },
+            {
+              "url": "https://www.instagram.com/p/DevGNvtjdS5/",
+              "excerpt": "Otro viernes de Ciclo Ardiente 🔥",
+              "proposal_id": "01b34fdfd2dd321a7e24a26e632d9e2277defabe847d6d28c8d10f0b10422ddb"
+            },
+            {
+              "url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+              "excerpt": "Ciclo Ardiente djurielgm",
+              "proposal_id": "80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d"
+            },
+            {
+              "url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+              "excerpt": "Ciclo Ardiente djurielgm",
+              "proposal_id": "9ccbf994b74985a937ff17e40e2585d584e3ccb961ddb1c99f1858c2a782b9b2"
+            },
+            {
+              "url": "https://www.instagram.com/p/DfSzHR9mbbX/",
+              "excerpt": "Otro viernes de Ciclo Ardiente 🔥",
+              "proposal_id": "09d345d20c4346673502aaa12a27eb4f043bc42f6e8ce2ed53889236742fc4bd"
+            }
+          ],
+          "verified": false,
+          "last_run_id": "radar2-maturity-42330359195-idempotence",
+          "first_run_id": "radar2-maturity-42330359195",
+          "identity_status": "pending_identity_review",
+          "new_to_radar_evidence": false,
+          "existing_identity_candidates": []
+        }
+      ]
+    }
+  },
+  {
+    "label": "source",
+    "url": "https://poraca-lp-privado.vercel.app/api/radar2?resource=accounts&limit=1&after=account%3Ateatroespacio43",
+    "status": 200,
+    "cache_control": "private, no-store",
+    "robots": "noindex, nofollow, noarchive",
+    "payload": {
+      "schema": "poraca-cultural",
+      "version": 1,
+      "resource": "accounts",
+      "publication_approved": false,
+      "count": 1,
+      "has_more": true,
+      "next_cursor": "account:teatroespacio44",
+      "items": [
+        {
+          "id": "account:teatroespacio44",
+          "name": "Teatro Espacio 44",
+          "handle": "teatroespacio44",
+          "result": "discovered_not_attempted",
+          "evidence": {
+            "url": "https://www.instagram.com/teatroespacio44/",
+            "name": "Teatro Espacio 44",
+            "@type": "Organization"
+          },
+          "priority": 2,
+          "username": "teatroespacio44",
+          "evidence_url": "https://agendalaplata.ar/evento/nosotras-dos-teatro-espacio-44-20261028194056",
+          "review_count": 0,
+          "last_review_at": null,
+          "next_review_at": null,
+          "discovery_state": "explicit_local_organizer_link_pending_meta_eligibility",
+          "last_attempt_at": null,
+          "official_eligibility": "not_checked"
+        }
+      ]
+    }
+  },
+  {
+    "label": "relation",
+    "url": "https://poraca-lp-privado.vercel.app/api/radar2?resource=relationships&limit=1&after=relation%3A1807daecc232769074cb94d12b9530fe1b9bfe8bc2e0c090ea3e6ab29d13beed",
+    "status": 200,
+    "cache_control": "private, no-store",
+    "robots": "noindex, nofollow, noarchive",
+    "payload": {
+      "schema": "poraca-cultural",
+      "version": 1,
+      "resource": "relationships",
+      "publication_approved": false,
+      "count": 1,
+      "has_more": true,
+      "next_cursor": "relation:1807daecc232769074cb94d12b9530fe1b9bfe8bc2e0c090ea3e6ab29d13beee",
+      "items": [
+        {
+          "id": "relation:1807daecc232769074cb94d12b9530fe1b9bfe8bc2e0c090ea3e6ab29d13beee",
+          "object": "entity:00b53182a3bc634f02765f2d39b136e41b31a00d82824f843334562f07de6567",
+          "status": "observed_pending_editorial_review",
+          "excerpt": "Ciclo Ardiente djurielgm",
+          "subject": "event:eebea56d700f5b0d62a680d67eb77151f1c464c7a2da4721a4881ca7a77b801b",
+          "verified": false,
+          "predicate": "part_of_cycle",
+          "last_run_id": "radar2-maturity-42330359195-idempotence",
+          "proposal_id": "9ccbf994b74985a937ff17e40e2585d584e3ccb961ddb1c99f1858c2a782b9b2",
+          "evidence_url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+          "reference_state": "resolved",
+          "original_subject": "event:9ccbf994b74985a937ff17e40e2585d584e3ccb961ddb1c99f1858c2a782b9b2"
+        }
+      ]
+    }
+  }
+]

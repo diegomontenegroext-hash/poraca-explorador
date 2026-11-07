@@ -1,0 +1,436 @@
+{
+  "annotation": "agent_annotated_before_predictions_after_code_freeze_3bba2ae_no_rule_tuning",
+  "selection": "stratified 12 clock-bearing and 8 remaining SHA256(final-reserved|URL), excludes prior 30, first reserved18 and development10; text length ceiling 2300 for clock stratum",
+  "limitations": [
+    "No independent human annotation",
+    "Festival program decomposition is an editorial judgment",
+    "Not representative of every source or the city"
+  ],
+  "cases": [
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DbqSmJZFmo9/",
+        "text": "El domingo 9 de agosto a las 18 hs haremos la Apertura de la Residencia INQUIETANTE volumen 3.\nTodos los años las aperturas finalizan con una charla con el público y los grupos residentes para compartir sus procesos creativos e intercambiar ideas, opiniones y hacer comunidad. Este año coordinaran esa charla Morena Pedalino Calviño junto a Fernanda Tappatá (curadora de la residencia y gestora del espacio Octopo) \n\nLes presentamos a MORE\nBailarina, intérprete, performer, actriz, artista plástica, profesora del movimiento tanto de la danza contemporánea como entrenamientos corporales.\nEgresada de la Escuela de Danzas Clásicas de La Plata, con la Tecnicatura “Intérprete de Danza Contemporánea”, y actualmente siendo estudiante del Profesorado de Danza Contemporánea. \nBachiller con orientación en artes visuales, concluido en el Bachillerato de bellas artes de la Universidad de La Plata.\nSu búsqueda artística nace en el cruce y potencia entre disciplinas, donde conviven: todo tipo de danzas (contemporánea, urbana, entre otras) la actuación, herramientas de improvisación, elementos compositivos escénicos. Al mismo tiempo apuesta al trabajo colectivo y al fortalecimiento del sector cultural en la danza y en el arte.\n\nLOS GRUPOS RESIDENTES SON TORO, COMPAÑIA OM Y LA FURIA TEATRO.\n\nLa entrada es gratuita pero deben reservar entrada mediante un formulario que se encuentra en el perfil, en las historias o pueden también solicitar el link x Whatsapp.",
+        "title": "Publicación de @octopo_tolosa",
+        "sha256": "599b61beeaa531f102af12213deb5e0d39d72ebbd5d23fb13d4a48ff82192084",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DbqSmJZFmo9/",
+        "fetched_at": "2026-11-07T01:58:20.337327+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "17894907387591145",
+        "text_sha256": "599b61beeaa531f102af12213deb5e0d39d72ebbd5d23fb13d4a48ff82192084",
+        "published_at": "2026-08-05T13:52:56+0000",
+        "content_scope": "caption",
+        "profile_username": "octopo_tolosa",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-08-09",
+          "time": "18:00"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DeNLeisvVW-/",
+        "text": "💫Llega lucianocaceresok a la SALA 420!!!!\n\nEl multipremiado actor llega con su aclamado unipersonal muerde___ \n\n📅 1 DE NOVIEMBRE 19 HS\n🎭 SALA 420 (42 ENTRE 6 Y 7 NRO 571\n🎟 ALTERNATIVA TEATRAL \n\nA René lo abandonaron en el taller familiar cuando tenía diez años. Desde ese momento: ¿Cuánto tiempo pasó?\nEso no lo puede saber.\nAhora está manchado de sangre y no entiende por qué. Intenta controlar sus pensamientos, pero las palabras aúllan, golpean y perforan, como un clavo a la madera o los dientes a la carne. Sangre. Aserrín. Ladridos. Sus pensamientos se desatan sin vuelta atrás.\nMuerde es un thriller en solitario, casi policial, en el que René intentará averiguar de dónde vienen sus heridas; mientras Rosa, y su pasado lo acechan en todo lo que calló.\n\n🌟Muerde ganó el 2do premio de obras inéditas del Fondo Nacional de las Artes 2015\n\n🌟Premio Estrella de Mar- Mejor Unipersonal- 2024\n\n🌟Premio de Escuela de espectadores de Buenos Aires 2023 a Luciano Cáceres.\n\n🗂Ficha técnico artística\n\nDRAMATURGIA: flumerman\nACTÚA: lucianocaceresok\nESCENOGRAFIA: Agustin Garbelloto \nDISEÑO DE LUCES: Ricardo Sica \nDISEÑO DE SONIDO: Agustin Lumerman \nDIRECCION: Francisco Lumerman",
+        "title": "Publicación de @sala420_lp",
+        "sha256": "3fac7aaa911c16e9dfd70edfa3dd0a6f23b3224c33f3a2129daa600a76551885",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DeNLeisvVW-/",
+        "fetched_at": "2026-11-07T01:59:42.044194+00:00",
+        "media_type": "IMAGE",
+        "external_id": "17968300727963580",
+        "text_sha256": "3fac7aaa911c16e9dfd70edfa3dd0a6f23b3224c33f3a2129daa600a76551885",
+        "published_at": "2026-10-07T20:06:59+0000",
+        "content_scope": "caption",
+        "profile_username": "sala420_lp",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-11-01",
+          "time": "19:00"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DezmxnroKE4/",
+        "text": "Este viernes 23 de octubre, el rock nacional está de fiesta 🎹🎤 Celebramos el cumpleaños de dos íconos absolutos de nuestra música: Charly García y Federico Moura ❤️\n\nQué mejor manera de recordarlos que con sus himnos sonando en el jardín de Mira. Nos preparamos para una noche de clásicos, a puro canto y magia ✨\n\n🎧 Musicalizando esta noche increíble: srobregon \n\nVení a cantar, a brindar y a celebrar a los que nos regalaron la banda sonora de nuestras vidas ¡Nos vemos en el jardín!\n\n📅 Viernes 23.10 // Desde las 19 hs\n📍 8 #1330 e 59 y 60 // Miraflores\n\n#CharlyGarcia #FedericoMoura #RockNacional #LaPlata",
+        "title": "Publicación de @mirafloreslp",
+        "sha256": "9f978469ce605de77d2f0fed2ca55562763b90d4012694b35d4d719e7d016d1d",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DezmxnroKE4/",
+        "fetched_at": "2026-11-07T01:32:30.306333+00:00",
+        "text_sha256": "9f978469ce605de77d2f0fed2ca55562763b90d4012694b35d4d719e7d016d1d",
+        "published_at": "2026-10-22T18:16:37+0000",
+        "content_scope": "caption",
+        "profile_username": "mirafloreslp",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-10-23",
+          "time": "19:00"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/reel/Ddb9T21prcV/",
+        "text": "🔥¡FELICIDAD TOTAL!🔥 Se viene Taller de alfarería 🏺\nTe sumas?? CUPOS LIMITADOS\n\nAdolescentes y adultos\n\n📍Taller Laura Gan Av.13 num 343 entre 38 y 39. \nLa plata\n\nHorarios\n✔️Lunes 9 a 11hs \nprofe Josefina Araneda\n\n✔️Lunes 16 a 18hs \nprofe Laura Bazán\n\n✔️Lunes 18 a 20hs\nprofe Laura Bazán\n\n✔️Martes 14 a 16hs \nprofe Samanta Niedfeld \n\n✔️Martes 18 a 20hs\nprofe Josefina Araneda \n\n✔️Jueves 16 a 18hs\nprofe Lucia Longhi \n\n✔️Jueves 18 a 20hs \nprofe Laura Bazán \n\n✔️Viernes 15.30 a 17.30hs\nprofe Laura Bazán\n\n✔️Sábado 14 a 16hs\nprofe Samanta Niedfeld\n\n#alfarería #cerámica #clasesalfarería #tallerlauragan #lauragan",
+        "title": "Publicación de @lauraganceramica",
+        "sha256": "a39b3e6a2b488f1ed3b887e79aefdf5792e505e97ff5de2e7dfb5e7a427b154f",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/reel/Ddb9T21prcV/",
+        "fetched_at": "2026-11-07T01:32:27.545792+00:00",
+        "text_sha256": "a39b3e6a2b488f1ed3b887e79aefdf5792e505e97ff5de2e7dfb5e7a427b154f",
+        "published_at": "2026-09-18T17:21:05+0000",
+        "content_scope": "caption",
+        "profile_username": "lauraganceramica",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/Dc_W-HbFFz6/",
+        "text": "El próximo viernes 11 de septiembre, 19 hs quedará inaugurada Luis Tomasello Arte cinético en la colección del MACLA Los esperamos !!",
+        "title": "Publicación de @maclamuseo",
+        "sha256": "8a2c1ba37ea87aa08b926ceb77da159b7058f2e8e5928784b5d1047a0b88a673",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/Dc_W-HbFFz6/",
+        "fetched_at": "2026-11-07T01:32:28.689663+00:00",
+        "text_sha256": "8a2c1ba37ea87aa08b926ceb77da159b7058f2e8e5928784b5d1047a0b88a673",
+        "published_at": "2026-09-07T14:46:36+0000",
+        "content_scope": "caption",
+        "profile_username": "maclamuseo",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-09-11",
+          "time": "19:00"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DfGJgilDgGL/",
+        "text": "LA SEXTA NOCHE EN MASCARÓ🌛📚\n\nSe viene otra Noche de las Librerias Platenses, un evento que cada año nos reúne alrededor de los libros, la música, la conversación y el compartir.\n\nComenzamos a la tardecita con una nueva edición del ciclo de poesía \"El viento nos amontona\" que lleva adelante Tatiana Fabrizio (tatianafabrizio).\n\nEn esta oportunidad acompañan los poetas: Mariano Dubin, Marisa Negri y Azucena Salpeter.\n\n📚📚📚📚\n\nUn rato más tarde llega a nuestra vereda Maia Debowicz (maia_debowicz), escritora y periodista que viene a charlar sobre sus libros, la escritura y, por supuesto, de conejos (ya verán...🐇). \n\n 🎶 Para terminar la noche viene con su música un amigo de la casa: Yuyi Gouman (yuyigouman) con sus canciones y un homenaje al gran Indio Solari.\n\nY como si fuera poco habrá comida 🍔🍔 y bebida 🍷🍷 de la mano de les amigues de tatana.ar \n\nEsperamos contar con ustedes como cada año!\nEstén atentxs que seguiremos anunciando novedades! \n\n📍Les esperamos el viernes 6 desde las 17 h, en nuestra (su) casa: diag. 73 nro 960.\n\n#nochedelaslibrerias #libreriasindependientes #libros #charlas #poesia",
+        "title": "Publicación de @libreriamascaro",
+        "sha256": "f154b9c4deb433fba6631fdb7d2f6e957a1939f12982822e7450aa4ddeeedc87",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DfGJgilDgGL/",
+        "fetched_at": "2026-11-07T01:32:28.333963+00:00",
+        "text_sha256": "f154b9c4deb433fba6631fdb7d2f6e957a1939f12982822e7450aa4ddeeedc87",
+        "published_at": "2026-10-29T23:06:26+0000",
+        "content_scope": "caption",
+        "profile_username": "libreriamascaro",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-11-06",
+          "time": "17:00"
+        },
+        {
+          "date": "2026-11-06",
+          "time": null
+        },
+        {
+          "date": "2026-11-06",
+          "time": null
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DbgJg6oFiU9/",
+        "text": "RESIDENCIA INQUIETANTE VOLUMEN 3\n\nLES ESPERAMOS EL DOMINGO 9 DE AGOSTO A LAS 18 HS CON ENTRADA LIBRE Y GRATUITA EN OCTOPO\n\nLes esperamos para ver, conversar, preguntar y compartir. \nUno de los grupos participantes de esta residencia es La Furia teatro que con ímpetu y garra se junto durante todo este cuatrimestre a cranear, diseñar, probar, discutir y fantasear. El domingo nueve veremos un fragmento de sus búsquedas y podremos conversar acerca de sus procesos creativos. \n\nRaíces que rompen el concreto de La Furia Teatro\nIntegrantes del grupo\n\nlafuriateatro  \n\nEvelin Arias eviirose \n\nGrell Gómez grelgomez\n\nSIM0 simonamoros0 \n\nLa Weltan laweltan \n\nMariano Greco marianogreco3\n\nAgustina Ayala agu_ayala05 \n\nDan Proven danproven \n\nAyelen Juárez cukiproducciones \n\nRaíces que rompen el concreto es un trabajo de investigación y creación escénica sexual y de género disidente, que nace de la pregunta ¿qué raíces nos sostienen, y de qué maneras podemos romper el concreto que nos oprime? Lo que crece en los márgenes, lo que insiste, lo que atraviesa lo rígido. \n\nLes acompañarán Mycelia de Compañía OM y Toro de Agustina Serena (Próximas publicaciones)",
+        "title": "Publicación de @octopo_tolosa",
+        "sha256": "d64c725850764bfa52a8277ef16a31eb97c50a56f72da55a0f1e406189f6088c",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DbgJg6oFiU9/",
+        "fetched_at": "2026-11-07T01:58:20.337784+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "18110151862808320",
+        "text_sha256": "d64c725850764bfa52a8277ef16a31eb97c50a56f72da55a0f1e406189f6088c",
+        "published_at": "2026-08-01T15:21:10+0000",
+        "content_scope": "caption",
+        "profile_username": "octopo_tolosa",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-08-09",
+          "time": "18:00"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DbD-i1vRy4B/",
+        "text": "Qué imposible esta semana, hermano. \nY si nos juntamos? \nEste viernes queremos invitarlos a honrar la amistad. Una noche para tomarse un vino, chusmear, abrazarse un poco y paliar el mundo. \n\nVamos a tener el honor enorme de recibir a nuestros amigos jfacundod nachosaffarano y rocioberge que fueron invitados a leer bajo la consigna *traete lo que para vos sea la amistad*. \nAsique será una noche de lecturas donde vamos a escuchar y conversar sobre el vínculo más maravilloso de la vida: los amigos, las chicas, la banda, los pibes.\nSus infinitas variantes, el mismo amor. \n\n24 de Julio. \n20 hs.\nNacional.",
+        "title": "Publicación de @nacional.cafe",
+        "sha256": "4bdd358a026ce82d4ef03dc008a2ccaed796985a9e0d676883d7df4a98f7df14",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DbD-i1vRy4B/",
+        "fetched_at": "2026-11-07T01:58:18.725759+00:00",
+        "media_type": "IMAGE",
+        "external_id": "18022583018895762",
+        "text_sha256": "4bdd358a026ce82d4ef03dc008a2ccaed796985a9e0d676883d7df4a98f7df14",
+        "published_at": "2026-07-21T16:46:38+0000",
+        "content_scope": "caption",
+        "profile_username": "nacional.cafe",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-07-24",
+          "time": "20:00"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DfVl6xEn9YI/",
+        "text": "Promos Exclusivas para La Noche de las Librerias!\n\nCUENTA DNI: 25% DE REINTEGRO\nTope $8000 - se alcanza con $32000.\nUnicamente Viernes de 18 a 23hs.\n\nPROVINCIA: 6 CUOTAS SIN INTERÉS\nPara tarjetas Visa y Master del Banco \n\nNARANJA X: 25% REINTEGRO + PLAN Z\nTope $8000 x Transaccion - se alcanza con $32000.\nUnicamente Viernes 6 y Sabado 7",
+        "title": "Publicación de @malisialibros",
+        "sha256": "4700325e7b4f698928141d5501e243e6788605ba9868ab83d75c9ce47a4b19b8",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DfVl6xEn9YI/",
+        "fetched_at": "2026-11-07T01:32:28.999976+00:00",
+        "text_sha256": "4700325e7b4f698928141d5501e243e6788605ba9868ab83d75c9ce47a4b19b8",
+        "published_at": "2026-11-04T23:03:18+0000",
+        "content_scope": "caption",
+        "profile_username": "malisialibros",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DfQgH3KkVJT/",
+        "text": "Chori de miércoles 👇🏽\n\nPara encontrarte con ese amigx que no ves hace mil 🫶🏼\nPara hacer la juntada post fulbito ⚽️\nPara festejar un cumple 🎂\nPara venir solx y hacer una diferente 😎\nPara no cocinar y cortar la semana 😜\n\nEstos son algunos de los motivos por los que que cada miércoles nos vemos en Mira, el Chori y el vermú ajenjo_vermut a $15.000 🇦🇷 así siempre a precio popular \n\nTe esperamos en el jardín más primaveral que nunca 🌺🌿✨ desde las 19 hs 📍 8 #1330 e 59 y 60 Miraflores \n\n#ChoriYVermu #MiercolesDeChori #Chori #LaPlata",
+        "title": "Publicación de @mirafloreslp",
+        "sha256": "7a3d6fb1fe7ffb62825901e29030015f0c16f617b79802a97df8be56ba2292cd",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DfQgH3KkVJT/",
+        "fetched_at": "2026-11-07T01:32:30.305514+00:00",
+        "text_sha256": "7a3d6fb1fe7ffb62825901e29030015f0c16f617b79802a97df8be56ba2292cd",
+        "published_at": "2026-11-02T23:36:27+0000",
+        "content_scope": "caption",
+        "profile_username": "mirafloreslp",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DdmzZ2pzxNq/",
+        "text": "🔥LA GRAN BARATA🔥 \n\nEs fin de mes y en Run Run 👇🏽\n\n🫱🏽‍🫲🏼 Nos juntamos amigxs gastro byb.cateringyeventos amichi_pasta y deportivo.milanga \n🍹 La barra está disponible para acompañar la noche\n🎶 La cabina se viene con alta sorpresa 🌶️\n\ny todo, absolutamente todo, A PRECIO AMIGX ❤️‍🔥\n\nUna noche COM-PLE-TA en la diagonal de Barrio Hipódromo ⚡️Les esperamos a todxs \n\n📅 Viernes 25.09 a partir de las 19 hs\n📍 Run Run | Diag. 74 #471 \n🆓 Entrada Libre & Gratuita",
+        "title": "Publicación de @runrun.bar",
+        "sha256": "6e0ecc49b2234985714b72e6e56ce03c0f76707692f7b1a90804fc79fb3c8145",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DdmzZ2pzxNq/",
+        "fetched_at": "2026-11-07T01:59:40.113404+00:00",
+        "media_type": "IMAGE",
+        "external_id": "18119373239315419",
+        "text_sha256": "6e0ecc49b2234985714b72e6e56ce03c0f76707692f7b1a90804fc79fb3c8145",
+        "published_at": "2026-09-22T22:26:24+0000",
+        "content_scope": "caption",
+        "profile_username": "runrun.bar",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-09-25",
+          "time": "19:00"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DdIY637Rd7b/",
+        "text": "🔥 El viernes 18 de septiembre a las 21:30 hs se estrena en@“Escenario 40”: TODO LO QUE CABE EN UNA VALIJA (directora CINTIA CORBALÁN).\n\n✍️ Ciclo de obras cortas:\n* Tres obras cortas sobre los vínculos, las decisiones y la vida misma. Para reírse reflexionar y emocionarse.\n\nDuración: 60 minutos \nActúan: Adriana Cerdá y Carolina Pellegrini. \nDirige Cintia Corbalán.\nTeatro Escenario 40\nViernes 18 de septiembre, 21 30 hs\n\nENTRADAS X ALTERNATIVA TEATRAL\n\nViví teatro\n💚",
+        "title": "Publicación de @escenario40",
+        "sha256": "1d1cb4d74dfc35932d92f0f2d3c864dfa3b98268aff927b301e9ff3dba065e4d",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DdIY637Rd7b/",
+        "fetched_at": "2026-11-07T01:58:15.389731+00:00",
+        "media_type": "IMAGE",
+        "external_id": "18009404474968687",
+        "text_sha256": "1d1cb4d74dfc35932d92f0f2d3c864dfa3b98268aff927b301e9ff3dba065e4d",
+        "published_at": "2026-09-11T03:01:35+0000",
+        "content_scope": "caption",
+        "profile_username": "escenario40",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-09-18",
+          "time": "21:30"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DfIfPIQID63/",
+        "text": "CYBER FEST 🎉\nTenemos un planazo y un descuento para vos! 🙌 La Polenta en El Opera es una cita impostergable \n\nAgendate el 6.11 ✅\nAvísale a tus amigxs ✅\nDesliza para obtener tu descuento de 25% 👉\n\n🎫 Conseguí tu entrada en livepass.com.ar\nCon Banco Provincia 6 cuotas sin interés",
+        "title": "Publicación de @operalaplata",
+        "sha256": "072bc71e5c03770924554127b97ba16da7c678909ada73cba4298294ba9c83af",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DfIfPIQID63/",
+        "fetched_at": "2026-11-07T01:58:21.481847+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "18016115345755274",
+        "text_sha256": "072bc71e5c03770924554127b97ba16da7c678909ada73cba4298294ba9c83af",
+        "published_at": "2026-10-30T20:54:47+0000",
+        "content_scope": "caption",
+        "profile_username": "operalaplata",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-11-06",
+          "time": null
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/reel/DE5ImQRv4zO/",
+        "text": "Estuve probando la superposición de esmaltes y aunque muero de calor no me aguanté las ganas de abrir el horno para ver los resultados! Estoy feliz con lo que logré ❤️\nLos esmaltes son de colores_mas_fuego!!! \nQuedaron soñados? Mañana los subo a la tienda!!! Venite a las clases de tallercasarombo  #ceramica #esmaltesceramicos #pottery #clay",
+        "title": "Publicación de @tulumceramica",
+        "sha256": "b3745972fbc44debff442554399c95ed18e8e5c8a4addd297562adbd390dda41",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/reel/DE5ImQRv4zO/",
+        "fetched_at": "2026-11-07T02:00:45.373463+00:00",
+        "media_type": "VIDEO",
+        "external_id": "18381489655128329",
+        "text_sha256": "b3745972fbc44debff442554399c95ed18e8e5c8a4addd297562adbd390dda41",
+        "published_at": "2025-01-16T16:13:08+0000",
+        "content_scope": "caption",
+        "profile_username": "tulumceramica",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/reel/DXfeEApDFYv/",
+        "text": "Cada búsqueda y cada proceso creativo es único🌻\n\nEste es el proceso de José, que se puso a jugar con la pintura y le dieron ganas de hacer interpretaciones de obras famosas con su toque personal.\n\nEste video merece que le dejen un mensajito a José, o no? 😎",
+        "title": "Publicación de @mandaladearena",
+        "sha256": "c2a7cb9600b1b13f82d37cb4377c47e9cb728bfbc7c698574551977a4cd9a8a7",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/reel/DXfeEApDFYv/",
+        "fetched_at": "2026-11-07T01:32:29.489322+00:00",
+        "text_sha256": "c2a7cb9600b1b13f82d37cb4377c47e9cb728bfbc7c698574551977a4cd9a8a7",
+        "published_at": "2026-04-23T23:07:44+0000",
+        "content_scope": "caption",
+        "profile_username": "mandaladearena",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DfA0cz1mdOl/",
+        "text": "📸Con la presentación del pianista Gregorio Szames el pasado domingo 25/10, cerramos un fin de semana a puro concierto en el Argentino 😊. \n\n🎹El destacado intérprete ofreció un programa íntegramente dedicado a obras de Johann Sebastian Bach, en la Sala Piazzolla 👏 \n\n#Concierto #Piano #TeatroArgentino #JohannSebastianBach\nFotos: Paula Pérez de Eulate/ Teatro Argentino\n\nprovinciaba kicillofok fsaintout buenosairescultura victoriaonetto",
+        "title": "Publicación de @teatroargentinopba",
+        "sha256": "c0c11ad0127109b3f1abc3f82aa57a972faadc30922e3396d08dce468dde14c4",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DfA0cz1mdOl/",
+        "fetched_at": "2026-11-07T01:58:16.000020+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "18184009975430850",
+        "text_sha256": "c0c11ad0127109b3f1abc3f82aa57a972faadc30922e3396d08dce468dde14c4",
+        "published_at": "2026-10-27T21:26:14+0000",
+        "content_scope": "caption",
+        "profile_username": "teatroargentinopba",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/reel/De-Ug6zttf_/",
+        "text": "Patio ahora también en tu celular 🤍  Lanzamos nuestra app Patio Café para poder premiar a quienes nos eligen. \n Cada vez que venís sumás un punto. Cuanto más venís, subís de nivel y mejores beneficios tenés.\n\nYa está disponible en App Store y Google Play. Buscá Patio Café y descargala.  Ah! También vas a encontrar nuestro menú, novedades, eventos y alguna que otra sorpresa.\n\nNos vemos en Patio.",
+        "title": "Publicación de @somospatiocafe",
+        "sha256": "92a6fce5d9a1e3122d87d201b0917048cd148187bacb9f1da1001ea16e7e7339",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/reel/De-Ug6zttf_/",
+        "fetched_at": "2026-11-07T02:00:40.995746+00:00",
+        "media_type": "VIDEO",
+        "external_id": "17983669893108784",
+        "text_sha256": "92a6fce5d9a1e3122d87d201b0917048cd148187bacb9f1da1001ea16e7e7339",
+        "published_at": "2026-10-26T23:01:07+0000",
+        "content_scope": "caption",
+        "profile_username": "somospatiocafe",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/reel/DaqU2UPR9-s/",
+        "text": "Betun a la cera sobre bizcocho ⚡\n\nSi querés un efecto madera sobre tu pieza, probalo y después contame cómo te fue✨😘\n\n¿Conocías está técnica? ¿Qué te parece? Te leo en comentarios👇🏽",
+        "title": "Publicación de @mandaladearena",
+        "sha256": "9324cd79101a7ec4a9352e75b59968eec2ad7729362875a6230dd5e3b187f3c0",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/reel/DaqU2UPR9-s/",
+        "fetched_at": "2026-11-07T01:32:29.488865+00:00",
+        "text_sha256": "9324cd79101a7ec4a9352e75b59968eec2ad7729362875a6230dd5e3b187f3c0",
+        "published_at": "2026-07-11T17:44:13+0000",
+        "content_scope": "caption",
+        "profile_username": "mandaladearena",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DfVX1B3Gjd0/",
+        "text": "7/11 HASTA ABAJO 💋 La medianoche del sábado en Guajira 👇\n\ndjlimonsonidero & gauchitokill\n\n🎫Entrada $7000, vení temprano que hay 2X1 ‼️ hasta las 2am 👀 \n\nEnviale el post a tu amigx y no cuelguen!\n\n✧ 𝓖𝓊𝒶𝒿𝒾𝓇𝒶 ✧ 49 e/ 4 y 5",
+        "title": "Publicación de @guajira.bar",
+        "sha256": "bc3045505ed4694318cb7af83d3d51ea71d29328a9b2ff86b6b92b0d40fd2bf7",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DfVX1B3Gjd0/",
+        "fetched_at": "2026-11-07T01:58:14.067198+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "18107756165199495",
+        "text_sha256": "bc3045505ed4694318cb7af83d3d51ea71d29328a9b2ff86b6b92b0d40fd2bf7",
+        "published_at": "2026-11-04T21:00:02+0000",
+        "content_scope": "caption",
+        "profile_username": "guajira.bar",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-11-07",
+          "time": null
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/reel/Db9AHQHTuel/",
+        "text": "CREAR ✨\ny su mundo infinito de posibilidades\n\nVengan al taller a potenciar su creatividad🧡",
+        "title": "Publicación de @mandaladearena",
+        "sha256": "8bd0e09ac9866e5eefd34e9787bcdbbf8c1a1e7f7376c41f56d6cd11aa3d460e",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/reel/Db9AHQHTuel/",
+        "fetched_at": "2026-11-07T01:32:29.488582+00:00",
+        "text_sha256": "8bd0e09ac9866e5eefd34e9787bcdbbf8c1a1e7f7376c41f56d6cd11aa3d460e",
+        "published_at": "2026-08-12T20:20:32+0000",
+        "content_scope": "caption",
+        "profile_username": "mandaladearena",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    }
+  ]
+}

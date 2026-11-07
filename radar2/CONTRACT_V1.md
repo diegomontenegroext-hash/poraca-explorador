@@ -64,7 +64,7 @@ Errores Meta de autenticación/cuota cortan el lote, sin intentos HTML. Fuentes 
 
 ## Enmienda de madurez — 07/11/2026 UTC
 
-El parser `caption-v2.1` segmenta múltiples horarios por fecha. Los IDs de
+El parser `caption-v2.2` segmenta múltiples horarios por fecha. Los IDs de
 ocurrencia conservan título, fecha y horario, incluyendo candidatos distintos de
 medianoche; nunca se colapsan solo por fecha. Los eventos de la misma publicación,
 título y sede agrupan sus funciones; `events.work` representa la obra documental
@@ -114,3 +114,10 @@ existentes; sustituir únicamente `META_ACCESS_TOKEN` en GitHub Secrets; ejecuta
 una validación puntual de salud antes de reanudar adquisiciones ordinarias. No
 copiar secretos al informe, Neon ni issues. Renovación desatendida sigue pendiente
 si no se acredita un mecanismo compatible y almacenamiento de reemplazo.
+
+La evaluación final reservada detectó omisiones de componentes narrativos y un
+falso evento de tienda. El parche v2.2 incorpora esos fragmentos como componentes
+pendientes y suprime fechas relativas de carga al catálogo; amplía el indicador
+cultural a entrada/cabina. No asigna horarios a los componentes narrativos. Una
+URL explícita `/obra/` permite agrupar funciones con título/sede coincidentes.
+Los resultados anteriores al parche siguen preservados, sin llamarlos PASS.

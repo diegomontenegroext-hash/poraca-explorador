@@ -9,13 +9,13 @@ from zoneinfo import ZoneInfo
 from collector import norm, compact
 from extract import MONTHS,category
 from semantics import normalized_original,proof,clocks_in,activity_title,credits,identity,CANCEL,clean_title
-VERSION='caption-v2.1'
+VERSION='caption-v2.2'
 ZONE=ZoneInfo('America/Argentina/Buenos_Aires')
 WEEK=['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
 DATE=re.compile(r'\b([0-3]?\d)\s*(?:[/.]+\s*(1[0-2]|0?[1-9])\b|(?:de\s+)?('+('|'.join(MONTHS))+r')\b)(?:\s*(?:de\s+|/)(20\d{2}))?',re.I)
 CLOCK=re.compile(r'(?<![\d.])([01]?\d|2[0-3])(?:[:.]([0-5]\d))?\s*(?:a\s*\d{1,2}(?:[:.]\d{2})?\s*)?(?:hs?\b|horas\b)|\b(medianoche)\b',re.I)
 PAST=re.compile(r'\b(postales|pasado|vivimos|presentaron|presento|nos quedaron|gracias por acompanarnos|asi vivimos|despide)\b')
-CULTURE=re.compile(r'tango|ceramica|cine|obra|teatro|taller|workshop|masterclass|milonga|fiesta|ciclo|concierto|recital|inaugur|muestra|festival|musica|musicaliza|libros|lectura|banda|entradas|en vivo')
+CULTURE=re.compile(r'tango|ceramica|cine|obra|teatro|taller|workshop|masterclass|milonga|fiesta|ciclo|concierto|recital|inaugur|muestra|festival|musica|musicaliza|libros|lectura|banda|entrada|cabina|en vivo')
 
 def anchor(d):
  try:return datetime.fromisoformat(d['published_at'].replace('Z','+00:00')).astimezone(ZONE).date()
@@ -93,7 +93,8 @@ def interpret(c,d,accounts):
   title=next((l for l in lines if len(norm(l))>6),title)[:160]
  if norm(title) in ('volvemos','con una nueva fecha'):title=next((compact(l) for l in text.splitlines() if re.search(r'milonga|concierto|taller|fiesta',norm(l))),title)[:160]
  commemorative=bool(re.search(r'aniversario del|anos de (?:su muerte|su partida|su fallecimiento)|hoy se cumplen',n)) and not bool(re.search(r'te esperamos|veni|inauguracion|a las \d',n))
- if commemorative:schedules=[]
+ retail_relative=bool(re.search(r'(?:manana|hoy).{0,30}(?:subo|subimos|tienda|catalogo)',n))
+ if commemorative or retail_relative:schedules=[]
  if (retrospective and not re.search(r'te esperamos|veni|proxim|se presenta|ultima funcion',n)) or regular or not cultural or re.search(r'hoy (?:compartimos|mostramos|recordamos)',n):schedules=[]
  for ix,(start,end,day,basis) in enumerate(schedules):
   block_end=schedules[ix+1][0] if ix+1<len(schedules) else len(text)
@@ -145,6 +146,16 @@ def interpret(c,d,accounts):
   matches=[p for p in produced if p['date']==pending['date'] and p['title']==pending['title'] and p.get('time')]
   if len(matches)==1:
    c.proposals.pop(pending['id'],None);produced.remove(pending)
+ # Narrative programs may contain titled sections without individual clocks.
+ # Keep their source fragments as pending components rather than assigning
+ # the parent's start time to each activity.
+ if produced and len({p['date'] for p in produced})==1:
+  narrative=list(re.finditer(r'(?:Un rato m[aá]s tarde|Para terminar la noche)[^\n]+',text,re.I))
+  for match in narrative:
+   component=clean_title(match[0]);key=c.add(d,component,state='incompleto',evidence=match[0],origin_account=d.get('profile_username'))
+   c.proposals[key].update(kind='program_component',parser_version=VERSION,acquisition_method='official_meta_api',
+    parent_document_url=d['url'],parent_announced_date=produced[0]['date'],publication_approved=False,
+    date_basis='narrative_component_pending_schedule_review',ambiguities=['component_identity_and_schedule_require_review'])
  if not produced and not retrospective and not schedules and re.search(r'actividades.*dia',n):
   # A festival's DAY 1 is not a calendar date. Preserve titled components
   # for review without expanding unspecified days into invented occurrences.

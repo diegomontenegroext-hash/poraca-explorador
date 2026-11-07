@@ -1,0 +1,140 @@
+{
+  "mode": "preserved_originals_replay_no_acquisition",
+  "first": {
+    "write": {
+      "documents_written": "499",
+      "proposals_written": "600"
+    },
+    "memory": {
+      "total_nodes": 170,
+      "active_nodes": 167,
+      "new_to_memory": 56,
+      "nodes_observed": 67,
+      "total_relationships": 316,
+      "active_relationships": 306,
+      "new_to_radar_evidence": 55,
+      "relationships_observed": 112,
+      "new_relationships_in_memory": 91
+    },
+    "parser": "caption-v2.1",
+    "run_id": "radar2-maturity-42330359195",
+    "documents": 499,
+    "proposals": 600,
+    "acquisition_requests": 0,
+    "publication_approved": false,
+    "retired_previous_interpretations": 73
+  },
+  "write": {
+    "documents_written": "499",
+    "proposals_written": "600"
+  },
+  "checks": [],
+  "commit": "3bba2ae9084e6f36e26bc703dd8c8fdaf07d163c",
+  "counts": {
+    "before": "1036",
+    "after_first": "1178",
+    "after_second": "1178"
+  },
+  "memory": {
+    "total_nodes": 170,
+    "active_nodes": 167,
+    "new_to_memory": 56,
+    "nodes_observed": 67,
+    "total_relationships": 316,
+    "active_relationships": 306,
+    "new_to_radar_evidence": 55,
+    "relationships_observed": 112,
+    "new_relationships_in_memory": 91
+  },
+  "parser": "caption-v2.1",
+  "run_id": "radar2-maturity-42330359195",
+  "second": {
+    "write": {
+      "documents_written": "499",
+      "proposals_written": "600"
+    },
+    "memory": {
+      "total_nodes": 170,
+      "active_nodes": 167,
+      "new_to_memory": 0,
+      "nodes_observed": 67,
+      "total_relationships": 316,
+      "active_relationships": 306,
+      "new_to_radar_evidence": 0,
+      "relationships_observed": 112,
+      "new_relationships_in_memory": 0
+    },
+    "parser": "caption-v2.1",
+    "run_id": "radar2-maturity-42330359195-idempotence",
+    "documents": 499,
+    "proposals": 600,
+    "acquisition_requests": 0,
+    "publication_approved": false,
+    "retired_previous_interpretations": 0
+  },
+  "status": "completed",
+  "documents": 499,
+  "proposals": 600,
+  "github_run_id": "42330359195",
+  "reconciliation": [
+    {
+      "id": "48e246dbc8d450b765160043e9b002596d43e50786eb4f80f566182ae46d0a42",
+      "title": "loloomorales",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "370ed22c991f630cbb61584fcb0e5e7f3ae3cbdb7eae326631f43275337e5cc1"
+    },
+    {
+      "id": "dc3f918888d8b1d845e4be093803bef2ac376d61b1e7cbd41a9c66d3a92bd635",
+      "title": "Taller de estampas",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "19b7c4182101bfa56b69b46e933c7287d6371618301caf1ed8c0894c869a55a7"
+    },
+    {
+      "id": "5d235ce22a6055f425f4dc33fef4541c3588760011aa4dcabba5aeafe2d5830d",
+      "title": "Este Miércoles 4/11 visita de lujo",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "d0a4bbd0eb291f0d5bb2c0e8c6ff3b5dfaf83e38b1d9eb3e158ef71c8325be8c"
+    }
+  ],
+  "collector_sha256": "4a972bd8a8f29a26ef525d083049218bc6c88b26780fcf7cf272e458abaf54dd",
+  "processor_sha256": "07afc618e0ade78b1108896fa2f9bd29d4f2c41854fc42f2781b213fa28bf1b2",
+  "source_admission": {
+    "admitted": [
+      {
+        "name": "Teatro Espacio 44",
+        "handle": "teatroespacio44",
+        "evidence": {
+          "url": "https://www.instagram.com/teatroespacio44/",
+          "name": "Teatro Espacio 44",
+          "@type": "Organization"
+        },
+        "username": "teatroespacio44",
+        "evidence_url": "https://agendalaplata.ar/evento/nosotras-dos-teatro-espacio-44-20261028194056",
+        "discovery_state": "explicit_local_organizer_link_pending_meta_eligibility"
+      }
+    ],
+    "roster_size": 124,
+    "max_accounts": 200,
+    "daily_admission_limit": 1,
+    "explicit_new_source_candidates": 2
+  },
+  "credential_health": {
+    "status": "PERMISSIONS_VALID",
+    "missing": [],
+    "renewal": "NOT_AUTOMATED_REAUTHORIZATION_OR_COMPATIBLE_PAGE_TOKEN_REQUIRED",
+    "is_valid": true,
+    "warnings": [],
+    "checked_at": "2026-11-07T02:40:06.743809+00:00",
+    "expires_at": "2027-01-05T22:08:08+00:00",
+    "token_type": "USER",
+    "credential_usable": true,
+    "inspection_status": "INSPECTED",
+    "expiry_introspected": true,
+    "data_access_expires_at": "2027-02-04T22:39:52+00:00",
+    "expires_at_reported_zero": false,
+    "data_access_expires_at_reported_zero": false
+  },
+  "acquisition_requests": 0,
+  "publication_approved": false,
+  "retired_previous_interpretations": 73
+}

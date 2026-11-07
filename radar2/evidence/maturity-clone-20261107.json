@@ -5,15 +5,15 @@
     "proposals_written": "600"
   },
   "memory": {
-    "nodes_observed": 76,
-    "new_to_radar_evidence": 65,
-    "new_to_memory": 54,
-    "relationships_observed": 122,
-    "new_relationships_in_memory": 72,
-    "total_nodes": 176,
-    "active_nodes": 173,
-    "total_relationships": 318,
-    "active_relationships": 308
+    "nodes_observed": 67,
+    "new_to_radar_evidence": 55,
+    "new_to_memory": 7,
+    "relationships_observed": 112,
+    "new_relationships_in_memory": 13,
+    "total_nodes": 183,
+    "active_nodes": 180,
+    "total_relationships": 331,
+    "active_relationships": 321
   },
   "counts_before_second_write": [
     {

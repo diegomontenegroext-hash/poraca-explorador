@@ -294,6 +294,11 @@ def enrich_graph(result,baseline):
         p['validity']={'date_known':bool(p.get('date')),'time_known':bool(p.get('time')),'observed_at':p.get('discovered_at'),'date_end':p.get('date_end')}
         if p.get('category') and re.search(r'(?:clases? regulares?|horarios? de clases?|todos los (?:lunes|martes|miercoles|jueves|viernes))',norm(p['title'])):
             p.update(kind='document',state='investigable',date=None,time=None)
+        if '/obra/' in p.get('original_url',p['document_url']) and p.get('kind')=='event':
+            origin=p.get('original_url') or p['document_url']
+            p['work_identity_key']=sha(origin+'|'+norm(p['title'])+'|'+norm(p.get('venue')))
+            p['event_identity_key']=p['work_identity_key']
+            p['identity_scope']='same_work_url_title_venue_pending_identity_review'
         p['entities']=list(p.get('entities',[]));p['relationships']=[]
         event_id='event:'+ (p.get('duplicate_of') or p['id'])
         accepted=[]

@@ -1,0 +1,24 @@
+{
+  "run_id": "radar2-maturity-v22-20261107",
+  "parser": "caption-v2.2",
+  "documents": 499,
+  "proposals": 607,
+  "write": {
+    "documents_written": "499",
+    "proposals_written": "607"
+  },
+  "retired_previous_interpretations": 15,
+  "memory": {
+    "nodes_observed": 70,
+    "new_to_radar_evidence": 3,
+    "new_to_memory": 3,
+    "relationships_observed": 118,
+    "new_relationships_in_memory": 6,
+    "total_nodes": 173,
+    "active_nodes": 170,
+    "total_relationships": 322,
+    "active_relationships": 312
+  },
+  "acquisition_requests": 0,
+  "publication_approved": false
+}

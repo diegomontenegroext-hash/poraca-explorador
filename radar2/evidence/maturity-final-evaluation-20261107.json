@@ -1,0 +1,957 @@
+{
+  "frozen_code": "3bba2ae9084e6f36e26bc703dd8c8fdaf07d163c",
+  "annotation": "agent_annotated_before_predictions_after_code_freeze_3bba2ae_no_rule_tuning",
+  "before": {
+    "tp": 5,
+    "fp": 2,
+    "fn": 8,
+    "joint_date_time_precision": 0.7142857142857143,
+    "joint_date_time_recall": 0.38461538461538464,
+    "date_time_venue_complete": 1,
+    "predicted": 7,
+    "cases": [
+      {
+        "url": "https://www.instagram.com/p/DbqSmJZFmo9/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "expected": [
+          [
+            "2026-08-09",
+            "18:00"
+          ]
+        ],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DeNLeisvVW-/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "expected": [
+          [
+            "2026-11-01",
+            "19:00"
+          ]
+        ],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DezmxnroKE4/",
+        "tp": 0,
+        "fp": 1,
+        "fn": 1,
+        "expected": [
+          [
+            "2026-10-23",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-10-23",
+            null
+          ]
+        ],
+        "titles": [
+          "Este viernes 23 de octubre, el rock nacional está de fiesta 🎹🎤 Celebramos el cumpleaños de dos íconos absolutos de nuestra música: Charly García y Federico Mour"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/Ddb9T21prcV/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/Dc_W-HbFFz6/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-09-11",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-09-11",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "El próximo viernes 11 de septiembre, 19 hs quedará inaugurada Luis Tomasello Arte cinético en la colección del MACLA Los esperamos"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DfGJgilDgGL/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 2,
+        "expected": [
+          [
+            "2026-11-06",
+            "17:00"
+          ],
+          [
+            "2026-11-06",
+            null
+          ],
+          [
+            "2026-11-06",
+            null
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-06",
+            "17:00"
+          ]
+        ],
+        "titles": [
+          "LA SEXTA NOCHE EN MASCARÓ🌛"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DbgJg6oFiU9/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-08-09",
+            "18:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-08-09",
+            "18:00"
+          ]
+        ],
+        "titles": [
+          "RESIDENCIA INQUIETANTE VOLUMEN 3"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DbD-i1vRy4B/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-07-24",
+            "20:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-07-24",
+            "20:00"
+          ]
+        ],
+        "titles": [
+          "Qué imposible esta semana, hermano."
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DfVl6xEn9YI/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DfQgH3KkVJT/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DdmzZ2pzxNq/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "expected": [
+          [
+            "2026-09-25",
+            "19:00"
+          ]
+        ],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DdIY637Rd7b/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-09-18",
+            "21:30"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-09-18",
+            "21:30"
+          ]
+        ],
+        "titles": [
+          "🔥 El viernes 18 de septiembre a las 21:30 hs se estrena en@“Escenario 40”: TODO LO QUE CABE EN UNA VALIJA (directora CINTIA CORBALÁN)."
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DfIfPIQID63/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "expected": [
+          [
+            "2026-11-06",
+            null
+          ]
+        ],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DE5ImQRv4zO/",
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "expected": [],
+        "extracted": [
+          [
+            "2025-01-17",
+            null
+          ]
+        ],
+        "titles": [
+          "Estuve probando la superposición de esmaltes y aunque muero de calor no me aguanté las ganas de abrir el horno para ver los resultados! Estoy feliz con lo que l"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/DXfeEApDFYv/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DfA0cz1mdOl/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/De-Ug6zttf_/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DaqU2UPR9-s/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DfVX1B3Gjd0/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "expected": [
+          [
+            "2026-11-07",
+            null
+          ]
+        ],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/Db9AHQHTuel/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      }
+    ]
+  },
+  "after": {
+    "tp": 8,
+    "fp": 1,
+    "fn": 5,
+    "joint_date_time_precision": 0.8888888888888888,
+    "joint_date_time_recall": 0.6153846153846154,
+    "date_time_venue_complete": 1,
+    "predicted": 9,
+    "cases": [
+      {
+        "url": "https://www.instagram.com/p/DbqSmJZFmo9/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-08-09",
+            "18:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-08-09",
+            "18:00"
+          ]
+        ],
+        "titles": [
+          "El domingo 9 de agosto a las 18 hs haremos la Apertura de la Residencia INQUIETANTE volumen 3."
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DeNLeisvVW-/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-11-01",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-01",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "💫Llega lucianocaceresok a la SALA 420"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DezmxnroKE4/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-10-23",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-10-23",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "Este viernes 23 de octubre, el rock nacional está de fiesta 🎹🎤 Celebramos el cumpleaños de dos íconos absolutos de nuestra música: Charly García y Federico Mour"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/Ddb9T21prcV/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/Dc_W-HbFFz6/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-09-11",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-09-11",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "El próximo viernes 11 de septiembre, 19 hs quedará inaugurada Luis Tomasello Arte cinético en la colección del MACLA Los esperamos"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DfGJgilDgGL/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 2,
+        "expected": [
+          [
+            "2026-11-06",
+            "17:00"
+          ],
+          [
+            "2026-11-06",
+            null
+          ],
+          [
+            "2026-11-06",
+            null
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-06",
+            "17:00"
+          ]
+        ],
+        "titles": [
+          "LA SEXTA NOCHE EN MASCARÓ🌛"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DbgJg6oFiU9/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-08-09",
+            "18:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-08-09",
+            "18:00"
+          ]
+        ],
+        "titles": [
+          "RESIDENCIA INQUIETANTE VOLUMEN 3"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DbD-i1vRy4B/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-07-24",
+            "20:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-07-24",
+            "20:00"
+          ]
+        ],
+        "titles": [
+          "Qué imposible esta semana, hermano."
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DfVl6xEn9YI/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DfQgH3KkVJT/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DdmzZ2pzxNq/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "expected": [
+          [
+            "2026-09-25",
+            "19:00"
+          ]
+        ],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DdIY637Rd7b/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-09-18",
+            "21:30"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-09-18",
+            "21:30"
+          ]
+        ],
+        "titles": [
+          "🔥 El viernes 18 de septiembre a las 21:30 hs se estrena en@“Escenario 40”: TODO LO QUE CABE EN UNA VALIJA (directora CINTIA CORBALÁN)."
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DfIfPIQID63/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "expected": [
+          [
+            "2026-11-06",
+            null
+          ]
+        ],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DE5ImQRv4zO/",
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "expected": [],
+        "extracted": [
+          [
+            "2025-01-17",
+            null
+          ]
+        ],
+        "titles": [
+          "Estuve probando la superposición de esmaltes y aunque muero de calor no me aguanté las ganas de abrir el horno para ver los resultados! Estoy feliz con lo que l"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/DXfeEApDFYv/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DfA0cz1mdOl/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/De-Ug6zttf_/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DaqU2UPR9-s/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DfVX1B3Gjd0/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "expected": [
+          [
+            "2026-11-07",
+            null
+          ]
+        ],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/Db9AHQHTuel/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      }
+    ]
+  },
+  "certified": false,
+  "after_failure_corrections_v22": {
+    "tp": 11,
+    "fp": 0,
+    "fn": 2,
+    "joint_date_time_precision": 1.0,
+    "joint_date_time_recall": 0.8461538461538461,
+    "date_time_venue_complete": 2,
+    "predicted": 11,
+    "cases": [
+      {
+        "url": "https://www.instagram.com/p/DbqSmJZFmo9/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-08-09",
+            "18:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-08-09",
+            "18:00"
+          ]
+        ],
+        "titles": [
+          "El domingo 9 de agosto a las 18 hs haremos la Apertura de la Residencia INQUIETANTE volumen 3."
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DeNLeisvVW-/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-11-01",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-01",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "💫Llega lucianocaceresok a la SALA 420"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DezmxnroKE4/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-10-23",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-10-23",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "Este viernes 23 de octubre, el rock nacional está de fiesta 🎹🎤 Celebramos el cumpleaños de dos íconos absolutos de nuestra música: Charly García y Federico Mour"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/Ddb9T21prcV/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/Dc_W-HbFFz6/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-09-11",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-09-11",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "El próximo viernes 11 de septiembre, 19 hs quedará inaugurada Luis Tomasello Arte cinético en la colección del MACLA Los esperamos"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DfGJgilDgGL/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 2,
+        "expected": [
+          [
+            "2026-11-06",
+            "17:00"
+          ],
+          [
+            "2026-11-06",
+            null
+          ],
+          [
+            "2026-11-06",
+            null
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-06",
+            "17:00"
+          ]
+        ],
+        "titles": [
+          "LA SEXTA NOCHE EN MASCARÓ🌛"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DbgJg6oFiU9/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-08-09",
+            "18:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-08-09",
+            "18:00"
+          ]
+        ],
+        "titles": [
+          "RESIDENCIA INQUIETANTE VOLUMEN 3"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DbD-i1vRy4B/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-07-24",
+            "20:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-07-24",
+            "20:00"
+          ]
+        ],
+        "titles": [
+          "Qué imposible esta semana, hermano."
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DfVl6xEn9YI/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DfQgH3KkVJT/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DdmzZ2pzxNq/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-09-25",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-09-25",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "LA GRAN BARATA"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DdIY637Rd7b/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-09-18",
+            "21:30"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-09-18",
+            "21:30"
+          ]
+        ],
+        "titles": [
+          "🔥 El viernes 18 de septiembre a las 21:30 hs se estrena en@“Escenario 40”: TODO LO QUE CABE EN UNA VALIJA (directora CINTIA CORBALÁN)."
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DfIfPIQID63/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-11-06",
+            null
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-06",
+            null
+          ]
+        ],
+        "titles": [
+          "CYBER FEST 🎉"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/DE5ImQRv4zO/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DXfeEApDFYv/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DfA0cz1mdOl/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/De-Ug6zttf_/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DaqU2UPR9-s/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DfVX1B3Gjd0/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-11-07",
+            null
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-07",
+            null
+          ]
+        ],
+        "titles": [
+          "7/11 HASTA ABAJO 💋 La medianoche del sábado en Guajira 👇"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/Db9AHQHTuel/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      }
+    ],
+    "independence": "Consumed set, not independent evaluation"
+  }
+}

@@ -37,8 +37,12 @@ def replay(conn,run_id):
  with tempfile.TemporaryDirectory() as tmp:
   result,graph=build(docs,old,run_id,tmp)
   result['finished_at']=utc();write=execute(conn,SQL,[json.dumps(result,ensure_ascii=False)])['rows'][0]
-  retired=retire_interpretations(conn,result);memory=persist_graph(conn,run_id,graph)
-  report={'run_id':run_id,'parser':VERSION,'documents':len(docs),'proposals':len(result['proposals']),'write':write,'retired_previous_interpretations':len(retired),'memory':memory,'acquisition_requests':0,'publication_approved':False}
+  execute(conn,"UPDATE radar2.runs SET summary=summary || jsonb_build_object('status','postprocessing') WHERE run_id=$1",[run_id])
+  try:
+   retired=retire_interpretations(conn,result);memory=persist_graph(conn,run_id,graph)
+  except Exception:
+   execute(conn,"UPDATE radar2.runs SET summary=summary || jsonb_build_object('status','failed_postprocessing') WHERE run_id=$1",[run_id]);raise
+  report={'status':'completed','run_id':run_id,'parser':VERSION,'documents':len(docs),'proposals':len(result['proposals']),'write':write,'retired_previous_interpretations':len(retired),'memory':memory,'acquisition_requests':0,'publication_approved':False}
   execute(conn,"UPDATE radar2.runs SET summary=summary || $2::jsonb WHERE run_id=$1",[run_id,json.dumps(report)])
   return report
 
