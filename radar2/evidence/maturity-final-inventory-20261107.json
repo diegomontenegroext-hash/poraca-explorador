@@ -1,0 +1,10 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "[\n  {\n    \"documents\": \"847\",\n    \"proposals\": \"1200\",\n    \"document_versions\": \"893\",\n    \"proposal_versions\": \"4110\",\n    \"future_dated_candidates\": \"236\",\n    \"future_date_time_venue\": \"171\",\n    \"instagram_future_date_time_venue\": \"9\"\n  }\n]"
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

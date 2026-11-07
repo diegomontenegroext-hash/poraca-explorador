@@ -1,0 +1,28 @@
+[
+  {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "[\n  {\n    \"dangling\": \"0\"\n  }\n]"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "[\n  {\n    \"run_id\": \"radar2-ghdaily-42249291641\",\n    \"finished_at\": \"2026-11-06T16:07:28.346Z\",\n    \"status\": \"completed\",\n    \"mode\": null\n  }\n]"
+        }
+      ],
+      "structuredContent": null,
+      "isError": false
+    }
+  }
+]

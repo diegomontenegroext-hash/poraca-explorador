@@ -4,7 +4,8 @@ exact artifact name, never executes artifact content or extracts arbitrary paths
 """
 import json,os,zipfile,io
 from pathlib import Path
-from urllib.request import Request,urlopen
+from urllib.request import Request,urlopen,build_opener,HTTPRedirectHandler
+from urllib.parse import urlsplit
 from collector import sha
 from persist import execute
 
@@ -34,9 +35,15 @@ def restore_artifact(root):
  """One bounded previous artifact. Existing Neon hash prevents stale overwrites."""
  token=os.environ.get('GITHUB_TOKEN');repo=os.environ.get('GITHUB_REPOSITORY')
  if not token or not repo:return {'status':'not_in_github'}
+ class ArtifactRedirect(HTTPRedirectHandler):
+  def redirect_request(self,req,fp,code,msg,headers,newurl):
+   redirected=super().redirect_request(req,fp,code,msg,headers,newurl)
+   if redirected and urlsplit(newurl).hostname!='api.github.com':redirected.remove_header('Authorization')
+   return redirected
+ opener=build_opener(ArtifactRedirect()).open
  def get(url,max_bytes):
   req=Request(url,headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'})
-  with urlopen(req,timeout=30) as r:
+  with opener(req,timeout=30) as r:
    data=r.read(max_bytes+1)
    if len(data)>max_bytes:raise ValueError('ARTIFACT_LIMIT')
    return data

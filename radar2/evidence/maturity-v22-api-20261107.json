@@ -1,0 +1,78 @@
+{
+  "status": 200,
+  "headers": {
+    "age": "0",
+    "cache-control": "private, no-store",
+    "content-encoding": "br",
+    "content-type": "application/json; charset=utf-8",
+    "date": "Sat, 07 Nov 2026 02:46:28 GMT",
+    "etag": "W/\"7d9-4jy6O+z30/oUdAKj4NzC7f1qGsg\"",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "server": "Vercel",
+    "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-robots-tag": "noindex, nofollow, noarchive",
+    "x-vercel-cache": "MISS",
+    "x-vercel-id": "gru1:iad1::iad1::lrj7c-1794019588086-34d67aeab147"
+  },
+  "payload": {
+    "schema": "poraca-cultural",
+    "version": 1,
+    "resource": "proposals",
+    "publication_approved": false,
+    "count": 1,
+    "has_more": true,
+    "next_cursor": "proposal:d5655605c8ae3d0d978e2b1ba87a1d3e08232958d6eb1b14350dd76986b431f8",
+    "items": [
+      {
+        "id": "proposal:d5655605c8ae3d0d978e2b1ba87a1d3e08232958d6eb1b14350dd76986b431f8",
+        "date": null,
+        "time": null,
+        "stage": "cultural_candidate",
+        "state": "incompleto",
+        "title": "Un rato más tarde llega a nuestra vereda Maia Debowicz (maia_debowicz), escritora y periodista que viene a charlar sobre sus libros, la escritura y, por supuest",
+        "venue": null,
+        "category": null,
+        "evidence": {
+          "id": "d5655605c8ae3d0d978e2b1ba87a1d3e08232958d6eb1b14350dd76986b431f8",
+          "date": null,
+          "kind": "program_component",
+          "time": null,
+          "state": "incompleto",
+          "title": "Un rato más tarde llega a nuestra vereda Maia Debowicz (maia_debowicz), escritora y periodista que viene a charlar sobre sus libros, la escritura y, por supuest",
+          "venue": null,
+          "source": "Instagram",
+          "category": null,
+          "entities": [],
+          "evidence": "Un rato más tarde llega a nuestra vereda Maia Debowicz (maia_debowicz), escritora y periodista que viene a charlar sobre sus libros, la escritura y, por supuesto, de conejos (ya verán...🐇).",
+          "mentions": [],
+          "validity": {
+            "date_end": null,
+            "date_known": false,
+            "time_known": false,
+            "observed_at": "2026-11-07T01:32:28.333963+00:00"
+          },
+          "certainty": "source_observed_pending_editorial_review",
+          "source_id": null,
+          "date_basis": "narrative_component_pending_schedule_review",
+          "ambiguities": [
+            "component_identity_and_schedule_require_review"
+          ],
+          "document_url": "https://www.instagram.com/p/DfGJgilDgGL/",
+          "discovered_at": "2026-11-07T01:32:28.333963+00:00",
+          "relationships": [],
+          "origin_account": "libreriamascaro",
+          "parser_version": "caption-v2.2",
+          "acquisition_method": "official_meta_api",
+          "parent_document_url": "https://www.instagram.com/p/DfGJgilDgGL/",
+          "publication_approved": false,
+          "parent_announced_date": "2026-11-06"
+        },
+        "timezone": "America/Argentina/Buenos_Aires",
+        "document_id": "document:https://www.instagram.com/p/DfGJgilDgGL/",
+        "publication_approved": false
+      }
+    ]
+  }
+}

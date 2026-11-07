@@ -1,0 +1,248 @@
+{
+  "annotation": "original_exploratory_development_30_not_independent",
+  "metric": "announced_date_slots_not_resolved_civil_dates_or_integral_editorial_quality",
+  "before": {
+    "tp": 21,
+    "fp": 0,
+    "fn": 4,
+    "precision": 1,
+    "recall": 0.84
+  },
+  "after": {
+    "tp": 25,
+    "fp": 1,
+    "fn": 0,
+    "precision": 0.9615384615384616,
+    "recall": 1.0
+  },
+  "cases": [
+    {
+      "url": "https://www.instagram.com/p/DYDd1h5ibzc/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DZN5gRfzPmC/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DaHs7uWOQ6K/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DcJIGudjrCO/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DcvuvRzjib1/",
+      "expected": [
+        "2026-09-26"
+      ],
+      "extracted": [
+        "2026-09-26"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/Dd-HfSwiTnd/",
+      "expected": [
+        "2026-10-11"
+      ],
+      "extracted": [
+        "2026-10-11"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/DdK7GDARs8D/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DdSlzs2xAGT/",
+      "expected": [
+        "2026-09-19",
+        "2026-09-20",
+        "2026-09-25"
+      ],
+      "extracted": [
+        "2026-09-19",
+        "2026-09-20",
+        "2026-09-25"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/DdY2kyou-79/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DdZdmC3JZ6U/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/Ddcha6ylGnw/",
+      "expected": [
+        "2026-09-25"
+      ],
+      "extracted": [
+        "2026-09-25"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/DdjX0sjoOzC/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DdmdMHCCavJ/",
+      "expected": [
+        "2026-10-10",
+        "2026-10-24"
+      ],
+      "extracted": [
+        "2026-10-10",
+        "2026-10-24"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/De0HOMfH9_e/",
+      "expected": [
+        "2026-11-06"
+      ],
+      "extracted": [
+        "2026-11-06"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/De16EyyxaZj/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DeH_pCZFBMK/",
+      "expected": [
+        "2026-10-17"
+      ],
+      "extracted": [
+        "2026-10-17"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/DeUUO9GFi4v/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DeXTssHI_Mc/",
+      "expected": [
+        "2026-10-17"
+      ],
+      "extracted": [
+        "2026-10-17"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/De_6aQ4HKzA/",
+      "expected": [],
+      "extracted": [
+        "2026-10-25"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/DecjTwHlKjt/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DekqcmHBSGi/",
+      "expected": [
+        "2026-11-06"
+      ],
+      "extracted": [
+        "2026-11-06"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/DeseWjTFIrC/",
+      "expected": [
+        "2026-10-24"
+      ],
+      "extracted": [
+        "2026-10-24"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/DezMqK1NIBQ/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DfAwBPeiTeC/",
+      "expected": [
+        "2026-11-08"
+      ],
+      "extracted": [
+        "2026-11-08"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/DfCsaeNljpJ/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DfFMhhpoLid/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DfLQZG0Gaow/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DfNHRODlGta/",
+      "expected": [],
+      "extracted": []
+    },
+    {
+      "url": "https://www.instagram.com/p/DfPab8rkR21/",
+      "expected": [
+        "2026-11-14"
+      ],
+      "extracted": [
+        "2026-11-14"
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+      "expected": [
+        "2026-11-05",
+        "2026-11-06",
+        "2026-11-06",
+        "2026-11-07",
+        "2026-11-07",
+        "2026-11-13",
+        "2026-11-13",
+        "2026-11-14",
+        "2026-11-14",
+        "2026-11-15"
+      ],
+      "extracted": [
+        "2026-11-05",
+        "2026-11-06",
+        "2026-11-06",
+        "2026-11-07",
+        "2026-11-07",
+        "2026-11-13",
+        "2026-11-13",
+        "2026-11-14",
+        "2026-11-14",
+        "2026-11-15"
+      ]
+    }
+  ]
+}
