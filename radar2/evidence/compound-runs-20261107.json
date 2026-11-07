@@ -1,0 +1,386 @@
+[
+  {
+    "run_id": "radar2-ghpilot-42332669232-attempt1",
+    "result": {
+      "mode": "full",
+      "commit": "f7b51553d20e5c3ba6e6b16b87a869a080d39009",
+      "matrix": null,
+      "memory": {
+        "total_nodes": 292,
+        "active_nodes": 289,
+        "new_to_memory": 49,
+        "nodes_observed": 218,
+        "total_relationships": 657,
+        "active_relationships": 646,
+        "new_to_radar_evidence": 48,
+        "relationships_observed": 427,
+        "new_relationships_in_memory": 80
+      },
+      "status": "completed",
+      "aliases": null,
+      "retired": null,
+      "new_sources": [],
+      "meta_queries": 11,
+      "checks_errors": 7,
+      "neon_readback": {
+        "status": "completed",
+        "documents": "641",
+        "proposals": "1073"
+      },
+      "extra_curators": [],
+      "readback_count": null,
+      "recovery_memory": null,
+      "instagram_status": "POSTS_ACQUIRED",
+      "new_publications": 84,
+      "discovery_metrics": {
+        "new_ids": 233,
+        "new_visible_unique": 147,
+        "new_unique_dated_proposals": 84
+      },
+      "rotating_accounts": [
+        "teatroespacio44",
+        "veredita.bar",
+        "vermu_interferencia",
+        "vonharveventos",
+        "centrodearteunlp",
+        "ciudaddegatos",
+        "intra.prod"
+      ],
+      "caption_documents_processed": 578
+    }
+  },
+  {
+    "run_id": "radar2-ghpilot-42332669232-attempt1-batch2",
+    "result": {
+      "mode": "incremental",
+      "commit": "f7b51553d20e5c3ba6e6b16b87a869a080d39009",
+      "matrix": null,
+      "memory": {
+        "total_nodes": 295,
+        "active_nodes": 292,
+        "new_to_memory": 3,
+        "nodes_observed": 61,
+        "total_relationships": 661,
+        "active_relationships": 650,
+        "new_to_radar_evidence": 3,
+        "relationships_observed": 77,
+        "new_relationships_in_memory": 4
+      },
+      "status": "completed",
+      "aliases": null,
+      "retired": null,
+      "new_sources": [],
+      "meta_queries": 1,
+      "checks_errors": 0,
+      "neon_readback": {
+        "status": "completed",
+        "documents": "28",
+        "proposals": "95"
+      },
+      "extra_curators": [],
+      "readback_count": null,
+      "recovery_memory": null,
+      "instagram_status": "POSTS_ACQUIRED",
+      "new_publications": 12,
+      "discovery_metrics": {
+        "new_ids": 26,
+        "new_visible_unique": 24,
+        "new_unique_dated_proposals": 17
+      },
+      "rotating_accounts": [
+        "teatrolanonna_oficial"
+      ],
+      "caption_documents_processed": 15
+    }
+  },
+  {
+    "run_id": "radar2-ghpilot-42332669232-attempt1-compound-idempotence",
+    "result": {
+      "mode": "selective_compound_recovery",
+      "commit": null,
+      "matrix": [
+        {
+          "url": "https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267",
+          "type": "cartelera",
+          "source": "El Día",
+          "complete": 86,
+          "ambiguous": 2,
+          "activities": 88,
+          "before_dated": 88,
+          "before_observations": 88
+        },
+        {
+          "url": "https://www.eldia.com/espectaculos/agenda-septimo-dia_1793514734",
+          "type": "cartelera",
+          "source": "El Día",
+          "complete": 20,
+          "ambiguous": 1,
+          "activities": 21,
+          "before_dated": 21,
+          "before_observations": 21
+        },
+        {
+          "url": "https://www.0221.com.ar/que-hago/fede-moura-juana-rozas-y-la-dupla-metalera-la-agenda-cultural-la-plata-n136575",
+          "type": "agenda_compuesta",
+          "source": "0221",
+          "complete": 41,
+          "ambiguous": 4,
+          "activities": 45,
+          "before_dated": 45,
+          "before_observations": 45
+        },
+        {
+          "url": "https://www.0221.com.ar/que-hago/festival-la-cerveza-mmce-y-piazzolla-piano-la-agenda-cultural-la-plata-n136995",
+          "type": "agenda_compuesta",
+          "source": "0221",
+          "complete": 29,
+          "ambiguous": 4,
+          "activities": 33,
+          "before_dated": 33,
+          "before_observations": 33
+        },
+        {
+          "url": "https://www.0221.com.ar/que-hago/massacre-y-las-armas-segundo-tiempo-y-mucho-mas-la-agenda-cultural-la-plata-n136584",
+          "type": "agenda_compuesta",
+          "source": "0221",
+          "complete": 24,
+          "ambiguous": 4,
+          "activities": 28,
+          "before_dated": 28,
+          "before_observations": 28
+        },
+        {
+          "url": "https://www.0221.com.ar/que-hago/sandra-mihanovich-la-plata-muerde-y-los-espiritus-la-agenda-cultural-la-plata-n136923",
+          "type": "agenda_compuesta",
+          "source": "0221",
+          "complete": 38,
+          "ambiguous": 4,
+          "activities": 42,
+          "before_dated": 42,
+          "before_observations": 42
+        },
+        {
+          "url": "https://www.instagram.com/reel/DeXYqWISZod/",
+          "type": "curaduria_cultural",
+          "source": "Instagram",
+          "complete": 0,
+          "ambiguous": 10,
+          "activities": 10,
+          "before_dated": 10,
+          "before_observations": 10
+        },
+        {
+          "url": "https://www.instagram.com/reel/DefVzFISwkm/",
+          "type": "curaduria_cultural",
+          "source": "Instagram",
+          "complete": 0,
+          "ambiguous": 11,
+          "activities": 11,
+          "before_dated": 10,
+          "before_observations": 11
+        },
+        {
+          "url": "https://www.instagram.com/reel/DexByxdy6dp/",
+          "type": "curaduria_cultural",
+          "source": "Instagram",
+          "complete": 0,
+          "ambiguous": 11,
+          "activities": 11,
+          "before_dated": 11,
+          "before_observations": 11
+        },
+        {
+          "url": "https://www.instagram.com/reel/DfDGyw_SkDA/",
+          "type": "curaduria_cultural",
+          "source": "Instagram",
+          "complete": 0,
+          "ambiguous": 13,
+          "activities": 13,
+          "before_dated": 13,
+          "before_observations": 13
+        },
+        {
+          "url": "https://www.instagram.com/reel/DfVEIVTSTGu/",
+          "type": "curaduria_cultural",
+          "source": "Instagram",
+          "complete": 0,
+          "ambiguous": 16,
+          "activities": 16,
+          "before_dated": 16,
+          "before_observations": 16
+        }
+      ],
+      "memory": null,
+      "status": "completed",
+      "aliases": 78,
+      "retired": 0,
+      "new_sources": null,
+      "meta_queries": null,
+      "checks_errors": null,
+      "neon_readback": null,
+      "extra_curators": null,
+      "readback_count": 318,
+      "recovery_memory": {
+        "total_nodes": 243,
+        "active_nodes": 240,
+        "new_to_memory": 0,
+        "nodes_observed": 91,
+        "total_relationships": 577,
+        "active_relationships": 567,
+        "new_to_radar_evidence": 0,
+        "relationships_observed": 262,
+        "new_relationships_in_memory": 0
+      },
+      "instagram_status": null,
+      "new_publications": null,
+      "discovery_metrics": null,
+      "rotating_accounts": null,
+      "caption_documents_processed": null
+    }
+  },
+  {
+    "run_id": "radar2-ghpilot-42332669232-attempt1-compound-recovery",
+    "result": {
+      "mode": "selective_compound_recovery",
+      "commit": null,
+      "matrix": [
+        {
+          "url": "https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267",
+          "type": "cartelera",
+          "source": "El Día",
+          "complete": 86,
+          "ambiguous": 2,
+          "activities": 88,
+          "before_dated": 0,
+          "before_observations": 1
+        },
+        {
+          "url": "https://www.eldia.com/espectaculos/agenda-septimo-dia_1793514734",
+          "type": "cartelera",
+          "source": "El Día",
+          "complete": 20,
+          "ambiguous": 1,
+          "activities": 21,
+          "before_dated": 0,
+          "before_observations": 1
+        },
+        {
+          "url": "https://www.0221.com.ar/que-hago/fede-moura-juana-rozas-y-la-dupla-metalera-la-agenda-cultural-la-plata-n136575",
+          "type": "agenda_compuesta",
+          "source": "0221",
+          "complete": 41,
+          "ambiguous": 4,
+          "activities": 45,
+          "before_dated": 0,
+          "before_observations": 1
+        },
+        {
+          "url": "https://www.0221.com.ar/que-hago/festival-la-cerveza-mmce-y-piazzolla-piano-la-agenda-cultural-la-plata-n136995",
+          "type": "agenda_compuesta",
+          "source": "0221",
+          "complete": 29,
+          "ambiguous": 4,
+          "activities": 33,
+          "before_dated": 0,
+          "before_observations": 1
+        },
+        {
+          "url": "https://www.0221.com.ar/que-hago/massacre-y-las-armas-segundo-tiempo-y-mucho-mas-la-agenda-cultural-la-plata-n136584",
+          "type": "agenda_compuesta",
+          "source": "0221",
+          "complete": 24,
+          "ambiguous": 4,
+          "activities": 28,
+          "before_dated": 0,
+          "before_observations": 1
+        },
+        {
+          "url": "https://www.0221.com.ar/que-hago/sandra-mihanovich-la-plata-muerde-y-los-espiritus-la-agenda-cultural-la-plata-n136923",
+          "type": "agenda_compuesta",
+          "source": "0221",
+          "complete": 38,
+          "ambiguous": 4,
+          "activities": 42,
+          "before_dated": 0,
+          "before_observations": 1
+        },
+        {
+          "url": "https://www.instagram.com/reel/DeXYqWISZod/",
+          "type": "curaduria_cultural",
+          "source": "Instagram",
+          "complete": 0,
+          "ambiguous": 10,
+          "activities": 10,
+          "before_dated": 9,
+          "before_observations": 9
+        },
+        {
+          "url": "https://www.instagram.com/reel/DefVzFISwkm/",
+          "type": "curaduria_cultural",
+          "source": "Instagram",
+          "complete": 0,
+          "ambiguous": 11,
+          "activities": 11,
+          "before_dated": 1,
+          "before_observations": 1
+        },
+        {
+          "url": "https://www.instagram.com/reel/DexByxdy6dp/",
+          "type": "curaduria_cultural",
+          "source": "Instagram",
+          "complete": 0,
+          "ambiguous": 11,
+          "activities": 11,
+          "before_dated": 1,
+          "before_observations": 1
+        },
+        {
+          "url": "https://www.instagram.com/reel/DfDGyw_SkDA/",
+          "type": "curaduria_cultural",
+          "source": "Instagram",
+          "complete": 0,
+          "ambiguous": 13,
+          "activities": 13,
+          "before_dated": 0,
+          "before_observations": 1
+        },
+        {
+          "url": "https://www.instagram.com/reel/DfVEIVTSTGu/",
+          "type": "curaduria_cultural",
+          "source": "Instagram",
+          "complete": 0,
+          "ambiguous": 16,
+          "activities": 16,
+          "before_dated": 1,
+          "before_observations": 1
+        }
+      ],
+      "memory": null,
+      "status": "completed",
+      "aliases": 78,
+      "retired": 18,
+      "new_sources": null,
+      "meta_queries": null,
+      "checks_errors": null,
+      "neon_readback": null,
+      "extra_curators": null,
+      "readback_count": 318,
+      "recovery_memory": {
+        "total_nodes": 243,
+        "active_nodes": 240,
+        "new_to_memory": 70,
+        "nodes_observed": 91,
+        "total_relationships": 577,
+        "active_relationships": 567,
+        "new_to_radar_evidence": 69,
+        "relationships_observed": 262,
+        "new_relationships_in_memory": 255
+      },
+      "instagram_status": null,
+      "new_publications": null,
+      "discovery_metrics": null,
+      "rotating_accounts": null,
+      "caption_documents_processed": null
+    }
+  }
+]

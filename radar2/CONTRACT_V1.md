@@ -121,3 +121,47 @@ pendientes y suprime fechas relativas de carga al catálogo; amplía el indicado
 cultural a entrada/cabina. No asigna horarios a los componentes narrativos. Una
 URL explícita `/obra/` permite agrupar funciones con título/sede coincidentes.
 Los resultados anteriores al parche siguen preservados, sin llamarlos PASS.
+
+## Fuentes compuestas — compound-v1 / caption-v2.3
+
+El documento puede ser evento individual, agenda compuesta, cartelera, programa
+festival, curaduría, programación recurrente, recomendación permanente o retrospectiva.
+La clasificación se basa en contenido y rol de fuente; no asigna aprobación editorial.
+Se comparten intérpretes de carteleras con horarios, filas de agenda y recomendaciones
+por día. Los adaptadores estructurados y las carteleras de varias bandas conservan
+precedencia; una banda de un mismo show no se convierte por ello en otro evento.
+
+`source_role=curator` se distingue de organizador: `recommended_by` usa la identidad
+de publicación observada, mientras que `organized_by` requiere crédito explícito.
+`source_role=secondary_publisher` no afirma que el medio sea fuente organizadora.
+`cross_source_candidate_match_pending_review` distingue conciliación documental de
+corroboración primaria y aprobación. Repeticiones del mismo medio no se llaman
+fuentes independientes. Se conservan originales, alias, versiones y discrepancias.
+
+Las fechas de captions compuestos usan publicación ART. Los días de una agenda
+semanal se resuelven dentro de esa semana y los encabezados editoriales de una
+cartelera (hoy/mañana/día próximo) desde la edición publicada. Un intervalo de fechas
+no se expande a funciones diarias no afirmadas. Varias sedes se conservan como programa
+con lugares múltiples, sin inventar una ocurrencia por sede. Recomendaciones de
+lugares son `place_recommendation`, sin fecha de evento. El contenido audiovisual
+sigue limitado al caption; no se afirma lectura del audio ni de las imágenes.
+
+El Día/0221 siguen entrando por sus secciones actuales, con agendas priorizadas antes
+del límite de artículos. FULL conserva siete días de Genda; incremental, uno.
+En los mismos horarios existentes hay vigilancia periodística adicional jueves/viernes
+cada ocho horas y fin de semana cada doce, según la última comprobación de ambas
+raíces. Puede añadirse una cuenta curatorial productiva en incrementales miércoles-
+viernes, cada ocho horas como máximo; no desplaza el lote equitativo y no fuerza una
+consulta cuando no hay cuenta elegible. La observación natural de esa política sigue
+pendiente. El hash, la versión de intérprete y la fecha de publicación controlan la
+reutilización; un documento sin eventos también puede marcarse interpretado.
+
+Los originales nuevos guardan bloques del artículo y metadatos estructurados para
+replay. Los originales anteriores conservan el texto disponible; no se presenta como
+HTML recuperado un archivo transitorio que no se preservó. El contrato v1 conserva
+sus recursos/campos. La consulta de relaciones usa un conjunto visible materializado
+por consulta para evitar recálculos por arista; no hay tabla, servicio ni cron nuevo.
+
+El cierre específico de esta ampliación y sus gates están en
+[COMPOUND_FINAL_20261107.md](COMPOUND_FINAL_20261107.md) e issue #20. El resultado
+operativo no sustituye la evaluación editorial ni certifica continuidad natural.

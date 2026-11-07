@@ -1,0 +1,12 @@
+[
+  {
+    "documents": "974",
+    "document_versions": "1054",
+    "proposals": "1779",
+    "proposal_versions": "6468",
+    "missing_originals": "0",
+    "dangling_events": "0",
+    "dangling_relationships": "0",
+    "autoapproved": "0"
+  }
+]

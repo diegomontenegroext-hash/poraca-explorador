@@ -1,0 +1,598 @@
+[
+  {
+    "status": "fulfilled",
+    "value": {
+      "label": "curated",
+      "url": "https://poraca-lp-privado.vercel.app/api/radar2?resource=proposals&limit=1&after=proposal%3Adbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff",
+      "status": 200,
+      "cache_control": "private, no-store",
+      "payload": {
+        "schema": "poraca-cultural",
+        "version": 1,
+        "resource": "proposals",
+        "publication_approved": false,
+        "count": 1,
+        "has_more": true,
+        "next_cursor": "proposal:dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+        "items": [
+          {
+            "id": "proposal:dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+            "date": "2026-11-07",
+            "time": null,
+            "stage": "cultural_candidate",
+            "state": "incompleto",
+            "title": "toca carmensanchezviamonte en operalaplata",
+            "venue": "operalaplata",
+            "category": "Cultura",
+            "evidence": {
+              "id": "dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+              "date": "2026-11-07",
+              "kind": "event",
+              "time": null,
+              "state": "incompleto",
+              "title": "toca carmensanchezviamonte en operalaplata",
+              "venue": "operalaplata",
+              "source": "Instagram",
+              "address": null,
+              "category": "Cultura",
+              "date_end": null,
+              "entities": [
+                {
+                  "name": "operalaplata",
+                  "role": "venue",
+                  "node_id": "8a2a67bfc72c1a5a5980516a4478e32ab8deb8eedca8d2b13434feb84568a42a",
+                  "evidence": "toca carmensanchezviamonte en operalaplata",
+                  "evidence_url": "https://www.instagram.com/reel/DfVEIVTSTGu/",
+                  "identity_status": "normalized_name_within_role_pending_identity_review",
+                  "event_relationship": {
+                    "object": "8a2a67bfc72c1a5a5980516a4478e32ab8deb8eedca8d2b13434feb84568a42a",
+                    "status": "observed_pending_editorial_review",
+                    "excerpt": "toca carmensanchezviamonte en operalaplata",
+                    "subject": "event:dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+                    "predicate": "takes_place_at",
+                    "proposal_id": "dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+                    "evidence_url": "https://www.instagram.com/reel/DfVEIVTSTGu/"
+                  }
+                },
+                {
+                  "name": "lutitravelguide",
+                  "role": "curator",
+                  "node_id": "5629b0c92a7081bf3eee8f24b9e4a630db87fb2c50122fb024f166040ed03523",
+                  "evidence": "{\"profile_username\": \"lutitravelguide\", \"source_url\": \"https://www.instagram.com/reel/DfVEIVTSTGu/\"}",
+                  "evidence_url": "https://www.instagram.com/reel/DfVEIVTSTGu/",
+                  "identity_status": "normalized_name_within_role_pending_identity_review",
+                  "event_relationship": {
+                    "object": "5629b0c92a7081bf3eee8f24b9e4a630db87fb2c50122fb024f166040ed03523",
+                    "status": "observed_pending_editorial_review",
+                    "excerpt": "{\"profile_username\": \"lutitravelguide\", \"source_url\": \"https://www.instagram.com/reel/DfVEIVTSTGu/\"}",
+                    "subject": "event:dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+                    "predicate": "recommended_by",
+                    "proposal_id": "dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+                    "evidence_url": "https://www.instagram.com/reel/DfVEIVTSTGu/"
+                  }
+                }
+              ],
+              "evidence": "toca carmensanchezviamonte en operalaplata",
+              "mentions": [],
+              "validity": {
+                "date_end": null,
+                "date_known": true,
+                "time_known": false,
+                "observed_at": "2026-11-07T01:58:14.663162+00:00"
+              },
+              "certainty": "source_observed_pending_editorial_review",
+              "organizer": null,
+              "source_id": null,
+              "date_basis": "publication_week_weekdays",
+              "source_url": "https://www.instagram.com/reel/DfVEIVTSTGu/",
+              "ambiguities": [],
+              "source_role": "curator",
+              "document_url": "https://www.instagram.com/reel/DfVEIVTSTGu/",
+              "discovered_at": "2026-11-07T01:58:14.663162+00:00",
+              "document_type": "curaduria_cultural",
+              "relationships": [
+                {
+                  "object": "8a2a67bfc72c1a5a5980516a4478e32ab8deb8eedca8d2b13434feb84568a42a",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "toca carmensanchezviamonte en operalaplata",
+                  "subject": "event:dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+                  "predicate": "takes_place_at",
+                  "proposal_id": "dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+                  "evidence_url": "https://www.instagram.com/reel/DfVEIVTSTGu/"
+                },
+                {
+                  "object": "5629b0c92a7081bf3eee8f24b9e4a630db87fb2c50122fb024f166040ed03523",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "{\"profile_username\": \"lutitravelguide\", \"source_url\": \"https://www.instagram.com/reel/DfVEIVTSTGu/\"}",
+                  "subject": "event:dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+                  "predicate": "recommended_by",
+                  "proposal_id": "dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+                  "evidence_url": "https://www.instagram.com/reel/DfVEIVTSTGu/"
+                },
+                {
+                  "object": "8a2a67bfc72c1a5a5980516a4478e32ab8deb8eedca8d2b13434feb84568a42a",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "toca carmensanchezviamonte en operalaplata",
+                  "subject": "event:dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+                  "predicate": "takes_place_at",
+                  "proposal_id": "dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+                  "evidence_url": "https://www.instagram.com/reel/DfVEIVTSTGu/"
+                },
+                {
+                  "object": "5629b0c92a7081bf3eee8f24b9e4a630db87fb2c50122fb024f166040ed03523",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "{\"profile_username\": \"lutitravelguide\", \"source_url\": \"https://www.instagram.com/reel/DfVEIVTSTGu/\"}",
+                  "subject": "event:dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+                  "predicate": "recommended_by",
+                  "proposal_id": "dbf25d10aaff3056960c6e7c68a4887c8569dcde8e01841e9038725117568ff0",
+                  "evidence_url": "https://www.instagram.com/reel/DfVEIVTSTGu/"
+                }
+              ],
+              "evidence_spans": {
+                "block": {
+                  "end": 768,
+                  "quote": "toca carmensanchezviamonte en operalaplata ",
+                  "start": 725
+                },
+                "title": {
+                  "end": 767,
+                  "quote": "toca carmensanchezviamonte en operalaplata",
+                  "start": 725
+                },
+                "venue": {
+                  "end": 767,
+                  "quote": "operalaplata",
+                  "start": 755
+                },
+                "address": null,
+                "organizer": null
+              },
+              "field_evidence": {
+                "date": null,
+                "time": null,
+                "title": "toca carmensanchezviamonte en operalaplata",
+                "venue": "operalaplata",
+                "address": null,
+                "organizer": null
+              },
+              "identity_scope": "same_document_activity_title_venue",
+              "missing_fields": [
+                "time"
+              ],
+              "origin_account": "lutitravelguide",
+              "parser_version": "compound-v1",
+              "temporal_state": "future_or_today",
+              "acquisition_method": "official_meta_api",
+              "event_identity_key": "9f16556bf9772131126c51cf241e04085bdfdb38c1fdf8499b325151ba65e542",
+              "publication_approved": false,
+              "date_heading_evidence": "sábado:",
+              "source_document_sha256": "ac07999b02a5005ec502420abbb84aa9bc22ee43f8ea80a60cf6c7f3a41d499f"
+            },
+            "timezone": "America/Argentina/Buenos_Aires",
+            "document_id": "document:https://www.instagram.com/reel/DfVEIVTSTGu/",
+            "publication_approved": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "label": "media",
+      "url": "https://poraca-lp-privado.vercel.app/api/radar2?resource=proposals&limit=1&after=proposal%3A99672169840d86e6a6dd0fefafc8e464d101a9983bff60b054af98ba34436dc",
+      "status": 200,
+      "cache_control": "private, no-store",
+      "payload": {
+        "schema": "poraca-cultural",
+        "version": 1,
+        "resource": "proposals",
+        "publication_approved": false,
+        "count": 1,
+        "has_more": true,
+        "next_cursor": "proposal:99672169840d86e6a6dd0fefafc8e464d101a9983bff60b054af98ba34436dcd",
+        "items": [
+          {
+            "id": "proposal:99672169840d86e6a6dd0fefafc8e464d101a9983bff60b054af98ba34436dcd",
+            "date": "2026-11-06",
+            "time": "21:00",
+            "stage": "cultural_candidate",
+            "state": "historico",
+            "title": "Sandra Mihanovich",
+            "venue": "Casa Metro",
+            "category": "Teatro",
+            "evidence": {
+              "id": "99672169840d86e6a6dd0fefafc8e464d101a9983bff60b054af98ba34436dcd",
+              "date": "2026-11-06",
+              "kind": "event",
+              "time": "21:00",
+              "state": "historico",
+              "title": "Sandra Mihanovich",
+              "venue": "Casa Metro",
+              "source": "El Día",
+              "address": "4 entre 51 y 53",
+              "category": "Teatro",
+              "date_end": null,
+              "entities": [
+                {
+                  "name": "Casa Metro",
+                  "role": "venue",
+                  "node_id": "cf49dbf3abaedf1bc8b914862f46156ace18d45c24e1e23eb2ee2b979867de60",
+                  "evidence": "Sandra Mihanovich.- A las 21 en Casa Metro, 4 entre 51 y 53. La cantante celebra los 40 años de “Sandra en el Paraíso”, el disco que editó en 1986 y que marcó una nueva etapa en su carrera.",
+                  "evidence_url": "https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267",
+                  "identity_status": "normalized_name_within_role_pending_identity_review",
+                  "event_relationship": {
+                    "object": "cf49dbf3abaedf1bc8b914862f46156ace18d45c24e1e23eb2ee2b979867de60",
+                    "status": "observed_pending_editorial_review",
+                    "excerpt": "Sandra Mihanovich.- A las 21 en Casa Metro, 4 entre 51 y 53. La cantante celebra los 40 años de “Sandra en el Paraíso”, el disco que editó en 1986 y que marcó una nueva etapa en su carrera.",
+                    "subject": "event:48ec1e40fcac690770bf202c595952a6336e826c8a83f0b527cc859a908814b1",
+                    "predicate": "takes_place_at",
+                    "proposal_id": "99672169840d86e6a6dd0fefafc8e464d101a9983bff60b054af98ba34436dcd",
+                    "evidence_url": "https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267"
+                  }
+                }
+              ],
+              "evidence": "Sandra Mihanovich.- A las 21 en Casa Metro, 4 entre 51 y 53. La cantante celebra los 40 años de “Sandra en el Paraíso”, el disco que editó en 1986 y que marcó una nueva etapa en su carrera.",
+              "mentions": [],
+              "validity": {
+                "date_end": null,
+                "date_known": true,
+                "time_known": true,
+                "observed_at": "2026-11-07T01:58:07.985135+00:00"
+              },
+              "certainty": "source_observed_pending_editorial_review",
+              "organizer": null,
+              "source_id": null,
+              "date_basis": "editorial_day_heading_from_publication_art",
+              "source_url": "https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267",
+              "ambiguities": [],
+              "source_role": "secondary_publisher",
+              "document_url": "https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267",
+              "duplicate_of": "48ec1e40fcac690770bf202c595952a6336e826c8a83f0b527cc859a908814b1",
+              "discovered_at": "2026-11-07T01:58:07.985135+00:00",
+              "document_type": "cartelera",
+              "relationships": [
+                {
+                  "object": "cf49dbf3abaedf1bc8b914862f46156ace18d45c24e1e23eb2ee2b979867de60",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "Sandra Mihanovich.- A las 21 en Casa Metro, 4 entre 51 y 53. La cantante celebra los 40 años de “Sandra en el Paraíso”, el disco que editó en 1986 y que marcó una nueva etapa en su carrera.",
+                  "subject": "event:48ec1e40fcac690770bf202c595952a6336e826c8a83f0b527cc859a908814b1",
+                  "predicate": "takes_place_at",
+                  "proposal_id": "99672169840d86e6a6dd0fefafc8e464d101a9983bff60b054af98ba34436dcd",
+                  "evidence_url": "https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267"
+                },
+                {
+                  "object": "cf49dbf3abaedf1bc8b914862f46156ace18d45c24e1e23eb2ee2b979867de60",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "Sandra Mihanovich.- A las 21 en Casa Metro, 4 entre 51 y 53. La cantante celebra los 40 años de “Sandra en el Paraíso”, el disco que editó en 1986 y que marcó una nueva etapa en su carrera.",
+                  "subject": "event:48ec1e40fcac690770bf202c595952a6336e826c8a83f0b527cc859a908814b1",
+                  "predicate": "takes_place_at",
+                  "proposal_id": "99672169840d86e6a6dd0fefafc8e464d101a9983bff60b054af98ba34436dcd",
+                  "evidence_url": "https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267"
+                }
+              ],
+              "evidence_spans": {
+                "block": {
+                  "end": 1671,
+                  "quote": "Sandra Mihanovich.- A las 21 en Casa Metro, 4 entre 51 y 53. La cantante celebra los 40 años de “Sandra en el Paraíso”, el disco que editó en 1986 y que marcó una nueva etapa en su carrera.",
+                  "start": 1482
+                },
+                "title": {
+                  "end": 1499,
+                  "quote": "Sandra Mihanovich",
+                  "start": 1482
+                },
+                "venue": {
+                  "end": 1524,
+                  "quote": "Casa Metro",
+                  "start": 1514
+                },
+                "address": {
+                  "end": 1541,
+                  "quote": "4 entre 51 y 53",
+                  "start": 1526
+                },
+                "organizer": null
+              },
+              "field_evidence": {
+                "date": "Sandra Mihanovich.- A las 21 en Casa Metro, 4 entre 51 y 53. La cantante celebra los 40 años de “Sandra en el Paraíso”, el disco que editó en 1986 y que marcó una nueva etapa en su carrera.",
+                "time": "21",
+                "title": "Sandra Mihanovich",
+                "venue": "Casa Metro",
+                "address": "4 entre 51 y 53",
+                "organizer": null
+              },
+              "identity_scope": "same_document_activity_title_venue",
+              "missing_fields": [],
+              "origin_account": null,
+              "parser_version": "compound-v1",
+              "temporal_state": "past",
+              "acquisition_method": "preserved_public_document",
+              "event_identity_key": "73dfdaf9ab577df7adad55f332cc0c719efb7f373cd615e1cb292f8a389d1bdd",
+              "corroboration_level": "cross_source_candidate_match_pending_review",
+              "publication_approved": false,
+              "corroboration_evidence": {
+                "url": "https://www.0221.com.ar/que-hago/festival-la-cerveza-mmce-y-piazzolla-piano-la-agenda-cultural-la-plata-n136995",
+                "basis": "matching title, date, time and venue; not editorial approval",
+                "proposal_id": "48ec1e40fcac690770bf202c595952a6336e826c8a83f0b527cc859a908814b1"
+              },
+              "source_document_sha256": "901d29a6b26a13a1e3e8db15033557f4812e831dd38d3fa52161925c9bb9d7f5"
+            },
+            "timezone": "America/Argentina/Buenos_Aires",
+            "document_id": "document:https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267",
+            "publication_approved": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "label": "multiple_places",
+      "url": "https://poraca-lp-privado.vercel.app/api/radar2?resource=proposals&limit=1&after=proposal%3A4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf3",
+      "status": 200,
+      "cache_control": "private, no-store",
+      "payload": {
+        "schema": "poraca-cultural",
+        "version": 1,
+        "resource": "proposals",
+        "publication_approved": false,
+        "count": 1,
+        "has_more": true,
+        "next_cursor": "proposal:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+        "items": [
+          {
+            "id": "proposal:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+            "date": "2026-11-12",
+            "time": null,
+            "stage": "cultural_candidate",
+            "state": "incompleto",
+            "title": "Festival de la pizza platense",
+            "venue": null,
+            "category": "Cultura",
+            "evidence": {
+              "id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+              "date": "2026-11-12",
+              "kind": "program",
+              "time": null,
+              "state": "incompleto",
+              "title": "Festival de la pizza platense",
+              "venue": null,
+              "source": "Instagram",
+              "address": null,
+              "category": "Cultura",
+              "date_end": null,
+              "entities": [
+                {
+                  "name": "vermu_interferencia",
+                  "role": "organizer",
+                  "node_id": "99fc4e7ed70a1ca4fe3e723c9b2499ef3b490c75f434179eeb2c982927440e25",
+                  "evidence": "🗓️ 12 de noviembre\nvermu_interferencia presenta \nFestival de la pizza platense \n📍Playon Estación Provincial y Ciudad de Gatos\nentrada gratuita",
+                  "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/",
+                  "identity_status": "normalized_name_within_role_pending_identity_review",
+                  "event_relationship": {
+                    "object": "99fc4e7ed70a1ca4fe3e723c9b2499ef3b490c75f434179eeb2c982927440e25",
+                    "status": "observed_pending_editorial_review",
+                    "excerpt": "🗓️ 12 de noviembre vermu_interferencia presenta Festival de la pizza platense 📍Playon Estación Provincial y Ciudad de Gatos entrada gratuita",
+                    "subject": "event:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                    "predicate": "organized_by",
+                    "proposal_id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                    "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/"
+                  }
+                },
+                {
+                  "name": "lutitravelguide",
+                  "role": "curator",
+                  "node_id": "5629b0c92a7081bf3eee8f24b9e4a630db87fb2c50122fb024f166040ed03523",
+                  "evidence": "{\"profile_username\": \"lutitravelguide\", \"source_url\": \"https://www.instagram.com/reel/DeXYqWISZod/\"}",
+                  "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/",
+                  "identity_status": "normalized_name_within_role_pending_identity_review",
+                  "event_relationship": {
+                    "object": "5629b0c92a7081bf3eee8f24b9e4a630db87fb2c50122fb024f166040ed03523",
+                    "status": "observed_pending_editorial_review",
+                    "excerpt": "{\"profile_username\": \"lutitravelguide\", \"source_url\": \"https://www.instagram.com/reel/DeXYqWISZod/\"}",
+                    "subject": "event:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                    "predicate": "recommended_by",
+                    "proposal_id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                    "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/"
+                  }
+                },
+                {
+                  "name": "Playon Estación Provincial",
+                  "role": "venue",
+                  "node_id": "cfc0f9ca8638665459ef229908002c205eaf1000cc9c359abcc107c216eda9e5",
+                  "evidence": "🗓️ 12 de noviembre\nvermu_interferencia presenta \nFestival de la pizza platense \n📍Playon Estación Provincial y Ciudad de Gatos\nentrada gratuita",
+                  "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/",
+                  "identity_status": "normalized_name_within_role_pending_identity_review",
+                  "event_relationship": {
+                    "object": "cfc0f9ca8638665459ef229908002c205eaf1000cc9c359abcc107c216eda9e5",
+                    "status": "observed_pending_editorial_review",
+                    "excerpt": "🗓️ 12 de noviembre vermu_interferencia presenta Festival de la pizza platense 📍Playon Estación Provincial y Ciudad de Gatos entrada gratuita",
+                    "subject": "event:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                    "predicate": "takes_place_at",
+                    "proposal_id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                    "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/"
+                  }
+                },
+                {
+                  "name": "Ciudad de Gatos",
+                  "role": "venue",
+                  "node_id": "5880be49043ca429b54e679781acc52ff972a1f840d669be6a1500ed231daed9",
+                  "evidence": "🗓️ 12 de noviembre\nvermu_interferencia presenta \nFestival de la pizza platense \n📍Playon Estación Provincial y Ciudad de Gatos\nentrada gratuita",
+                  "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/",
+                  "identity_status": "normalized_name_within_role_pending_identity_review",
+                  "event_relationship": {
+                    "object": "5880be49043ca429b54e679781acc52ff972a1f840d669be6a1500ed231daed9",
+                    "status": "observed_pending_editorial_review",
+                    "excerpt": "🗓️ 12 de noviembre vermu_interferencia presenta Festival de la pizza platense 📍Playon Estación Provincial y Ciudad de Gatos entrada gratuita",
+                    "subject": "event:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                    "predicate": "takes_place_at",
+                    "proposal_id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                    "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/"
+                  }
+                }
+              ],
+              "evidence": "🗓️ 12 de noviembre vermu_interferencia presenta Festival de la pizza platense 📍Playon Estación Provincial y Ciudad de Gatos entrada gratuita",
+              "mentions": [],
+              "validity": {
+                "date_end": null,
+                "date_known": true,
+                "time_known": false,
+                "observed_at": "2026-11-07T01:58:14.664723+00:00"
+              },
+              "certainty": "source_observed_pending_editorial_review",
+              "organizer": "vermu_interferencia",
+              "source_id": null,
+              "date_basis": "day_month_year_from_publication",
+              "source_url": "https://www.instagram.com/reel/DeXYqWISZod/",
+              "ambiguities": [
+                "multiple_places_program_occurrences_unresolved"
+              ],
+              "source_role": "curator",
+              "document_url": "https://www.instagram.com/reel/DeXYqWISZod/",
+              "discovered_at": "2026-11-07T01:58:14.664723+00:00",
+              "document_type": "curaduria_cultural",
+              "relationships": [
+                {
+                  "object": "99fc4e7ed70a1ca4fe3e723c9b2499ef3b490c75f434179eeb2c982927440e25",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "🗓️ 12 de noviembre vermu_interferencia presenta Festival de la pizza platense 📍Playon Estación Provincial y Ciudad de Gatos entrada gratuita",
+                  "subject": "event:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "predicate": "organized_by",
+                  "proposal_id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/"
+                },
+                {
+                  "object": "5629b0c92a7081bf3eee8f24b9e4a630db87fb2c50122fb024f166040ed03523",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "{\"profile_username\": \"lutitravelguide\", \"source_url\": \"https://www.instagram.com/reel/DeXYqWISZod/\"}",
+                  "subject": "event:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "predicate": "recommended_by",
+                  "proposal_id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/"
+                },
+                {
+                  "object": "cfc0f9ca8638665459ef229908002c205eaf1000cc9c359abcc107c216eda9e5",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "🗓️ 12 de noviembre vermu_interferencia presenta Festival de la pizza platense 📍Playon Estación Provincial y Ciudad de Gatos entrada gratuita",
+                  "subject": "event:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "predicate": "takes_place_at",
+                  "proposal_id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/"
+                },
+                {
+                  "object": "5880be49043ca429b54e679781acc52ff972a1f840d669be6a1500ed231daed9",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "🗓️ 12 de noviembre vermu_interferencia presenta Festival de la pizza platense 📍Playon Estación Provincial y Ciudad de Gatos entrada gratuita",
+                  "subject": "event:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "predicate": "takes_place_at",
+                  "proposal_id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/"
+                },
+                {
+                  "object": "99fc4e7ed70a1ca4fe3e723c9b2499ef3b490c75f434179eeb2c982927440e25",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "🗓️ 12 de noviembre vermu_interferencia presenta Festival de la pizza platense 📍Playon Estación Provincial y Ciudad de Gatos entrada gratuita",
+                  "subject": "event:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "predicate": "organized_by",
+                  "proposal_id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/"
+                },
+                {
+                  "object": "5629b0c92a7081bf3eee8f24b9e4a630db87fb2c50122fb024f166040ed03523",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "{\"profile_username\": \"lutitravelguide\", \"source_url\": \"https://www.instagram.com/reel/DeXYqWISZod/\"}",
+                  "subject": "event:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "predicate": "recommended_by",
+                  "proposal_id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/"
+                },
+                {
+                  "object": "cfc0f9ca8638665459ef229908002c205eaf1000cc9c359abcc107c216eda9e5",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "🗓️ 12 de noviembre vermu_interferencia presenta Festival de la pizza platense 📍Playon Estación Provincial y Ciudad de Gatos entrada gratuita",
+                  "subject": "event:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "predicate": "takes_place_at",
+                  "proposal_id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/"
+                },
+                {
+                  "object": "5880be49043ca429b54e679781acc52ff972a1f840d669be6a1500ed231daed9",
+                  "status": "observed_pending_editorial_review",
+                  "excerpt": "🗓️ 12 de noviembre vermu_interferencia presenta Festival de la pizza platense 📍Playon Estación Provincial y Ciudad de Gatos entrada gratuita",
+                  "subject": "event:4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "predicate": "takes_place_at",
+                  "proposal_id": "4560eb07e0274d217ff13ad348502d50a65efb6400dcee818822caadb6c6cf30",
+                  "evidence_url": "https://www.instagram.com/reel/DeXYqWISZod/"
+                }
+              ],
+              "evidence_spans": {
+                "block": {
+                  "end": 1370,
+                  "quote": "🗓️ 12 de noviembre\nvermu_interferencia presenta \nFestival de la pizza platense \n📍Playon Estación Provincial y Ciudad de Gatos\nentrada gratuita",
+                  "start": 1228
+                },
+                "title": {
+                  "end": 1306,
+                  "quote": "Festival de la pizza platense",
+                  "start": 1277
+                },
+                "venue": {
+                  "end": 1353,
+                  "quote": "Playon Estación Provincial y Ciudad de Gatos",
+                  "start": 1309
+                },
+                "address": null,
+                "organizer": {
+                  "end": 1266,
+                  "quote": "vermu_interferencia",
+                  "start": 1247
+                }
+              },
+              "field_evidence": {
+                "date": "12 de noviembre",
+                "time": null,
+                "title": "Festival de la pizza platense",
+                "venue": "Playon Estación Provincial y Ciudad de Gatos",
+                "address": null,
+                "organizer": "vermu_interferencia"
+              },
+              "identity_scope": "same_document_activity_title_venue",
+              "missing_fields": [
+                "time"
+              ],
+              "origin_account": "lutitravelguide",
+              "parser_version": "compound-v1",
+              "temporal_state": "future_or_today",
+              "multiple_places": [
+                "Playon Estación Provincial",
+                "Ciudad de Gatos"
+              ],
+              "acquisition_method": "official_meta_api",
+              "event_identity_key": "322cf2b590832970005822507f9eca43c382627e98bc3dca60b04d9bae4a0235",
+              "publication_approved": false,
+              "date_heading_evidence": "12 de noviembre",
+              "source_document_sha256": "90ddb6ce8171135e641a183ad440009d7425acfd81525592910d28d69cc0ce8b"
+            },
+            "timezone": "America/Argentina/Buenos_Aires",
+            "document_id": "document:https://www.instagram.com/reel/DeXYqWISZod/",
+            "publication_approved": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "label": "recommended_by",
+      "url": "https://poraca-lp-privado.vercel.app/api/radar2?resource=relationships&limit=1&after=relation%3A02c736e21e3ac2363ddfee784e8911f70929c662b63f493ee3db91ede1e96ff",
+      "status": 503,
+      "cache_control": "private, no-store",
+      "payload": {
+        "error": "PRIVATE_DISCOVERIES_UNAVAILABLE"
+      }
+    }
+  }
+]

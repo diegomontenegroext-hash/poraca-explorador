@@ -1,0 +1,12 @@
+{
+  "branch": "br-calm-queen-b46np7a8",
+  "before": {
+    "digest": "ac0198e0b77b236fd8c9a67ad55a624b",
+    "records": 3621
+  },
+  "after": {
+    "digest": "ac0198e0b77b236fd8c9a67ad55a624b",
+    "records": 3621
+  },
+  "changed": "one materialized visible-occurrence set per query; same contract fields; no new table or grants"
+}

@@ -1,0 +1,35 @@
+[
+  {
+    "source": "0221",
+    "documents": "4",
+    "proposals": "148",
+    "dated_activities": "148",
+    "complete": "132",
+    "cross_source_matches": "8",
+    "same_publisher_repeats": "48",
+    "ambiguous": "16",
+    "place_recommendations": "0"
+  },
+  {
+    "source": "El Día",
+    "documents": "4",
+    "proposals": "230",
+    "dated_activities": "230",
+    "complete": "225",
+    "cross_source_matches": "44",
+    "same_publisher_repeats": "55",
+    "ambiguous": "5",
+    "place_recommendations": "0"
+  },
+  {
+    "source": "Instagram",
+    "documents": "8",
+    "proposals": "69",
+    "dated_activities": "60",
+    "complete": "0",
+    "cross_source_matches": "0",
+    "same_publisher_repeats": "0",
+    "ambiguous": "69",
+    "place_recommendations": "8"
+  }
+]

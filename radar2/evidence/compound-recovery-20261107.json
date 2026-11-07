@@ -1,0 +1,609 @@
+{
+  "mode": "selective_compound_recovery",
+  "checks": [],
+  "matrix": [
+    {
+      "url": "https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267",
+      "type": "cartelera",
+      "source": "El Día",
+      "complete": 86,
+      "ambiguous": 2,
+      "activities": 88,
+      "before_dated": 0,
+      "before_observations": 1
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos/agenda-septimo-dia_1793514734",
+      "type": "cartelera",
+      "source": "El Día",
+      "complete": 20,
+      "ambiguous": 1,
+      "activities": 21,
+      "before_dated": 0,
+      "before_observations": 1
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago/fede-moura-juana-rozas-y-la-dupla-metalera-la-agenda-cultural-la-plata-n136575",
+      "type": "agenda_compuesta",
+      "source": "0221",
+      "complete": 41,
+      "ambiguous": 4,
+      "activities": 45,
+      "before_dated": 0,
+      "before_observations": 1
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago/festival-la-cerveza-mmce-y-piazzolla-piano-la-agenda-cultural-la-plata-n136995",
+      "type": "agenda_compuesta",
+      "source": "0221",
+      "complete": 29,
+      "ambiguous": 4,
+      "activities": 33,
+      "before_dated": 0,
+      "before_observations": 1
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago/massacre-y-las-armas-segundo-tiempo-y-mucho-mas-la-agenda-cultural-la-plata-n136584",
+      "type": "agenda_compuesta",
+      "source": "0221",
+      "complete": 24,
+      "ambiguous": 4,
+      "activities": 28,
+      "before_dated": 0,
+      "before_observations": 1
+    },
+    {
+      "url": "https://www.0221.com.ar/que-hago/sandra-mihanovich-la-plata-muerde-y-los-espiritus-la-agenda-cultural-la-plata-n136923",
+      "type": "agenda_compuesta",
+      "source": "0221",
+      "complete": 38,
+      "ambiguous": 4,
+      "activities": 42,
+      "before_dated": 0,
+      "before_observations": 1
+    },
+    {
+      "url": "https://www.instagram.com/reel/DeXYqWISZod/",
+      "type": "curaduria_cultural",
+      "source": "Instagram",
+      "complete": 0,
+      "ambiguous": 10,
+      "activities": 10,
+      "before_dated": 9,
+      "before_observations": 9
+    },
+    {
+      "url": "https://www.instagram.com/reel/DefVzFISwkm/",
+      "type": "curaduria_cultural",
+      "source": "Instagram",
+      "complete": 0,
+      "ambiguous": 11,
+      "activities": 11,
+      "before_dated": 1,
+      "before_observations": 1
+    },
+    {
+      "url": "https://www.instagram.com/reel/DexByxdy6dp/",
+      "type": "curaduria_cultural",
+      "source": "Instagram",
+      "complete": 0,
+      "ambiguous": 11,
+      "activities": 11,
+      "before_dated": 1,
+      "before_observations": 1
+    },
+    {
+      "url": "https://www.instagram.com/reel/DfDGyw_SkDA/",
+      "type": "curaduria_cultural",
+      "source": "Instagram",
+      "complete": 0,
+      "ambiguous": 13,
+      "activities": 13,
+      "before_dated": 0,
+      "before_observations": 1
+    },
+    {
+      "url": "https://www.instagram.com/reel/DfVEIVTSTGu/",
+      "type": "curaduria_cultural",
+      "source": "Instagram",
+      "complete": 0,
+      "ambiguous": 16,
+      "activities": 16,
+      "before_dated": 1,
+      "before_observations": 1
+    }
+  ],
+  "memory": {
+    "total_nodes": 243,
+    "active_nodes": 240,
+    "new_to_memory": 70,
+    "nodes_observed": 91,
+    "total_relationships": 577,
+    "active_relationships": 567,
+    "new_to_radar_evidence": 69,
+    "relationships_observed": 262,
+    "new_relationships_in_memory": 255
+  },
+  "parser": "compound-v1",
+  "run_id": "radar2-ghpilot-42332669232-attempt1-compound-recovery",
+  "status": "completed",
+  "aliases": 78,
+  "retired": 18,
+  "documents": 11,
+  "proposals": 318,
+  "readback_count": 318,
+  "reconciliation": [
+    {
+      "id": "c8180a5f62c5a3ff439264f7eda9aeeec12d58dbb8ac2d748942b9494edff3c2",
+      "title": "Narices negras",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "30aa2a1aafd462d7387263937fe0492574ab9f5d704ce73933da186e9fe10233"
+    },
+    {
+      "id": "d9d3aa69706c5aab2d026be11aaebd32e9a0aaca26fcc96f3c9bd9b421151194",
+      "title": "Escrito en la piel",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "28adbcf4c6a80647706c18d64e7a204ec8ee1b93d8b467010d8c9f083e70edb9"
+    },
+    {
+      "id": "dbcf563c45b0ccdd75b9c2910e17c82f9e688c0360c22c94ffb66037a1163c13",
+      "title": "Fulanas Trío y El Engrupe",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "d2b28fdfdb3c345fafd2da56110159424a2f3aeb45849222e8c12399bf581cf7"
+    },
+    {
+      "id": "e3b5ab01e78edced22abf75383d5272fd8b6385cebf5e68892c0f12072c0ab5a",
+      "title": "Las mil y una noches: Las aventuras del Príncipe Achmed, musicalizada en vivo",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "703b02b9cf6b6a77b2f3372e6437df3bba67562dbf894607796057753ea4f223"
+    },
+    {
+      "id": "0808634d206c4b0592ff183bd3372bdbcc8408ee0f3407bb48aeea521b80446a",
+      "title": "Segundo Tiempo Sexteto",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "27e85cf9178d948b726dab4ed505ca5ea5cb23433c531bc5088c7853b4c46c44"
+    },
+    {
+      "id": "16aa366cda0a2e30ef882c8a14f8f359717946bf2e14a80d08ea057aa2c15766",
+      "title": "Cine EcoSelect: El viaje de Chihiro",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "c7b0c83284754e40f3d4eba9a932de0f2568478aadaa84ba6523c7e076934630"
+    },
+    {
+      "id": "19a09984db449d6b4f60919e276b64ae4f0e369e4497fb9362acb1912057d005",
+      "title": "Cine Select: Susana Rinaldi, libre",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "0b0a5a68179cdfd2be47b47ac0eca0e4e7b1713c78b9ff1f4c86708e9ad60d19"
+    },
+    {
+      "id": "2498baec3369cfb3e2446a21030e7ecc67a9f47abe64af31eb87043d97f7a8b6",
+      "title": "Conversatorio de artistas: Aripuca, la paradoja del encierro MUMART,",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "263e02400ecce37ed9132f56be41ec7a9caf563e8b62f9186685df5001923137"
+    },
+    {
+      "id": "26159cc331c48e9a803c5f79821422942567f74a431b73aa7b8c9373d91d172e",
+      "title": "II Congreso Internacional sobre Diego Armando Maradona: Tras las huellas de su legado",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "471595d86fa1eba47b899541601b4056af9d43f487ff5df208d8c8516d87a331"
+    },
+    {
+      "id": "2ec563e44801b6ce4112ce8d8faca03f7876b41ddc3740e8673565f83c6205e9",
+      "title": "La flauta mágica",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "76e7c28c1f733104ef99adebf83be326536fd194e1ac2b439c0e8fcd72c35335"
+    },
+    {
+      "id": "2f58157e21c6a59d40d874af0cff3e24cbb9f6a6c52b261a3dbc23aaed7e5906",
+      "title": "Antonio Birabent",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "31974e81a1f268d1fd46846bd3f10e3bc5cce28d6977ed342196f70a2dc28618"
+    },
+    {
+      "id": "52ee6443e5bf3a4c6b4b4c93a8d8d9217387d67db9e05177475f0b95e311a1ab",
+      "title": "Cine Select: Hausu",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "9610fa7fc71b1fa3a0979a5edca1997c033be768eea625dadbc16c76032a1336"
+    },
+    {
+      "id": "581de1525c34970b68bdfee908af6e523e3b58499731f3b82b58b3a360f911f7",
+      "title": "Cine Select: Cría cuervos + La prima Angélica",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "7c45529b3980135f902d6e5786721f8e37725f4a7fd071debc73717b4d25b2ab"
+    },
+    {
+      "id": "725c2071840934b7662d53737db687fffb05950d13f4c23396f5175bd95c4e72",
+      "title": "Danza por la identidad",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "0ba7337d07fd256b241dc4f0afd7016ffa2837f718bc51e00eb731d6a5702168"
+    },
+    {
+      "id": "75f9a410aa1c4d3f790e292ac971c0d949e11e6ce4273797dfcaa06bb978eb45",
+      "title": "Fito Páez",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "eb42880e9c98849556486e57e9c6dc406ae60a4c2a1c59875a7f29568842fcc4"
+    },
+    {
+      "id": "873a1b3b87f0fb8e4667b253f129ebcd06da238b4ffdcde75d213c490fbd0d95",
+      "title": "Cine Select: El principito",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "bfc076cef292ac19b23123ad9e081136e1952e7eeffab6b181bf811743df86f7"
+    },
+    {
+      "id": "8c9e121554c752bbf7f2796737c93bed66c99583c6d7e0633fae6ac34b186da8",
+      "title": "Perú Vive",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "fe4a71aa4204c5904c4b131857e4d6669cd4292b4950d061fa06baed7e0dbdfb"
+    },
+    {
+      "id": "96cb863938a2ffc01d9cffbdea5ae971a12375767b061a206f8fa0c5daac9b4b",
+      "title": "Pequeño Pez",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "fafe88bb28f68417cc9b88918155722287d67a09d86f17ca14296a254d8dec33"
+    },
+    {
+      "id": "a17f9f5a4bbe982c7ce019a104fbd04e195fcaf52f01c67f98d1bea9e7b27c4b",
+      "title": "Cine Select: Éramos tan flacos",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "a78e85605e266e736aa4f87dcca27a1b88c087959bc086cb08e4a0ecf6959015"
+    },
+    {
+      "id": "a26e323f6d75031aeab17d93febbde7706e219359746593d869decd36acdef94",
+      "title": "Poética de la multitud + Puta Ama DJ",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "3d47c7ee06fe4a0828cea70a0edcf7e5fdc1c0578d8f173debff11263515c910"
+    },
+    {
+      "id": "b56d05297824e65e96158470d3c646be397c550536d01a750642911d8a991dab",
+      "title": "Pupina Plomer - Especial Brujas",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "d23977e74ed68861c1fd7359653e7053c9bd667cd32cff70537ccc03c616f845"
+    },
+    {
+      "id": "ccc091713220cc9932afb9df48688117ffc70fcd054ba0de03a1bbda5bd0545c",
+      "title": "Mi vida anterior",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "2a6ed5ec85ed79c60c6844671a76cc47ff6bcea60f9d62554a8a5e2a0e523be0"
+    },
+    {
+      "id": "d30d803c5764394e5cf451617f9bdac501511077a3f2b884e99f214e448751c9",
+      "title": "Pablo Fábregas: Inestable",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "cbe5ccbc11140e31af938fb691305bd0807c9d7b85938dc834f488987b44f00a"
+    },
+    {
+      "id": "dfdd78476c85b7138c7e01252fa70d1bb9e86fa8d4755ac0637a100db41bbdf8",
+      "title": "Cine Select: La casa del minotauro",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "f8b32e84b4ff416f8d9620f9eb95ea8b0b997115f8e9ef45490d98a0cd49b132"
+    },
+    {
+      "id": "dfe33c1f26407c4de943abb713a5815fec95f257ed0011b723aa075e02bd6ad3",
+      "title": "Massacre y Las Armas",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "8f1a43fef1a1abd11592db53247e7d7b74ba9bc4bf47e534c91688be8443edb1"
+    },
+    {
+      "id": "e83f3bbd865102524b6d38633f1c6502089da8367763e454d3dd99d96aa4fcb6",
+      "title": "Perú Vive",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "1425bf216a168134e45274f6e32498dbb8251fea0c71caf7280aa352158bb468"
+    },
+    {
+      "id": "f00eb0caa71e9f3461ccfa13cce968b30e6c515e5df3cb01b21be6eb6e7b14de",
+      "title": "Presentación del libro Carne de cañón. Memorias travestis trans de la dictadura",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "e44ccb056807eb1769ddb371db6cfcfd03cec00a73349d43381e803cd8cc42a1"
+    },
+    {
+      "id": "f7d53d7b172abc967e9bc074e03ecec24d7f684afe54e17b5e5042ba762143d4",
+      "title": "La flauta mágica",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "4def28ecc47d8a37752206e39a76358eb87c4789605842e44e68fb6fc20631f9"
+    },
+    {
+      "id": "2223692d0277b5494cd74c2497523ad50648a8980915177643580fa60dfca6d8",
+      "title": "Narices negras",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "30aa2a1aafd462d7387263937fe0492574ab9f5d704ce73933da186e9fe10233"
+    },
+    {
+      "id": "314d4a5112ffc023ea7b01a29da4f2cf8d0a18f9a2c453a0cb390942c957863e",
+      "title": "Enrevistadas",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "deefed6d73c2c0882d036b5c9e977f546d85497b8c04b1c4cb34c36456cb36dd"
+    },
+    {
+      "id": "32619c19685e7447939969f94e1894ca0b39dde210e06bf3dc0df3ad82d65061",
+      "title": "Festival de la Cerveza Capital: Traiko Meta Guacha, Sindicato Argentino de Boleros, La Feeling Blues, Palassi Reggae, Dinosaurios Now y DJ China",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "dcf035044c7daff08eb590102650d0e435110b8a1ad86f3a9547c52ffb058cca"
+    },
+    {
+      "id": "40888d9c1a542ac4e7535c0263a803718ab4e22ae4d15ae7a416c6ce48f5903b",
+      "title": "Fulanas Trío y El Engrupe",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "d2b28fdfdb3c345fafd2da56110159424a2f3aeb45849222e8c12399bf581cf7"
+    },
+    {
+      "id": "490483fba698d019c0f37f4150527d70f36ead7a4055ea73bc56b967225938cf",
+      "title": "Festival de la Cerveza Capital: Ezequiel y la Clave, Ilan Amores, Oye Pana!, Se Viene la Maroma, Manijas Percusión, DJ Tahiel Yain y DJ Castropical",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "0fac176e44b4db03a98f5fcdfb464c1dd9bd8fb883f1a47084dc62b3ed770039"
+    },
+    {
+      "id": "5238857576097c4a1a38897db543852b8ac9c3de2f713792b8196cd822814e36",
+      "title": "Piazzolla en piano: Mario Parmisano",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "b076ce0919b884d5638bdd71aaef7ad7be2e7ecbbbd054df68e759a2fe4a9caa"
+    },
+    {
+      "id": "5396bb1a0c3929e197e633074ad4914885c407d235903989f3cb338efed7bf37",
+      "title": "Cine EcoSelect: El increíble castillo vagabundo",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "cee40c4dcb450227b4b6e4cce280ccb4e07ab320cb15fb30c9fc96f71fd1ea55"
+    },
+    {
+      "id": "5749884367909398f2b5e19f8415b1fbeb7b80ed5bd4e59b1643dafae24e2271",
+      "title": "Cine Select: El origen de los guardianes",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "42a856e9c07fe2e1a9f71d394b4d61aafc1db962e4093a27d2e4e04658f85d67"
+    },
+    {
+      "id": "66fbec541ded7f91153c9e37e548596680b13298ab98d8924bf91ff956d9ed7a",
+      "title": "Festi Chaza: Roxana Carabajal, Los Chaza, La Bestia Folk y Los Silveyra",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "090a50bcfcd3bfe141e70878b6eb860b2f8398908ee5cecd0737b5b9ad94301e"
+    },
+    {
+      "id": "6af3160ebc963f85a1c8ca1509e462c7a1548d1514c9fa85b2d1b426282bb20e",
+      "title": "Solo Cerati",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "836166e0a46a967300730f83522cbcc2f6501708a467b71ed07ea06e273be17b"
+    },
+    {
+      "id": "6b92dc2a039a1db2cc99e81b8d5c5a848186ced6fbbc6b5a8aaa51b21386c349",
+      "title": "Walking Tour gratuito: Circuito Misterios de la Fe",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "5a13f71419b1f66bc65ab03297425fc82a8ca299b8128aa0646ffabab3afbca3"
+    },
+    {
+      "id": "6c2c052757acc9ca75fdc1781ecb27ffc403e633710555c6647c3b874ddc7554",
+      "title": "Nanutria",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "d8f9857064591fcad9531a37800da2ac564fe884085fd86a90cc0d5ad3bdd93c"
+    },
+    {
+      "id": "6c364974eddf4aa2e5799e9c7b18bb6bead160b8aa779047ee296f420d158178",
+      "title": "La Facunda (farsa rural)",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "cddc1b4b9b6c6bbd870c797f3547b2a4587935404796a2431822f5d302c773df"
+    },
+    {
+      "id": "81b16acccafd1f451c11de9df2c1203ad444b28cd8acbcb7ed3ed28b25d048d3",
+      "title": "La Plata Muerde 2026",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "778a69f3188cba4fceb63617a372f2c7b5d065721c8d72cac2a7270f0adeccce"
+    },
+    {
+      "id": "9210683de75c7d84bd751f61f19a58aeb18ffee0e800f2a46e4a8e11ce97f623",
+      "title": "Diego Frenkel: A través de otras canciones",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "8ccab367a324ada6c0f11c397e803a4ebf6cf0d28fb6a58549cdc12289cb388b"
+    },
+    {
+      "id": "957f218c0978307083e24caa0e712fd5d3a1565f54448f4051c263551416d0c9",
+      "title": "Cine Select: Nené y las cosas",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "f2fd37f21b5db2a67a8c2f7a09ae332dd3f74070fbfd2f2be667e4bf0247c744"
+    },
+    {
+      "id": "9e628e76b2af61336766f072b8931a789d7603e6ba4b7501cb57dedde7b5fef9",
+      "title": "Cine Select: Sorcerer",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "9730ed5287cf09beef2c8c6977fb2a05518018fc9f3cab56f052f35f92672ba6"
+    },
+    {
+      "id": "b8a4fc9c8b0d82423b919cb4deed9d51dc0a10c447abee8eb7e1ac9df91e73f8",
+      "title": "Cine Select: Corto de caza en 35 mm (Cazadores nocturnos)",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "443d5fcc227ab29d3c8b5194e42e438d31ce4e2e7106a970592cb62f215ef861"
+    },
+    {
+      "id": "c006f2c82abf4d08fd429dda8f4c42ae716505a75dd581265f9c29ca042744a8",
+      "title": "Cine Select: Soy ella",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "113eceff204977252dd0cb350c53dfacb47830072d70270d3ae6e0b9c05611e5"
+    },
+    {
+      "id": "c48af8f4950f32e3e7800dc04beeb676effb6392cfb867c84671ba2871289040",
+      "title": "Las mil y una noches: Las aventuras del Príncipe Achmed, musicalizada en vivo",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "703b02b9cf6b6a77b2f3372e6437df3bba67562dbf894607796057753ea4f223"
+    },
+    {
+      "id": "c7907374efe95146519f5656e32bc1c460b22282b8f2e2c867888f9764677ec0",
+      "title": "Las hijas",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "99309da03b63e11806a18ffaced26f00fad5dffa879689867453f7a652726af9"
+    },
+    {
+      "id": "cbedfd227610c66f0004361c01cbcb704ac4b4bda84fa84976c0089cd20a1b20",
+      "title": "Walking Tour gratuito: Ciudad Soñada",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "c9e0e9c16f84158222fe38bbd92162f342796a2ebd65a77240e7e9bb4d8c06de"
+    },
+    {
+      "id": "d17fe35c4cfd52dc5c9b165504de6dd35a632e36a7ccae27e73e2158b2e3a8e5",
+      "title": "Improvisación Artificial",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "9888ad3c2e144cd82551bb6495ee81504faf330b9570106f11bfcab1a0d0e1e4"
+    },
+    {
+      "id": "d225443b892807d32e4af4e35a4f60e8e64624caac3bc67de1c8babb2fc7adf6",
+      "title": "Brotes",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "8808cb9ec7d211c1ccfe4e790600787451da02d670123fa60cfb9f545262ae5a"
+    },
+    {
+      "id": "d7f2956c6bed3337a95a31c809d3b2eb5a9335085c10e2304d4113a6182a93ca",
+      "title": "Cine EcoSelect: Pertenencias",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "5b3dfbf58a6a6059b7f2d64f3672a07d480fbd6deec5dfce35c74c3894d1bca3"
+    },
+    {
+      "id": "df34bda06d0c2aed9de99e364e29587ffe42a7042d5c983f9a5704f366173361",
+      "title": "Escrito en la piel",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "28adbcf4c6a80647706c18d64e7a204ec8ee1b93d8b467010d8c9f083e70edb9"
+    },
+    {
+      "id": "e7d8ceec3bea5cbc63de1c440566937f51c82864d6e7315c4edfaa67f5d961b4",
+      "title": "Cerouno, Vinyltracker y Juan97. Abre Alessvndra",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "d4fb65d504415151018676e1c6de8b07c3105a82a8d6f718a58f9b00bbc91771"
+    },
+    {
+      "id": "f92debc859a19564ffb95145a58390a1763ca9987c4c7cba31e2fe78c04bf4c7",
+      "title": "Sandra Mihanovich",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "48ec1e40fcac690770bf202c595952a6336e826c8a83f0b527cc859a908814b1"
+    },
+    {
+      "id": "000ce368e172a8c4017b2488f364d7ef4b41a20b679747149a97f63194a90e2a",
+      "title": "La industria del amo(r)",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "a91f8e4ab42850f2f673fb1d73bc854921ec911b0b794444cb97a7f28c65624e"
+    },
+    {
+      "id": "011614ad61a454776b75cee57897b0d64d7076de2116823ce0f1a84b19fcf5a1",
+      "title": "¡Actúen!",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "e6ffb423973f9d690e78779a9eca1aa10919bc46cf77d0f40a831fdfe5ef4578"
+    },
+    {
+      "id": "08c5a213356f0600fd94fd5263177ab6b9f07b543828ca0a19196b26d2e875bd",
+      "title": "La Plata Muerde 2026",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "778a69f3188cba4fceb63617a372f2c7b5d065721c8d72cac2a7270f0adeccce"
+    },
+    {
+      "id": "2906862b6354d49bd8608d4875e18330c52a9b4f9c259c33a0180e22ebbb65d9",
+      "title": "Festival de la Cerveza Capital",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "0fac176e44b4db03a98f5fcdfb464c1dd9bd8fb883f1a47084dc62b3ed770039"
+    },
+    {
+      "id": "2f28b1447b6cc60a4c47af4a9518e9681447ce3bc2f309d3f2f9faa832e75ce9",
+      "title": "El increíble castillo vagabundo",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "cee40c4dcb450227b4b6e4cce280ccb4e07ab320cb15fb30c9fc96f71fd1ea55"
+    },
+    {
+      "id": "2f6a07086c9cdb5e65621ad36f24b14797a38e47d74674ef719db740bd69d540",
+      "title": "Polenta",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "04a6c27454661bfbfd79c1a05c88cbafa78063d9d6bea9382822f029da2e5560"
+    },
+    {
+      "id": "31117e974ae0a8e795ae528735bd988c546e4146ea7ae524dfc1258972d64c37",
+      "title": "Las hijas",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "99309da03b63e11806a18ffaced26f00fad5dffa879689867453f7a652726af9"
+    },
+    {
+      "id": "404b9d48eb1f0923013fe08eec35588570c12662f1d0575fbb5fc6195d79cf6d",
+      "title": "Greatest Hits de los 80",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "4beeb219cbc25668a79364a58feac78e2b2519c36e65de692cbe187f7c1d9bb1"
+    },
+    {
+      "id": "55f0a1cc882b26c1450bc3f9ec3274286b01d73b3be17faddc3d4bf55cad359e",
+      "title": "Carmen Sánchez Viamonte",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "d98ae87c0d68db41c7cb29a43f2e8905c6a2324fded1bfa4e89c4c03bdff8297"
+    },
+    {
+      "id": "5bce3122fd1054954d0446cdb7c399d03e2587bd81127f7e8259559cfad7902a",
+      "title": "Luna Sujatovich e Inbal Comedi",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "45da17c5e090a492db4f708aa28bbe105d5f722ea94852a1143841c7271a0dc0"
+    },
+    {
+      "id": "82120749041de32e94f2a0c35cd662db39356ced33be5fa4672f0d3cecc80fba",
+      "title": "Fulanas Trío y El Engrupe",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "d2b28fdfdb3c345fafd2da56110159424a2f3aeb45849222e8c12399bf581cf7"
+    },
+    {
+      "id": "825607f068b7b7dd86dbeb63946e18c08570e0e24ab94612d55c5c640a95c20f",
+      "title": "El origen de los guardianes",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "42a856e9c07fe2e1a9f71d394b4d61aafc1db962e4093a27d2e4e04658f85d67"
+    },
+    {
+      "id": "8377c742e2d57e5c3a035f8cd9aef6cbbd2479f8c6d288206e1d8df8c1293f47",
+      "title": "Festival de la Cerveza Capital",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "dcf035044c7daff08eb590102650d0e435110b8a1ad86f3a9547c52ffb058cca"
+    },
+    {
+      "id": "8fecb5c92fee7c0574af1f0729b068be84b3ea241edb343112da329b87f3adb2",
+      "title": "Todo Queen y Elton John",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "079483f5c7ad61a7e09aa6e237f43b131c1d57ea92b3b00e983abd5679be0861"
+    },
+    {
+      "id": "99672169840d86e6a6dd0fefafc8e464d101a9983bff60b054af98ba34436dcd",
+      "title": "Sandra Mihanovich",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "48ec1e40fcac690770bf202c595952a6336e826c8a83f0b527cc859a908814b1"
+    },
+    {
+      "id": "a00227c142688fb4fe4562ec1f972f7bf4e3fb50a3a80c5caa21983fcc64ce5b",
+      "title": "Solo Cerati",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "0568ee32c5b4ea9e3bbc9ffd9803da6d77039343528ff7b0f1575db1139b8db3"
+    },
+    {
+      "id": "bc5ce193bd834648966a2f7c3a469e0ecbfc68b21b5acd0047bc1a055528be41",
+      "title": "Festival de la Cerveza Capital",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "25109bc00b5dcbd63b7d45ed83043402596fabac61520091a90d80cb2c359f00"
+    },
+    {
+      "id": "c37ad232017d0ce95a7f6937af6eb81acef67aef649952f47699412462ac3356",
+      "title": "Ciudad violenta, antropología urbana",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "59e27270c5b6a65916358ec5547b1dfcfe9faab8d357f66c715f8db8be00a997"
+    },
+    {
+      "id": "dab9c34372e7359d96c4927607b0b574fbf16490d5e779208248baa845d5bbad",
+      "title": "Las mil y una noches: Las aventuras del príncipe Achmed",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "703b02b9cf6b6a77b2f3372e6437df3bba67562dbf894607796057753ea4f223"
+    },
+    {
+      "id": "47639afa4ea6b467ee28510e12b46c50d79de67340fd9f99cd94ccdf7f1381fb",
+      "title": "La flauta mágica",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "4def28ecc47d8a37752206e39a76358eb87c4789605842e44e68fb6fc20631f9"
+    },
+    {
+      "id": "acb01c182a7b662062b69134569a39e4e9327bd26f922f7ffb90b55f25c2a352",
+      "title": "Perú Vive",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "fe4a71aa4204c5904c4b131857e4d6669cd4292b4950d061fa06baed7e0dbdfb"
+    },
+    {
+      "id": "f933146d6bb07a9e93d4e319d4f22e6e78b0ef8a297307fbefee58ec6ed2f693",
+      "title": "Pequeño Pez",
+      "reason": "matching date, hour, venue and equivalent cultural title",
+      "duplicate_of": "fafe88bb28f68417cc9b88918155722287d67a09d86f17ca14296a254d8dec33"
+    }
+  ],
+  "collector_sha256": "990830a6c244cb0da582b5896b7cefd1b032c3840f98fa9c7c73cf5378e5836d",
+  "processor_sha256": "9146cf4b8531b821352f1a44237d4f32da304e25aae953d334a4e92932120fdb",
+  "acquisition_requests": 0,
+  "publication_approved": false
+}

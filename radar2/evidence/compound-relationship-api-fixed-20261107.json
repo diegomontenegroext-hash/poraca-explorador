@@ -1,0 +1,44 @@
+{
+  "status": 200,
+  "headers": {
+    "age": "0",
+    "cache-control": "private, no-store",
+    "content-encoding": "br",
+    "content-type": "application/json; charset=utf-8",
+    "date": "Sat, 07 Nov 2026 03:14:57 GMT",
+    "etag": "W/\"3fb-L4Ivz9+xJ85vA3Xs7EbcI9kYBzQ\"",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "server": "Vercel",
+    "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-robots-tag": "noindex, nofollow, noarchive",
+    "x-vercel-cache": "MISS",
+    "x-vercel-id": "gru1:iad1::iad1::d9pq8-1794021292415-f2c0ace3dc8c"
+  },
+  "payload": {
+    "schema": "poraca-cultural",
+    "version": 1,
+    "resource": "relationships",
+    "publication_approved": false,
+    "count": 1,
+    "has_more": true,
+    "next_cursor": "relation:02c736e21e3ac2363ddfee784e8911f70929c662b63f493ee3db91ede1e96ff4",
+    "items": [
+      {
+        "id": "relation:02c736e21e3ac2363ddfee784e8911f70929c662b63f493ee3db91ede1e96ff4",
+        "object": "entity:5629b0c92a7081bf3eee8f24b9e4a630db87fb2c50122fb024f166040ed03523",
+        "status": "observed_pending_editorial_review",
+        "excerpt": "{\"profile_username\": \"lutitravelguide\", \"source_url\": \"https://www.instagram.com/reel/DexByxdy6dp/\"}",
+        "subject": "event:794dc6ac9a191cf67e0fa24f8acda0b242aa0259a4c24bed2332cc8c923ea4c0",
+        "verified": false,
+        "predicate": "recommended_by",
+        "last_run_id": "radar2-ghpilot-42332669232-attempt1-compound-idempotence",
+        "proposal_id": "8196bfacd9bd4cd73782a0168142b803f09075de0badb72e39dcf620787a7b4e",
+        "evidence_url": "https://www.instagram.com/reel/DexByxdy6dp/",
+        "reference_state": "resolved",
+        "original_subject": "event:8196bfacd9bd4cd73782a0168142b803f09075de0badb72e39dcf620787a7b4e"
+      }
+    ]
+  }
+}

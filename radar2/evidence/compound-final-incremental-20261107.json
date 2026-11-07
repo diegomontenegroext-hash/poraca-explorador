@@ -1,0 +1,16 @@
+[
+  {
+    "run_id": "radar2-ghpilot-42333406637-attempt1",
+    "status": "completed",
+    "mode": "incremental",
+    "readback": {
+      "status": "completed",
+      "documents": "10",
+      "proposals": "35"
+    },
+    "captions": "3",
+    "meta_queries": "0",
+    "genda_pages": "1",
+    "source_errors": "0"
+  }
+]
