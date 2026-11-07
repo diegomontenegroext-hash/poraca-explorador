@@ -77,7 +77,7 @@ class CaptionVenueResolution(unittest.TestCase):
   p=self.parse(self.doc('lauraganceramica','¡Taller de fotocerámica!\nDomingo 8 de noviembre 13 a 17hs\nTaller Laura Gan Av. 13 num 343 entre 38 y 39, La Plata'))[0]
   self.assertEqual(p['venue'],'Taller Laura Gan')
  def test_cinema_with_address_and_own_room(self):
-  p=self.parse(self.doc('proyeccionesterrestres','Sábado 7 de Noviembre 19:30 hs - Nuestra Tierra\n📍 Calle 3 e/ 66 y 67 n°1663, timbre 3\nNos vemos en la sala 🙂'))[0]
+  p=self.parse(self.doc('proyeccionesterrestres','Sábado 7 de Noviembre\n🎬 Cine nacional\n19:30 hs - Nuestra Tierra\n📍 Calle 3 e/ 66 y 67 n°1663, timbre 3\nNos vemos en la sala 🙂'))[0]
   self.assertEqual(p['venue'],'Cineclub Proyecciones Terrestres')
   self.assertEqual(p['venue_basis'],'owned_venue_with_explicit_address')
  def test_home_venue_only_is_candidate_not_fact(self):
@@ -93,7 +93,7 @@ class CaptionVenueResolution(unittest.TestCase):
   self.assertFalse(p['account_context']['account_verified'])
  def test_itinerant_artist_never_inherits_sala(self):
   ps=self.parse(self.doc('sindicatoargentinodeboleros',
-   'Agenda de Boleros\nSábado 7/11 22hs en Camping Municipal\nDomingo 8/11 por Canal 7 23:30hs\nMiércoles 11/11 por YouTube 20hs'))
+   'Agenda de Boleros - recitales y música\nSábado 7/11 22hs en Camping Municipal\nDomingo 8/11 por Canal 7 23:30hs\nMiércoles 11/11 por YouTube 20hs'))
   self.assertGreaterEqual(len(ps),1)
   self.assertTrue(all(p['venue'] is None for p in ps))
   self.assertTrue(all(p.get('venue_candidate') is None for p in ps))
