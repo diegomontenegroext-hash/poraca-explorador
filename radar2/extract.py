@@ -11,7 +11,7 @@ PUBLISHERS={'que hacemos','eleven flow','pogo','saleplan','teatrina','marquesina
 def category(text):
  # Explicit screening-series titles are stronger evidence than generic topic words.
  # Preserve source labels in revisions; never guess film from a venue or poster alone.
- if re.search(r'^cine\s+(?:eco)?select\s*[:\-]',norm(text)):
+ if re.search(r'^\s*cine\s+(?:eco)?select\s*[:\-]\s*\S',text or '',re.I):
   return 'Cine'
  for pattern,label in [(r'vino|bodega|degustacion|cata\b','Vino'),(r'teatro|obra|escenario','Teatro'),(r'fotografia|exposicion|fotolibro|inauguracion|cianotipia|mosaico','Arte'),(r'taller|seminario','Taller especial'),(r'electronica|techno|circus|intra|\b999\b','Electrónica'),(r'musica|recital|banda|concierto|guajira','Música')]:
   if re.search(pattern,norm(text)):return label
