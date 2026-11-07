@@ -1,8 +1,8 @@
-# Radar 2: reintento diagnóstico oficial de Meta, autorizado desde chat.
-# Mismo job y cron, sin imprimir tokens ni respuestas HTTP crudas.
+# Radar 2: validar token Meta renovado mediante workflow existente.
+# Una sola corrida, sin nuevo workflow, cron ni servicios.
 trigger_date=2026-11-06
-trigger_slot=meta_official_http_diagnostics
+trigger_slot=meta_token_renewed_live_validation_20261106_2218
 trigger_mode=radar2_pilot
-trigger_reason=record_safe_meta_error_codes_in_neon
+trigger_reason=validate_meta_token_renewal_and_official_instagram_posts_in_neon
 trigger_scope=standard_daily_acquisition
 certification_batches=1
