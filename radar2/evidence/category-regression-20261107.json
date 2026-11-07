@@ -1,0 +1,88 @@
+{
+  "schema": "radar2-category-regression-v1",
+  "date": "2026-11-07",
+  "parser": "compound-v1.2",
+  "source_url": "https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267",
+  "input": "original from existing Neon radar2.documents (SELECT only; no new acquisition)",
+  "original_activity_count": 88,
+  "reinterpreted_activity_count": 88,
+  "category_counts": {
+    "Música": 34,
+    "Teatro": 33,
+    "Cultura": 10,
+    "Cine": 8,
+    "Infantiles": 1,
+    "Literatura": 1,
+    "Charlas": 1
+  },
+  "spot_checks": [
+    {
+      "title": "Diego Frenkel",
+      "previous": "Teatro",
+      "new": "Música",
+      "day": "2026-11-07",
+      "time": "20:00"
+    },
+    {
+      "title": "Ricardo Parisi",
+      "previous": "Teatro",
+      "new": "Música",
+      "day": "2026-11-07",
+      "time": "21:00"
+    },
+    {
+      "title": "Retumbe",
+      "previous": "Teatro",
+      "new": "Música",
+      "day": "2026-11-07",
+      "time": "16:00"
+    },
+    {
+      "title": "Los Totora",
+      "previous": "Teatro",
+      "new": "Música",
+      "day": "2026-11-07",
+      "time": "21:30"
+    },
+    {
+      "title": "14º Encuentro Coral Berissense",
+      "previous": "Teatro",
+      "new": "Música",
+      "day": "2026-11-07",
+      "time": "19:30"
+    },
+    {
+      "title": "Feria del Playón",
+      "previous": "Teatro",
+      "new": "Cultura",
+      "day": "2026-11-07",
+      "time": "14:00"
+    },
+    {
+      "title": "La nona",
+      "previous": "Teatro",
+      "new": "Teatro",
+      "day": "2026-11-07",
+      "time": "21:00"
+    }
+  ],
+  "tests": {
+    "command": "python3 -m unittest discover -s tests -q",
+    "executed": 536,
+    "passed": 535,
+    "skipped": 1,
+    "failures": 0,
+    "radar_specific": 66
+  },
+  "genda": {
+    "normalized_labels_checked": true,
+    "raw_tag_preserved_for_future_acquisitions": true,
+    "existing_rows_reprocessed": false
+  },
+  "persistence": {
+    "neon_writes": false,
+    "old_rows_remain_uncorrected": true
+  },
+  "acceptance": "Parser/categorization technical QA PASS; stored-data replay and independent editorial QA pending",
+  "environment": "short-lived Vercel Sandbox clone of public repo, stopped after QA"
+}
