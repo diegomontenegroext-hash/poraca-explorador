@@ -4,6 +4,7 @@ from datetime import datetime,timedelta
 from zoneinfo import ZoneInfo
 from urllib.parse import urlsplit
 from collector import norm,compact
+from territory import event_location
 
 MONTHS={'enero':1,'febrero':2,'marzo':3,'abril':4,'mayo':5,'junio':6,'julio':7,'agosto':8,'septiembre':9,'setiembre':9,'octubre':10,'noviembre':11,'diciembre':12}
 PUBLISHERS={'que hacemos','eleven flow','pogo','saleplan','teatrina','marquesina'}
@@ -90,6 +91,10 @@ def extract_document(c,d,accounts,method):
     c.checks.append({'url':d['url'],'status':'generic_ticket_title_requires_review'});continue
   key=add(title,dt.date().isoformat(),dt.strftime('%H:%M') if 'T' in item['startDate'] else None,venue,ev,item.get('url'),org.get('name') if isinstance(org,dict) else None,end_date=end,category_label=label or category(title+' '+item.get('description','')))
   if key:
+   # Geographic evidence belongs to this specific JSON-LD Event, not the
+   # region of its publisher, a search result page, or an Instagram account.
+   # A source assertion is NOT independent venue verification or admission.
+   c.proposals[key]['territory_resolution']=event_location(item,d.get('final_url'))
    for field,role in [('performer','performer'),('director','director')]:
     actors=item.get(field) or [];actors=actors if isinstance(actors,list) else [actors]
     for actor in actors:
