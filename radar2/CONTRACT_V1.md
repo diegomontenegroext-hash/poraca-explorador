@@ -165,3 +165,12 @@ por consulta para evitar recálculos por arista; no hay tabla, servicio ni cron 
 El cierre específico de esta ampliación y sus gates están en
 [COMPOUND_FINAL_20261107.md](COMPOUND_FINAL_20261107.md) e issue #20. El resultado
 operativo no sustituye la evaluación editorial ni certifica continuidad natural.
+
+
+Subactividades narrativas (`compound-v1.1`): `evidence.parent_program_id` apunta a
+una propuesta existente; `parent_relationship=part_of_program` expresa relación
+observada, con `subactivity_evidence` y span literal. La fecha deriva del programa;
+el horario requiere evidencia propia. `venue_basis=parent_program_context` distingue
+sede heredada por contexto de sede explícita; `sublocation` preserva referencias
+como escalinatas. Traslado o modalidad virtual impiden herencia automática. No cambia
+el conjunto de recursos del contrato ni la aprobación editorial.

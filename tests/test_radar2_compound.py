@@ -88,3 +88,33 @@ class AcquisitionBudgetRegression(unittest.TestCase):
   self.assertTrue(requires_interpretation(dict(d,sha256='b'),[],previous,[]))
   self.assertTrue(requires_interpretation(dict(d,published_at='2026-11-07T10:00:00Z'),[],previous,[]))
   self.assertTrue(requires_interpretation(d,[],dict(previous,interpretation_version='old'),[]))
+
+class NarrativePrograms(unittest.TestCase):
+ setUp=Compound.setUp
+ doc=Compound.doc
+ def program(self,description):
+  return self.doc('Hoy Música Encuentro.- De 15.30 a 18 en el Museo Sur, calle 1. '+description+' Otro.- A las 21 en Sala Norte, calle 2. Tercero.- A las 22 en Sala Este, calle 3.')
+ def test_explicit_clock_and_sequential_book_have_parent_evidence(self):
+  d=self.program('A las 17.45 habrá un cierre coral en las escalinatas del museo, que interpretará canciones. Luego se presentará el libro “Versos del sur”, de Ana Pérez.')
+  ps=interpret(self.c,d,[]);children=[p for p in ps if p.get('parent_program_id')]
+  self.assertEqual(len(children),2);self.assertEqual([(p['title'],p['time']) for p in children],[('un cierre coral','17:45'),('Versos del sur',None)])
+  self.assertTrue(all(p['venue']=='Museo Sur' and p['date']=='2026-11-06' for p in children))
+  self.assertEqual(children[0]['sublocation'],'las escalinatas del museo')
+  self.assertIn('time',children[1]['missing_fields'])
+  for p in children:
+   span=p['evidence_spans']['subactivity'];self.assertEqual(d['text'][span['start']:span['end']],span['quote'])
+   self.assertIn(p['parent_program_id'][9:],[q['id'] for q in ps])
+  self.assertEqual([p['id'] for p in ps],[p['id'] for p in interpret(self.c,d,[])])
+ def test_artist_lists_past_story_and_show_description_not_events(self):
+  ps=interpret(self.c,self.program('Participarán Banda Uno y Banda Dos. A las 17.45 hubo un cierre coral. Luego se presentó un libro. La obra cuenta que luego se presentaba un héroe.'),[])
+  self.assertEqual(len(ps),3)
+ def test_relocation_does_not_inherit_parent_venue_or_time(self):
+  ps=interpret(self.c,self.program('Luego se presentará el libro “Azul” online. A las 19 habrá una charla en Sala Nueva.'),[])
+  children=[p for p in ps if p.get('parent_program_id')]
+  self.assertIsNone(children[0]['venue']);self.assertIsNone(children[0]['time']);self.assertEqual(children[1]['venue'],'Sala Nueva')
+ def test_real_saved_sunday_two_narrative_omissions(self):
+  path=Path(__file__).resolve().parents[1]/'radar2/evidence/compound-reserved-20261107.json'
+  case=next(x for x in json.loads(path.read_text())['cases'] if 'agenda-septimo-dia_1793514734' in x['document']['url'])
+  ps=interpret(self.c,case['document'],[]);self.assertEqual(len(ps),23)
+  children=[p for p in ps if p.get('parent_program_id')];self.assertEqual(len(children),2)
+  self.assertEqual({(p['title'],p['date'],p['time'],p['venue']) for p in children},{('un cierre con una masa coral de 300 integrantes','2026-11-01','17:45','Museo de Ciencias Naturales'),('Versos de mi pago','2026-11-01',None,'Centro de Jubilados Telefónicos')})

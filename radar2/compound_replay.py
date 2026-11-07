@@ -19,9 +19,9 @@ def retire(conn,result):
  AND coalesce(evidence->>'interpretation_superseded_by','')=''
  RETURNING proposal_id""",[result['run_id'],json.dumps(urls),json.dumps(ids)])['rows']
 
-def recover(conn,run_id):
+def recover(conn,run_id,urls=None):
  accounts=json.loads((ROOT/'radar2/accounts.json').read_text())
- rows=execute(conn,'SELECT payload FROM radar2.documents ORDER BY url')['rows']
+ rows=execute(conn,'SELECT payload FROM radar2.documents WHERE ($1::jsonb IS NULL OR url IN (SELECT jsonb_array_elements_text($1::jsonb))) ORDER BY url',[json.dumps(urls) if urls is not None else None])['rows']
  docs=[json.loads(r['payload']) if isinstance(r['payload'],str) else r['payload'] for r in rows]
  docs=[d for d in docs if classify(d,accounts)['compound'] and d.get('published_at') and not any(str(item.get('@type','')).endswith('Event') for item in d.get('structured_items',[]))]
  docs.sort(key=lambda d:(classify(d,accounts)['shape']!='bullet_schedule',d['url']))

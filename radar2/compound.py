@@ -8,7 +8,7 @@ from pathlib import Path
 from collector import norm,compact,sha
 from semantics import normalized_original,proof,credits,clean_title
 
-VERSION='compound-v1'
+VERSION='compound-v1.1'
 ZONE=ZoneInfo('America/Argentina/Buenos_Aires')
 DAYS=['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
 CATS={'musica':'Música','teatro':'Teatro','cine':'Cine','literarias':'Literatura','charlas':'Charlas','eventos':'Cultura','infantiles':'Infantiles','opera':'Música','zarzuela':'Teatro','exposiciones':'Arte'}
@@ -108,11 +108,11 @@ def known_places(accounts,baseline):
  return sorted(values,key=len,reverse=True)
 
 
-def emit(c,d,title,day,hour,venue,segment,source_role,classification,date_basis,end=None,category=None,address=None,organizer=None):
+def emit(c,d,title,day,hour,venue,segment,source_role,classification,date_basis,end=None,category=None,address=None,organizer=None,source_id=None):
  from extract import category as categorize
  if not title or len(norm(title))<3:return None
  now=datetime.now(ZONE).date();state='historico' if day and day<now else 'incompleto' if not(day and hour and venue) else 'observado_agenda'
- key=c.add(d,title,day.isoformat() if day else None,hour,venue,category or categorize(title),state,segment,origin_account=d.get('profile_username'))
+ key=c.add(d,title,day.isoformat() if day else None,hour,venue,category or categorize(title),state,segment,origin_account=d.get('profile_username'),source_id=source_id)
  p=c.proposals[key];start=d['text'].find(segment)
  p.update(parser_version=VERSION,source_document_sha256=d.get('sha256'),kind='event' if day else 'cultural_recommendation',document_type=classification,
   source_role=source_role,source_url=d['url'],publication_approved=False,date_basis=date_basis,date_end=end,address=address,
@@ -132,6 +132,49 @@ def emit(c,d,title,day,hour,venue,segment,source_role,classification,date_basis,
   p['entities'].append({'name':d['profile_username'],'role':'curator','evidence':json.dumps({'profile_username':d['profile_username'],'source_url':d['url']})})
  # Curator/publication identity is not an organizer credit.
  return p
+
+
+def narrative_activities(c,d,parent,day,segment,classification):
+ """Explicit future subprogram announcements; no inferred start times.
+ Parent location is inherited only without a relocation cue, with its evidence.
+ Descriptive present/past text and artist lists do not create occurrences.
+ """
+ out=[]
+ patterns=[
+  re.compile(r'(?<!\w)A las\s+('+CLOCK+r')\s+(?:habrá|se realizará|tendrá lugar)\s+([^.!?]+)',re.I),
+  re.compile(r'\b(?:Luego|Después|A continuación|Más tarde)\s+(?:se\s+)?(?:presentará|realizará|inaugurará)\s+([^.!?]+)',re.I)]
+ for index,pattern in enumerate(patterns):
+  for m in pattern.finditer(segment):
+   statement=m[0];description=m[2] if index==0 else m[1]
+   # A quoted work names the activity; otherwise retain its literal description.
+   quoted=re.search(r'[“"]([^”"]+)[”"]',description)
+   title=quoted[1] if quoted and index==1 else re.split(r',|\ben las?\b|\bque\b',description)[0].strip()
+   if not title:continue
+   hour=None
+   if index==0:
+    parts=m[1].replace('.',':').split(':');hour=f'{int(parts[0]):02}:{parts[1] if len(parts)>1 else "00"}'
+   explicit=re.search(r'\ben\s+(?:(?-i:el|la)\s+)?(.+?)(?:,|$)',description,re.I)
+   location=explicit[1].strip() if explicit else None
+   anaphoric=bool(location and re.search(r'\b(?:del museo|del teatro|del centro|del lugar|allí|mismo)\b',location,re.I))
+   relocation=bool(re.search(r'\b(?:otro|otra|online|virtual|traslad|posteriormente en)\b',description,re.I))
+   venue=location if location and not anaphoric else parent.get('venue') if not relocation else None
+   p=emit(c,d,title,day,None if hour=='00:00' else hour,venue,statement,classification['source_role'],classification['type'],
+    'parent_program_day_with_explicit_narrative_activity',source_id=sha(parent['id']+'|'+title+'|'+str(hour)))
+   if not p:continue
+   p.update(parent_program_id='proposal:'+parent['id'],parent_relationship='part_of_program',
+    relationship_evidence_status='observed',subactivity_evidence=statement,
+    venue_basis='explicit_subactivity_location' if location and not anaphoric else 'parent_program_context' if venue else 'unresolved',
+    sublocation=location if anaphoric else None)
+   p['field_evidence']['date']=parent['field_evidence']['date']
+   p['field_evidence']['time']=m[1] if index==0 else None
+   p['field_evidence']['parent_program']=segment
+   for entity in p['entities']:
+    if entity.get('role')=='venue':entity['evidence']=segment
+   start=d['text'].find(statement)
+   p['evidence_spans']['subactivity']={'start':start,'end':start+len(statement),'quote':statement}
+   if hour=='00:00':p.update(announced_time=hour,ambiguities=p['ambiguities']+['midnight_calendar_day_requires_review'])
+   out.append(p)
+ return sorted(out,key=lambda p:p['evidence_spans']['subactivity']['start'])
 
 
 def bullet_schedule(c,d,classification):
@@ -188,6 +231,7 @@ def bullet_schedule(c,d,classification):
     if conflict:p['ambiguities'].append('conflicting_time_statement')
     if hour=='00:00':p.update(announced_date=p['date'],announced_time=hour,ambiguities=p['ambiguities']+['midnight_calendar_day_requires_review'])
     out.append(p)
+  if p:out.extend(narrative_activities(c,d,p,current,segment,classification))
   previous=b
  return out
 
