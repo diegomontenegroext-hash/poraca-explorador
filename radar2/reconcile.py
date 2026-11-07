@@ -42,6 +42,9 @@ def reconcile(result,baseline):
    if ('vino' in t or 'feria' in t) and ('vino' in u or 'feria' in u) and ('argentino juvenil' in a):matched=q;break
   if matched:
    p['duplicate_of']=matched.get('duplicate_of') or matched['id']
+   same_publisher=urlsplit(p.get('document_url','')).hostname==urlsplit(matched.get('document_url','')).hostname
+   p['corroboration_level']='same_publisher_repeat' if same_publisher else 'cross_source_candidate_match_pending_review'
+   p['corroboration_evidence']={'url':matched.get('document_url'),'proposal_id':p['duplicate_of'],'basis':'matching title, date, time and venue; not editorial approval'}
    decisions.append({'id':p['id'],'duplicate_of':p['duplicate_of'],'reason':'matching date, hour, venue and equivalent cultural title','title':p['title']})
   else:known.append(p)
  result['reconciliation']=decisions

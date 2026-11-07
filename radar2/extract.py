@@ -31,6 +31,11 @@ def day_from(text,year):
  except ValueError:return None
 
 def extract_document(c,d,accounts,method):
+ from compound import interpret as compound_interpret,classify,VERSION as COMPOUND_VERSION
+ if classify(d,accounts)['compound'] and any(p.get('document_url')==d['url'] and (json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}).get('parser_version')==COMPOUND_VERSION and (json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}).get('source_document_sha256')==d.get('sha256') for p in getattr(c,'baseline',[])):return []
+ structured_first=c.structured(d)
+ multi=None if any(re.search(r'Event$',str(item.get('@type',''))) for item in structured_first) else compound_interpret(c,d,accounts,getattr(c,'baseline',[])+list(c.proposals.values()))
+ if multi is not None:return multi
  before=set(c.proposals);produced=set();tree=c.tree(d);items=c.structured(d)
  now=datetime.fromisoformat(d['fetched_at']).date();published=next((x.get('datePublished') for x in items if x.get('datePublished')),None)
  if published:d['published_at']=published

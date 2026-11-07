@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 from collector import norm, compact
 from extract import MONTHS,category
 from semantics import normalized_original,proof,clocks_in,activity_title,credits,identity,CANCEL,clean_title
-VERSION='caption-v2.2'
+VERSION='caption-v2.3'
 ZONE=ZoneInfo('America/Argentina/Buenos_Aires')
 WEEK=['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
 DATE=re.compile(r'\b([0-3]?\d)\s*(?:[/.]+\s*(1[0-2]|0?[1-9])\b|(?:de\s+)?('+('|'.join(MONTHS))+r')\b)(?:\s*(?:de\s+|/)(20\d{2}))?',re.I)
@@ -56,6 +56,12 @@ def dates(text,base):
  return out
 
 def interpret(c,d,accounts):
+ from compound import interpret as compound_interpret,permanent_recommendations,classify
+ info=classify(d,accounts);d['document_type']=info['type'];d['source_role']=info['source_role']
+ multi=compound_interpret(c,d,accounts,getattr(c,'baseline',[])+list(c.proposals.values()))
+ if multi is not None:return multi
+ permanent=permanent_recommendations(c,d,accounts)
+ if permanent is not None:return []
  raw=d.get('text','');text,positions=normalized_original(raw);n=norm(text)
  base=anchor(d);schedules=dates(text,base);now=datetime.now(ZONE).date()
  retrospective=bool(PAST.search(norm(text[:schedules[0][0]] if schedules else text[:300])))
@@ -124,7 +130,7 @@ def interpret(c,d,accounts):
    p=c.proposals[key]
    title_at=text.find(local_title)
    title_proof=proof(raw,positions,title_at,title_at+len(local_title)) if title_at>=0 else None
-   p.update(kind='event',acquisition_method='official_meta_api',parser_version=VERSION,date_basis=basis,
+   p.update(source_document_sha256=d.get('sha256'),document_type=info['type'],source_role=info['source_role'],kind='event',acquisition_method='official_meta_api',parser_version=VERSION,date_basis=basis,
     content_type='festival' if 'festival' in n else 'workshop' if re.search(r'taller|workshop|masterclass',n) else 'exhibition' if 'muestra' in n else 'party' if re.search(r'fiesta|milonga',n) else 'program' if len(schedules)>1 else 'event',
     temporal_state='past' if day<now else 'today' if day==now else 'future',publication_approved=False,
     event_status='cancelled' if cancelled else 'scheduled_pending_review',announced_date=day.isoformat(),announced_time=announced_time,

@@ -1,0 +1,538 @@
+{
+  "annotation": "agent_labeled_reserved_partial_field_labels_no_human_validation",
+  "certified": false,
+  "cases": [
+    {
+      "url": "https://www.0221.com.ar/que-hago/massacre-y-las-armas-segundo-tiempo-y-mucho-mas-la-agenda-cultural-la-plata-n136584",
+      "expected_activities": 28,
+      "dated_events": 28,
+      "all_candidates": 28,
+      "samples": [
+        {
+          "expected": [
+            "II Congreso Internacional sobre Diego Armando Maradona: Tras las huellas de su legado",
+            "2026-10-31",
+            "10:00",
+            "Facultad de Periodismo UNLP"
+          ],
+          "matched": true,
+          "venue_exact": true
+        },
+        {
+          "expected": [
+            "Fito Páez",
+            "2026-10-31",
+            "21:00",
+            "Hipódromo de La Plata"
+          ],
+          "matched": true,
+          "venue_exact": true
+        },
+        {
+          "expected": [
+            "Mi vida anterior",
+            "2026-11-01",
+            "19:00",
+            "Teatro Argentino"
+          ],
+          "matched": true,
+          "venue_exact": true
+        },
+        {
+          "expected": [
+            "Massacre y Las Armas",
+            "2026-10-31",
+            "21:00",
+            "Ciudad de Gatos"
+          ],
+          "matched": true,
+          "venue_exact": true
+        }
+      ],
+      "proposals": [
+        {
+          "title": "II Congreso Internacional sobre Diego Armando Maradona: Tras las huellas de su legado",
+          "date": "2026-10-31",
+          "time": "10:00",
+          "venue": "Facultad de Periodismo UNLP",
+          "kind": "event"
+        },
+        {
+          "title": "Walking Tour: Paseo del Bosque Puerta de ingreso al Bioparque",
+          "date": "2026-10-31",
+          "time": "10:30",
+          "venue": null,
+          "kind": "event"
+        },
+        {
+          "title": "Perú Vive Paseo del Bosque",
+          "date": "2026-10-31",
+          "time": "12:00",
+          "venue": null,
+          "kind": "event"
+        },
+        {
+          "title": "Conversatorio de artistas: Aripuca, la paradoja del encierro MUMART,",
+          "date": "2026-10-31",
+          "time": "16:00",
+          "venue": "Pasaje Dardo Rocha",
+          "kind": "event"
+        },
+        {
+          "title": "Semifinal La Plata Rock Playón Estación Provincial Meridiano V",
+          "date": "2026-10-31",
+          "time": "16:00",
+          "venue": null,
+          "kind": "event"
+        },
+        {
+          "title": "Cine Select: El principito",
+          "date": "2026-10-31",
+          "time": "16:30",
+          "venue": "Pasaje Dardo Rocha",
+          "kind": "event"
+        },
+        {
+          "title": "Presentación del libro Carne de cañón. Memorias travestis trans de la dictadura",
+          "date": "2026-10-31",
+          "time": "18:30",
+          "venue": "Auditorio de la Comisión Provincial por la Memoria (CPM)",
+          "kind": "event"
+        },
+        {
+          "title": "Cine Select: Éramos tan flacos",
+          "date": "2026-10-31",
+          "time": "18:30",
+          "venue": "Pasaje Dardo Rocha",
+          "kind": "event"
+        },
+        {
+          "title": "La flauta mágica",
+          "date": "2026-10-31",
+          "time": "19:30",
+          "venue": "Pasaje Dardo Rocha",
+          "kind": "event"
+        },
+        {
+          "title": "Segundo Tiempo Sexteto",
+          "date": "2026-10-31",
+          "time": "20:00",
+          "venue": "Casa Metro",
+          "kind": "event"
+        },
+        {
+          "title": "Cine Select: Hausu",
+          "date": "2026-10-31",
+          "time": "20:30",
+          "venue": "Pasaje Dardo Rocha",
+          "kind": "event"
+        },
+        {
+          "title": "Fito Páez",
+          "date": "2026-10-31",
+          "time": "21:00",
+          "venue": "Hipódromo de La Plata",
+          "kind": "event"
+        },
+        {
+          "title": "Pablo Fábregas: Inestable",
+          "date": "2026-10-31",
+          "time": "21:00",
+          "venue": "Teatro Metro",
+          "kind": "event"
+        },
+        {
+          "title": "Pupina Plomer - Especial Brujas",
+          "date": "2026-10-31",
+          "time": "21:00",
+          "venue": "El Teatro Bar",
+          "kind": "event"
+        },
+        {
+          "title": "Antonio Birabent",
+          "date": "2026-10-31",
+          "time": "21:00",
+          "venue": "Casa Suiza",
+          "kind": "event"
+        },
+        {
+          "title": "Massacre y Las Armas",
+          "date": "2026-10-31",
+          "time": "21:00",
+          "venue": "Ciudad de Gatos",
+          "kind": "event"
+        },
+        {
+          "title": "Perú Vive Paseo del Bosque",
+          "date": "2026-11-01",
+          "time": "12:00",
+          "venue": null,
+          "kind": "event"
+        },
+        {
+          "title": "Walking Tour: República de los Niños Stand del EMATUR en la Plaza Central del Centro Cívico",
+          "date": "2026-11-01",
+          "time": "16:00",
+          "venue": null,
+          "kind": "event"
+        },
+        {
+          "title": "Pequeño Pez",
+          "date": "2026-11-01",
+          "time": "17:00",
+          "venue": "Teatro Metro",
+          "kind": "event"
+        },
+        {
+          "title": "La flauta mágica",
+          "date": "2026-11-01",
+          "time": "17:00",
+          "venue": "Pasaje Dardo Rocha",
+          "kind": "event"
+        },
+        {
+          "title": "Cine Select: Susana Rinaldi, libre",
+          "date": "2026-11-01",
+          "time": "17:00",
+          "venue": "Pasaje Dardo Rocha",
+          "kind": "event"
+        },
+        {
+          "title": "Cine Select: La casa del minotauro",
+          "date": "2026-11-01",
+          "time": "18:00",
+          "venue": "Pasaje Dardo Rocha",
+          "kind": "event"
+        },
+        {
+          "title": "Mi vida anterior",
+          "date": "2026-11-01",
+          "time": "19:00",
+          "venue": "Teatro Argentino",
+          "kind": "event"
+        },
+        {
+          "title": "Danza por la identidad",
+          "date": "2026-11-01",
+          "time": "19:00",
+          "venue": "Centro Cultural Islas Malvinas",
+          "kind": "event"
+        },
+        {
+          "title": "Poética de la multitud + Puta Ama DJ",
+          "date": "2026-11-01",
+          "time": "20:00",
+          "venue": "Comunidad Ferroviaria",
+          "kind": "event"
+        },
+        {
+          "title": "A todo volumen: noche de libros, autores y música Aluvión",
+          "date": "2026-11-01",
+          "time": "20:00",
+          "venue": null,
+          "kind": "event"
+        },
+        {
+          "title": "Cine EcoSelect: El viaje de Chihiro",
+          "date": "2026-11-01",
+          "time": "20:00",
+          "venue": "Centro Cultural Islas Malvinas",
+          "kind": "event"
+        },
+        {
+          "title": "Cine Select: Cría cuervos + La prima Angélica",
+          "date": "2026-11-01",
+          "time": "20:00",
+          "venue": "Pasaje Dardo Rocha",
+          "kind": "event"
+        }
+      ]
+    },
+    {
+      "url": "https://www.eldia.com/espectaculos/agenda-septimo-dia_1793514734",
+      "expected_activities": 23,
+      "dated_events": 21,
+      "all_candidates": 21,
+      "samples": [
+        {
+          "expected": [
+            "La flauta mágica",
+            "2026-11-01",
+            "17:00",
+            "Pasaje Dardo Rocha"
+          ],
+          "matched": true,
+          "venue_exact": true
+        },
+        {
+          "expected": [
+            "El dúo de La Africana",
+            "2026-11-01",
+            "18:00",
+            "Teatro de Cámara de City Bell"
+          ],
+          "matched": true,
+          "venue_exact": true
+        },
+        {
+          "expected": [
+            "Irish Session",
+            "2026-11-01",
+            "20:00",
+            "Cinco Sabios"
+          ],
+          "matched": true,
+          "venue_exact": true
+        },
+        {
+          "expected": [
+            "Narices negras",
+            "2026-11-01",
+            "20:00",
+            "Centro Cultural Viejo Almacén El Obrero"
+          ],
+          "matched": true,
+          "venue_exact": true
+        },
+        {
+          "expected": [
+            "Pequeño Pez",
+            "2026-11-01",
+            "17:00",
+            "Teatro Metro"
+          ],
+          "matched": true,
+          "venue_exact": true
+        },
+        {
+          "expected": [
+            "Orquesta Sinfónica Municipal de Berisso",
+            "2026-11-02",
+            "20:00",
+            "Sociedad Italiana de Berisso"
+          ],
+          "matched": true,
+          "venue_exact": true
+        }
+      ],
+      "proposals": [
+        {
+          "title": "La flauta mágica",
+          "date": "2026-11-01",
+          "time": "17:00",
+          "venue": "Pasaje Dardo Rocha",
+          "kind": "event"
+        },
+        {
+          "title": "El dúo de La Africana",
+          "date": "2026-11-01",
+          "time": "18:00",
+          "venue": "Teatro de Cámara de City Bell",
+          "kind": "event"
+        },
+        {
+          "title": "Concierto en la Peña de las Bellas Artes",
+          "date": "2026-11-01",
+          "time": "19:00",
+          "venue": "Peña de las Bellas Artes",
+          "kind": "event"
+        },
+        {
+          "title": "Ensayo abierto de la Orquesta Big Band",
+          "date": "2026-11-01",
+          "time": "15:30",
+          "venue": "planta alta de Estación Provincial",
+          "kind": "event"
+        },
+        {
+          "title": "El Conjunto",
+          "date": "2026-11-01",
+          "time": "16:00",
+          "venue": "Playón de Estación Provincial",
+          "kind": "event"
+        },
+        {
+          "title": "La Matilde Cumbia Club",
+          "date": "2026-11-01",
+          "time": "17:30",
+          "venue": "Playón de Estación Provincial",
+          "kind": "event"
+        },
+        {
+          "title": "Clase abierta de swing",
+          "date": "2026-11-01",
+          "time": "18:00",
+          "venue": "planta alta de Estación Provincial",
+          "kind": "event"
+        },
+        {
+          "title": "Tremendo Marañón",
+          "date": "2026-11-01",
+          "time": "19:00",
+          "venue": "Playón de Estación Provincial",
+          "kind": "event"
+        },
+        {
+          "title": "Irish Session",
+          "date": "2026-11-01",
+          "time": "20:00",
+          "venue": "Cinco Sabios",
+          "kind": "event"
+        },
+        {
+          "title": "Corosaurus",
+          "date": "2026-11-01",
+          "time": "15:30",
+          "venue": "Museo de Ciencias Naturales",
+          "kind": "event"
+        },
+        {
+          "title": "Narices negras",
+          "date": "2026-11-01",
+          "time": "20:00",
+          "venue": "Centro Cultural Viejo Almacén El Obrero",
+          "kind": "event"
+        },
+        {
+          "title": "Pablo Picotto: stand up y personajes",
+          "date": "2026-11-01",
+          "time": "20:00",
+          "venue": "La Nonna",
+          "kind": "event"
+        },
+        {
+          "title": "Sofía Calvo: Es hora de hablar",
+          "date": "2026-11-01",
+          "time": "19:00",
+          "venue": "Casa Metro",
+          "kind": "event"
+        },
+        {
+          "title": "Pequeño Pez",
+          "date": "2026-11-01",
+          "time": "17:00",
+          "venue": "Teatro Metro",
+          "kind": "event"
+        },
+        {
+          "title": "Entrega de premios del Certamen de Poesía Gauchesca",
+          "date": "2026-11-01",
+          "time": "16:00",
+          "venue": "Centro de Jubilados Telefónicos",
+          "kind": "event"
+        },
+        {
+          "title": "Feria del Playón",
+          "date": "2026-11-01",
+          "time": "14:00",
+          "venue": "Playón de Estación Provincial",
+          "kind": "event"
+        },
+        {
+          "title": "Feria de Colecciones y Antigüedades",
+          "date": "2026-11-01",
+          "time": "14:00",
+          "venue": "Playón de Estación Provincial",
+          "kind": "event"
+        },
+        {
+          "title": "Perú Vive",
+          "date": "2026-11-01",
+          "time": "12:00",
+          "venue": "Paseo del Bosque",
+          "kind": "event"
+        },
+        {
+          "title": "Caravana CUGA",
+          "date": "2026-11-01",
+          "time": "11:00",
+          "venue": "Parque Alberti",
+          "kind": "event"
+        },
+        {
+          "title": "Orquesta Sinfónica Municipal de Berisso",
+          "date": "2026-11-02",
+          "time": "20:00",
+          "venue": "Sociedad Italiana de Berisso",
+          "kind": "event"
+        },
+        {
+          "title": "La búsqueda",
+          "date": "2026-11-02",
+          "time": "19:00",
+          "venue": null,
+          "kind": "event"
+        }
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/reel/DefVzFISwkm/",
+      "expected_activities": 11,
+      "dated_events": 4,
+      "all_candidates": 4,
+      "samples": [],
+      "proposals": [
+        {
+          "title": "de marcha federal universitaria unlpoficial",
+          "date": "2026-10-15",
+          "time": null,
+          "venue": null,
+          "kind": "event"
+        },
+        {
+          "title": "astorbirra reestrena cocina propia & jazz en vivo",
+          "date": "2026-10-15",
+          "time": null,
+          "venue": null,
+          "kind": "event"
+        },
+        {
+          "title": "destileriamoreira desobediente.sr casiasesino",
+          "date": "2026-10-16",
+          "time": null,
+          "venue": null,
+          "kind": "event"
+        },
+        {
+          "title": "aniversario nacional.cafe con vermu_interferencia napolesbh.pizzanapoletana",
+          "date": "2026-10-17",
+          "time": null,
+          "venue": null,
+          "kind": "event"
+        }
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/reel/DfYdYPFMs_w/",
+      "expected_activities": 0,
+      "dated_events": 0,
+      "all_candidates": 1,
+      "samples": [],
+      "proposals": [
+        {
+          "title": "barrio.lp",
+          "date": null,
+          "time": null,
+          "venue": "barrio.lp",
+          "kind": "place_recommendation"
+        }
+      ]
+    },
+    {
+      "url": "https://www.instagram.com/reel/DfaBydFxVCM/",
+      "expected_activities": 0,
+      "dated_events": 0,
+      "all_candidates": 1,
+      "samples": [],
+      "proposals": [
+        {
+          "title": "cafequeva",
+          "date": null,
+          "time": null,
+          "venue": "cafequeva",
+          "kind": "place_recommendation"
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,8 @@
-# Una verificacion agrupada; reprocesar originales, sin consultar fuentes otra vez.
+# Una aceptacion agrupada: recuperacion selectiva, FULL e incremental.
 trigger_date=2026-11-07
-trigger_slot=maturity_replay_20261107
+trigger_slot=compound_acceptance_20261107
 trigger_mode=radar2_pilot
-trigger_reason=preserved_original_replay_idempotence_and_meta_health
-trigger_scope=maturity_replay
+trigger_reason=compound_sources_recovery_full_incremental_readback
+trigger_scope=compound_acceptance
 certification_batches=1
+certification_modes=full,incremental

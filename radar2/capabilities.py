@@ -304,7 +304,7 @@ def enrich_graph(result,baseline):
         accepted=[]
         for e in p['entities']:
             name=compact(e.get('name',''));role=e.get('role');evidence=e.get('evidence') or p.get('evidence','')
-            if not name or len(name)<2 or len(name)>160 or role not in ('venue','organizer','performer','director','cycle','collective'):continue
+            if not name or len(name)<2 or len(name)>160 or role not in ('venue','organizer','performer','director','cycle','collective','curator'):continue
             # Only explicit parser evidence can create nodes and role edges.
             if norm(name) not in norm(evidence):continue
             proof_url=e.get('evidence_url') or p['document_url']
@@ -313,7 +313,7 @@ def enrich_graph(result,baseline):
             n=nodes.setdefault(nid,{'node_id':nid,'name':name,'role':role,'new_to_radar_evidence':(role,identity(role,name)) not in known,'evidence':[]})
             n['evidence'].append({'proposal_id':p['id'],'url':proof_url,'excerpt':compact(evidence)[:1000]})
             if p.get('kind') not in ('event','program') or not p.get('date'):continue
-            predicate={'venue':'takes_place_at','organizer':'organized_by','performer':'features','director':'directed_by','cycle':'part_of_cycle','collective':'organized_by'}[role]
+            predicate={'venue':'takes_place_at','organizer':'organized_by','performer':'features','director':'directed_by','cycle':'part_of_cycle','collective':'organized_by','curator':'recommended_by'}[role]
             edge={'subject':event_id,'predicate':predicate,'object':nid,'proposal_id':p['id'],'evidence_url':proof_url,'excerpt':compact(evidence)[:1000],'status':'observed_pending_editorial_review'}
             e['event_relationship']=edge;p['relationships'].append(edge);edges[sha(event_id+predicate+nid)]=edge
         p['entities']=list({(e['node_id'],e['role']):e for e in accepted}.values())

@@ -64,7 +64,7 @@ class Collector:
     def __init__(self,out,previous=None):
         self.out=Path(out);self.out.mkdir(parents=True,exist_ok=True)
         self.docs={};self.proposals={};self.checks=[];self.robots={};self.policy_errors={}
-        self.checkpoint=None
+        self.checkpoint=None;self.baseline=[]
         self.previous=previous or {};self.previous_docs={d['url']:d for d in self.previous.get('documents',[])}
         self.run_id='radar2-'+datetime.now(ZoneInfo('UTC')).strftime('%Y%m%dT%H%M%SZ')
         self.code_sha256=sha(Path(__file__).read_text())
@@ -106,6 +106,11 @@ class Collector:
                 (self.out/(key+'.html')).write_text(s)
                 d={'url':url,'final_url':r.url,'source':source,'origin':origin,'fetched_at':utc(),'sha256':h,'text_sha256':sha(text),'title':title,'text':text,'html_file':key+'.html','http_status':r.status}
                 self.docs[url]=d;check.update(status=r.status,sha256=h)
+                article=next((n for n in t.walk() if n.tag=='article'),None)
+                if article:d['content_blocks']=[{'tag':n.tag,'text':n.text()} for n in article.walk() if n.tag in ('h1','h2','h3','p','li') and n.text()][:500]
+                d['structured_items']=self.structured(d)
+                published=next((x.get('datePublished') for x in d['structured_items'] if x.get('datePublished')),None)
+                if published:d['published_at']=published
         except Exception as e:
             check.update(error=type(e).__name__+': '+str(e)[:180]);d=None
         if d and self.checkpoint:self.checkpoint(d)
@@ -204,7 +209,12 @@ class Collector:
                 child['discovery']=[{'via_link':d['url'],'searches':d.get('discovery',[])}]
                 child['acquisition_method']='public_search_then_published_ticket_link'
                 extract_document(self,child,accounts,child['acquisition_method'])
-    def tree(self,d):return Tree((self.out/d['html_file']).read_text()).root
+    def tree(self,d):
+        path=self.out/d.get('html_file','__missing__')
+        if path.is_file():return Tree(path.read_text()).root
+        if d.get('content_blocks'):
+            return Tree('<article>'+''.join('<'+b['tag']+'>'+html.escape(b['text'])+'</'+b['tag']+'>' for b in d['content_blocks'])+'</article>').root
+        return Tree('<article><p>'+html.escape(d.get('text',''))+'</p></article>').root
     def reuse(self,d):
         if self.previous.get('collector_sha256')!=self.code_sha256:return False
         processor=Path(__file__).with_name('extract.py')
@@ -218,6 +228,7 @@ class Collector:
     def links(self,d):
         return list(dict.fromkeys(urljoin(d['final_url'],n.a['href']) for n in self.tree(d).walk() if n.tag=='a' and n.a.get('href')))
     def structured(self,d):
+        if d.get('structured_items'):return d['structured_items']
         items=[]
         def visit(x):
             if isinstance(x,dict):
@@ -257,19 +268,22 @@ class Collector:
             hour=re.search(r'(\d{1,2}:\d{2}) Hs\.',block)
             venue=re.search(r'Hs\. (.*?) · La Plata',block)
             self.add(item,title,day,hour[1] if hour else None,venue[1] if venue else None,'Teatro','observado_agenda',block or item['text'])
-    def media_sources(self):
-        for url,source in [('https://www.0221.com.ar/que-hago','0221'),('https://www.eldia.com/espectaculos','El Día')]:
+    def media_sources(self,max_articles=6,agendas_only=False):
+        for url,source in [('https://www.eldia.com/espectaculos','El Día'),('https://www.0221.com.ar/que-hago','0221')]:
             d=self.fetch(url,source)
             if not d:continue
             links=self.links(d)
             if source=='El Día':
                 links += [x['url'] for x in self.structured(d) if x.get('@type')=='ListItem' and x.get('url')]
                 links=[u for u in dict.fromkeys(links) if re.search(r'/espectaculos/[^/]+_\d+',u) and re.search(r'agenda|platense|teatro|festival|concierto|recital|musica|muestra|cierre-de-ano',norm(u))]
-                links=sorted(links,key=lambda u:int(re.search(r'_(\d+)',u)[1]),reverse=True)[:6]
-            else:links=[u for u in links if re.search(r'/que-hago/.+-n\d+$',u)][:6]
-            for u in links:
+                links=sorted(links,key=lambda u:(not bool(re.search(r'agenda|cartelera|programacion',norm(u))),-int(re.search(r'_(\d+)',u)[1])))[:6]
+            else:links=sorted(dict.fromkeys(u for u in links if re.search(r'/que-hago/.+-n\d+$',u)),key=lambda u:(not bool(re.search(r'agenda|cartelera|programacion',norm(u))),-int(re.search(r'-n(\d+)$',u)[1])))[:6]
+            if agendas_only:links=[u for u in links if re.search(r'agenda|cartelera|programacion',norm(u))]
+            for u in links[:max_articles]:
                 item=self.fetch(u,source,d['url'])
-                if item:self.document_lead(item)
+                if item:
+                    from extract import extract_document
+                    extract_document(self,item,json.loads(Path(__file__).with_name('accounts.json').read_text()),'public_media_discovery')
     def alternativa(self):
         d=self.fetch('https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires','Alternativa Teatral')
         if not d:return

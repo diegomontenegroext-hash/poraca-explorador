@@ -15,7 +15,7 @@ ACCOUNTS = ("guajira.bar", "lutitravelguide", "escenario40", "teatroargentinopba
 REQUIRED = ("META_IG_USER_ID", "META_ACCESS_TOKEN", "META_GRAPH_VERSION")
 PERMALINK = re.compile(r"https://(?:www\.)?instagram\.com/(?:p|reel)/[A-Za-z0-9_-]+/?\Z")
 
-def acquire(collector, known_urls, rotating_accounts=(),include_controls=True):
+def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,extra_curators=()):
     """Four controls plus at most ten unique users from the persisted daily batch."""
     rotating=[]
     for raw in rotating_accounts:
@@ -25,7 +25,11 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True):
             rotating.append(username)
         if len(rotating)>=10: break
     accounts=(list(ACCOUNTS) if include_controls else [])+rotating
-    report={"kind":"instagram_official_rotating_pilot",
+    extra=[]
+    for u in extra_curators:
+        if isinstance(u,str) and re.fullmatch(r'[a-z0-9_.]{1,30}',u) and u not in accounts:extra.append(u);accounts.append(u)
+        if len(extra)>=1:break
+    report={"extra_curators":extra,"kind":"instagram_official_rotating_pilot",
               "accounts":accounts,"controls":list(ACCOUNTS),
               "rotating_accounts":rotating,"method":"meta_business_discovery",
               "enabled": False, "queries_sent": 0,

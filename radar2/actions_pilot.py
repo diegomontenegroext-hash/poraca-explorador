@@ -62,7 +62,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     old=baseline(conn)
     known_urls={r['url'] for r in execute(conn,'SELECT url FROM radar2.documents')['rows']}
     out=work/run_id;out.mkdir()
-    c=Collector(out);c.run_id=run_id
+    c=Collector(out);c.run_id=run_id;c.baseline=old
     journal=Journal(ROOT/".radar2-checkpoints",conn,run_id);c.checkpoint=journal.save
     recovered=journal.recover(c)
     # Preserve working daily acquisition. The second certification batch only
@@ -84,6 +84,9 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
         from zoneinfo import ZoneInfo
         try:c.genda(datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date())
         except Exception as exc:c.checks.append({'phase':'incremental_agenda','error':type(exc).__name__})
+    if not full:
+        from source_cadence import media_due
+        if media_due(conn):c.media_sources(max_articles=2,agendas_only=True)
     # The official pilot reuses the same persisted ten-account selection.
     official_pilot={'status':'SKIPPED_NOT_DAILY'}
     rotation_status={'status':'not_executed'};batch={'accounts':[]}
@@ -96,11 +99,14 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     except Exception as e:
         manifest={'searches':[],'documents':[],'instagram_attempts':[]}
         rotation_status={'status':'not_repeated_in_corrective' if corrective else 'phase_failed','error':type(e).__name__+': '+str(e)[:160]}
+    extra_curators=[]
     if not corrective:
         try:
+            from source_cadence import curator_due
+            if not full:extra_curators=curator_due(conn,[a['username'] for a in batch.get('accounts',[])])
             if credential_health().get('credential_usable') is False:raise RuntimeError('META_CREDENTIAL_INVALID_ACQUISITION_HALTED')
             official_pilot=official_ig_pilot(c,known_urls,
-                [a['username'] for a in batch.get('accounts',[])],include_controls=full)
+                [a['username'] for a in batch.get('accounts',[])],include_controls=full,extra_curators=extra_curators)
         except Exception as e:
             official_pilot={'status':'FAILED','error_type':type(e).__name__}
         manifest['official_results']=official_pilot.get('results',[])
@@ -115,19 +121,28 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
         rejected=[u for u,x in sources.items() if x['status'].startswith('rejected_')]
         archived=execute(conn,"UPDATE radar2.proposals SET review_state='historico',evidence=evidence || jsonb_build_object('state','historico','kind','rejected_document','editorial_exclusion','not a local cultural source','exclusion_run_id',$2::text) WHERE event_date IS NULL AND document_url IN (SELECT jsonb_array_elements_text($1::jsonb)) AND evidence->>'acquisition_method'='autonomous_public_link_frontier' AND review_state<>'historico' RETURNING proposal_id",[json.dumps(rejected),run_id])['rows']
     # Reprocess original captions from Neon, without extra Meta downloads.
-    # FULL covers the corpus; incremental processes only changed/unprocessed documents.
+    # Both modes reinterpret only new/changed documents or a changed parser version.
     corpus=execute(conn,"SELECT payload FROM radar2.documents WHERE payload->>'acquisition_method'='official_meta_api' ORDER BY url")['rows']
     accounts=json.loads((ROOT/'radar2/accounts.json').read_text())
-    prior={p['document_url']:p for p in old if (json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}).get('parser_version')==CAPTION_VERSION}
+    from compound import classify,effective_version,VERSION as COMPOUND_VERSION
+    prior={}
+    for p in old:
+        e=json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}
+        if not e.get('interpretation_superseded_by'):prior.setdefault(p['document_url'],[]).append(e)
+    def needs(d):
+        version=effective_version(d,accounts)
+        return not any(e.get('parser_version')==version and e.get('source_document_sha256')==d.get('sha256') for e in prior.get(d['url'],[]))
     reprocessed=0
     for row in corpus:
         d=row['payload'];d=json.loads(d) if isinstance(d,str) else d
-        if full or d['url'] not in prior:c.docs.setdefault(d['url'],d)
+        if needs(d):c.docs.setdefault(d['url'],d)
     for d in list(c.docs.values()):
         if d.get('acquisition_method')!='official_meta_api':continue
-        # Replace this run's generic leads only; previous ledger rows stay archived/auditable.
         for key in [k for k,p in c.proposals.items() if p['document_url']==d['url']]:c.proposals.pop(key)
-        interpret(c,d,accounts);reprocessed+=1
+        if needs(d):
+            interpret(c,d,accounts);reprocessed+=1
+            for p in c.proposals.values():
+                if p['document_url']==d['url']:p['source_document_sha256']=d.get('sha256')
     result=c.save();result=reconcile(result,old);result=carry_forward(result,old)
     # Collect graph evidence before writing proposals so the API sees the same
     # node IDs and event relationships persisted in the cultural memory ledger.
@@ -139,6 +154,8 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     superseded=execute(conn,"WITH incoming AS (SELECT x->>'document_url' url,x->>'title' title,x->>'id' id FROM jsonb_array_elements($1::jsonb) x) UPDATE radar2.proposals p SET review_state='historico',evidence=p.evidence || jsonb_build_object('kind','superseded_document','superseded_by',i.id) FROM incoming i WHERE p.document_url=i.url AND p.title=i.title AND p.event_date IS NULL AND p.review_state='investigable' RETURNING p.proposal_id",[json.dumps(dated,ensure_ascii=False)])['rows']
     write=execute(conn,SQL,[json.dumps(result,ensure_ascii=False)])['rows'][0]
     execute(conn,"UPDATE radar2.proposals p SET review_state='historico',evidence=evidence || jsonb_build_object('interpretation_superseded_by',$1::text) WHERE coalesce(evidence->>'parser_version','')='' AND evidence->>'kind'='document' AND EXISTS(SELECT 1 FROM radar2.proposals q WHERE q.document_url=p.document_url AND q.evidence->>'parser_version'=$2)",[run_id,CAPTION_VERSION])
+    from compound_replay import retire as retire_compound
+    retire_compound(conn,result)
     from maturity import retire_interpretations
     retire_interpretations(conn,result)
     supplemented=supplement_representatives(conn,result)
@@ -151,6 +168,9 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
             completed=rotation.complete(conn,run_id,manifest)
             rotation_status.update(status=completed['status'],results=completed.get('results',[]))
         except Exception as e:rotation_status.update(status='completion_failed',error=type(e).__name__+': '+str(e)[:160])
+    if extra_curators:
+        from source_cadence import record_curator_checks
+        record_curator_checks(conn,extra_curators,manifest.get('official_results',[]),run_id)
     admissions=rotation.admit_discovered(conn,baseline(conn)) if full else {'status':'full_only_no_extra_acquisition'}
     m=execute(conn,NEW_DISCOVERY_METRICS_SQL,[run_id,started_at])['rows'][0]
     metrics={k:int(v) for k,v in m.items()}
@@ -202,7 +222,15 @@ def main():
     print(json.dumps({'acquisition_journal_restore':restored}))
     with tempfile.TemporaryDirectory(prefix='radar2-gh-') as temp:
         trigger=(ROOT/'ops/radar-fallback-trigger.txt').read_text() if os.environ.get('GITHUB_EVENT_NAME')=='push' else ''
-        modes=['full','incremental','incremental'] if 'certification_modes=full,incremental,incremental' in trigger else [mode]* (1 if corrective else certification_batches())
+        if 'trigger_scope=compound_acceptance' in trigger:
+            from compound_replay import recover
+            recovered= recover(conn,run_id+'-compound-recovery')
+            before=execute(conn,'SELECT count(*) n FROM radar2.proposals')['rows'][0]['n']
+            repeated=recover(conn,run_id+'-compound-idempotence')
+            after=execute(conn,'SELECT count(*) n FROM radar2.proposals')['rows'][0]['n']
+            if before!=after:raise RuntimeError('COMPOUND_IDEMPOTENCE_FAILED')
+            print(json.dumps({'compound_recovery':recovered,'idempotence':repeated,'proposal_count_before_repeat':before,'proposal_count_after_repeat':after}))
+        modes=['full','incremental'] if 'certification_modes=full,incremental' in trigger and 'full,incremental,incremental' not in trigger else ['full','incremental','incremental'] if 'certification_modes=full,incremental,incremental' in trigger else [mode]* (1 if corrective else certification_batches())
         for i,current_mode in enumerate(modes):
             current_id=run_id+('-batch'+str(i+1) if i else '')
             try:reports.append(run_batch(conn,current_id,Path(temp),current_mode=='full' and i==0 and not corrective,access,corrective))
@@ -210,7 +238,7 @@ def main():
                 execute(conn,"UPDATE radar2.runs SET finished_at=now(),summary=summary || jsonb_build_object('status','failed','error_type',$2::text) WHERE run_id=$1",[current_id,type(exc).__name__])
                 raise
     for path in (ROOT/'.radar2-checkpoints').glob('*.json'):path.unlink()
-    if len(reports)==2:
+    if len(reports)==2 and 'trigger_scope=compound_acceptance' not in trigger:
         sets=[{x['username'] for x in r['instagram']['receipts']} for r in reports]
         if sets[0]&sets[1] or any(len(s)!=10 for s in sets):raise RuntimeError('TWO_BATCH_ROTATION_ACCEPTANCE_FAILED')
         print(json.dumps({'certification':'two_distinct_ten_account_batches','accounts':20,'overlap':0,'github_run_id':os.environ['GITHUB_RUN_ID']}))
