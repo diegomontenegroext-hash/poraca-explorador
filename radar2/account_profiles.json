@@ -1,0 +1,684 @@
+{
+  "schema": "radar2-account-preflight-v1",
+  "generated_at_art": "2026-11-07",
+  "policy": "Only approved public venues with exact official Instagram URL receive host-venue semantics. Non-venue and internal candidates cannot assert location. This is a snapshot, not live Neon access.",
+  "entries": [
+    {
+      "handle": "_rbcafe",
+      "role": "venue",
+      "entity_id": "r-b-cafe",
+      "name": "R&B Café",
+      "venue_name": "R&B Café",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/_rbcafe/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "R&B Café",
+        "_rbcafe"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "888casa",
+      "role": "venue",
+      "entity_id": "888-casa",
+      "name": "888 Casa",
+      "venue_name": "888 Casa",
+      "identity_state": "approved_public",
+      "location_scope": "Villa Elisa",
+      "account_evidence_url": "https://www.instagram.com/888casa/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "888 Casa",
+        "888casa"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "asoc.mayo",
+      "role": "venue",
+      "entity_id": "asociacion-mayo",
+      "name": "Asociación Mayo",
+      "venue_name": "Asociación Mayo",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/asoc.mayo/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Asociación Mayo",
+        "asoc.mayo"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "bocanada.bar",
+      "role": "venue",
+      "entity_id": "bocanada",
+      "name": "Bocanada",
+      "venue_name": "Bocanada",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/bocanada.bar/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Bocanada",
+        "bocanada.bar"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "calle.uno",
+      "role": "venue",
+      "entity_id": "calle-uno",
+      "name": "Calle UNO · Espacio para la producción de arte y cultura",
+      "venue_name": "Calle UNO · Espacio para la producción de arte y cultura",
+      "identity_state": "approved_public",
+      "location_scope": "Barrio Hipódromo, La Plata",
+      "account_evidence_url": "https://www.instagram.com/calle.uno/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Calle UNO · Espacio para la producción de arte y cultura",
+        "calle.uno"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "caracuceramica",
+      "role": "venue",
+      "entity_id": "caracu-ceramica",
+      "name": "Caracú Cerámica · Laura Carranza",
+      "venue_name": "Caracú Cerámica · Laura Carranza",
+      "identity_state": "approved_public",
+      "location_scope": "Villa Elisa",
+      "account_evidence_url": "https://www.instagram.com/caracuceramica/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Caracú Cerámica · Laura Carranza",
+        "caracuceramica"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "casa_sonoralp",
+      "role": "venue",
+      "entity_id": "casa-sonora-la-plata",
+      "name": "Casa Sonora · Escuela de Música de La Plata",
+      "venue_name": "Casa Sonora · Escuela de Música de La Plata",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/casa_sonoralp/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Casa Sonora · Escuela de Música de La Plata",
+        "casa_sonoralp"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "casa.mutar",
+      "role": "venue",
+      "entity_id": "casa-mutar",
+      "name": "Casa Mutar",
+      "venue_name": "Casa Mutar",
+      "identity_state": "approved_public",
+      "location_scope": "Villa Elisa",
+      "account_evidence_url": "https://www.instagram.com/casa.mutar/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Casa Mutar",
+        "casa.mutar"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "casadefuego_lp",
+      "role": "venue",
+      "entity_id": "casa-de-fuego-lp",
+      "name": "Casa de Fuego · Escuela Taller de Cerámica",
+      "venue_name": "Casa de Fuego · Escuela Taller de Cerámica",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata y región",
+      "account_evidence_url": "https://www.instagram.com/casadefuego_lp/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Casa de Fuego · Escuela Taller de Cerámica",
+        "casadefuego_lp"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "casamandala.art",
+      "role": "venue",
+      "entity_id": "casa-mandala-art-lp",
+      "name": "Casa Mandala · Arte y prácticas",
+      "venue_name": "Casa Mandala · Arte y prácticas",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/casamandala.art/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Casa Mandala · Arte y prácticas",
+        "casamandala.art"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "casasesentaydos",
+      "role": "venue",
+      "entity_id": "casa-62",
+      "name": "Casa 62",
+      "venue_name": "Casa 62",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/casasesentaydos/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Casa 62",
+        "casasesentaydos"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "casasuizalp",
+      "role": "venue",
+      "entity_id": "casa-suiza",
+      "name": "Casa Suiza La Plata",
+      "venue_name": "Casa Suiza La Plata",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/casasuizalp/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Casa Suiza La Plata",
+        "casasuizalp"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "cavavrava",
+      "role": "venue",
+      "entity_id": "cava-vrava",
+      "name": "Cava Vrava · Bar de vinos",
+      "venue_name": "Cava Vrava · Bar de vinos",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/cavavrava/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Cava Vrava · Bar de vinos",
+        "cavavrava"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "centrodearteunlp",
+      "role": "venue",
+      "entity_id": "centro-arte",
+      "name": "Centro de Arte UNLP",
+      "venue_name": "Centro de Arte UNLP",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://reddemuseos.unlp.edu.ar/2023/09/18/centro-de-arte-de-la-unlp/",
+      "account_evidence_basis": "official_UNLP_profile_and_instagram_cross_reference",
+      "aliases": [
+        "Centro de Arte UNLP",
+        "centrodearteunlp",
+        "Auditorio del Centro de Arte UNLP",
+        "Edificio Karakachoff - Centro de Arte UNLP"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "cineecoselect",
+      "role": "venue",
+      "entity_id": "cine-ecoselect",
+      "name": "Cine Municipal EcoSelect",
+      "venue_name": "Cine Municipal EcoSelect",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/cineecoselect/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Cine Municipal EcoSelect",
+        "cineecoselect"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "ciudaddegatos",
+      "role": "venue",
+      "entity_id": "ciudad-de-gatos",
+      "name": "Ciudad de Gatos",
+      "venue_name": "Ciudad de Gatos",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/ciudaddegatos/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Ciudad de Gatos",
+        "ciudaddegatos"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "comunidadferroviaria",
+      "role": "venue",
+      "entity_id": "comunidad-ferroviaria",
+      "name": "Comunidad Ferroviaria",
+      "venue_name": "Comunidad Ferroviaria",
+      "identity_state": "approved_public",
+      "location_scope": "Tolosa",
+      "account_evidence_url": "https://www.instagram.com/comunidadferroviaria/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Comunidad Ferroviaria",
+        "comunidadferroviaria"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "desafinadoclub",
+      "role": "venue",
+      "entity_id": "desafinado-club",
+      "name": "Desafinado Club",
+      "venue_name": "Desafinado Club",
+      "identity_state": "approved_public",
+      "location_scope": "City Bell",
+      "account_evidence_url": "https://www.instagram.com/desafinadoclub/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Desafinado Club",
+        "desafinadoclub"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "elcafecitodecocoliche",
+      "role": "venue",
+      "entity_id": "cafecito-cocoliche",
+      "name": "El Cafecito de Cocoliche",
+      "venue_name": "El Cafecito de Cocoliche",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/elcafecitodecocoliche/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "El Cafecito de Cocoliche",
+        "elcafecitodecocoliche"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "elgalpondelasartes_meridianov",
+      "role": "venue",
+      "entity_id": "galpon-de-las-artes",
+      "name": "Galpón de Las Artes · Meridiano V",
+      "venue_name": "Galpón de Las Artes · Meridiano V",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/elgalpondelasartes_meridianov/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Galpón de Las Artes · Meridiano V",
+        "elgalpondelasartes_meridianov"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "en_eso_estamos",
+      "role": "venue",
+      "entity_id": "en-eso-estamos",
+      "name": "En Eso Estamos",
+      "venue_name": "En Eso Estamos",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/en_eso_estamos/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "En Eso Estamos",
+        "en_eso_estamos"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "espacio_foli",
+      "role": "venue",
+      "entity_id": "espacio-foli",
+      "name": "Espacio Foli",
+      "venue_name": "Espacio Foli",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/espacio_foli/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Espacio Foli",
+        "espacio_foli"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "guajira.bar",
+      "role": "venue",
+      "entity_id": "guajira",
+      "name": "Guajira",
+      "venue_name": "Guajira",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/guajira.bar/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Guajira",
+        "guajira.bar"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "jardinprimitivo.bar",
+      "role": "venue",
+      "entity_id": "jardin-primitivo",
+      "name": "Jardín Primitivo",
+      "venue_name": "Jardín Primitivo",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/jardinprimitivo.bar/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Jardín Primitivo",
+        "jardinprimitivo.bar"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "labicicreacioncolectiva",
+      "role": "venue",
+      "entity_id": "la-bicicleteria",
+      "name": "La Bicicletería — Creación Colectiva",
+      "venue_name": "La Bicicletería — Creación Colectiva",
+      "identity_state": "approved_public",
+      "location_scope": "Barrio Hipódromo, La Plata",
+      "account_evidence_url": "https://www.instagram.com/labicicreacioncolectiva/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "La Bicicletería — Creación Colectiva",
+        "labicicreacioncolectiva"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "laculturosa_",
+      "role": "venue",
+      "entity_id": "la-culturosa",
+      "name": "La Culturosa",
+      "venue_name": "La Culturosa",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/laculturosa_/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "La Culturosa",
+        "laculturosa_"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "lafilial_espaciocultural",
+      "role": "venue",
+      "entity_id": "la-filial",
+      "name": "La Filial · Espacio Cultural",
+      "venue_name": "La Filial · Espacio Cultural",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/lafilial_espaciocultural/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "La Filial · Espacio Cultural",
+        "lafilial_espaciocultural"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "laselva.yoga",
+      "role": "venue",
+      "entity_id": "selva",
+      "name": "La Selva · Yoga y Café",
+      "venue_name": "La Selva · Yoga y Café",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/laselva.yoga/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "La Selva · Yoga y Café",
+        "laselva.yoga"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "lauraganceramica",
+      "role": "venue",
+      "entity_id": "laura-gan-taller",
+      "name": "Taller Laura Gan",
+      "venue_name": "Taller Laura Gan",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://guia25digital.com.ar/laura-gan",
+      "account_evidence_basis": "public_venue_directory_plus_owned_caption_and_roster",
+      "aliases": [
+        "Taller Laura Gan",
+        "lauraganceramica"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "lutitravelguide",
+      "role": "curator",
+      "name": "Luti",
+      "identity_state": "catalog_and_prior_public_profile",
+      "account_evidence_url": "https://linktr.ee/lutitravelguide",
+      "account_evidence_basis": "radar2_accounts_roster_verified_curator_role",
+      "aliases": []
+    },
+    {
+      "handle": "mirafloreslp",
+      "role": "venue",
+      "entity_id": "miraflores",
+      "name": "Miraflores",
+      "venue_name": "Miraflores",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/mirafloreslp/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Miraflores",
+        "mirafloreslp"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "museodearteymemoria",
+      "role": "venue",
+      "entity_id": "museo-arte-memoria",
+      "name": "Museo de Arte y Memoria",
+      "venue_name": "Museo de Arte y Memoria",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/museodearteymemoria/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Museo de Arte y Memoria",
+        "museodearteymemoria"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "nn_galeriadearte",
+      "role": "venue",
+      "entity_id": "nn-galeria",
+      "name": "NN Galería",
+      "venue_name": "NN Galería",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/nn_galeriadearte/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "NN Galería",
+        "nn_galeriadearte"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "patiointerno.libros",
+      "role": "venue",
+      "entity_id": "patio-interno-libros",
+      "name": "Patio Interno Libros",
+      "venue_name": "Patio Interno Libros",
+      "identity_state": "approved_public",
+      "location_scope": "City Bell",
+      "account_evidence_url": "https://www.instagram.com/patiointerno.libros/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Patio Interno Libros",
+        "patiointerno.libros"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "pivot.cafe",
+      "role": "venue",
+      "entity_id": "pivot-cafe",
+      "name": "Pivot Café",
+      "venue_name": "Pivot Café",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/pivot.cafe/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Pivot Café",
+        "pivot.cafe"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "proyeccionesterrestres",
+      "role": "venue",
+      "entity_id": "cineclub-proyecciones",
+      "name": "Cineclub Proyecciones Terrestres",
+      "venue_name": "Cineclub Proyecciones Terrestres",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/proyeccionesterrestres/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Cineclub Proyecciones Terrestres",
+        "proyeccionesterrestres"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "puravidalaplata2008",
+      "role": "venue",
+      "entity_id": "pura-vida",
+      "name": "Pura Vida",
+      "venue_name": "Pura Vida",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/puravidalaplata2008/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Pura Vida",
+        "puravidalaplata2008"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "sindicatoargentinodeboleros",
+      "role": "itinerant_artist",
+      "name": "Sindicato Argentino de Boleros",
+      "identity_state": "profile_role_unverified",
+      "account_evidence_url": "https://www.instagram.com/p/DfZ85DXo7pe/",
+      "account_evidence_basis": "primary_caption_multiple_venues_digital_outputs",
+      "aliases": []
+    },
+    {
+      "handle": "somospatiocafe",
+      "role": "venue",
+      "entity_id": "patio-cafe-citybell",
+      "name": "Patio Café · City Bell",
+      "venue_name": "Patio Café · City Bell",
+      "identity_state": "approved_public",
+      "location_scope": "City Bell",
+      "account_evidence_url": "https://www.instagram.com/somospatiocafe/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Patio Café · City Bell",
+        "somospatiocafe"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "tallercasarombo",
+      "role": "venue",
+      "entity_id": "casa-rombo-city-bell",
+      "name": "Casa Rombo · Taller de Cerámica",
+      "venue_name": "Casa Rombo · Taller de Cerámica",
+      "identity_state": "approved_public",
+      "location_scope": "City Bell, La Plata",
+      "account_evidence_url": "https://www.instagram.com/tallercasarombo/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Casa Rombo · Taller de Cerámica",
+        "tallercasarombo"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "teatroespacio44",
+      "role": "venue_candidate",
+      "entity_id": "research-espacio-44-laplata",
+      "name": "Espacio 44",
+      "venue_name": "Teatro Espacio 44",
+      "identity_state": "verified_internal",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.alternativateatral.com.ar/espacio1782-espacio-44",
+      "account_evidence_basis": "editorial_venue_internal_and_related_IG_profile_pending_link_review",
+      "aliases": [
+        "Espacio 44",
+        "Teatro Espacio 44",
+        "teatroespacio44"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "teatrounlp",
+      "role": "venue",
+      "entity_id": "teatro-unlp",
+      "name": "Teatro UNLP",
+      "venue_name": "Teatro UNLP",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/teatrounlp/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Teatro UNLP",
+        "teatrounlp"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "veredita.bar",
+      "role": "venue",
+      "entity_id": "veredita",
+      "name": "Veredita",
+      "venue_name": "Veredita",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://www.instagram.com/veredita.bar/",
+      "account_evidence_basis": "approved_public_entity_official_instagram_url",
+      "aliases": [
+        "Veredita",
+        "veredita.bar"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    }
+  ]
+}
