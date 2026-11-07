@@ -9,6 +9,7 @@ import re
 from collector import sha, utc
 from instagram import discover
 from capabilities import CULTURAL, norm
+from account_context import preflight
 
 # Four cultural reference accounts, unchanged across days for a comparable sample.
 ACCOUNTS = ("guajira.bar", "lutitravelguide", "escenario40", "teatroargentinopba")
@@ -34,7 +35,8 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,ex
               "rotating_accounts":rotating,"method":"meta_business_discovery",
               "enabled": False, "queries_sent": 0,
               "new_documents": 0, "new_cultural_candidates": 0,
-              "results": []}
+              "results": [],
+              "account_preflight": [preflight(username) for username in accounts]}
     missing = [k for k in REQUIRED if not os.environ.get(k)]
     if missing:
         report.update(status="NOT_CONFIGURED", missing_configuration=missing)
@@ -45,7 +47,8 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,ex
     for username in accounts:
         official = discover(username)
         report["queries_sent"] += 1
-        summary = {"username": username, "status": official.get("status", "UNKNOWN"),
+        summary = {"username": username, "preflight": preflight(username),
+                   "status": official.get("status", "UNKNOWN"),
                    "items_returned": len(official.get("posts") or []),
                    "new_documents": 0, "new_candidates": 0, "known_documents":0,
                    "latest_publication_at":max((p.get("timestamp") or "" for p in official.get("posts",[])),default=None),
