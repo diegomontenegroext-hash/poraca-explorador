@@ -83,11 +83,21 @@ def acquire(collector, known_urls, rotating_accounts=()):
                     summary["new_candidates"] += 1
                     report["new_cultural_candidates"] += 1
         report["results"].append(summary)
+        if (summary["meta_error_code"] in (4, 17, 32, 613, 80002, 190)
+                or summary["http_status"] == 429):
+            report["halt_reason"] = ("META_AUTH" if summary["meta_error_code"] == 190
+                                     else "META_RATE_LIMIT")
+            break
+    report["unattempted_accounts"] = accounts[len(report["results"]):]
     # Do not misreport authentication failure as a quiet day with no posts.
     results = report["results"]
-    if results and all(r.get("meta_error_code") == 190 and
-                       r.get("meta_error_subcode") == 463 for r in results):
+    if report.get("halt_reason") == "META_RATE_LIMIT":
+        report["status"] = "META_RATE_LIMITED"
+    elif any(r.get("meta_error_code") == 190 and
+             r.get("meta_error_subcode") == 463 for r in results):
         report["status"] = "META_TOKEN_EXPIRED"
+    elif report.get("halt_reason") == "META_AUTH":
+        report["status"] = "META_AUTH_ERROR"
     elif results and all(r.get("status") == "OFFICIAL_API_ERROR" for r in results):
         report["status"] = "OFFICIAL_API_ERRORS"
     else:

@@ -99,6 +99,24 @@ def complete(conn,run_id,manifest):
                 if attempt['posts_recovered']:
                     a['last_successful_post_at']=attempt['checked_at']
                 a['next_review_at']=timestamp(at+timedelta(hours=24 if attempt['posts_recovered'] else 96))
+            # Persist official results distinctly from public index/access checks.
+            official=next((x for x in manifest.get('official_results',[]) if x.get('username')==u),None)
+            if official:
+                safe={'status':official['status'],'items_returned':official.get('items_returned',0),
+                      'new_documents':official.get('new_documents',0),
+                      'new_candidates':official.get('new_candidates',0),
+                      'http_status':official.get('http_status'),
+                      'meta_error_code':official.get('meta_error_code')}
+                a['official_last_result']=dict(safe,checked_at=timestamp(at),run_id=run_id)
+                a['official_attempt_count']=a.get('official_attempt_count',0)+1
+                a['last_result']['official']=safe
+                if official['status']=='MEDIA_RETURNED':
+                    a['official_success_count']=a.get('official_success_count',0)+1
+                    a['last_successful_post_at']=timestamp(at)
+                    a['result']='official_posts_recovered'
+                    a['next_review_at']=timestamp(at+timedelta(hours=24 if a['priority']==1 else 48))
+                elif official.get('meta_error_code')==110:
+                    a['next_review_at']=timestamp(at+timedelta(days=14))
             results.append(dict(username=u,**a['last_result'],result=a['result'],next_review_at=a['next_review_at']))
         batch.update(status='completed',finished_at=timestamp(at),results=results)
         if cas(conn,state,version):return batch

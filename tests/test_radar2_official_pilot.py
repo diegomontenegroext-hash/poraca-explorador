@@ -68,7 +68,32 @@ class OfficialInstagramPilot(unittest.TestCase):
             "instagram_official_pilot.discover",return_value=expired):
             outcome=acquire(fake,set())
         self.assertEqual(outcome["status"],"META_TOKEN_EXPIRED")
-        self.assertEqual(outcome["queries_sent"],4)
+        self.assertEqual(outcome["queries_sent"],1)
+
+    def test_extra_accounts_rotate_without_duplicate_controls(self):
+        fake=SimpleNamespace(docs={},proposals={})
+        creds={"META_IG_USER_ID":"test","META_ACCESS_TOKEN":"dummy","META_GRAPH_VERSION":"v27.0"}
+        candidates=["teatroargentinopba"]+["venue_"+str(i) for i in range(15)]
+        with patch.dict(os.environ,creds,clear=True),patch(
+            "instagram_official_pilot.discover",
+            return_value={"status":"NO_MEDIA_RETURNED","posts":[]}) as discover:
+            report=acquire(fake,set(),candidates)
+        self.assertEqual(report["queries_sent"],14)
+        self.assertEqual(len(report["rotating_accounts"]),10)
+        self.assertEqual(len(set(report["accounts"])),14)
+        self.assertEqual(discover.call_count,14)
+
+    def test_rate_limit_stops_remaining_requests(self):
+        fake=SimpleNamespace(docs={},proposals={})
+        creds={"META_IG_USER_ID":"test","META_ACCESS_TOKEN":"dummy","META_GRAPH_VERSION":"v27.0"}
+        response={"status":"OFFICIAL_API_ERROR","meta_error_code":80002,"http_status":429,"posts":[]}
+        with patch.dict(os.environ,creds,clear=True),patch(
+            "instagram_official_pilot.discover",return_value=response) as discover:
+            report=acquire(fake,set(),["venue_test"])
+        self.assertEqual(report["status"],"META_RATE_LIMITED")
+        self.assertEqual(report["queries_sent"],1)
+        self.assertEqual(len(report["unattempted_accounts"]),4)
+        discover.assert_called_once()
 
     def test_official_post_becomes_investigable_not_canonical(self):
         class FakeCollector:

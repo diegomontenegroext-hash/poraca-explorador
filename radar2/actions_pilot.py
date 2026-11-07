@@ -88,6 +88,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
                 [a['username'] for a in batch.get('accounts',[])])
         except Exception as e:
             official_pilot={'status':'FAILED','error_type':type(e).__name__}
+        manifest['official_results']=official_pilot.get('results',[])
     try:source_report=discover_links(c,conn,known_urls,limit=12 if full else 6,refresh_candidates=corrective)
     except Exception as e:source_report={'status':'phase_failed','error':type(e).__name__+': '+str(e)[:160]}
     # Rejected non-cultural documents remain auditable but leave the private
