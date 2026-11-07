@@ -70,6 +70,14 @@ def acquire(collector, known_urls):
                     summary["new_candidates"] += 1
                     report["new_cultural_candidates"] += 1
         report["results"].append(summary)
-    report["status"] = ("POSTS_ACQUIRED" if report["new_documents"] else
-                        "NO_NEW_POSTS_OR_UNAVAILABLE")
+    # Do not misreport authentication failure as a quiet day with no posts.
+    results = report["results"]
+    if results and all(r.get("meta_error_code") == 190 and
+                       r.get("meta_error_subcode") == 463 for r in results):
+        report["status"] = "META_TOKEN_EXPIRED"
+    elif results and all(r.get("status") == "OFFICIAL_API_ERROR" for r in results):
+        report["status"] = "OFFICIAL_API_ERRORS"
+    else:
+        report["status"] = ("POSTS_ACQUIRED" if report["new_documents"] else
+                            "NO_NEW_POSTS_OR_UNAVAILABLE")
     return report

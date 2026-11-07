@@ -57,6 +57,19 @@ class OfficialInstagramPilot(unittest.TestCase):
         self.assertNotIn("very_secret_token",serialized)
         self.assertNotIn("sensitive",serialized)
 
+    def test_expired_token_is_not_a_quiet_day(self):
+        fake = SimpleNamespace(docs={}, proposals={})
+        creds = {"META_IG_USER_ID":"test_id", "META_ACCESS_TOKEN":"expired",
+                 "META_GRAPH_VERSION":"v27.0"}
+        expired = {"status":"OFFICIAL_API_ERROR", "error_type":"HTTPError",
+                   "http_status":401,"meta_error_code":190,"meta_error_subcode":463,
+                   "posts":[]}
+        with patch.dict(os.environ,creds,clear=True),patch(
+            "instagram_official_pilot.discover",return_value=expired):
+            outcome=acquire(fake,set())
+        self.assertEqual(outcome["status"],"META_TOKEN_EXPIRED")
+        self.assertEqual(outcome["queries_sent"],4)
+
     def test_official_post_becomes_investigable_not_canonical(self):
         class FakeCollector:
             def __init__(self):
