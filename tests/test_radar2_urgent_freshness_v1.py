@@ -27,8 +27,8 @@ class NearTermRefreshTests(unittest.TestCase):
   with patch.dict(sys.modules,{'capabilities':guarded}):
    with patch.object(source_cadence,'execute',return_value={'rows':rows}) as fake:
     selected=source_cadence.urgent_source_rechecks('dummy',limit=3)
-   self.assertEqual([x['source'] for x in selected],
-                    ['pogo.ar','www.passline.com','festival.freezer.com.ar'])
+    self.assertEqual([x['source'] for x in selected],
+                     ['pogo.ar','www.passline.com','festival.freezer.com.ar'])
     self.assertEqual(len(selected),3)
     self.assertEqual(fake.call_count,1)
     self.assertEqual(len(source_cadence.urgent_source_rechecks('dummy',limit=90)),3)
