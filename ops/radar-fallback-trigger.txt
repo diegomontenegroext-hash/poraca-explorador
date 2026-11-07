@@ -1,8 +1,8 @@
-# Verificacion acotada de Radar 2: un unico lote diario fuera del slot natural faltante.
-# Se utiliza la infraestructura existente; no hay scheduler/cron adicional.
+# Radar 2: disparo manual autorizado desde chat, via push en workflow existente.
+# Una sola corrida completa, sin tareas extra ni cron nuevo.
 trigger_date=2026-11-06
-trigger_slot=bootstrap
+trigger_slot=meta_official_live_validation
 trigger_mode=radar2_pilot
-trigger_reason=first_official_instagram_four_account_pilot_readback
+trigger_reason=validate_new_github_meta_secrets_and_teatroargentinopba
 trigger_scope=standard_daily_acquisition
 certification_batches=1
