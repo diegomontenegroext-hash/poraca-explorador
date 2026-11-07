@@ -118,3 +118,50 @@ class NarrativePrograms(unittest.TestCase):
   ps=interpret(self.c,case['document'],[]);self.assertEqual(len(ps),23)
   children=[p for p in ps if p.get('parent_program_id')];self.assertEqual(len(children),2)
   self.assertEqual({(p['title'],p['date'],p['time'],p['venue']) for p in children},{('un cierre con una masa coral de 300 integrantes','2026-11-01','17:45','Museo de Ciencias Naturales'),('Versos de mi pago','2026-11-01',None,'Centro de Jubilados Telefónicos')})
+
+
+class ScheduleCategoryRegression(unittest.TestCase):
+ def setUp(self):
+  self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
+  self.c=Collector(self.tmp.name)
+ def doc(self,text):
+  return {'url':'https://example.test/agenda','source':'El Día','text':text,
+          'published_at':'2026-11-06T04:11:00Z','fetched_at':'2026-11-07T01:00:00Z','sha256':'category-v12'}
+ def test_venue_teatro_bar_is_not_theatre_category(self):
+  d=self.doc('Por Redacción Hoy Música Solo Cerati.- A las 21 en El Teatro Bar, 1. '
+    'Diego Frenkel.- A las 20 en Desafinados Club, 2. '
+    '14º Encuentro Coral.- A las 19 en Escuela Secundaria, 3. '
+    'Eventos Feria del Playón.- Desde las 14 en el Playón, 4. '
+    'Teatro Obra Sur.- A las 21 en Sala Norte, 5. '
+    'Mañana Música Los Totora.- A las 20 en Club Azul, 6.')
+  ps=interpret(self.c,d,[])
+  by_title={p['title']:p for p in ps}
+  self.assertEqual(len(ps),6)
+  for title in ('Solo Cerati','Diego Frenkel','14º Encuentro Coral'):
+   self.assertEqual(by_title[title]['category'],'Música',title)
+  self.assertEqual(by_title['Feria del Playón']['category'],'Cultura')
+  self.assertEqual(by_title['Obra Sur']['category'],'Teatro')
+  self.assertEqual(by_title['Los Totora']['category'],'Música')
+  self.assertEqual(by_title['Los Totora']['date'],'2026-11-07')
+ def test_theatre_name_is_not_heading(self):
+  d=self.doc('Hoy Música Banda Uno.- A las 20 en Sala Azul, calle 1. '
+   'Teatro Comunitario Sin Telón.- A las 19 en La Caterva, calle 2. '
+   'Eventos Feria de Arte.- A las 15 en Plaza Mayor, calle 3.')
+  ps=interpret(self.c,d,[])
+  self.assertEqual([p['title'] for p in ps],
+    ['Banda Uno','Teatro Comunitario Sin Telón','Feria de Arte'])
+  self.assertEqual([p['category'] for p in ps],['Música','Música','Cultura'])
+ def test_genda_category_badges_have_clean_genres(self):
+  from collector import genda_category
+  cases={
+    'Gratis Feria En 10 h 41 min':'Feria',
+    'Música En vivo En 19 h 41 min':'Música',
+    'Cine Infantil En 16 h 11 min':'Cine',
+    'Gratis Muestra - Expo':'Arte',
+    'Teatro Stand Up En 19 h 41 min':'Teatro',
+    'Literatura Muestra - Expo':'Literatura',
+    'Infantil Actividad Danza Baile Gastronomía Juegos':'Danza'
+  }
+  for raw,expected in cases.items():
+   with self.subTest(raw=raw):self.assertEqual(genda_category(raw),expected)
+  self.assertIsNone(genda_category(None))
