@@ -34,6 +34,32 @@ def norm(s): return re.sub(r'\W+',' ',unicodedata.normalize('NFKD',s or '').enco
 def compact(s): return re.sub(r'\s+',' ',s or '').strip()
 def utc(): return datetime.now(ZoneInfo('UTC')).isoformat()
 
+def genda_category(raw):
+    """Normalize agenda tags; countdown badges are NOT cultural categories."""
+    if not raw:return None
+    cleaned=compact(re.sub(r'\bEn\s+\d+\s*h(?:\s+\d+\s*min)?\b',' ',raw,flags=re.I))
+    cleaned=compact(re.sub(r'\bEn\s+\d+\s*min\b',' ',cleaned,flags=re.I))
+    tag=norm(cleaned)
+    # Match explicit topic tags, never the event title/venue/remaining countdown.
+    taxonomy=(
+        (r'\bteatro\b|\bstand up\b','Teatro'),
+        (r'\bcine\b|\bpelicula\b','Cine'),
+        (r'\bmusica\b|\brecital\b|\ben vivo\b','Música'),
+        (r'\belectronica\b|\btechno\b','Electrónica'),
+        (r'\bferia\b','Feria'),
+        (r'\bliteratura\b|\blibros\b','Literatura'),
+        (r'\bmuestra\b|\bexpo\b|\bfotografia\b|\bartes visuales\b','Arte'),
+        (r'\bdanza\b|\bbaile\b','Danza'),
+        (r'\btaller\b|\bseminario\b','Taller especial'),
+        (r'\bfiesta\b','Fiesta'),
+        (r'\bvino\b|\bdegustacion\b|\bcata\b','Vino'),
+        (r'\binfantil\b|\bninos\b','Infantiles'),
+        (r'\bgastronomia\b','Gastronomía'),
+    )
+    for pattern,label in taxonomy:
+        if re.search(pattern,tag):return label
+    return 'Cultura' if tag else None
+
 class Node:
     def __init__(self,tag='',attrs=(),parent=None):
         self.tag=tag; self.a=dict(attrs); self.parent=parent; self.parts=[]
@@ -348,7 +374,8 @@ class Collector:
                 if not title:
                     title=next((x.text() for x in nodes if x.cls('lh-sm')),None)
                 hour=re.search(r'\b([0-2]?\d:[0-5]\d)\b',n.text())
-                cats=next((x.text() for x in nodes if x.cls('evento-tabs')),None)
+                raw_cats=next((x.text() for x in nodes if x.cls('evento-tabs')),None)
+                cats=genda_category(raw_cats)
                 evidence=n.text();ident=n.a['id'].removeprefix('evento-')
                 # Keep missing venue and completed sessions; recommendations outside
                 # the selected day have no evento-ID and cannot contaminate this set.
@@ -369,11 +396,13 @@ class Collector:
                             except (ValueError,KeyError):pass
                     self.proposals[key]['original_url']=pretty or d['url']
                     self.proposals[key]['kind']='event';self.proposals[key]['acquisition_method']='genda_seven_consecutive_days'
+                    self.proposals[key]['category_source_raw']=raw_cats
                     if pretty and not cats:
                         detail=self.fetch(pretty,'Genda detail',d['url'])
                         if detail:
-                            cats=' '.join(x.text() for x in self.tree(detail).walk() if x.cls('tag-evento'))
-                            self.proposals[key]['category']=cats or None
+                            raw_cats=' '.join(x.text() for x in self.tree(detail).walk() if x.cls('tag-evento'))
+                            self.proposals[key]['category_source_raw']=raw_cats
+                            self.proposals[key]['category']=genda_category(raw_cats)
                     self.proposals[key]['link_resolution']='source_share_url' if pretty else 'listing_fallback_no_verified_detail'
     def genda_theatre(self):
         d=self.fetch('https://agendalaplata.ar/teatro','Genda teatro')
