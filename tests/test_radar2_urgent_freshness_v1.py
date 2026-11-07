@@ -3,6 +3,8 @@ import sys
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from types import SimpleNamespace
+from urllib.parse import urlsplit
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'radar2'))
@@ -15,18 +17,21 @@ class NearTermRefreshTests(unittest.TestCase):
    {'url':'https://pogo.ar/evento/a','source':'pogo.ar','first_event_date':'2026-11-07'},
    {'url':'https://pogo.ar/evento/b','source':'pogo.ar','first_event_date':'2026-11-07'},
    {'url':'http://unsafe.example.org/item','source':'unsafe','first_event_date':'2026-11-07'},
+   {'url':'https://127.0.0.1/internal','source':'private','first_event_date':'2026-11-07'},
    {'url':'https://www.instagram.com/p/abc','source':'Instagram','first_event_date':'2026-11-07'},
    {'url':'https://www.passline.com/eventos/1','source':'www.passline.com','first_event_date':'2026-11-08'},
    {'url':'https://festival.freezer.com.ar/programacion','source':'festival.freezer.com.ar','first_event_date':'2026-11-08'},
    {'url':'https://www.eventbrite.com.ar/e/test','source':'www.eventbrite.com.ar','first_event_date':'2026-11-09'}
   ]
-  with patch.object(source_cadence,'execute',return_value={'rows':rows}) as fake:
-   selected=source_cadence.urgent_source_rechecks('dummy',limit=3)
+  guarded=SimpleNamespace(safe_url=lambda u:urlsplit(u).hostname not in ('127.0.0.1','localhost'))
+  with patch.dict(sys.modules,{'capabilities':guarded}):
+   with patch.object(source_cadence,'execute',return_value={'rows':rows}) as fake:
+    selected=source_cadence.urgent_source_rechecks('dummy',limit=3)
    self.assertEqual([x['source'] for x in selected],
                     ['pogo.ar','www.passline.com','festival.freezer.com.ar'])
-   self.assertEqual(len(selected),3)
-   self.assertEqual(fake.call_count,1)
-   self.assertEqual(len(source_cadence.urgent_source_rechecks('dummy',limit=90)),3)
+    self.assertEqual(len(selected),3)
+    self.assertEqual(fake.call_count,1)
+    self.assertEqual(len(source_cadence.urgent_source_rechecks('dummy',limit=90)),3)
 
  def test_sql_is_bounded_and_focuses_on_existing_upcoming_origins(self):
   sql=source_cadence.URGENT_REFRESH_SQL
