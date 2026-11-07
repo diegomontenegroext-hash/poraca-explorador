@@ -55,8 +55,20 @@ SELECT 'entity:'||n.key,CASE WHEN n.value->>'role'='venue' THEN 'places' ELSE 'a
 FROM radar2.runs r CROSS JOIN LATERAL jsonb_each(coalesce(r.summary->'nodes','{}')) n
 WHERE r.run_id='radar2-cultural-memory-state-v1' AND NOT n.value ? 'alias_of'
 UNION ALL
-SELECT 'relation:'||n.key,'relationships',n.value || jsonb_build_object('id','relation:'||n.key,'verified',false)
+SELECT 'relation:'||n.key,'relationships',n.value || jsonb_build_object(
+ 'id','relation:'||n.key,'verified',false,'original_subject',n.value->>'subject',
+ 'subject',CASE WHEN representative.proposal_id IS NOT NULL THEN 'event:'||representative.proposal_id ELSE NULL END,
+ 'object','entity:'||coalesce(r.summary->'nodes'->(n.value->>'object')->>'alias_of',n.value->>'object'),
+ 'reference_state',CASE WHEN representative.proposal_id IS NOT NULL THEN 'resolved' ELSE 'pending_event_identity_review' END)
 FROM radar2.runs r CROSS JOIN LATERAL jsonb_each(coalesce(r.summary->'relationships','{}')) n
+LEFT JOIN radar2.proposals p ON p.proposal_id=substring(n.value->>'subject' from 7)
+LEFT JOIN LATERAL (
+ SELECT q.proposal_id FROM radar2.private_discoveries q
+ WHERE q.event_date IS NOT NULL AND coalesce(q.evidence->>'kind','event') IN ('event','program') AND
+ (q.proposal_id=coalesce(p.evidence->>'duplicate_of',p.proposal_id) OR
+ (q.title=p.title AND q.event_date=p.event_date AND q.event_time IS NOT DISTINCT FROM p.event_time AND q.venue IS NOT DISTINCT FROM p.venue))
+ ORDER BY q.proposal_id LIMIT 1
+) representative ON true
 WHERE r.run_id='radar2-cultural-memory-state-v1' AND n.value->>'status'<>'superseded_by_reconciliation'
 UNION ALL
 SELECT 'source:'||d.source,'sources',jsonb_build_object('id','source:'||d.source,'name',d.source,

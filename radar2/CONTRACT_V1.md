@@ -27,7 +27,7 @@ FULL consulta las agendas, hasta 10 cuentas rotativas más 4 controles y 12 enla
 - Eventos: título, categoría, ocurrencias y documentos corroborantes. Conservador: por ahora un evento por ocurrencia representativa; vincular funciones a una obra común sigue pendiente de conciliación editorial.
 - Ocurrencias: evento, fecha, hora, zona Argentina, precisión, estado, evidencia. Medianoche ambigua conserva hora null y motivo explícito.
 - Lugares/actores: identidad normalizada dentro de rol, evidencia y estado de revisión. Son nombres observados, **no identidades verificadas automáticamente**.
-- Relaciones: sujeto, predicado, objeto, propuesta, URL y extracto. Se mantiene el formato histórico del ledger; prefijos de nodos/eventos deben interpretarse según el tipo y no como una identidad canónica ya aprobada.
+- Relaciones: sujeto, predicado, objeto, propuesta, URL y extracto. El contrato normaliza los prefijos de nodos y resuelve sujetos contra la propuesta representativa; los sujetos sin representación quedan null y pending_event_identity_review, con original_subject preservado. No son identidades canónicas aprobadas.
 - Fuentes/cuentas: productividad, última observación, selección, intentos y restricciones. La lista de fuentes agrupada por nombre se complementa con el padrón por cuenta.
 - Corridas: modo, readback, consultas, adquisición, extracción, memoria y salud de credencial.
 

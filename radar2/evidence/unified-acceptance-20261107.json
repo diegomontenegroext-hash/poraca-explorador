@@ -1,0 +1,1940 @@
+{
+  "date_utc": "2026-11-07",
+  "date_art": "2026-11-06",
+  "radar_sha": "2d2a85cd3533465f1f2142d08ef7540daebebeea",
+  "api_sha": "de5ab69a95364a6075cb4e48817c6dcb083b23f5",
+  "github_run": 42326736932,
+  "github_status": "success",
+  "deployment_id": "dpl_C5JjCbBCtHXZYfaRfFgGNabn4piG",
+  "deployment_status": "READY",
+  "sso": "all",
+  "runs": [
+    {
+      "run_id": "radar2-ghpilot-42326736932-attempt1",
+      "finished_at": "2026-11-07T01:58:45.408Z",
+      "status": "completed",
+      "mode": "full",
+      "readback": {
+        "status": "completed",
+        "documents": "379",
+        "proposals": "442"
+      },
+      "official": {
+        "kind": "instagram_official_rotating_pilot",
+        "method": "meta_business_discovery",
+        "status": "POSTS_ACQUIRED",
+        "enabled": true,
+        "results": [
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "guajira.bar",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 0,
+            "items_returned": 12,
+            "new_candidates": 7,
+            "known_documents": 12,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-04T21:00:02+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "lutitravelguide",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 0,
+            "items_returned": 12,
+            "new_candidates": 8,
+            "known_documents": 12,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-06T16:34:48+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "escenario40",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 0,
+            "items_returned": 12,
+            "new_candidates": 9,
+            "known_documents": 12,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-10-26T17:01:46+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "teatroargentinopba",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 0,
+            "items_returned": 12,
+            "new_candidates": 12,
+            "known_documents": 12,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-05T19:30:36+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "museodearteymemoria",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 9,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-04T21:32:09+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "museopettoruti",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 12,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-06T15:21:13+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "nacional.cafe",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 8,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-04T21:29:32+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "nn_galeriadearte",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 6,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-01T14:47:36+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "octopo_tolosa",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 11,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-03T12:44:35+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "operalaplata",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 11,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-06T20:35:31+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "pivot.cafe",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 2,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-06T15:12:47+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "planetariounlp",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 8,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-04T11:45:47+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "plateadaferia",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 12,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-08-31T13:45:49+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "proyeccionesterrestres",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 11,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-06T22:30:05+0000"
+          }
+        ],
+        "accounts": [
+          "guajira.bar",
+          "lutitravelguide",
+          "escenario40",
+          "teatroargentinopba",
+          "museodearteymemoria",
+          "museopettoruti",
+          "nacional.cafe",
+          "nn_galeriadearte",
+          "octopo_tolosa",
+          "operalaplata",
+          "pivot.cafe",
+          "planetariounlp",
+          "plateadaferia",
+          "proyeccionesterrestres"
+        ],
+        "controls": [
+          "guajira.bar",
+          "lutitravelguide",
+          "escenario40",
+          "teatroargentinopba"
+        ],
+        "queries_sent": 14,
+        "new_documents": 120,
+        "rotating_accounts": [
+          "museodearteymemoria",
+          "museopettoruti",
+          "nacional.cafe",
+          "nn_galeriadearte",
+          "octopo_tolosa",
+          "operalaplata",
+          "pivot.cafe",
+          "planetariounlp",
+          "plateadaferia",
+          "proyeccionesterrestres"
+        ],
+        "unattempted_accounts": [],
+        "new_cultural_candidates": 126
+      },
+      "metrics": {
+        "new_ids": 313,
+        "new_visible_unique": 297,
+        "new_unique_dated_proposals": 103
+      },
+      "memory": {
+        "total_nodes": 108,
+        "active_nodes": 105,
+        "new_to_memory": 34,
+        "nodes_observed": 104,
+        "total_relationships": 216,
+        "active_relationships": 206,
+        "new_to_radar_evidence": 33,
+        "relationships_observed": 202,
+        "new_relationships_in_memory": 60
+      },
+      "source_discovery": {
+        "checked": [
+          {
+            "url": "https://lumenartis.org/?post_type=funcion&p=2904",
+            "score": 9,
+            "checks": 6,
+            "sha256": "bd1f183cafe9dab486661939a7d7c033ebf7557fcae352020ff945b316a57ed5",
+            "status": "productive_observed",
+            "via_url": "https://www.0221.com.ar/que-hago/proyectan-la-plata-y-musica-vivo-una-pelicula-animada-hace-100-anos-n136991",
+            "link_label": "Las entradas se consiguen en este link",
+            "http_status": 200,
+            "proposal_ids": [
+              "eeba72b5a561ce72e99c9ccb0801e23fd69471d7ebb9ed593d1cea892e01d0cb"
+            ],
+            "last_check_at": "2026-11-07T01:58:28.127312+00:00",
+            "next_check_at": "2026-11-08T01:58:28.138027+00:00",
+            "event_proposals": 1,
+            "productive_days": [
+              "2026-11-05",
+              "2026-11-06"
+            ],
+            "productive_runs": [
+              "radar2-ghpilot-42146038206",
+              "radar2-ghpilot-42146423167",
+              "radar2-ghpilot-42146682368",
+              "radar2-ghpilot-42146830199",
+              "radar2-ghpilot-42326736932-attempt1"
+            ],
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "last_productive_at": "2026-11-07T01:58:28.138007+00:00",
+            "certification_scope": "controlled reads on one day; sustained monitoring unobserved",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "monitoring_certified": true,
+            "new_domain_at_discovery": true,
+            "extraction_verified_repeatedly": true
+          },
+          {
+            "url": "https://casametro.com.ar/evento/pan-con-manteca-con-augusto-alonso-y-frankillo/",
+            "score": 10,
+            "checks": 1,
+            "sha256": "0b6755515ef76aa2e8ecfff0c9bda7201ebf9b4aee00a8234a4dd6b3d9e2289c",
+            "status": "rejected_no_local_cultural_evidence",
+            "via_url": "https://teatrocerca.com.ar/obra/alonso-y-frankillo-pan-con-manteca",
+            "link_label": "Ir a comprar entradas",
+            "http_status": 200,
+            "proposal_ids": [],
+            "last_check_at": "2026-11-07T01:58:33.041039+00:00",
+            "next_check_at": "2026-11-11T01:58:33.041141+00:00",
+            "event_proposals": 0,
+            "discovered_by_run": "radar2-ghpilot-42324533672",
+            "first_discovered_at": "2026-11-07T01:32:30.485670+00:00",
+            "new_domain_at_discovery": true
+          },
+          {
+            "url": "https://www.alternativateatral.com/espacio5168-teatro-el-escape",
+            "score": 4,
+            "checks": 1,
+            "sha256": "a4b42cf3add4c2ee0873b43914479b8bb87544cab364ca9ac1fcb5b298ae60d9",
+            "status": "cultural_candidate",
+            "via_url": "https://publico.alternativateatral.com/entradas103581-la-fiaca?o=14",
+            "link_label": "TEATRO EL ESCAPE",
+            "http_status": 200,
+            "proposal_ids": [
+              "4a160d85f07c7065b99a3985de6828b4ea86a50062f3a145dee4a415de102f0c"
+            ],
+            "last_check_at": "2026-11-07T01:58:33.722462+00:00",
+            "next_check_at": "2026-11-11T01:58:33.745397+00:00",
+            "event_proposals": 0,
+            "productive_days": [],
+            "productive_runs": [],
+            "discovered_by_run": "radar2-ghpilot-42145502319-batch2",
+            "last_productive_at": null,
+            "first_discovered_at": "2026-11-06T01:42:24.653938+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://www.alternativateatral.com/espacio544-teatro-estudio-de-las-artes",
+            "score": 4,
+            "checks": 1,
+            "sha256": "3e06d8c4498e6da750b863122973bb7db2e4f7e3ca49951e06e4cddce47f1b5d",
+            "status": "cultural_candidate",
+            "via_url": "https://publico.alternativateatral.com/entradas103617-ciudad-violenta-antropologia-urbana?o=14",
+            "link_label": "TEATRO ESTUDIO DE LAS ARTES",
+            "http_status": 200,
+            "proposal_ids": [
+              "b3edac21d37a305e73715571e07252f2fd4efdac3da06b8da54507537e3a5847"
+            ],
+            "last_check_at": "2026-11-07T01:58:34.299804+00:00",
+            "next_check_at": "2026-11-11T01:58:34.320804+00:00",
+            "event_proposals": 0,
+            "productive_days": [],
+            "productive_runs": [],
+            "discovered_by_run": "radar2-ghpilot-42322496087",
+            "last_productive_at": null,
+            "first_discovered_at": "2026-11-07T01:10:22.196894+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://agendalaplata.ar/evento/modelo-vivo-muerto-teatro-y-museo-coliseo-podesta-20260815134813",
+            "score": 3,
+            "checks": 1,
+            "sha256": "d72caf6d1e45befb2aa92f7c284409c00ad6dc2755648a2a6262d31cf5869cd4",
+            "status": "productive_observed",
+            "via_url": "https://agendalaplata.ar/teatro",
+            "link_label": "Teatro 20:30 hs Modelo vivo muerto Teatro y Museo Coliseo Podestá",
+            "http_status": 200,
+            "proposal_ids": [
+              "40e956bc97ee0860110ef32433d63dfd2c8c8ce9f3fa8745826236163a1542dd"
+            ],
+            "last_check_at": "2026-11-07T01:58:35.298427+00:00",
+            "next_check_at": "2026-11-08T01:58:35.303048+00:00",
+            "event_proposals": 1,
+            "productive_days": [
+              "2026-11-06"
+            ],
+            "productive_runs": [
+              "radar2-ghpilot-42326736932-attempt1"
+            ],
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "last_productive_at": "2026-11-07T01:58:35.303036+00:00",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://agendalaplata.ar/evento/nosotras-dos-teatro-espacio-44-20261028194056",
+            "score": 3,
+            "checks": 1,
+            "sha256": "4b9af444115e106cbbdabe735e14a13be0c91dea253514a244ccf2cb9445f5d8",
+            "status": "productive_observed",
+            "via_url": "https://agendalaplata.ar/teatro",
+            "link_label": "Teatro 20:30 hs Nosotras Dos Teatro Espacio 44",
+            "http_status": 200,
+            "proposal_ids": [
+              "9e13cb7c5e74267d73556d625d78de768f83fdfd48aa5c7f1e1794173424d03a"
+            ],
+            "last_check_at": "2026-11-07T01:58:36.255173+00:00",
+            "next_check_at": "2026-11-08T01:58:36.258766+00:00",
+            "event_proposals": 1,
+            "productive_days": [
+              "2026-11-06"
+            ],
+            "productive_runs": [
+              "radar2-ghpilot-42326736932-attempt1"
+            ],
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "last_productive_at": "2026-11-07T01:58:36.258755+00:00",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+            "score": 3,
+            "checks": 1,
+            "sha256": "b777ef99446cb711754dad517b3890c8e333ff92dd8e2d9e1f0b221f4c37661c",
+            "status": "productive_observed",
+            "via_url": "https://teatrocerca.com.ar/obra/la-facunda/funcion/la-plata/viejo-almacen-el-obrero/7-noviembre-2026",
+            "link_label": "¡Ay, por Dios!",
+            "http_status": 200,
+            "proposal_ids": [
+              "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+            ],
+            "last_check_at": "2026-11-07T01:58:36.978922+00:00",
+            "next_check_at": "2026-11-08T01:58:36.991911+00:00",
+            "event_proposals": 1,
+            "productive_days": [
+              "2026-11-06"
+            ],
+            "productive_runs": [
+              "radar2-ghpilot-42326736932-attempt1"
+            ],
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "last_productive_at": "2026-11-07T01:58:36.991898+00:00",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://teatrocerca.com.ar/obra/beguinas-ni-esposas-ni-monjas",
+            "score": 3,
+            "checks": 1,
+            "sha256": "5ca5e30017a57be75736af48f5b577580e61a00fe7a710465e519975586e8c31",
+            "status": "productive_observed",
+            "via_url": "https://teatrocerca.com.ar/obra/la-facunda/funcion/la-plata/viejo-almacen-el-obrero/7-noviembre-2026",
+            "link_label": "Beguinas (Ni Esposas Ni Monjas)",
+            "http_status": 200,
+            "proposal_ids": [
+              "12d3e765a54fc4b464ff87726e7bcf74ef960b43b6c031eaf2f09657a3a8c810"
+            ],
+            "last_check_at": "2026-11-07T01:58:37.671370+00:00",
+            "next_check_at": "2026-11-08T01:58:37.683455+00:00",
+            "event_proposals": 1,
+            "productive_days": [
+              "2026-11-06"
+            ],
+            "productive_runs": [
+              "radar2-ghpilot-42326736932-attempt1"
+            ],
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "last_productive_at": "2026-11-07T01:58:37.683437+00:00",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://www.eventbrite.com.ar/l/event-management-software/",
+            "score": 3,
+            "checks": 1,
+            "sha256": "eee41db41248e31ed196209ababef44a951218e70b83192c3f99ef3ace4bf176",
+            "status": "rejected_no_local_cultural_evidence",
+            "via_url": "https://www.eventbrite.com.ar/e/homenaje-a-astor-piazzolla-tickets-2003361459053",
+            "link_label": "Gestión y planificación de eventos",
+            "http_status": 200,
+            "proposal_ids": [],
+            "last_check_at": "2026-11-07T01:58:40.060827+00:00",
+            "next_check_at": "2026-11-11T01:58:40.060942+00:00",
+            "event_proposals": 0,
+            "discovered_by_run": "radar2-ghpilot-42208584992",
+            "first_discovered_at": "2026-11-06T11:13:35.791904+00:00",
+            "new_domain_at_discovery": false
+          },
+          {
+            "url": "https://www.eventbrite.com.ar/l/event-marketing-platform/",
+            "error": "HTTPError: HTTP Error 404: Not Found",
+            "score": 3,
+            "checks": 1,
+            "status": "inaccessible",
+            "via_url": "https://www.eventbrite.com.ar/e/homenaje-a-astor-piazzolla-tickets-2003361459053",
+            "link_label": "Plataforma de marketing para eventos",
+            "last_check_at": "2026-11-07T01:58:40.716935+00:00",
+            "next_check_at": "2026-11-11T01:58:40.716972+00:00",
+            "discovered_by_run": "radar2-ghpilot-42208584992",
+            "first_discovered_at": "2026-11-06T11:13:35.791904+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false
+          },
+          {
+            "url": "https://lumenartis.org/funcion/festival-camerata/",
+            "score": 3,
+            "checks": 1,
+            "sha256": "d4c0b4df18bc10329e6f69e9b8b6a2da3f9ff676ca40b3d625a9057a20bb097b",
+            "status": "cultural_candidate",
+            "via_url": "https://lumenartis.org/eventos-pasados/",
+            "link_label": "Festival de Primavera de Música de Cámara Camerata Concertante 31 de octubre, 2026",
+            "http_status": 200,
+            "proposal_ids": [
+              "62a4e1df74fe75809de704d67c89c62ec7e563a7bad76dfe61f2c69c89b558db"
+            ],
+            "last_check_at": "2026-11-07T01:58:41.962491+00:00",
+            "next_check_at": "2026-11-11T01:58:41.977988+00:00",
+            "event_proposals": 0,
+            "productive_days": [],
+            "productive_runs": [],
+            "discovered_by_run": "radar2-ghpilot-42322247897",
+            "last_productive_at": null,
+            "first_discovered_at": "2026-11-07T01:07:53.966880+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://www.0221.com.ar/la-plata/el-festival-la-gastronomia-italiana-fue-declarado-interes-municipal-la-plata-n126643",
+            "score": 3,
+            "checks": 1,
+            "sha256": "c9b68b862564febd6c3b9074eee339a9d095c91d9818027de331830917979220",
+            "status": "cultural_candidate",
+            "via_url": "https://www.0221.com.ar/tag/festival-de-la-gastronomia-italiana",
+            "link_label": "Reconocimiento El Festival de la Gastronomía Italiana fue declarado de Interés Municipal en La Plata",
+            "http_status": 200,
+            "proposal_ids": [
+              "2909a61f521f1038f97475f80df154243a563cc900bcf69bf0c69460a6c64d2b"
+            ],
+            "last_check_at": "2026-11-07T01:58:43.588868+00:00",
+            "next_check_at": "2026-11-11T01:58:43.639733+00:00",
+            "event_proposals": 0,
+            "productive_days": [],
+            "productive_runs": [],
+            "discovered_by_run": "radar2-ghpilot-42323134929",
+            "last_productive_at": null,
+            "first_discovered_at": "2026-11-07T01:17:09.307945+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          }
+        ],
+        "candidates_total": 657,
+        "productive_sources": [
+          "https://lumenartis.org/?post_type=funcion&p=2904",
+          "https://agendalaplata.ar/evento/modelo-vivo-muerto-teatro-y-museo-coliseo-podesta-20260815134813",
+          "https://agendalaplata.ar/evento/nosotras-dos-teatro-espacio-44-20261028194056",
+          "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "https://teatrocerca.com.ar/obra/beguinas-ni-esposas-ni-monjas"
+        ],
+        "new_domains_observed": [
+          "lumenartis.org"
+        ],
+        "candidates_discovered": 327
+      },
+      "captions": "286",
+      "credential": {
+        "status": "PERMISSIONS_VALID",
+        "missing": [],
+        "renewal": "NOT_AUTOMATED_REAUTHORIZATION_OR_COMPATIBLE_PAGE_TOKEN_REQUIRED",
+        "checked_at": "2026-11-07T01:58:52.200057+00:00",
+        "expires_at": null,
+        "expiry_introspected": false,
+        "data_access_expires_at": null
+      }
+    },
+    {
+      "run_id": "radar2-ghpilot-42326736932-attempt1-batch2",
+      "finished_at": "2026-11-07T01:59:51.473Z",
+      "status": "completed",
+      "mode": "incremental",
+      "readback": {
+        "status": "completed",
+        "documents": "155",
+        "proposals": "190"
+      },
+      "official": {
+        "kind": "instagram_official_rotating_pilot",
+        "method": "meta_business_discovery",
+        "status": "POSTS_ACQUIRED",
+        "enabled": true,
+        "results": [
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "proyecto.prisma",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 8,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-10-30T22:06:53+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "puravidalaplata2008",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 6,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-06T17:06:35+0000"
+          },
+          {
+            "status": "OFFICIAL_API_ERROR",
+            "username": "putipary",
+            "error_type": "HTTPError",
+            "http_status": 400,
+            "new_documents": 0,
+            "items_returned": 0,
+            "new_candidates": 0,
+            "known_documents": 0,
+            "meta_error_code": 110,
+            "meta_error_type": "OAuthException",
+            "meta_error_subcode": 2207013,
+            "latest_publication_at": null
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "rauber.cerveza",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 5,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-07T00:10:26+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "revolucionotakuoficial",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 6,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-10-31T01:32:44+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "runrun.bar",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 11,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-09-22T22:26:24+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "sabor.canela",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 10,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-10-17T03:11:48+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "sala420_lp",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 11,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-10-16T22:39:26+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "sifon.producciones",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 11,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-06T15:17:09+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "sindicatoargentinodeboleros",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 8,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-06T15:41:00+0000"
+          }
+        ],
+        "accounts": [
+          "proyecto.prisma",
+          "puravidalaplata2008",
+          "putipary",
+          "rauber.cerveza",
+          "revolucionotakuoficial",
+          "runrun.bar",
+          "sabor.canela",
+          "sala420_lp",
+          "sifon.producciones",
+          "sindicatoargentinodeboleros"
+        ],
+        "controls": [
+          "guajira.bar",
+          "lutitravelguide",
+          "escenario40",
+          "teatroargentinopba"
+        ],
+        "queries_sent": 10,
+        "new_documents": 108,
+        "rotating_accounts": [
+          "proyecto.prisma",
+          "puravidalaplata2008",
+          "putipary",
+          "rauber.cerveza",
+          "revolucionotakuoficial",
+          "runrun.bar",
+          "sabor.canela",
+          "sala420_lp",
+          "sifon.producciones",
+          "sindicatoargentinodeboleros"
+        ],
+        "unattempted_accounts": [],
+        "new_cultural_candidates": 76
+      },
+      "metrics": {
+        "new_ids": 121,
+        "new_visible_unique": 115,
+        "new_unique_dated_proposals": 64
+      },
+      "memory": {
+        "total_nodes": 110,
+        "active_nodes": 107,
+        "new_to_memory": 2,
+        "nodes_observed": 55,
+        "total_relationships": 221,
+        "active_relationships": 211,
+        "new_to_radar_evidence": 2,
+        "relationships_observed": 82,
+        "new_relationships_in_memory": 5
+      },
+      "source_discovery": {
+        "checked": [
+          {
+            "url": "https://publico.alternativateatral.com/entradas100991-beguinas-ni-esposas-ni-monjas?o=14",
+            "score": 4,
+            "checks": 1,
+            "sha256": "bc37813f174b69ffd76cf324212ed5f0767bb0a67d9b428bdd4066c666d0b2a3",
+            "status": "cultural_candidate",
+            "via_url": "https://teatrocerca.com.ar/obra/beguinas-ni-esposas-ni-monjas",
+            "link_label": "Ir a comprar entradas",
+            "http_status": 200,
+            "proposal_ids": [
+              "bd1c727e2c4e5557cad6f3e2b6aa278b9c086b790267b3ae745bf20779f63bcd"
+            ],
+            "last_check_at": "2026-11-07T01:59:44.933072+00:00",
+            "next_check_at": "2026-11-11T01:59:44.947971+00:00",
+            "event_proposals": 0,
+            "productive_days": [],
+            "productive_runs": [],
+            "discovered_by_run": "radar2-ghpilot-42326736932-attempt1",
+            "last_productive_at": null,
+            "first_discovered_at": "2026-11-07T01:58:25.522306+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://agendalaplata.ar/evento/proyecto-10-el-medio-aljibe-20261025174856",
+            "score": 3,
+            "checks": 1,
+            "sha256": "112766fafa583623e497f200075a4330c9d0dbd6dba9bc74a4e4ae0f849a8b24",
+            "status": "rejected_no_local_cultural_evidence",
+            "via_url": "https://agendalaplata.ar/teatro",
+            "link_label": "Teatro 21:00 hs Proyecto 10 El Medio Aljibe",
+            "http_status": 200,
+            "proposal_ids": [],
+            "last_check_at": "2026-11-07T01:59:45.932005+00:00",
+            "next_check_at": "2026-11-11T01:59:45.932092+00:00",
+            "event_proposals": 0,
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "new_domain_at_discovery": false
+          },
+          {
+            "url": "https://agendalaplata.ar/evento/punto-fijo-la-filial-espacio-cultural-20261105125906",
+            "score": 3,
+            "checks": 1,
+            "sha256": "6fb7cd1fd09340c63fa6069f80a8e20fb5d51e1095f4766dbc585f83fa4b7837",
+            "status": "rejected_no_local_cultural_evidence",
+            "via_url": "https://agendalaplata.ar/teatro",
+            "link_label": "Teatro, En vivo, Espectáculo 21:00 hs Punto Fijo La Filial Espacio Cultural",
+            "http_status": 200,
+            "proposal_ids": [],
+            "last_check_at": "2026-11-07T01:59:46.899883+00:00",
+            "next_check_at": "2026-11-11T01:59:46.900082+00:00",
+            "event_proposals": 0,
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "new_domain_at_discovery": false
+          },
+          {
+            "url": "https://teatrocerca.com.ar/obra/camas-cruzadas",
+            "score": 3,
+            "checks": 1,
+            "sha256": "f48b897836f8e8aa65c15e34a9953059786db70e9730d51a4d79c777c3c4e61b",
+            "status": "productive_observed",
+            "via_url": "https://teatrocerca.com.ar/obra/la-nona-del-teatro-unlp/funcion/la-plata/teatro-de-la-unlp/7-noviembre-2026",
+            "link_label": "Camas Cruzadas",
+            "http_status": 200,
+            "proposal_ids": [
+              "366a94047a0e9557a7a4b798cd341d20c8060d9f8d35807e37f88db91161d543"
+            ],
+            "last_check_at": "2026-11-07T01:59:48.031978+00:00",
+            "next_check_at": "2026-11-08T01:59:48.046910+00:00",
+            "event_proposals": 1,
+            "productive_days": [
+              "2026-11-06"
+            ],
+            "productive_runs": [
+              "radar2-ghpilot-42326736932-attempt1-batch2"
+            ],
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "last_productive_at": "2026-11-07T01:59:48.046897+00:00",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://teatrocerca.com.ar/obra/campi-de-gira-monologos-argentinos",
+            "score": 3,
+            "checks": 1,
+            "sha256": "8ef53df019b876f032501ee890fe21bedf7c354f688424bac092117e6535673f",
+            "status": "productive_observed",
+            "via_url": "https://teatrocerca.com.ar/obra/escrito-en-la-piel/funcion/la-plata/viejo-almacen-el-obrero/7-noviembre-2026",
+            "link_label": "Campi de gira – Monólogos Argentinos",
+            "http_status": 200,
+            "proposal_ids": [
+              "a73377c0de8b29167b3d66c2562cfcc547363915c3b91ad13af5ed910d773a84"
+            ],
+            "last_check_at": "2026-11-07T01:59:48.752595+00:00",
+            "next_check_at": "2026-11-08T01:59:48.765027+00:00",
+            "event_proposals": 1,
+            "productive_days": [
+              "2026-11-06"
+            ],
+            "productive_runs": [
+              "radar2-ghpilot-42326736932-attempt1-batch2"
+            ],
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "last_productive_at": "2026-11-07T01:59:48.765013+00:00",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://www.alternativateatral.com/curso31088-seminario-de-programacion-de-consola-de-iluminacion-escenica-ma",
+            "score": 3,
+            "checks": 1,
+            "sha256": "512d2a1d6d152f6e272c2477aa7d0f982e1acd562462e61022cf40a91160ae3f",
+            "status": "rejected_no_local_cultural_evidence",
+            "via_url": "https://www.alternativateatral.com/novedades.asp",
+            "link_label": "> Seminario de Programación de Consola de Iluminación Escénica Ma",
+            "http_status": 200,
+            "proposal_ids": [],
+            "last_check_at": "2026-11-07T01:59:49.856806+00:00",
+            "next_check_at": "2026-11-11T01:59:49.857710+00:00",
+            "event_proposals": 0,
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "new_domain_at_discovery": false
+          }
+        ],
+        "candidates_total": 662,
+        "productive_sources": [
+          "https://teatrocerca.com.ar/obra/camas-cruzadas",
+          "https://teatrocerca.com.ar/obra/campi-de-gira-monologos-argentinos"
+        ],
+        "new_domains_observed": [],
+        "candidates_discovered": 81
+      },
+      "captions": "108",
+      "credential": {
+        "status": "PERMISSIONS_VALID",
+        "missing": [],
+        "renewal": "NOT_AUTOMATED_REAUTHORIZATION_OR_COMPATIBLE_PAGE_TOKEN_REQUIRED",
+        "checked_at": "2026-11-07T01:59:56.153485+00:00",
+        "expires_at": null,
+        "expiry_introspected": false,
+        "data_access_expires_at": null
+      }
+    },
+    {
+      "run_id": "radar2-ghpilot-42326736932-attempt1-batch3",
+      "finished_at": "2026-11-07T02:00:57.346Z",
+      "status": "completed",
+      "mode": "incremental",
+      "readback": {
+        "status": "completed",
+        "documents": "152",
+        "proposals": "180"
+      },
+      "official": {
+        "kind": "instagram_official_rotating_pilot",
+        "method": "meta_business_discovery",
+        "status": "POSTS_ACQUIRED",
+        "enabled": true,
+        "results": [
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "solciceramica",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 9,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-04T23:22:16+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "somospatiocafe",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 4,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-05T23:22:31+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "tallerdehuerta",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 1,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-02T19:56:55+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "teatrodecamaracitybell",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 12,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-02T16:08:07+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "teatrounlp",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 11,
+            "items_returned": 12,
+            "new_candidates": 11,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-06T23:16:19+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "tranzafestival",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 5,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-10-24T15:36:16+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "tulumceramica",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 11,
+            "items_returned": 12,
+            "new_candidates": 4,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-07-08T20:03:05+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "turismo.laplata",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 12,
+            "items_returned": 12,
+            "new_candidates": 11,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-06T18:18:03+0000"
+          },
+          {
+            "status": "MEDIA_RETURNED",
+            "username": "vachug_humedalurbano",
+            "error_type": null,
+            "http_status": null,
+            "new_documents": 11,
+            "items_returned": 12,
+            "new_candidates": 0,
+            "known_documents": 0,
+            "meta_error_code": null,
+            "meta_error_type": null,
+            "meta_error_subcode": null,
+            "latest_publication_at": "2026-11-03T15:15:32+0000"
+          }
+        ],
+        "accounts": [
+          "solciceramica",
+          "somospatiocafe",
+          "tallerdehuerta",
+          "teatrodecamaracitybell",
+          "teatrounlp",
+          "tranzafestival",
+          "tulumceramica",
+          "turismo.laplata",
+          "vachug_humedalurbano"
+        ],
+        "controls": [
+          "guajira.bar",
+          "lutitravelguide",
+          "escenario40",
+          "teatroargentinopba"
+        ],
+        "queries_sent": 9,
+        "new_documents": 105,
+        "rotating_accounts": [
+          "solciceramica",
+          "somospatiocafe",
+          "tallerdehuerta",
+          "teatrodecamaracitybell",
+          "teatrounlp",
+          "tranzafestival",
+          "tulumceramica",
+          "turismo.laplata",
+          "vachug_humedalurbano"
+        ],
+        "unattempted_accounts": [],
+        "new_cultural_candidates": 57
+      },
+      "metrics": {
+        "new_ids": 111,
+        "new_visible_unique": 100,
+        "new_unique_dated_proposals": 25
+      },
+      "memory": {
+        "total_nodes": 114,
+        "active_nodes": 111,
+        "new_to_memory": 4,
+        "nodes_observed": 56,
+        "total_relationships": 225,
+        "active_relationships": 215,
+        "new_to_radar_evidence": 4,
+        "relationships_observed": 83,
+        "new_relationships_in_memory": 4
+      },
+      "source_discovery": {
+        "checked": [
+          {
+            "url": "https://www.passline.com/eventos/campi-monologos-argentinos-en-la-plata",
+            "score": 5,
+            "checks": 1,
+            "sha256": "bf1b341c2b5560ccaa5933abfbbe5a6cd23bcea6a73b4666732d02653e9fcb7f",
+            "status": "rejected_no_local_cultural_evidence",
+            "via_url": "https://teatrocerca.com.ar/obra/campi-de-gira-monologos-argentinos",
+            "link_label": "Ir a comprar entradas",
+            "http_status": 200,
+            "proposal_ids": [],
+            "last_check_at": "2026-11-07T02:00:50.711659+00:00",
+            "next_check_at": "2026-11-11T02:00:50.711750+00:00",
+            "event_proposals": 0,
+            "discovered_by_run": "radar2-ghpilot-42326736932-attempt1-batch2",
+            "first_discovered_at": "2026-11-07T01:59:43.757841+00:00",
+            "new_domain_at_discovery": false
+          },
+          {
+            "url": "https://agendalaplata.ar/evento/roberto-antier-desafinado-club-20261023125450",
+            "score": 3,
+            "checks": 1,
+            "sha256": "9827d326fd2c3e317fa128c5fcbdb49411947ed63d788803c6541c89fccc7478",
+            "status": "rejected_no_local_cultural_evidence",
+            "via_url": "https://agendalaplata.ar/teatro",
+            "link_label": "Música, Teatro 20:00 hs Roberto Antier Desafinado Club",
+            "http_status": 200,
+            "proposal_ids": [],
+            "last_check_at": "2026-11-07T02:00:51.688896+00:00",
+            "next_check_at": "2026-11-11T02:00:51.688981+00:00",
+            "event_proposals": 0,
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "new_domain_at_discovery": false
+          },
+          {
+            "url": "https://agendalaplata.ar/evento/shakespeare-echoes-teatro-en-ingles-para-adultos-espacio-doble-t-20260926164555",
+            "score": 3,
+            "checks": 1,
+            "sha256": "da07273a6b4fb22b28c1c03e8d21cea319553c7039588f9898354c699cc503cb",
+            "status": "productive_observed",
+            "via_url": "https://agendalaplata.ar/teatro",
+            "link_label": "Teatro 20:00 hs Shakespeare Echoes - Teatro en inglés para adultos Espacio Doble-T",
+            "http_status": 200,
+            "proposal_ids": [
+              "7a2ffe37e5964a5ddbf0662a6c8edaafb723f6b8b631d02ee843567224b761cb"
+            ],
+            "last_check_at": "2026-11-07T02:00:52.666724+00:00",
+            "next_check_at": "2026-11-08T02:00:52.670606+00:00",
+            "event_proposals": 1,
+            "productive_days": [
+              "2026-11-06"
+            ],
+            "productive_runs": [
+              "radar2-ghpilot-42326736932-attempt1-batch3"
+            ],
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "last_productive_at": "2026-11-07T02:00:52.670594+00:00",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://teatrocerca.com.ar/obra/casi-presente-agustina-aguilar",
+            "score": 3,
+            "checks": 1,
+            "sha256": "96e6238105d0a5df32ae8e469768191414fac6be2307270a511f4b52e6227c2b",
+            "status": "productive_observed",
+            "via_url": "https://teatrocerca.com.ar/obra/actuen/funcion/la-plata/teatro-abierto/7-noviembre-2026",
+            "link_label": "Agustina Aguilar: Casi Presente",
+            "http_status": 200,
+            "proposal_ids": [
+              "374dcc3e10b27c87eff40c08f5c355e9dd0045a9a851aff629b759a34dc9073d"
+            ],
+            "last_check_at": "2026-11-07T02:00:53.666785+00:00",
+            "next_check_at": "2026-11-08T02:00:53.682664+00:00",
+            "event_proposals": 1,
+            "productive_days": [
+              "2026-11-06"
+            ],
+            "productive_runs": [
+              "radar2-ghpilot-42326736932-attempt1-batch3"
+            ],
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "last_productive_at": "2026-11-07T02:00:53.682651+00:00",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://teatrocerca.com.ar/obra/connie-ballarini-tour-2026",
+            "score": 3,
+            "checks": 1,
+            "sha256": "2ab0f7818ac1b87aa84fa36e20cafa8fd906187713dfd1650ec9728e6284b62e",
+            "status": "productive_observed",
+            "via_url": "https://teatrocerca.com.ar/obra/criminal-obra/funcion/la-plata/telon-negro-teatro/14-noviembre-2026",
+            "link_label": "Connie Ballarini: Tour 2026",
+            "http_status": 200,
+            "proposal_ids": [
+              "41631344977a7b4a16a70d19d3ef89f894eb47f241ffb5d65a11fff31b3b1bbf"
+            ],
+            "last_check_at": "2026-11-07T02:00:54.230631+00:00",
+            "next_check_at": "2026-11-08T02:00:54.242862+00:00",
+            "event_proposals": 1,
+            "productive_days": [
+              "2026-11-06"
+            ],
+            "productive_runs": [
+              "radar2-ghpilot-42326736932-attempt1-batch3"
+            ],
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "last_productive_at": "2026-11-07T02:00:54.242850+00:00",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "monitoring_certified": false,
+            "new_domain_at_discovery": false,
+            "extraction_verified_repeatedly": false
+          },
+          {
+            "url": "https://www.alternativateatral.com/curso59522-taller-de-actuacion-y-montaje-de-obra",
+            "score": 3,
+            "checks": 1,
+            "sha256": "90c788871057648e24204a1995a181ec8bd54acbb6d668d197585dfe350be206",
+            "status": "rejected_no_local_cultural_evidence",
+            "via_url": "https://www.alternativateatral.com/novedades.asp",
+            "link_label": "> Taller de actuación y montaje de obra",
+            "http_status": 200,
+            "proposal_ids": [],
+            "last_check_at": "2026-11-07T02:00:55.613842+00:00",
+            "next_check_at": "2026-11-11T02:00:55.614486+00:00",
+            "event_proposals": 0,
+            "discovered_by_run": "radar2-ghpilot-42145502319",
+            "first_discovered_at": "2026-11-06T01:42:10.727585+00:00",
+            "new_domain_at_discovery": false
+          }
+        ],
+        "candidates_total": 671,
+        "productive_sources": [
+          "https://agendalaplata.ar/evento/shakespeare-echoes-teatro-en-ingles-para-adultos-espacio-doble-t-20260926164555",
+          "https://teatrocerca.com.ar/obra/casi-presente-agustina-aguilar",
+          "https://teatrocerca.com.ar/obra/connie-ballarini-tour-2026"
+        ],
+        "new_domains_observed": [],
+        "candidates_discovered": 74
+      },
+      "captions": "105",
+      "credential": {
+        "status": "PERMISSIONS_VALID",
+        "missing": [],
+        "renewal": "NOT_AUTOMATED_REAUTHORIZATION_OR_COMPATIBLE_PAGE_TOKEN_REQUIRED",
+        "checked_at": "2026-11-07T02:01:02.769101+00:00",
+        "expires_at": null,
+        "expiry_introspected": false,
+        "data_access_expires_at": null
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "documents": "847",
+      "official_documents": "499",
+      "proposals": "1036",
+      "document_versions": "893",
+      "proposal_versions": "1608"
+    }
+  ],
+  "future": [
+    {
+      "future_dated_candidates": "221",
+      "future_with_date_time_venue": "169",
+      "instagram_future_dated_candidates": "41"
+    }
+  ],
+  "instagram_future": [
+    {
+      "all_ig_future": "41",
+      "ig_future_date_time_venue": "7"
+    }
+  ],
+  "accounts": [
+    {
+      "attempted": "43",
+      "accessible": "42"
+    }
+  ],
+  "aliases": [
+    {
+      "duplicate_aliases": "40",
+      "representatives": "31"
+    }
+  ],
+  "new_nodes": [
+    {
+      "name": "Agustina Aguilar",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1-batch3",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/casi-presente-agustina-aguilar",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Agustina Aguilar\"}",
+          "proposal_id": "374dcc3e10b27c87eff40c08f5c355e9dd0045a9a851aff629b759a34dc9073d"
+        }
+      ]
+    },
+    {
+      "name": "Manu Stoichevich",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/beguinas-ni-esposas-ni-monjas",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Manu Stoichevich\"}",
+          "proposal_id": "12d3e765a54fc4b464ff87726e7bcf74ef960b43b6c031eaf2f09657a3a8c810"
+        }
+      ]
+    },
+    {
+      "name": "Francisco Bereilh",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Francisco Bereilh\"}",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Lautaro Alejo Negri",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Lautaro Alejo Negri\"}",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Mey Maklen",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Mey Maklen\"}",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Teatro Municipal Coliseo Podestá",
+      "role": "venue",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1-batch3",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/connie-ballarini-tour-2026",
+          "excerpt": "{\"@type\": \"TheaterEvent\", \"@id\": \"https://teatrocerca.com.ar/obra/connie-ballarini-tour-2026#funcion-230\", \"name\": \"Connie Ballarini: Tour 2026\", \"description\": \"Connie Ballarini: Tour 2026\", \"image\": \"https://teatrocerca.com.ar/uploads/posters/poster-20260808230420-137a0468.webp\", \"url\": \"https://teatrocerca.com.ar/obra/connie-ballarini-tour-2026/funcion/la-plata/teatro-municipal-coliseo-podesta/14-noviembre-2026\", \"startDate\": \"2026-11-14T20:00:00-03:00\", \"eventStatus\": \"https://schema.org/EventScheduled\", \"eventAttendanceMode\": \"https://schema.org/OfflineEventAttendanceMode\", \"location\": {\"@type\": \"Place\", \"name\": \"Teatro Municipal Coliseo Podestá\", \"address\": {\"@type\": \"PostalAddress\", \"streetAddress\": \"Calle 10 Nº 733\", \"addressLocality\": \"La Plata\", \"addressCountry\": \"AR\"}, \"geo\": {\"@type\": \"GeoCoordinates\", \"latitude\": -34.915699, \"longitude\": -57.955606}}, \"workPerformed\": {\"@id\": \"https://teatrocerca.com.ar/obra/connie-ballarini-tour-2026#play\"}, \"performer\": [{\"@type\": \"Perso",
+          "proposal_id": "41631344977a7b4a16a70d19d3ef89f894eb47f241ffb5d65a11fff31b3b1bbf"
+        }
+      ]
+    },
+    {
+      "name": "Espacio E MACLA",
+      "role": "venue",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://www.instagram.com/p/DcwD72plOxS/",
+          "excerpt": "Este viernes 4 de septiembre a las 19 hs te invitamos a Fake news de Alfredo Azcona en Espacio E MACLA, sobre la rambla de calle 50 esquina 6. ¡No te la pierdas, es un único día! Fake News invita a recorrer el arte como una ilusión programada y a repensar las tensiones de nuestro presente. La muestra se despliega a través de una propuesta que dialoga en un territorio donde todo lo simbólico es mentira y todas las mentiras son simbólicas. El arte como la metáfora de la mentira y como capitalismo simbólico. No explica el engaño que el espectador necesita reconstruir a partir de los rastros o guiños pensados por el artista en la instalación, que no deja de ser una narrativa ficticia de un ritual contemporáneo. Lic. María Claudia Florescano / Curadora",
+          "proposal_id": "412c66c9fa2772facbdaf34fb3a0697276b44bc772d91b167be8b3e59697017d"
+        },
+        {
+          "url": "https://www.instagram.com/p/DecQgZaFMJq/",
+          "excerpt": "El próximo viernes inauguramos 16 octubre 19 hs en Espacio E MACLA la muestra Como un jardín eterno de Glenda Pocai. Lecturass a cargo de glendapocai rocipassarelli y fernandosantana Música: alejandro_bertora y lucia.pocai Video: juani_echeverria Editorial polvilho_edicoes Los esperamos !!!",
+          "proposal_id": "dcaf8701f73cc67e0701e2dbe4be893f1a46a98182967e79b150fcb86a376ae0"
+        }
+      ]
+    },
+    {
+      "name": "Pablo Fusco",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://agendalaplata.ar/evento/modelo-vivo-muerto-teatro-y-museo-coliseo-podesta-20260815134813",
+          "excerpt": "{\"@type\": \"PerformingGroup\", \"name\": \"Pablo Fusco\"}",
+          "proposal_id": "40e956bc97ee0860110ef32433d63dfd2c8c8ce9f3fa8745826236163a1542dd"
+        }
+      ]
+    },
+    {
+      "name": "Florencia Bartneche",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Florencia Bartneche\"}",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Mauricio Regalado",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Mauricio Regalado\"}",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Mónica Pérsigo",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/beguinas-ni-esposas-ni-monjas",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Mónica Pérsigo\"}",
+          "proposal_id": "12d3e765a54fc4b464ff87726e7bcf74ef960b43b6c031eaf2f09657a3a8c810"
+        }
+      ]
+    },
+    {
+      "name": "Campi",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1-batch2",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/campi-de-gira-monologos-argentinos",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Campi\"}",
+          "proposal_id": "a73377c0de8b29167b3d66c2562cfcc547363915c3b91ad13af5ed910d773a84"
+        }
+      ]
+    },
+    {
+      "name": "Julián Lucero",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://agendalaplata.ar/evento/modelo-vivo-muerto-teatro-y-museo-coliseo-podesta-20260815134813",
+          "excerpt": "{\"@type\": \"PerformingGroup\", \"name\": \"Julián Lucero\"}",
+          "proposal_id": "40e956bc97ee0860110ef32433d63dfd2c8c8ce9f3fa8745826236163a1542dd"
+        }
+      ]
+    },
+    {
+      "name": "Taller Laura Gan",
+      "role": "venue",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://www.instagram.com/p/DdmdMHCCavJ/",
+          "excerpt": "¡Talleres para compartir en familia! Y para todas las edades! Una oportunidad para que vengas con quien quieras y disfrutes de aprender algo nuevo 🙌 🌈Sábado 10 de octubre Taller de estampas (tote bag + abanico) 17 a 20hs con merienda de maiscelzo 🌈Sábado 24 de octubre Taller de Taza y plato de cerámica 16.30 a 19.30hs con merienda de maiscelzo 📍Taller Laura Gan Av. 13 num 343 entre 38 y 39 La plata Infoe inscribipción 👉(221) 317 2475 Laura Gan",
+          "proposal_id": "b39ddb17b3b5bd7aad63ca94f1a03274acbd4ce6d62c3c6edd3225af508335fe"
+        },
+        {
+          "url": "https://www.instagram.com/p/DdmdMHCCavJ/",
+          "excerpt": "¡Talleres para compartir en familia! Y para todas las edades! Una oportunidad para que vengas con quien quieras y disfrutes de aprender algo nuevo 🙌 🌈Sábado 10 de octubre Taller de estampas (tote bag + abanico) 17 a 20hs con merienda de maiscelzo 🌈Sábado 24 de octubre Taller de Taza y plato de cerámica 16.30 a 19.30hs con merienda de maiscelzo 📍Taller Laura Gan Av. 13 num 343 entre 38 y 39 La plata Infoe inscribipción 👉(221) 317 2475 Laura Gan",
+          "proposal_id": "fdf3b49fcd0a7d9f1065300f27747dea3a00097834928f043b4b9796ce05e708"
+        },
+        {
+          "url": "https://www.instagram.com/reel/Dd7FavgJ2Y5/",
+          "excerpt": "¡Esta vez es tu oportunidad,no te lo podés perder! Taller de Taza y plato de cerámica para hacer en familia🥰 ✔️Sábado 24 de octubre ⏰️16.30 a 19.30hs con merienda de maiscelzo 📍Taller Laura Gan Av. 13 num 343 entre 38 y 39. La plata 🔥Valor: 1 adulto $75.000 2 adultos $135.000 1 adulto y un niño/adolescente $112.000 2 adultos y un niño/adolescente $160.000 Info e inscripción 👉 Laura Gan (221) 317 2475 #cerámica #tazacerámica #talleresfamilia #tallerlauragan #lauragan",
+          "proposal_id": "abf73f29db6728e04eb247d5912f44713f496fe878da8b2c69d941438d694d5c"
+        },
+        {
+          "url": "https://www.instagram.com/reel/DdpC46rp2B-/",
+          "excerpt": "Talleres para compartir en familia, para todas las edades,veni con quien quieras🤗 Taller de estampas Tote bag + abanico con merienda de maiscelzo 💕Sábado 10 de octubre ⏰️17 a 20hs 📍Taller Laura Gan Av 13 num 343 entre 38 y 39. La plata 🔥Valor: 1 adulto $75.000 2 adultos $135.000 1 adulto y un ñino: $112.000 #estampas #totebag #abanico #tallerintensivo #lauragan",
+          "proposal_id": "5870110f154ad11e98d2e3c15d69ded0dd6b80fbf0429740c624cd159e8af385"
+        },
+        {
+          "url": "https://www.instagram.com/reel/DfH8BVuCLIy/",
+          "excerpt": "Alfarería experimental: técnica neriage🏺 ✔️Sábado 14 de noviembre ⏰️ 16.30 a 20.30hs Con merienda de maiscelzo Profe Josefina Araneda(Unlp) 🔥Valor: 1 pago $95.000 o 2 cuotas de $50.000 📍Taller Laura Gan Av. 13 num 343 entre 38 y 39. La plata Info e inscripción 👉 (221)3172475 Laura Gan",
+          "proposal_id": "a0e8e47d8a2e8865ee8f34b86593cd15c73bd39ba019f614e8a60c66051fb285"
+        },
+        {
+          "url": "https://www.instagram.com/reel/DfKXytPiC-N/",
+          "excerpt": "¡Nueva fecha! TALLER DE NAVIDAD 🎅 ✔️Sábado 14 de noviembre ⏰️16.30 a 19.30hs con merienda de maiscelzo Vamos a intervenir tres figuras navideñas 🫶 Horneadas y materiales incluidos 📍Taller Laura Gan Av. 13 num 343 entre 38 y 39. La plata 🔥Valor: 1 adulto $75.000 2 adultos $135.000 1 adulto y un niño/adolescente $112.000 2 adultos y un niño/adolescente $160.000 Info e inscripción 👉 (221) 317 2475 Laura Gan",
+          "proposal_id": "b60abbfd3a0f2530e5a13fd853a72faf197fe818d86f0be483c2ff2be9f56d12"
+        }
+      ]
+    },
+    {
+      "name": "Gonzalo Alba",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Gonzalo Alba\"}",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Yamila Acuña",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/beguinas-ni-esposas-ni-monjas",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Yamila Acuña\"}",
+          "proposal_id": "12d3e765a54fc4b464ff87726e7bcf74ef960b43b6c031eaf2f09657a3a8c810"
+        }
+      ]
+    },
+    {
+      "name": "Casa Mandala",
+      "role": "venue",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://www.instagram.com/p/DeXTssHI_Mc/",
+          "excerpt": "Día de la madre en el taller🪻 Workshop de Lámparas Vení a pintar tu lámpara💡 ¿Qué incluye? - materiales - horneadas - instalación eléctrica lista para usar - pantalla cilíndrica de tela (color a eleccion) 💌 Sábado 17/10 a las 18h 📍Casa Mandala 55 n 331, entre 1 y 2 Valor: $70.000 Reservando este finde, si venís con tu mamá o hija, tienen un 10% off cada una Nos vemos en el taller, Juli🧑🏽‍🎨",
+          "proposal_id": "f2dbc8bed7c62e896c6a3c0e2ba7768860a9383791708c71bdc527b2f89f2d45"
+        }
+      ]
+    },
+    {
+      "name": "Teatro Espacio 44",
+      "role": "organizer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://agendalaplata.ar/evento/nosotras-dos-teatro-espacio-44-20261028194056",
+          "excerpt": "{\"@context\": \"https://schema.org\", \"@type\": \"Event\", \"name\": \"Nosotras Dos\", \"startDate\": \"2026-11-07T20:30:00-03:00\", \"endDate\": \"2026-11-07T22:30:00-03:00\", \"eventAttendanceMode\": \"https://schema.org/OfflineEventAttendanceMode\", \"eventStatus\": \"https://schema.org/EventScheduled\", \"location\": {\"@type\": \"Place\", \"name\": \"Teatro Espacio 44\", \"address\": {\"@type\": \"PostalAddress\", \"addressLocality\": \"La Plata\", \"addressRegion\": \"Buenos Aires\", \"addressCountry\": \"AR\"}}, \"image\": [\"https://agendalaplata.ar/_fotos/20261028194057.jpg\"], \"description\": \"Nosotras Dos en Teatro Espacio 44\", \"organizer\": {\"@type\": \"Organization\", \"name\": \"Teatro Espacio 44\", \"url\": \"https://www.instagram.com/teatroespacio44/\"}, \"url\": \"https://agendalaplata.ar/evento/nosotras-dos-teatro-espacio-44-20261028194056\", \"offers\": {\"@type\": \"Offer\", \"url\": \"https://agendalaplata.ar/evento/nosotras-dos-teatro-espacio-44-20261028194056\", \"availability\": \"https://schema.org/InStock\"}}",
+          "proposal_id": "9e13cb7c5e74267d73556d625d78de768f83fdfd48aa5c7f1e1794173424d03a"
+        },
+        {
+          "url": "https://agendalaplata.ar/evento/nosotras-dos-teatro-espacio-44-20261028194056",
+          "excerpt": "{\"@context\": \"https://schema.org\", \"@type\": \"Event\", \"name\": \"Nosotras Dos\", \"startDate\": \"2026-11-07T20:30:00-03:00\", \"endDate\": \"2026-11-07T22:30:00-03:00\", \"eventAttendanceMode\": \"https://schema.org/OfflineEventAttendanceMode\", \"eventStatus\": \"https://schema.org/EventScheduled\", \"location\": {\"@type\": \"Place\", \"name\": \"Teatro Espacio 44\", \"address\": {\"@type\": \"PostalAddress\", \"addressLocality\": \"La Plata\", \"addressRegion\": \"Buenos Aires\", \"addressCountry\": \"AR\"}}, \"image\": [\"https://agendalaplata.ar/_fotos/20261028194057.jpg\"], \"description\": \"Nosotras Dos en Teatro Espacio 44\", \"organizer\": {\"@type\": \"Organization\", \"name\": \"Teatro Espacio 44\", \"url\": \"https://www.instagram.com/teatroespacio44/\"}, \"url\": \"https://agendalaplata.ar/evento/nosotras-dos-teatro-espacio-44-20261028194056\", \"offers\": {\"@type\": \"Offer\", \"url\": \"https://agendalaplata.ar/evento/nosotras-dos-teatro-espacio-44-20261028194056\", \"availability\": \"https://schema.org/InStock\"}}",
+          "proposal_id": "b74ff1c3a3fddc3f1582edf9c4de22630fd379c0c3ea9f9c21de45008d46b104"
+        }
+      ]
+    },
+    {
+      "name": "Manu Fanego",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://agendalaplata.ar/evento/modelo-vivo-muerto-teatro-y-museo-coliseo-podesta-20260815134813",
+          "excerpt": "{\"@type\": \"PerformingGroup\", \"name\": \"Manu Fanego\"}",
+          "proposal_id": "40e956bc97ee0860110ef32433d63dfd2c8c8ce9f3fa8745826236163a1542dd"
+        }
+      ]
+    },
+    {
+      "name": "Guillermo Schinella",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Guillermo Schinella\"}",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Teatro y Museo Coliseo Podestá",
+      "role": "organizer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://agendalaplata.ar/evento/modelo-vivo-muerto-teatro-y-museo-coliseo-podesta-20260815134813",
+          "excerpt": "{\"@context\": \"https://schema.org\", \"@type\": \"Event\", \"name\": \"Modelo vivo muerto\", \"startDate\": \"2026-11-29T20:30:00-03:00\", \"endDate\": \"2026-11-29T22:30:00-03:00\", \"eventAttendanceMode\": \"https://schema.org/OfflineEventAttendanceMode\", \"eventStatus\": \"https://schema.org/EventScheduled\", \"location\": {\"@type\": \"Place\", \"name\": \"Teatro y Museo Coliseo Podestá\", \"address\": {\"@type\": \"PostalAddress\", \"addressLocality\": \"La Plata\", \"addressRegion\": \"Buenos Aires\", \"addressCountry\": \"AR\"}}, \"image\": [\"https://agendalaplata.ar/_fotos/20260815134814.jpg\"], \"description\": \"Modelo vivo muerto en Teatro y Museo Coliseo Podestá\", \"organizer\": {\"@type\": \"Organization\", \"name\": \"Teatro y Museo Coliseo Podestá\", \"url\": \"https://www.instagram.com/tcoliseopodesta/\"}, \"performer\": [{\"@type\": \"PerformingGroup\", \"name\": \"Manu Fanego\"}, {\"@type\": \"PerformingGroup\", \"name\": \"Sebastián Furman\"}, {\"@type\": \"PerformingGroup\", \"name\": \"Pablo Fusco\"}, {\"@type\": \"PerformingGroup\", \"name\": \"Julián Lucero\"}, {\"@typ",
+          "proposal_id": "40e956bc97ee0860110ef32433d63dfd2c8c8ce9f3fa8745826236163a1542dd"
+        }
+      ]
+    },
+    {
+      "name": "La Selva",
+      "role": "venue",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://www.instagram.com/p/DeH_pCZFBMK/",
+          "excerpt": "🤸🏻‍♂️ DESAFIÁ LA PERSPECTIVA 🤸🏻‍♂️ con cam.riganti en La Selva Sabemos que ponerse patas para arriba puede parecer una cuestión de fuerza, destreza o valentía. Pero muchas veces, antes que todo eso, hace falta entender qué estamos haciendo, construir buenas bases y animarnos a probar. Y cómo sabemos que la tribu está manija de invertirse invitamos a a Cami Riganti, creadora de metodo.balance para una mañana de práctica, teoría y exploración dedicada al mundo de los balances de brazos y las invertidas. Vamos a trabajar herramientas y biomecánica para entender los armados, reconocer las posibilidades de cada cuerpo y encontrar distintas maneras de acercarnos a estas posturas con más seguridad, confianza y —fundamental— ganas de jugar. Este taller es para vos si: 🦚 tenés al menos 6 meses de práctica corporal 🦚 querés acercarte por primera vez a las invertidas y adquirir confianza 🦚 sos entusiasta de estas posturas y querés sumar herramientas de profundidad 🦚 querés jugar y divertirte con",
+          "proposal_id": "9bdfcd31fb81196ceef23d06a00c5b572d1a89aae9a86243aa7089ab13ab1af4"
+        },
+        {
+          "url": "https://www.instagram.com/p/DeseWjTFIrC/",
+          "excerpt": "🎁 MASTERCLASS GRATUITA 🎁 Movimiento umbral, un espacio para traducir el lenguaje del cuerpo. En el regalo mensual para nuestra tribu querida, en el mes de Octubre traemos una propuesta de belenambrosetti una práctica de yoga y movimiento somático, con mirada desde la biomecánica para poder investigar sobre la relación entre lo sutil, el cuerpo que siente, y lo tangible, la materia. 🦚 si sos parte activa de la tribu, con abono al día te podes anotar desde ya en la app 🦚 si no sos de la tribu o no tenes abono activo y querés sumarte, comenta algo lindo acá abajo y te escribimos. SÁBADO 24 de 10 a 12hs MOVIMIENTO UMBRAL por belenambrosetti en La Selva",
+          "proposal_id": "d3730bb873d7a160f930d491942927688a46da3113e7959095b4422628ecee72"
+        },
+        {
+          "url": "https://www.instagram.com/p/DfPab8rkR21/",
+          "excerpt": "🦚 SALUD DIGESTIVA EN LA SELVA 🦚 Yoga, respiración y alimentación consciente. La digestión no depende solamente de lo que comemos. El estrés, la respiración, el movimiento y nuestros hábitos cotidianos también influyen en cómo funciona nuestro sistema digestivo y cómo nos sentimos. En este encuentro, shakti.yoga.hipopresivos y lucia_gamba_yoga nos invitan a explorar esa conexión a través de una práctica de yoga, técnicas de respiración y trabajo abdominal, y un espacio para conversar y aprender sobre alimentación consciente. ESTE TALLER ES PARA VOS SI... Querés entender mejor cómo funciona tu sistema digestivo y qué hábitos pueden influir en él. 🌱 Sentís que el estrés repercute en tu cuerpo y te interesa incorporar herramientas para gestionar las tensiones cotidianas. 🌱 Tenés curiosidad por conocer técnicas tradicionales de yoga, respiración y trabajo abdominal. 🌱 Te interesa revisar tu relación con la alimentación, aprender a escuchar las necesidades de tu cuerpo y construir hábitos má",
+          "proposal_id": "94e145ff3ae32b6393c31a721553f2a8f26627fbcc72f05f0252313b9b99f6b2"
+        }
+      ]
+    },
+    {
+      "name": "Connie Ballarini",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1-batch3",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/connie-ballarini-tour-2026",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Connie Ballarini\"}",
+          "proposal_id": "41631344977a7b4a16a70d19d3ef89f894eb47f241ffb5d65a11fff31b3b1bbf"
+        }
+      ]
+    },
+    {
+      "name": "Espacio Doble-T",
+      "role": "organizer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1-batch3",
+      "evidence": [
+        {
+          "url": "https://agendalaplata.ar/evento/shakespeare-echoes-teatro-en-ingles-para-adultos-espacio-doble-t-20260926164555",
+          "excerpt": "{\"@context\": \"https://schema.org\", \"@type\": \"Event\", \"name\": \"Shakespeare Echoes - Teatro en inglés para adultos\", \"startDate\": \"2026-11-17T20:00:00-03:00\", \"endDate\": \"2026-11-17T22:00:00-03:00\", \"eventAttendanceMode\": \"https://schema.org/OfflineEventAttendanceMode\", \"eventStatus\": \"https://schema.org/EventScheduled\", \"location\": {\"@type\": \"Place\", \"name\": \"Espacio Doble-T\", \"address\": {\"@type\": \"PostalAddress\", \"addressLocality\": \"La Plata\", \"addressRegion\": \"Buenos Aires\", \"addressCountry\": \"AR\"}}, \"image\": [\"https://agendalaplata.ar/_fotos/20261029120258.jpg\"], \"description\": \"Shakespeare Echoes - Teatro en inglés para adultos en Espacio Doble-T\", \"organizer\": {\"@type\": \"Organization\", \"name\": \"Espacio Doble-T\", \"url\": \"https://www.instagram.com/espaciodoblet/\"}, \"url\": \"https://agendalaplata.ar/evento/shakespeare-echoes-teatro-en-ingles-para-adultos-espacio-doble-t-20260926164555\", \"offers\": {\"@type\": \"Offer\", \"url\": \"https://agendalaplata.ar/evento/shakespeare-echoes-teatro-en-in",
+          "proposal_id": "7a2ffe37e5964a5ddbf0662a6c8edaafb723f6b8b631d02ee843567224b761cb"
+        }
+      ]
+    },
+    {
+      "name": "Fabiana Rodriguez",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/beguinas-ni-esposas-ni-monjas",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Fabiana Rodriguez\"}",
+          "proposal_id": "12d3e765a54fc4b464ff87726e7bcf74ef960b43b6c031eaf2f09657a3a8c810"
+        }
+      ]
+    },
+    {
+      "name": "Paulina Zabala",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Paulina Zabala\"}",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Carola Oyarbide",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://agendalaplata.ar/evento/modelo-vivo-muerto-teatro-y-museo-coliseo-podesta-20260815134813",
+          "excerpt": "{\"@type\": \"PerformingGroup\", \"name\": \"Carola Oyarbide\"}",
+          "proposal_id": "40e956bc97ee0860110ef32433d63dfd2c8c8ce9f3fa8745826236163a1542dd"
+        }
+      ]
+    },
+    {
+      "name": "Tincho Lups",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://agendalaplata.ar/evento/modelo-vivo-muerto-teatro-y-museo-coliseo-podesta-20260815134813",
+          "excerpt": "{\"@type\": \"PerformingGroup\", \"name\": \"Tincho Lups\"}",
+          "proposal_id": "40e956bc97ee0860110ef32433d63dfd2c8c8ce9f3fa8745826236163a1542dd"
+        }
+      ]
+    },
+    {
+      "name": "Sofía Cuzunakis",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Sofía Cuzunakis\"}",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Dante Galipo",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Dante Galipo\"}",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Sebastián Furman",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://agendalaplata.ar/evento/modelo-vivo-muerto-teatro-y-museo-coliseo-podesta-20260815134813",
+          "excerpt": "{\"@type\": \"PerformingGroup\", \"name\": \"Sebastián Furman\"}",
+          "proposal_id": "40e956bc97ee0860110ef32433d63dfd2c8c8ce9f3fa8745826236163a1542dd"
+        }
+      ]
+    },
+    {
+      "name": "Guajira",
+      "role": "venue",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://www.instagram.com/p/DfSzHR9mbbX/",
+          "excerpt": "✶ Viernes 6.11 ✶ 00 h Otro viernes de Ciclo Ardiente 🔥 djurielgm + BAILAN vvickydemarco + josefinalopezseco + irinamerlos !!️ Hay lista 🆓 hasta las 2 am❗️para Ixs que: den like ❤️ y comentan etiquetando a sus amigxs 🗯️ 🎫Después entrada $6000 👆 todesdefiesta ✧ Guajira ✧ 49 e/ 4 y 5",
+          "proposal_id": "09d345d20c4346673502aaa12a27eb4f043bc42f6e8ce2ed53889236742fc4bd"
+        },
+        {
+          "url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+          "excerpt": "Empieza NOVIEMBRE en Guajira💥 ✧JUEVES 5.11 ⊹ 21 h | chaza_pena ✧VIERNES 6.11 ⊹ 20 h | ciudadpantano temblores.banda lasarpias.musica // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 7.11 ⊹ 21 h | doblepar_oficial maratonatokio // 00 h 🌼 gauchitokill + djlimonsonidero ⸻—————————————————— ✧VIERNES 13.11 ⊹ 21 h | panter_giuliano // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 14.11 ⊹ 21 h | paramo_sur delaorillarock // 00 h | Noche Tramposa 🌹 denisylasperlas ✧DOMINGO 15.11 ⊹ | loloomorales 20 h //",
+          "proposal_id": "cb59451a42d1b55e45cc07715cc951667e150d8fa3efa2a53ed84c8e4f6ef0b8"
+        },
+        {
+          "url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+          "excerpt": "Empieza NOVIEMBRE en Guajira💥 ✧JUEVES 5.11 ⊹ 21 h | chaza_pena ✧VIERNES 6.11 ⊹ 20 h | ciudadpantano temblores.banda lasarpias.musica // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 7.11 ⊹ 21 h | doblepar_oficial maratonatokio // 00 h 🌼 gauchitokill + djlimonsonidero ⸻—————————————————— ✧VIERNES 13.11 ⊹ 21 h | panter_giuliano // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 14.11 ⊹ 21 h | paramo_sur delaorillarock // 00 h | Noche Tramposa 🌹 denisylasperlas ✧DOMINGO 15.11 ⊹ | loloomorales 20 h //",
+          "proposal_id": "7f50fb93ae6ce151bf4d10a6e14781f6fb18014fcc9d77dc795ae1b426b98297"
+        },
+        {
+          "url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+          "excerpt": "Empieza NOVIEMBRE en Guajira💥 ✧JUEVES 5.11 ⊹ 21 h | chaza_pena ✧VIERNES 6.11 ⊹ 20 h | ciudadpantano temblores.banda lasarpias.musica // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 7.11 ⊹ 21 h | doblepar_oficial maratonatokio // 00 h 🌼 gauchitokill + djlimonsonidero ⸻—————————————————— ✧VIERNES 13.11 ⊹ 21 h | panter_giuliano // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 14.11 ⊹ 21 h | paramo_sur delaorillarock // 00 h | Noche Tramposa 🌹 denisylasperlas ✧DOMINGO 15.11 ⊹ | loloomorales 20 h //",
+          "proposal_id": "38c07bd666580044ee5d199be0b0fbbe6328726570d1a7299d159ac15089f2b6"
+        },
+        {
+          "url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+          "excerpt": "Empieza NOVIEMBRE en Guajira💥 ✧JUEVES 5.11 ⊹ 21 h | chaza_pena ✧VIERNES 6.11 ⊹ 20 h | ciudadpantano temblores.banda lasarpias.musica // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 7.11 ⊹ 21 h | doblepar_oficial maratonatokio // 00 h 🌼 gauchitokill + djlimonsonidero ⸻—————————————————— ✧VIERNES 13.11 ⊹ 21 h | panter_giuliano // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 14.11 ⊹ 21 h | paramo_sur delaorillarock // 00 h | Noche Tramposa 🌹 denisylasperlas ✧DOMINGO 15.11 ⊹ | loloomorales 20 h //",
+          "proposal_id": "e8d6619eb92d1c29315029166140acc009e044d721e19b474a85d7cb9d0f3bea"
+        },
+        {
+          "url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+          "excerpt": "Empieza NOVIEMBRE en Guajira💥 ✧JUEVES 5.11 ⊹ 21 h | chaza_pena ✧VIERNES 6.11 ⊹ 20 h | ciudadpantano temblores.banda lasarpias.musica // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 7.11 ⊹ 21 h | doblepar_oficial maratonatokio // 00 h 🌼 gauchitokill + djlimonsonidero ⸻—————————————————— ✧VIERNES 13.11 ⊹ 21 h | panter_giuliano // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 14.11 ⊹ 21 h | paramo_sur delaorillarock // 00 h | Noche Tramposa 🌹 denisylasperlas ✧DOMINGO 15.11 ⊹ | loloomorales 20 h //",
+          "proposal_id": "9c879fbcc3280cab65cabab4d00c16f8b6e73d2dec9b23a182ead773f6a99938"
+        },
+        {
+          "url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+          "excerpt": "Empieza NOVIEMBRE en Guajira💥 ✧JUEVES 5.11 ⊹ 21 h | chaza_pena ✧VIERNES 6.11 ⊹ 20 h | ciudadpantano temblores.banda lasarpias.musica // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 7.11 ⊹ 21 h | doblepar_oficial maratonatokio // 00 h 🌼 gauchitokill + djlimonsonidero ⸻—————————————————— ✧VIERNES 13.11 ⊹ 21 h | panter_giuliano // 00 h | ❤️‍🔥Ciclo Ardiente djurielgm ✧SÁBADO 14.11 ⊹ 21 h | paramo_sur delaorillarock // 00 h | Noche Tramposa 🌹 denisylasperlas ✧DOMINGO 15.11 ⊹ | loloomorales 20 h //",
+          "proposal_id": "c155cd8469b1c314d26fd4ddfa3ff4c7cfc047a083252fe45a7e4097e8e30dc2"
+        },
+        {
+          "url": "https://www.instagram.com/p/DfGD-ZIGU0S/",
+          "excerpt": "🎃HALLOWEEN EN GUAJIRA🎃 El sábado hay FIESTA, quién viene con DISFRAZ? 👀 SET djurielgm + doblej0ta_ EN VIVO Entradas $7000 // VENÍ TEMPRANO porque hay 2X1 hasta las 2AM 🥵",
+          "proposal_id": "83daf88a1b35a7c450bafce8d9ec59028beb7f4e452b8b4b1dba74ba71fba25a"
+        },
+        {
+          "url": "https://www.instagram.com/p/DfBIdBYDSlC/",
+          "excerpt": "✶ Viernes 30.10 ✶ 00 h El último PERREITO de OCTUBRE🔥 djurielgm + BAILAN impacto.dance.company / emibaraibar + caroopedrozo_ !!️ Hay lista 🆓 hasta las 2 am❗️para Ixs que: den like ❤️ y comentan etiquetando a sus amigxs 🗯️ 🎫Después entrada $6000 👆 todesdefiesta ✧ Guajira ✧ 49 e/ 4 y 5",
+          "proposal_id": "3f2ff45c5795620909cd0ed042a6b6ca668bba92d3d59a8f9c556215c27ec423"
+        },
+        {
+          "url": "https://www.instagram.com/p/DevGNvtjdS5/",
+          "excerpt": "✶ Viernes 23.10 ✶ 00 h Otro viernes de Ciclo Ardiente 🔥 djurielgm + BAILAN hortelvic + charlees.romero !!️ Hay lista 🆓 hasta las 2 am❗️para Ixs que: den like ❤️ y comentan etiquetando a sus amigxs 🗯️ 🎫Después entrada $6000 👆 todesdefiesta ✧ Guajira ✧ 49 e/ 4 y 5",
+          "proposal_id": "01b34fdfd2dd321a7e24a26e632d9e2277defabe847d6d28c8d10f0b10422ddb"
+        },
+        {
+          "url": "https://www.instagram.com/p/DedD9_PjRrD/",
+          "excerpt": "✶ Viernes 16.10 ✶ 00 h El Ciclo Ardiente 🔥 tu perreito de confianza djurielgm + BAILAN fortezaisabella + juanseeornat + ampibressa !!️ Hay lista 🆓 hasta las 2 am❗️para Ixs que: den like ❤️ y comentan etiquetando a sus amigxs 🗯️ 🎫Después entrada $6000 👆 todesdefiesta ✧ Guajira ✧ 49 e/ 4 y 5",
+          "proposal_id": "682a88e919f03758855530f1fca1096a5384d8f8418a37313088195f8fbf5b81"
+        }
+      ]
+    },
+    {
+      "name": "Martín Noya",
+      "role": "director",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/beguinas-ni-esposas-ni-monjas",
+          "excerpt": "Dirección: Martín Noya",
+          "proposal_id": "12d3e765a54fc4b464ff87726e7bcf74ef960b43b6c031eaf2f09657a3a8c810"
+        }
+      ]
+    },
+    {
+      "name": "Verónica Bascaran",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/beguinas-ni-esposas-ni-monjas",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Verónica Bascaran\"}",
+          "proposal_id": "12d3e765a54fc4b464ff87726e7bcf74ef960b43b6c031eaf2f09657a3a8c810"
+        }
+      ]
+    },
+    {
+      "name": "Erica Guerrero",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Erica Guerrero\"}",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Gonzalo Alba",
+      "role": "director",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "Dirección: Gonzalo Alba",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Ornella Coleffi",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/ay-por-dios-obra",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Ornella Coleffi\"}",
+          "proposal_id": "e576dcc6f56693417cf680d2db11cf659177aa5ac1211d0b96729efbf4aac18e"
+        }
+      ]
+    },
+    {
+      "name": "Música en vivo: Miguel Rausch",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1-batch2",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/campi-de-gira-monologos-argentinos",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Música en vivo: Miguel Rausch\"}",
+          "proposal_id": "a73377c0de8b29167b3d66c2562cfcc547363915c3b91ad13af5ed910d773a84"
+        }
+      ]
+    },
+    {
+      "name": "Miraflores",
+      "role": "venue",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://www.instagram.com/p/DeVR4R2EZi2/",
+          "excerpt": "El domingo ¡se festeja porque el lunes es feriado! 🌿✨ Mañana el jardín abre sus puertas para recibirte con la calidez de siempre y con PROMOS, porque el preferiado se DIS-FRU-TA La música, a cargo de srobregon 🎧🔥 Planazo asegurado para arrancar el feriado como corresponde: 🔸 Promos del día: 🥃 2 ajenjo_vermut x $11.500 🥃 2 ajenjo_vermut + tortilla $22.000 🍹 2 Gintonic + tequeños $25.000 📍 Miraflores La Plata 8 #1330 e 59 y 60 🕒 Desde las 19 hs 📲 Reservas por WhatsApp al link del perfil #Preferiado #Vermu #Gintonic #LaPlata",
+          "proposal_id": "480c1d5a65d845a4251482460c861646fc33098f3481a6ceab5a15a5b2e6658b"
+        }
+      ]
+    },
+    {
+      "name": "Mariana Bolino",
+      "role": "performer",
+      "first_run_id": "radar2-ghpilot-42326736932-attempt1",
+      "evidence": [
+        {
+          "url": "https://teatrocerca.com.ar/obra/beguinas-ni-esposas-ni-monjas",
+          "excerpt": "{\"@type\": \"Person\", \"name\": \"Mariana Bolino\"}",
+          "proposal_id": "12d3e765a54fc4b464ff87726e7bcf74ef960b43b6c031eaf2f09657a3a8c810"
+        }
+      ]
+    }
+  ],
+  "api_http_resources_verified": [
+    "events",
+    "occurrences",
+    "places",
+    "actors",
+    "relationships",
+    "documents",
+    "accounts",
+    "runs"
+  ],
+  "certification": "NO_GO",
+  "limitations": [
+    "caption date-occurrence recall 84% on agent-labeled exploratory sample; event field precision not certified",
+    "cross-source identity and conceptual-event/occurrence grouping incomplete",
+    "new account incorporation and emerging circuit inference incomplete",
+    "token expiry/data access not introspected; renewal not automated",
+    "no multi-day natural continuity evidence",
+    "no durable per-request acquisition checkpoint"
+  ]
+}
