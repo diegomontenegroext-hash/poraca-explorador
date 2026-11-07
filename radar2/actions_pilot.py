@@ -84,9 +84,38 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
         from zoneinfo import ZoneInfo
         try:c.genda(datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date(),days=1)
         except Exception as exc:c.checks.append({'phase':'incremental_agenda','error':type(exc).__name__})
+    urgent_refresh={'status':'full_covered' if full else 'not_checked','selected':0,'fetched':0,'parsed':0,'checks':[]}
     if not full:
-        from source_cadence import media_due
+        from source_cadence import media_due,urgent_source_rechecks
         if media_due(conn):c.media_sources(max_articles=2,agendas_only=True)
+        # Re-read a few existing original sources for events happening now.
+        # No new scheduler, no approval, no duplicate sweep, no special bypass.
+        if not corrective:
+            try:
+                from extract import extract_document
+                due=urgent_source_rechecks(conn,limit=3)
+                accounts=json.loads((ROOT/'radar2/accounts.json').read_text())
+                urgent_refresh.update(status='bounded_existing_incremental',selected=len(due))
+                for item in due:
+                    d=c.fetch(item['url'],item['source'])
+                    if not d:
+                        urgent_refresh['checks'].append({'url':item['url'],'status':'blocked_or_unavailable'})
+                        continue
+                    urgent_refresh['fetched']+=1
+                    before=len(c.proposals)
+                    try:
+                        extract_document(c,d,accounts,'near_term_source_refresh_v1')
+                        urgent_refresh['parsed']+=1
+                        urgent_refresh['checks'].append({'url':item['url'],'status':'parsed_or_reused',
+                                                         'proposal_delta':len(c.proposals)-before})
+                    except Exception as exc:
+                        c.checks.append({'phase':'urgent_source_parse','url':item['url'],
+                                         'error':type(exc).__name__})
+                        urgent_refresh['checks'].append({'url':item['url'],'status':'parse_failed',
+                                                         'error_type':type(exc).__name__})
+            except Exception as exc:
+                urgent_refresh.update(status='selection_failed',error_type=type(exc).__name__)
+                c.checks.append({'phase':'urgent_source_selection','error':type(exc).__name__})
     # The official pilot reuses the same persisted ten-account selection.
     official_pilot={'status':'SKIPPED_NOT_DAILY'}
     rotation_status={'status':'not_executed'};batch={'accounts':[]}
@@ -178,7 +207,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     metrics={k:int(v) for k,v in m.items()}
     attempts=manifest['instagram_attempts']
     ig={'accounts_attempted':len(attempts),'accounts_with_profile_http_request':sum(bool(a.get('profile_http_requested')) for a in attempts),'profiles_accessible':sum(bool(a['profile_accessible']) for a in attempts),'accounts_with_posts':sum(a['posts_recovered']>0 for a in attempts),'posts_recovered':sum(a['posts_recovered'] for a in attempts),'errors_or_restrictions':sum(bool(a.get('error')) for a in attempts),'receipts':attempts,'index_searches':len(manifest['searches']),'search_failures':sum(bool(s.get('error')) for s in manifest['searches']),'search_receipts':manifest['searches']}
-    report={'execution_context':'GitHub Actions','github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'mode':'full' if full else 'incremental','caption_documents_processed':reprocessed,'journal_recovered_documents':recovered,'credential_health':credential_health(),'scope':'full' if full else 'incremental','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'instagram_official_pilot':official_pilot,'rotation':rotation_status,'source_discovery':source_report,'cultural_memory':graph_report,'source_admission':admissions,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'supplemented_representatives':supplemented,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0}
+    report={'execution_context':'GitHub Actions','github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'mode':'full' if full else 'incremental','caption_documents_processed':reprocessed,'journal_recovered_documents':recovered,'credential_health':credential_health(),'scope':'full' if full else 'incremental','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'instagram_official_pilot':official_pilot,'rotation':rotation_status,'source_discovery':source_report,'cultural_memory':graph_report,'source_admission':admissions,'urgent_source_refresh':urgent_refresh,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'supplemented_representatives':supplemented,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0}
     saved=execute(conn,"UPDATE radar2.runs SET summary=summary || $2::jsonb WHERE run_id=$1 RETURNING run_id",[run_id,json.dumps(report,ensure_ascii=False)])['rows']
     if len(saved)!=1:raise RuntimeError('RUN_SUMMARY_NOT_SAVED')
     print(json.dumps({k:v for k,v in report.items() if k not in ('proposal_ids','rotation','instagram','source_discovery')}))
