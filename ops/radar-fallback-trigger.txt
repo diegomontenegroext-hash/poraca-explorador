@@ -1,8 +1,8 @@
-# Radar 2: validar token Meta renovado mediante workflow existente.
-# Una sola corrida, sin nuevo workflow, cron ni servicios.
+# Radar 2: validar rotacion oficial Meta y la vista de propuestas corregida.
+# Mismo workflow de produccion y una sola corrida. Sin cron adicional.
 trigger_date=2026-11-06
-trigger_slot=meta_token_renewed_live_validation_20261106_2218
+trigger_slot=official_rotation_validation_20261106
 trigger_mode=radar2_pilot
-trigger_reason=validate_meta_token_renewal_and_official_instagram_posts_in_neon
+trigger_reason=validate_ten_rotating_business_discovery_accounts_and_neon_readback
 trigger_scope=standard_daily_acquisition
 certification_batches=1
