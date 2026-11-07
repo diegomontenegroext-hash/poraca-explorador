@@ -1,0 +1,79 @@
+[
+  {
+    "url": "https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267",
+    "source": "El Día",
+    "type": "cartelera",
+    "activities": 88,
+    "complete": 86
+  },
+  {
+    "url": "https://www.eldia.com/espectaculos/agenda-septimo-dia_1793514734",
+    "source": "El Día",
+    "type": "cartelera",
+    "activities": 21,
+    "complete": 20
+  },
+  {
+    "url": "https://www.0221.com.ar/que-hago/fede-moura-juana-rozas-y-la-dupla-metalera-la-agenda-cultural-la-plata-n136575",
+    "source": "0221",
+    "type": "agenda_compuesta",
+    "activities": 45,
+    "complete": 41
+  },
+  {
+    "url": "https://www.0221.com.ar/que-hago/festival-la-cerveza-mmce-y-piazzolla-piano-la-agenda-cultural-la-plata-n136995",
+    "source": "0221",
+    "type": "agenda_compuesta",
+    "activities": 33,
+    "complete": 29
+  },
+  {
+    "url": "https://www.0221.com.ar/que-hago/massacre-y-las-armas-segundo-tiempo-y-mucho-mas-la-agenda-cultural-la-plata-n136584",
+    "source": "0221",
+    "type": "agenda_compuesta",
+    "activities": 28,
+    "complete": 24
+  },
+  {
+    "url": "https://www.0221.com.ar/que-hago/sandra-mihanovich-la-plata-muerde-y-los-espiritus-la-agenda-cultural-la-plata-n136923",
+    "source": "0221",
+    "type": "agenda_compuesta",
+    "activities": 42,
+    "complete": 38
+  },
+  {
+    "url": "https://www.instagram.com/reel/DeXYqWISZod/",
+    "source": "Instagram",
+    "type": "curaduria_cultural",
+    "activities": 10,
+    "complete": 0
+  },
+  {
+    "url": "https://www.instagram.com/reel/DefVzFISwkm/",
+    "source": "Instagram",
+    "type": "curaduria_cultural",
+    "activities": 11,
+    "complete": 0
+  },
+  {
+    "url": "https://www.instagram.com/reel/DexByxdy6dp/",
+    "source": "Instagram",
+    "type": "curaduria_cultural",
+    "activities": 11,
+    "complete": 0
+  },
+  {
+    "url": "https://www.instagram.com/reel/DfDGyw_SkDA/",
+    "source": "Instagram",
+    "type": "curaduria_cultural",
+    "activities": 13,
+    "complete": 0
+  },
+  {
+    "url": "https://www.instagram.com/reel/DfVEIVTSTGu/",
+    "source": "Instagram",
+    "type": "curaduria_cultural",
+    "activities": 16,
+    "complete": 0
+  }
+]

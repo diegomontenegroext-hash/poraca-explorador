@@ -30,8 +30,10 @@ def classify(d,accounts=()):
  text=d.get('text','');n=norm(text)
  if len(re.findall(r'\.\s*[-–]\s*(?:A las|Desde las|De)\s+\d',text,re.I))>=3:return {'type':'cartelera','shape':'bullet_schedule','compound':True,'source_role':'secondary_publisher'}
  if re.search(r'agenda cultural(?: completa)?\s+(?:'+DAY+r')\b',text,re.I) and len(re.findall(r'\b\d{1,2}(?:[.:]\d{2})?\s*[-–]\s*\S',text))>=3:return {'type':'agenda_compuesta','shape':'time_rows','compound':True,'source_role':'secondary_publisher'}
- date_heads=len(re.findall(r'(?:^|\n)\s*[^\w\n]{0,8}(?:(?:el|desde el|del)\s+)?(?:'+DAY+r'|\d{1,2}\s+(?:de|y)\s+)',text,re.I))
+ date_heads=len(re.findall(r'(?:^|\n)\s*[^\w\n📍]{0,8}(?:(?:el|desde el|del)\s+)?(?:'+DAY+r')\b',text,re.I))
  calendars=len(re.findall('🗓',text))
+ if calendars>=3 and not curator(d,accounts) and re.search(r'(?m)^\s*•',text):
+  return {'type':'cartelera','shape':'specialized_caption_program','compound':False,'source_role':'source_observed'}
  if (date_heads>=3 and curator(d,accounts)) or calendars>=3:
   return {'type':'curaduria_cultural' if curator(d,accounts) else 'programa_festival' if 'festival' in n else 'agenda_compuesta','shape':'paragraph_schedule','compound':True,'source_role':'curator' if curator(d,accounts) else 'source_observed'}
  if re.search(r'(?:todos los|cada) (?:lunes|martes|miercoles|jueves|viernes)|clases regulares',n):typ='programacion_recurrente'
@@ -91,7 +93,10 @@ def known_places(accounts,baseline):
  values={a['entity'] for a in accounts if a.get('identity')!='ambiguous' and norm(a.get('circuit',''))!='curaduria'}
  values.update(p['venue'] for p in baseline if p.get('venue'))
  for p in baseline:
-  evidence=p.get('evidence') or {};evidence=json.loads(evidence) if isinstance(evidence,str) else evidence
+  evidence=p.get('evidence') or {}
+  if isinstance(evidence,str):
+   try:evidence=json.loads(evidence)
+   except ValueError:evidence={}
   if isinstance(evidence,dict):
    for e in evidence.get('entities',[]):
     if e.get('role')=='venue' and e.get('name'):values.add(e['name'])

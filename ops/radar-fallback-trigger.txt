@@ -6,3 +6,4 @@ trigger_reason=compound_sources_recovery_full_incremental_readback
 trigger_scope=compound_acceptance
 certification_batches=1
 certification_modes=full,incremental
+verification_correction=mixed_evidence_guard_and_specialized_bill_precedence

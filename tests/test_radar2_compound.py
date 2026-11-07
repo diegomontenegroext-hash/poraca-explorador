@@ -62,3 +62,14 @@ class CompoundBoundaries(unittest.TestCase):
    c=Collector(t);d={'url':'https://example.test/news','source':'test','text':'Agenda cultural Viernes 6 20 - Banda Club Sur 21 - Otro Club Sur Sábado 7 18 - Obra Club Sur','published_at':'2026-11-06T15:00:00Z','fetched_at':'2026-11-07T00:00:00Z','sha256':'hash'}
    ps=interpret(c,d,[],[{'venue':'Club Sur'}]);c.baseline=[{'document_url':d['url'],'evidence':p} for p in ps];c.proposals={}
    self.assertEqual(extract_document(c,d,[],'test'),[]);self.assertEqual(c.proposals,{})
+
+class MixedEvidenceRegression(unittest.TestCase):
+ def test_place_lexicon_accepts_ledger_json_and_incoming_text(self):
+  from compound import known_places
+  self.assertIn('Sala Sur',known_places([],[{'venue':'Sala Sur','evidence':'Source text that is not JSON'}]))
+ def test_multi_band_bill_uses_existing_caption_program_interpreter(self):
+  d={'text':'AGENDA SEMANAL\n\n🗓️ VIERNES 6 DE NOVIEMBRE 21HS\n\n• Banda Uno\n• Banda Dos\n\n🗓️ SÁBADO 7 DE NOVIEMBRE 21HS\n\n• Banda Tres\n\n🗓️ DOMINGO 8 DE NOVIEMBRE 21HS\n\n• Banda Cuatro'}
+  self.assertFalse(classify(d)['compound']);self.assertEqual(classify(d)['shape'],'specialized_caption_program')
+ def test_recommended_addresses_are_not_numeric_date_headers(self):
+  d={'profile_username':'curador','text':'Lugares para cenar\n\nbar.uno\n📍17 y 63\n\nbar.dos\n📍13 y 34\n\nbar.tres\n📍5 y 54'}
+  self.assertFalse(classify(d,[{'username':'curador','circuit':'curaduría'}])['compound'])
