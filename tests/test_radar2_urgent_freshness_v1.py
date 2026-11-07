@@ -1,0 +1,63 @@
+"""Bounded priority refresh selection and persistence guardrails; no live network."""
+import sys
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'radar2'))
+import source_cadence
+from persist import SQL
+
+class NearTermRefreshTests(unittest.TestCase):
+ def test_selection_limits_hosts_and_blocks_unsafe_urls(self):
+  rows=[
+   {'url':'https://pogo.ar/evento/a','source':'pogo.ar','first_event_date':'2026-11-07'},
+   {'url':'https://pogo.ar/evento/b','source':'pogo.ar','first_event_date':'2026-11-07'},
+   {'url':'http://unsafe.example.org/item','source':'unsafe','first_event_date':'2026-11-07'},
+   {'url':'https://www.instagram.com/p/abc','source':'Instagram','first_event_date':'2026-11-07'},
+   {'url':'https://www.passline.com/eventos/1','source':'www.passline.com','first_event_date':'2026-11-08'},
+   {'url':'https://festival.freezer.com.ar/programacion','source':'festival.freezer.com.ar','first_event_date':'2026-11-08'},
+   {'url':'https://www.eventbrite.com.ar/e/test','source':'www.eventbrite.com.ar','first_event_date':'2026-11-09'}
+  ]
+  with patch.object(source_cadence,'execute',return_value={'rows':rows}) as fake:
+   selected=source_cadence.urgent_source_rechecks('dummy',limit=3)
+   self.assertEqual([x['source'] for x in selected],
+                    ['pogo.ar','www.passline.com','festival.freezer.com.ar'])
+   self.assertEqual(len(selected),3)
+   self.assertEqual(fake.call_count,1)
+   self.assertEqual(len(source_cadence.urgent_source_rechecks('dummy',limit=90)),3)
+
+ def test_sql_is_bounded_and_focuses_on_existing_upcoming_origins(self):
+  sql=source_cadence.URGENT_REFRESH_SQL
+  for fragment in (
+   "FROM radar2.proposals p",
+   "JOIN radar2.documents d",
+   "AT TIME ZONE 'America/Argentina/Buenos_Aires'",
+   "p.last_seen_at<now()-interval '24 hours'",
+   "d.fetched_at<now()-interval '12 hours'",
+   "p.review_state<>'historico'",
+   "LIMIT 18"):
+   self.assertIn(fragment,sql)
+  self.assertNotIn('INSERT',sql.upper())
+  self.assertNotIn('UPDATE',sql.upper())
+
+ def test_persist_keeps_earlier_explicit_editorial_decisions(self):
+  self.assertIn("'category_revision'",SQL)
+  self.assertIn("'territory_revision'",SQL)
+  self.assertIn("'editorial_exclusion'",SQL)
+  self.assertIn("THEN radar2.proposals.category",SQL)
+  self.assertIn("THEN 'historico' ELSE excluded.review_state",SQL)
+  self.assertIn("AND NOT (excluded.evidence ? k)",SQL)
+
+ def test_existing_incremental_only_and_receipts(self):
+  code=(ROOT/'radar2/actions_pilot.py').read_text()
+  self.assertIn("if not corrective:",code)
+  self.assertIn("urgent_source_rechecks(conn,limit=3)",code)
+  self.assertIn("'urgent_source_refresh':urgent_refresh",code)
+  self.assertIn("c.fetch(item['url'],item['source'])",code)
+  self.assertIn("extract_document(c,d,accounts,'near_term_source_refresh_v1')",code)
+  self.assertIn("if not full:",code)
+
+if __name__=='__main__':
+ unittest.main()
