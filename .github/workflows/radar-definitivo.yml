@@ -14,8 +14,10 @@ on:
       - 'ops/radar-fallback-trigger.txt'
       - 'ops/e2e-verification-trigger.txt'
   schedule:
-    # Una corrida diaria: 05:27 ART (Argentina UTC-3), sin segundo cron.
+    # Un unico workflow: FULL 05:27 ART, incrementales 13:27 y 20:27 ART.
     - cron: '27 8 * * *'
+    - cron: '27 16 * * *'
+    - cron: '27 23 * * *'
   workflow_dispatch:
     inputs:
       mode:
@@ -46,7 +48,7 @@ concurrency:
 
 jobs:
   definitivo:
-    if: ${{ !((github.event_name == 'schedule') || (github.event_name == 'workflow_dispatch' && inputs.mode == 'radar2_pilot') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[radar2-pilot]'))) }}
+    if: ${{ !((github.event_name == 'schedule') || (github.event_name == 'workflow_dispatch' && (inputs.mode == 'radar2_pilot' || inputs.mode == 'full' || inputs.mode == 'incremental')) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[radar2-pilot]'))) }}
     name: Radar o certificacion puntual sin ingesta
     runs-on: ubuntu-latest
     timeout-minutes: 38
@@ -244,8 +246,8 @@ jobs:
   # El mismo job integra rotación persistente, frontera de enlaces, memoria
   # cultural y acceso público condicionado; no depende de herramientas de Work.
   radar2_pilot:
-    if: ${{ (github.event_name == 'schedule') || (github.event_name == 'workflow_dispatch' && inputs.mode == 'radar2_pilot') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[radar2-pilot]')) }}
-    name: Radar 2 - adquisicion diaria limitada
+    if: ${{ (github.event_name == 'schedule') || (github.event_name == 'workflow_dispatch' && (inputs.mode == 'radar2_pilot' || inputs.mode == 'full' || inputs.mode == 'incremental')) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[radar2-pilot]')) }}
+    name: Radar 2 - FULL e incremental
     runs-on: ubuntu-latest
     timeout-minutes: 35
     permissions:
@@ -264,4 +266,7 @@ jobs:
           META_IG_USER_ID: ${{ secrets.META_IG_USER_ID }}
           META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
           META_GRAPH_VERSION: ${{ vars.META_GRAPH_VERSION }}
+          RADAR2_SCHEDULE: ${{ github.event.schedule }}
+          RADAR2_MODE: ${{ inputs.mode }}
+          META_TOKEN_EXPIRES_AT: ${{ vars.META_TOKEN_EXPIRES_AT }}
         run: python3 radar2/actions_pilot.py

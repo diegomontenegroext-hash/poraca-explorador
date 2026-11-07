@@ -105,11 +105,15 @@ def complete(conn,run_id,manifest):
                 safe={'status':official['status'],'items_returned':official.get('items_returned',0),
                       'new_documents':official.get('new_documents',0),
                       'new_candidates':official.get('new_candidates',0),
+                      'latest_publication_at':official.get('latest_publication_at'),
                       'http_status':official.get('http_status'),
                       'meta_error_code':official.get('meta_error_code')}
                 a['official_last_result']=dict(safe,checked_at=timestamp(at),run_id=run_id)
                 a['official_attempt_count']=a.get('official_attempt_count',0)+1
                 a['last_result']['official']=safe
+                if official['status'] in ('MEDIA_RETURNED','NO_MEDIA_RETURNED'):
+                    a['last_review_at']=timestamp(at)
+                    a['review_count']+=int(not success)
                 if official['status']=='MEDIA_RETURNED':
                     a['official_success_count']=a.get('official_success_count',0)+1
                     a['last_successful_post_at']=timestamp(at)

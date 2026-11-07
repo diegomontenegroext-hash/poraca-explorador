@@ -1,0 +1,270 @@
+{
+  "annotation": "agent_labeled_exploratory_not_independent_holdout",
+  "parser": "caption-v1",
+  "sample_size": 30,
+  "coverage_limitations": [
+    "no independently labeled festival sample",
+    "event identity and field accuracy not certified",
+    "midnight secondary acts require review"
+  ],
+  "cases": [
+    {
+      "url": "https://www.instagram.com/p/DYDd1h5ibzc/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DZN5gRfzPmC/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DaHs7uWOQ6K/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DcJIGudjrCO/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DcvuvRzjib1/",
+      "expected_dates": [
+        "2026-09-26"
+      ],
+      "extracted_dates": [
+        "2026-09-26"
+      ],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/Dd-HfSwiTnd/",
+      "expected_dates": [
+        "2026-10-11"
+      ],
+      "extracted_dates": [
+        "2026-10-11"
+      ],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DdK7GDARs8D/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DdSlzs2xAGT/",
+      "expected_dates": [
+        "2026-09-19",
+        "2026-09-20",
+        "2026-09-25"
+      ],
+      "extracted_dates": [
+        "2026-09-19",
+        "2026-09-20",
+        "2026-09-25"
+      ],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DdY2kyou-79/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DdZdmC3JZ6U/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/Ddcha6ylGnw/",
+      "expected_dates": [
+        "2026-09-25"
+      ],
+      "extracted_dates": [
+        "2026-09-25"
+      ],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DdjX0sjoOzC/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DdmdMHCCavJ/",
+      "expected_dates": [
+        "2026-10-10",
+        "2026-10-24"
+      ],
+      "extracted_dates": [
+        "2026-10-10",
+        "2026-10-24"
+      ],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/De0HOMfH9_e/",
+      "expected_dates": [
+        "2026-11-06"
+      ],
+      "extracted_dates": [
+        "2026-11-06"
+      ],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/De16EyyxaZj/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DeH_pCZFBMK/",
+      "expected_dates": [
+        "2026-10-17"
+      ],
+      "extracted_dates": [
+        "2026-10-17"
+      ],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DeUUO9GFi4v/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DeXTssHI_Mc/",
+      "expected_dates": [
+        "2026-10-17"
+      ],
+      "extracted_dates": [
+        "2026-10-17"
+      ],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/De_6aQ4HKzA/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DecjTwHlKjt/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DekqcmHBSGi/",
+      "expected_dates": [
+        "2026-11-06"
+      ],
+      "extracted_dates": [
+        "2026-11-06"
+      ],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DeseWjTFIrC/",
+      "expected_dates": [
+        "2026-10-24"
+      ],
+      "extracted_dates": [
+        "2026-10-24"
+      ],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DezMqK1NIBQ/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DfAwBPeiTeC/",
+      "expected_dates": [
+        "2026-11-08"
+      ],
+      "extracted_dates": [
+        "2026-11-08"
+      ],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DfCsaeNljpJ/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DfFMhhpoLid/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DfLQZG0Gaow/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DfNHRODlGta/",
+      "expected_dates": [],
+      "extracted_dates": [],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DfPab8rkR21/",
+      "expected_dates": [
+        "2026-11-14"
+      ],
+      "extracted_dates": [
+        "2026-11-14"
+      ],
+      "correct": true
+    },
+    {
+      "url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+      "expected_dates": [
+        "2026-11-05",
+        "2026-11-06",
+        "2026-11-06",
+        "2026-11-07",
+        "2026-11-07",
+        "2026-11-13",
+        "2026-11-13",
+        "2026-11-14",
+        "2026-11-14",
+        "2026-11-15"
+      ],
+      "extracted_dates": [
+        "2026-11-05",
+        "2026-11-06",
+        "2026-11-07",
+        "2026-11-13",
+        "2026-11-14",
+        "2026-11-15"
+      ],
+      "correct": false
+    }
+  ],
+  "true_positive": 21,
+  "false_positive": 0,
+  "false_negative": 4,
+  "precision": 1.0,
+  "recall": 0.84,
+  "certified_95_90": false
+}

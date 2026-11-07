@@ -15,7 +15,7 @@ ACCOUNTS = ("guajira.bar", "lutitravelguide", "escenario40", "teatroargentinopba
 REQUIRED = ("META_IG_USER_ID", "META_ACCESS_TOKEN", "META_GRAPH_VERSION")
 PERMALINK = re.compile(r"https://(?:www\.)?instagram\.com/(?:p|reel)/[A-Za-z0-9_-]+/?\Z")
 
-def acquire(collector, known_urls, rotating_accounts=()):
+def acquire(collector, known_urls, rotating_accounts=(),include_controls=True):
     """Four controls plus at most ten unique users from the persisted daily batch."""
     rotating=[]
     for raw in rotating_accounts:
@@ -24,7 +24,7 @@ def acquire(collector, known_urls, rotating_accounts=()):
                 username not in ACCOUNTS and username not in rotating):
             rotating.append(username)
         if len(rotating)>=10: break
-    accounts=list(ACCOUNTS)+rotating
+    accounts=(list(ACCOUNTS) if include_controls else [])+rotating
     report={"kind":"instagram_official_rotating_pilot",
               "accounts":accounts,"controls":list(ACCOUNTS),
               "rotating_accounts":rotating,"method":"meta_business_discovery",
@@ -43,7 +43,8 @@ def acquire(collector, known_urls, rotating_accounts=()):
         report["queries_sent"] += 1
         summary = {"username": username, "status": official.get("status", "UNKNOWN"),
                    "items_returned": len(official.get("posts") or []),
-                   "new_documents": 0, "new_candidates": 0,
+                   "new_documents": 0, "new_candidates": 0, "known_documents":0,
+                   "latest_publication_at":max((p.get("timestamp") or "" for p in official.get("posts",[])),default=None),
                    "error_type": official.get("error_type"),
                    "http_status": official.get("http_status"),
                    "meta_error_code": official.get("meta_error_code"),
@@ -56,18 +57,19 @@ def acquire(collector, known_urls, rotating_accounts=()):
                 continue
             if not isinstance(caption,str) or not caption.strip():
                 continue
-            if url in known_urls or url in collector.docs:
+            if url in collector.docs:
                 continue
+            if url in known_urls:summary['known_documents']+=1
             fetched_at=utc()
             d={"url":url,"final_url":url,"source":"Instagram",
                "title":"Publicación de @"+username,"text":caption[:16000],
                "fetched_at":fetched_at,"sha256":sha(caption),
                "text_sha256":sha(caption),"acquisition_method":"official_meta_api",
                "content_scope":"caption","profile_username":username,
-               "published_at":post.get("timestamp")}
+               "published_at":post.get("timestamp"),"external_id":post.get("id"),"media_type":post.get("media_type")}
             collector.docs[url]=d
-            report["new_documents"] += 1
-            summary["new_documents"] += 1
+            report["new_documents"] += int(url not in known_urls)
+            summary["new_documents"] += int(url not in known_urls)
             if CULTURAL.search(norm(caption)):
                 # Use a distinct title per post, not just the profile name.
                 first_line=next((re.sub(r"\s+"," ",line).strip()

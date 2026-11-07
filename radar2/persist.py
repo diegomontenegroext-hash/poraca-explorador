@@ -2,7 +2,8 @@
 """Run the collector's restricted Neon writer. Credential file stays outside repo.
 Uses the official Neon HTTP SQL endpoint; no dependency or owner credentials.
 """
-import json,os,sys
+import json,os,sys,time
+from urllib.error import HTTPError,URLError
 from pathlib import Path
 from urllib.parse import urlsplit
 from urllib.request import Request,urlopen
@@ -12,7 +13,14 @@ def execute(conn,query,params=()):
  if not host or not host.endswith('.neon.tech'):raise ValueError('Expected Neon endpoint')
  body=json.dumps({'query':query,'params':list(params)}).encode()
  req=Request('https://'+host+'/sql',data=body,headers={'Content-Type':'application/json','Neon-Connection-String':conn,'Neon-Raw-Text-Output':'true','Neon-Array-Mode':'false'})
- with urlopen(req,timeout=45) as r:return json.load(r)
+ for attempt in range(3):
+  try:
+   with urlopen(req,timeout=45) as r:return json.load(r)
+  except HTTPError as exc:
+   if exc.code not in (429,500,502,503,504) or attempt==2:raise
+  except (TimeoutError,URLError):
+   if attempt==2:raise
+  time.sleep(attempt+1)
 
 SQL="""
 WITH input AS (SELECT $1::jsonb AS j),

@@ -1,8 +1,8 @@
-# Radar 2: validar rotacion oficial Meta y la vista de propuestas corregida.
-# Mismo workflow de produccion y una sola corrida. Sin cron adicional.
+# Una sola corrida Actions; FULL y dos incrementales limitadas para aceptación.
 trigger_date=2026-11-06
-trigger_slot=official_rotation_validation_20261106
+trigger_slot=unified_contract_validation_20261107
 trigger_mode=radar2_pilot
-trigger_reason=validate_ten_rotating_business_discovery_accounts_and_neon_readback
+trigger_reason=full_and_two_incrementals_with_official_rotation_and_readback
 trigger_scope=standard_daily_acquisition
 certification_batches=1
+certification_modes=full,incremental,incremental
