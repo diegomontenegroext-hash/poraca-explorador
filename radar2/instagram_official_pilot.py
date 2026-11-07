@@ -35,7 +35,11 @@ def acquire(collector, known_urls):
         summary = {"username": username, "status": official.get("status", "UNKNOWN"),
                    "items_returned": len(official.get("posts") or []),
                    "new_documents": 0, "new_candidates": 0,
-                   "error_type": official.get("error_type")}
+                   "error_type": official.get("error_type"),
+                   "http_status": official.get("http_status"),
+                   "meta_error_code": official.get("meta_error_code"),
+                   "meta_error_subcode": official.get("meta_error_subcode"),
+                   "meta_error_type": official.get("meta_error_type")}
         for post in (official.get("posts") or [])[:12]:
             url = post.get("permalink") or ""
             caption = post.get("caption") or ""

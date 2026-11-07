@@ -1,8 +1,8 @@
-# Radar 2: disparo manual autorizado desde chat, via push en workflow existente.
-# Una sola corrida completa, sin tareas extra ni cron nuevo.
+# Radar 2: reintento diagnóstico oficial de Meta, autorizado desde chat.
+# Mismo job y cron, sin imprimir tokens ni respuestas HTTP crudas.
 trigger_date=2026-11-06
-trigger_slot=meta_official_live_validation
+trigger_slot=meta_official_http_diagnostics
 trigger_mode=radar2_pilot
-trigger_reason=validate_new_github_meta_secrets_and_teatroargentinopba
+trigger_reason=record_safe_meta_error_codes_in_neon
 trigger_scope=standard_daily_acquisition
 certification_batches=1

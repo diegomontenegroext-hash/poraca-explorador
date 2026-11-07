@@ -1,7 +1,10 @@
 """Offline guardrails for four-account Meta pilot; never contacts Instagram."""
+import io
+import json
 import os
 import sys
 import unittest
+from urllib.error import HTTPError
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -38,6 +41,21 @@ class OfficialInstagramPilot(unittest.TestCase):
         self.assertEqual([c.args[0] for c in discover.call_args_list], list(ACCOUNTS))
         self.assertEqual(outcome["new_documents"], 0)
         self.assertEqual(outcome["status"], "NO_NEW_POSTS_OR_UNAVAILABLE")
+
+    def test_meta_http_error_records_only_safe_codes(self):
+        from instagram import discover
+        creds = {"META_IG_USER_ID":"test_id","META_ACCESS_TOKEN":"very_secret_token",
+                 "META_GRAPH_VERSION":"v27.0"}
+        body = b'{"error":{"type":"OAuthException","code":190,"error_subcode":463,"message":"sensitive"}}'
+        err = HTTPError("https://graph.facebook.com/v27.0/test_id",400,"Bad Request",{},io.BytesIO(body))
+        with patch.dict(os.environ,creds,clear=True),patch("instagram.urlopen",side_effect=err):
+            result = discover("teatroargentinopba")
+        self.assertEqual(result["http_status"],400)
+        self.assertEqual(result["meta_error_code"],190)
+        self.assertEqual(result["meta_error_subcode"],463)
+        serialized = json.dumps(result)
+        self.assertNotIn("very_secret_token",serialized)
+        self.assertNotIn("sensitive",serialized)
 
     def test_official_post_becomes_investigable_not_canonical(self):
         class FakeCollector:

@@ -7,6 +7,7 @@ Professional target eligibility is determined by Meta, never inferred from bio.
 import json,os
 from urllib.parse import urlencode
 from urllib.request import Request,urlopen
+from urllib.error import HTTPError
 from collector import utc
 
 def discover(username):
@@ -21,6 +22,20 @@ def discover(username):
         with urlopen(Request(url,headers={'Authorization':'Bearer '+token}),timeout=20) as r:data=json.load(r)
         bd=data.get('business_discovery',{});media=bd.get('media',{})
         return {'username':username,'checked_at':utc(),'status':'MEDIA_RETURNED' if media.get('data') else 'NO_MEDIA_RETURNED','posts':media.get('data',[]),'has_more':bool(media.get('paging',{}).get('next') or media.get('paging',{}).get('cursors',{}).get('after')),'limit':12,'stories':'THIRD_PARTY_STORIES_NOT_SUPPORTED'}
+    except HTTPError as e:
+        # Only structured status/codes reach logs and Neon; never persist raw Meta error text.
+        try:
+            payload=json.loads(e.read(8192).decode('utf-8'))
+            error=payload.get('error',{}) if isinstance(payload,dict) else {}
+        except (ValueError,UnicodeError,OSError):
+            error={}
+        if not isinstance(error,dict):error={}
+        return {'username':username,'checked_at':utc(),'status':'OFFICIAL_API_ERROR',
+                'error_type':'HTTPError','http_status':e.code,
+                'meta_error_code':error.get('code') if isinstance(error.get('code'),int) else None,
+                'meta_error_subcode':error.get('error_subcode') if isinstance(error.get('error_subcode'),int) else None,
+                'meta_error_type':error.get('type') if error.get('type') in ('OAuthException','GraphMethodException') else None,
+                'posts':[]}
     except Exception as e:
         return {'username':username,'checked_at':utc(),'status':'OFFICIAL_API_ERROR','error_type':type(e).__name__,'posts':[]}
 
