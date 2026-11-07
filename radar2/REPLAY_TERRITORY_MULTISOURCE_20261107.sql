@@ -30,8 +30,8 @@ signalled AS (
  (lower(coalesce(region,''))='caba'
   OR lower(coalesce(region,'')) LIKE '%aut%noma%') AS region_caba,
  (coalesce(postal,'') ~ '^C1[0-9]{3}') AS postal_caba,
- CASE WHEN coalesce(lat,'') ~ '^-?[0-9]+(\\.[0-9]+)?$'
-           AND coalesce(lng,'') ~ '^-?[0-9]+(\\.[0-9]+)?$'
+ CASE WHEN coalesce(lat,'') ~ '^-?[0-9]+([.][0-9]+)?$'
+           AND coalesce(lng,'') ~ '^-?[0-9]+([.][0-9]+)?$'
   THEN lat::numeric BETWEEN -34.67 AND -34.54
        AND lng::numeric BETWEEN -58.53 AND -58.34
   ELSE FALSE END AS geo_caba
