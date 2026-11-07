@@ -99,7 +99,11 @@ def event_location(item, fallback_url=None):
     caba_postal = bool(re.fullmatch(r'C1\d{3}[A-Z]{0,3}', postal.upper()))
     caba_inner_geo = (lat is not None and
                       -34.67 <= lat <= -34.54 and -58.53 <= lon <= -58.34)
-    if local_claim and not caba_claim and not caba_postal:
+    if local_claim and (caba_claim or caba_postal or caba_inner_geo):
+        # An internally contradictory primary source is not evidence of a
+        # confirmed local event. Preserve it for a human locality check.
+        base.update(status='pending',basis='conflicting_structured_location')
+    elif local_claim:
         base.update(status='source_stated_local',basis='jsonld_address_locality',
                     area='La Plata y alrededores')
     elif caba_claim and not local_claim:
