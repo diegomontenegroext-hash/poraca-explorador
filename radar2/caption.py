@@ -9,7 +9,8 @@ from zoneinfo import ZoneInfo
 from collector import norm, compact
 from extract import MONTHS,category
 from semantics import normalized_original,proof,clocks_in,activity_title,credits,identity,CANCEL,clean_title
-VERSION='caption-v2.3'
+from account_context import location_for,preflight
+VERSION='caption-v2.4'
 ZONE=ZoneInfo('America/Argentina/Buenos_Aires')
 WEEK=['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
 DATE=re.compile(r'\b([0-3]?\d)\s*(?:[/.]+\s*(1[0-2]|0?[1-9])\b|(?:de\s+)?('+('|'.join(MONTHS))+r')\b)(?:\s*(?:de\s+|/)(20\d{2}))?',re.I)
@@ -125,8 +126,14 @@ def interpret(c,d,accounts):
    if len(venues)>1:
     venue=local_venues[0]['entity'] if len(local_venues)==1 else None
     venue_proof=scope if venue else None
-   state='historico' if day<now else 'incompleto' if ambiguous_midnight or not venue or cancelled else 'observado_agenda'
-   key=c.add(d,local_title,day.isoformat(),hour,venue,category(n),state,raw,origin_account=d.get('profile_username'))
+   # First understand whether this account is a venue, organizer or curator.
+   # Match a real venue name/address inside THIS activity scope; profile ownership
+   # alone produces a candidate, never a confirmed event place.
+   host_location=location_for(d,scope)
+   local_venue=host_location['venue'] or venue
+   local_venue_proof=host_location.get('quote') if host_location['venue'] else venue_proof
+   state='historico' if day<now else 'incompleto' if ambiguous_midnight or not local_venue or cancelled else 'observado_agenda'
+   key=c.add(d,local_title,day.isoformat(),hour,local_venue,category(n),state,raw,origin_account=d.get('profile_username'))
    p=c.proposals[key]
    title_at=text.find(local_title)
    title_proof=proof(raw,positions,title_at,title_at+len(local_title)) if title_at>=0 else None
@@ -136,9 +143,15 @@ def interpret(c,d,accounts):
     event_status='cancelled' if cancelled else 'scheduled_pending_review',announced_date=day.isoformat(),announced_time=announced_time,
     field_evidence={'date':raw[positions[start]:positions[end-1]+1],
      'time':(proof(raw,positions,clock_origin+clock.start(),clock_origin+clock.end()) or {}).get('quote') if clock else None,
-     'venue':venue_proof,'title':(title_proof or {}).get('quote')},
+     'venue':local_venue_proof,'title':(title_proof or {}).get('quote')},
+    account_context=preflight(d.get('profile_username')),
+    venue_basis=host_location['basis'] if host_location.get('venue') or host_location.get('candidate') else 'existing_literal_heuristic' if local_venue else host_location['basis'],
+    venue_candidate=host_location.get('candidate') if not local_venue else None,
+    venue_candidate_basis=host_location.get('basis') if host_location.get('candidate') and not local_venue else None,
+    venue_entity_id=host_location.get('venue_entity_id') if host_location.get('venue') else None,
+    venue_profile_evidence_url=host_location.get('profile_evidence_url') if host_location.get('venue') or host_location.get('candidate') else None,
     evidence_spans={'date':proof(raw,positions,start,end),'time':proof(raw,positions,clock_origin+clock.start(),clock_origin+clock.end()) if clock else None,'title':title_proof},
-    ambiguities=(['midnight_calendar_day_requires_review'] if ambiguous_midnight else [])+(['venue_unresolved'] if not venue else []))
+    ambiguities=(['midnight_calendar_day_requires_review'] if ambiguous_midnight else [])+(['venue_unresolved'] if not local_venue else []))
    p['event_identity_key']=identity(p)
    p['identity_scope']='same_document_title_venue_pending_editorial_review'
    p['work_identity_key']=p['event_identity_key'] if re.search(r'obra|funciones|funcion',n) else None
