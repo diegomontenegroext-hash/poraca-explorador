@@ -72,13 +72,14 @@ def urgent_source_rechecks(conn,limit=3):
  successful HTTP fetch into independent editorial confirmation.
  """
  from urllib.parse import urlsplit
+ from capabilities import safe_url
  rows=execute(conn,URGENT_REFRESH_SQL)['rows']
  selected=[];hosts=set()
  for row in rows:
   url=str(row.get('url') or '')
   parts=urlsplit(url)
   host=(parts.hostname or '').lower()
-  if parts.scheme!='https' or not host or parts.username or parts.password:continue
+  if parts.scheme!='https' or not host or parts.username or parts.password or not safe_url(url):continue
   if host in hosts or host.endswith('.instagram.com') or host=='instagram.com':continue
   if host in ('localhost','127.0.0.1') or host.endswith('.local'):continue
   source=str(row.get('source') or '').strip()
