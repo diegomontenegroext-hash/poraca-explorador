@@ -39,6 +39,7 @@ def genda_category(raw):
     if not raw:return None
     cleaned=compact(re.sub(r'\bEn\s+\d+\s*h(?:\s+\d+\s*min)?\b',' ',raw,flags=re.I))
     cleaned=compact(re.sub(r'\bEn\s+\d+\s*min\b',' ',cleaned,flags=re.I))
+    cleaned=compact(re.sub(r'\bEn\s+menos\s+de\s+\d+\s*min\b',' ',cleaned,flags=re.I))
     tag=norm(cleaned)
     # Match explicit topic tags, never the event title/venue/remaining countdown.
     taxonomy=(
@@ -47,6 +48,7 @@ def genda_category(raw):
         (r'\bmusica\b|\brecital\b|\ben vivo\b','Música'),
         (r'\belectronica\b|\btechno\b','Electrónica'),
         (r'\bferia\b','Feria'),
+        (r'\bcharla\b|\bconversatorio\b|\bdebate\b','Charlas'),
         (r'\bliteratura\b|\blibros\b','Literatura'),
         (r'\bmuestra\b|\bexpo\b|\bfotografia\b|\bartes visuales\b','Arte'),
         (r'\bdanza\b|\bbaile\b','Danza'),
