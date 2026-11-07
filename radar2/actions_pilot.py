@@ -82,7 +82,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
         # Incrementals acquire only the current agenda, not all historical sources.
         from datetime import datetime
         from zoneinfo import ZoneInfo
-        try:c.genda(datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date())
+        try:c.genda(datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date(),days=1)
         except Exception as exc:c.checks.append({'phase':'incremental_agenda','error':type(exc).__name__})
     if not full:
         from source_cadence import media_due
@@ -124,14 +124,15 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     # Both modes reinterpret only new/changed documents or a changed parser version.
     corpus=execute(conn,"SELECT payload FROM radar2.documents WHERE payload->>'acquisition_method'='official_meta_api' ORDER BY url")['rows']
     accounts=json.loads((ROOT/'radar2/accounts.json').read_text())
-    from compound import classify,effective_version,VERSION as COMPOUND_VERSION
+    from compound import classify,effective_version,requires_interpretation,VERSION as COMPOUND_VERSION
     prior={}
     for p in old:
         e=json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}
         if not e.get('interpretation_superseded_by'):prior.setdefault(p['document_url'],[]).append(e)
-    def needs(d):
-        version=effective_version(d,accounts)
-        return not any(e.get('parser_version')==version and e.get('source_document_sha256')==d.get('sha256') for e in prior.get(d['url'],[]))
+    previous_docs={}
+    for row in corpus:
+        saved=json.loads(row['payload']) if isinstance(row['payload'],str) else row['payload'];previous_docs[saved['url']]=saved
+    def needs(d):return requires_interpretation(d,accounts,previous_docs.get(d['url']),prior.get(d['url'],[]))
     reprocessed=0
     for row in corpus:
         d=row['payload'];d=json.loads(d) if isinstance(d,str) else d
@@ -143,6 +144,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
             interpret(c,d,accounts);reprocessed+=1
             for p in c.proposals.values():
                 if p['document_url']==d['url']:p['source_document_sha256']=d.get('sha256')
+        d['interpretation_version']=effective_version(d,accounts)
     result=c.save();result=reconcile(result,old);result=carry_forward(result,old)
     # Collect graph evidence before writing proposals so the API sees the same
     # node IDs and event relationships persisted in the cultural memory ledger.
@@ -230,7 +232,7 @@ def main():
             after=execute(conn,'SELECT count(*) n FROM radar2.proposals')['rows'][0]['n']
             if before!=after:raise RuntimeError('COMPOUND_IDEMPOTENCE_FAILED')
             print(json.dumps({'compound_recovery':recovered,'idempotence':repeated,'proposal_count_before_repeat':before,'proposal_count_after_repeat':after}))
-        modes=['full','incremental'] if 'certification_modes=full,incremental' in trigger and 'full,incremental,incremental' not in trigger else ['full','incremental','incremental'] if 'certification_modes=full,incremental,incremental' in trigger else [mode]* (1 if corrective else certification_batches())
+        modes=['incremental'] if 'certification_modes=incremental' in trigger else ['full','incremental'] if 'certification_modes=full,incremental' in trigger and 'full,incremental,incremental' not in trigger else ['full','incremental','incremental'] if 'certification_modes=full,incremental,incremental' in trigger else [mode]* (1 if corrective else certification_batches())
         for i,current_mode in enumerate(modes):
             current_id=run_id+('-batch'+str(i+1) if i else '')
             try:reports.append(run_batch(conn,current_id,Path(temp),current_mode=='full' and i==0 and not corrective,access,corrective))

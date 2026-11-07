@@ -332,3 +332,10 @@ def effective_version(d,accounts):
  if info['compound'] or (curator(d,accounts) and info['type'] in ('recomendacion_permanente','retrospectiva') and re.search(r'^[a-z][a-z0-9_.]{2,40}$',d.get('text',''),re.M)):return VERSION
  from caption import VERSION as caption_version
  return caption_version
+
+
+def requires_interpretation(d,accounts,previous,proposals):
+ version=effective_version(d,accounts)
+ if previous and previous.get('published_at')!=d.get('published_at'):return True
+ if previous and previous.get('sha256')==d.get('sha256') and previous.get('published_at')==d.get('published_at') and previous.get('interpretation_version')==version:return False
+ return not any(p.get('parser_version')==version and p.get('source_document_sha256')==d.get('sha256') for p in proposals)

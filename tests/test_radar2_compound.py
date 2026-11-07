@@ -73,3 +73,18 @@ class MixedEvidenceRegression(unittest.TestCase):
  def test_recommended_addresses_are_not_numeric_date_headers(self):
   d={'profile_username':'curador','text':'Lugares para cenar\n\nbar.uno\n📍17 y 63\n\nbar.dos\n📍13 y 34\n\nbar.tres\n📍5 y 54'}
   self.assertFalse(classify(d,[{'username':'curador','circuit':'curaduría'}])['compound'])
+
+class AcquisitionBudgetRegression(unittest.TestCase):
+ def test_incremental_day_does_not_refetch_seven_days(self):
+  from unittest.mock import patch
+  with tempfile.TemporaryDirectory() as t:
+   c=Collector(t)
+   with patch.object(c,'fetch',return_value=None) as fetch:c.genda(date(2026,11,7),days=1);self.assertEqual(fetch.call_count,1)
+   with patch.object(c,'fetch',return_value=None) as fetch:c.genda(date(2026,11,7));self.assertEqual(fetch.call_count,7)
+ def test_empty_result_document_can_be_cached_without_fake_proposal(self):
+  from compound import requires_interpretation,effective_version
+  d={'url':'https://example.test/a','text':'Un comunicado sin fecha','published_at':'2026-11-06T10:00:00Z','sha256':'a'};previous=dict(d,interpretation_version=effective_version(d,[]))
+  self.assertFalse(requires_interpretation(d,[],previous,[]))
+  self.assertTrue(requires_interpretation(dict(d,sha256='b'),[],previous,[]))
+  self.assertTrue(requires_interpretation(dict(d,published_at='2026-11-07T10:00:00Z'),[],previous,[]))
+  self.assertTrue(requires_interpretation(d,[],dict(previous,interpretation_version='old'),[]))

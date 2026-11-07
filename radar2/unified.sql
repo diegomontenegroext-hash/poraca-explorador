@@ -21,6 +21,7 @@ END $$;
 CREATE OR REPLACE TRIGGER preserve_document_v1 AFTER INSERT OR UPDATE ON radar2.documents FOR EACH ROW EXECUTE FUNCTION radar2.preserve_version_v1();
 CREATE OR REPLACE TRIGGER preserve_proposal_v1 AFTER INSERT OR UPDATE ON radar2.proposals FOR EACH ROW EXECUTE FUNCTION radar2.preserve_version_v1();
 CREATE OR REPLACE VIEW radar2.contract_v1 AS
+WITH visible AS MATERIALIZED (SELECT * FROM radar2.private_discoveries)
 SELECT 'document:'||d.url id,'documents' resource,jsonb_build_object(
  'id','document:'||d.url,'url',d.url,'source',d.source,'published_at',d.payload->>'published_at',
  'acquired_at',d.first_seen_at,'observed_at',d.fetched_at,'version',d.sha256,'original',d.payload,
@@ -40,7 +41,7 @@ SELECT 'occurrence:'||p.proposal_id,'occurrences',jsonb_build_object(
  'event_status',coalesce(p.evidence->>'event_status','scheduled_pending_review'),
  'time_precision',CASE WHEN p.event_time IS NULL THEN 'unknown' ELSE 'minute' END,
  'venue',p.venue,'state',p.review_state,'stage','structured_unapproved_event',
- 'evidence',p.evidence,'publication_approved',false) FROM radar2.private_discoveries p
+ 'evidence',p.evidence,'publication_approved',false) FROM visible p
 WHERE p.event_date IS NOT NULL AND coalesce(p.evidence->>'kind','event') IN ('event','program')
 UNION ALL
 SELECT 'event:'||coalesce(p.evidence->>'event_identity_key',p.proposal_id),'events',jsonb_build_object(
@@ -52,7 +53,7 @@ SELECT 'event:'||coalesce(p.evidence->>'event_identity_key',p.proposal_id),'even
    'identity_status','document_scoped_work_pending_review') ELSE NULL END,
  'stage','structured_unapproved_event','state',min(p.review_state),'publication_approved',false,
  'identity_policy',coalesce(min(p.evidence->>'identity_scope'),'conservative_per_occurrence_pending_work_identity_review'))
-FROM radar2.private_discoveries p
+FROM visible p
 WHERE p.event_date IS NOT NULL AND coalesce(p.evidence->>'kind','event') IN ('event','program')
 GROUP BY coalesce(p.evidence->>'event_identity_key',p.proposal_id)
 UNION ALL
@@ -70,7 +71,7 @@ SELECT 'relation:'||n.key,'relationships',n.value || jsonb_build_object(
 FROM radar2.runs r CROSS JOIN LATERAL jsonb_each(coalesce(r.summary->'relationships','{}')) n
 LEFT JOIN radar2.proposals p ON p.proposal_id=substring(n.value->>'subject' from 7)
 LEFT JOIN LATERAL (
- SELECT q.proposal_id,q.evidence->>'event_identity_key' event_identity_key FROM radar2.private_discoveries q
+ SELECT q.proposal_id,q.evidence->>'event_identity_key' event_identity_key FROM visible q
  WHERE q.event_date IS NOT NULL AND coalesce(q.evidence->>'kind','event') IN ('event','program') AND
  (q.proposal_id=coalesce(p.evidence->>'duplicate_of',p.proposal_id) OR
  (q.title=p.title AND q.event_date=p.event_date AND q.event_time IS NOT DISTINCT FROM p.event_time AND q.venue IS NOT DISTINCT FROM p.venue))

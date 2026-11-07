@@ -247,7 +247,9 @@ class Collector:
         articles=[n.text() for n in t.walk() if n.tag=='article']
         body=max(articles,key=len) if articles else d['text']
         d['original_links']=[u for u in self.links(d) if platform_host(urlsplit(u).hostname) or any(x in u for x in ['ticket','bombo','evento-simple','dogma'])]
-        d['instagram_permalinks']=sorted(set(re.findall(r'https?://(?:www\.)?instagram.com/(?:p|reel)/[\w-]+/?',html.unescape((self.out/d['html_file']).read_text()).replace('\\/','/'))))
+        raw_path=self.out/d.get('html_file','__missing__')
+        raw=raw_path.read_text() if raw_path.is_file() else d.get('text','')
+        d['instagram_permalinks']=sorted(set(re.findall(r'https?://(?:www\.)?instagram.com/(?:p|reel)/[\w-]+/?',html.unescape(raw).replace('\\/','/'))))
         published=next((x.get('datePublished') for x in self.structured(d) if x.get('datePublished')),None)
         if published:d['published_at']=published
         self.add(d,title,state=state,evidence=body,origin_account=account)
@@ -329,8 +331,8 @@ class Collector:
                     # Ticket explicitly separates venue and street address in markup.
                     place=re.split(r' (?=\d{2,4} entre )',place,maxsplit=1)[0] if place else None
                     self.add(item,title,day,m[4] if m else None,place,'Vino / fiesta','fuente_original' if day else 'incompleto',text,account)
-    def genda(self,start):
-        for i in range(7):
+    def genda(self,start,days=7):
+        for i in range(max(1,min(int(days),7))):
             day=(start+timedelta(days=i)).isoformat();url='https://agendalaplata.ar/?fecha='+day
             d=self.fetch(url,'Genda')
             if not d:continue

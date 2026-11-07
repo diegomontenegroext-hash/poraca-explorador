@@ -1,9 +1,7 @@
-# Una aceptacion agrupada: recuperacion selectiva, FULL e incremental.
+# Solo incremental final: verificar limite de un dia Genda y cache de interpretacion.
 trigger_date=2026-11-07
-trigger_slot=compound_acceptance_20261107
+trigger_slot=compound_incremental_validation_20261107
 trigger_mode=radar2_pilot
-trigger_reason=compound_sources_recovery_full_incremental_readback
-trigger_scope=compound_acceptance
+trigger_scope=compound_incremental_validation
 certification_batches=1
-certification_modes=full,incremental
-verification_correction=mixed_evidence_guard_and_specialized_bill_precedence
+certification_modes=incremental
