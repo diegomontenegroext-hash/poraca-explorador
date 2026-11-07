@@ -68,11 +68,8 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
         with ThreadPoolExecutor(max_workers=4) as ex:
             for f in ex.map(lambda f:f(),[c.teatrocerca,c.media_sources,c.alternativa,c.cultural_channels,c.genda_theatre]):pass
         if len(c.docs)<2 or not c.proposals:raise RuntimeError('BASE_ACQUISITION_FAILED')
-    # One fixed, four-account experiment in the existing daily run; never in corrections.
+    # The official pilot reuses the same persisted ten-account selection.
     official_pilot={'status':'SKIPPED_NOT_DAILY'}
-    if full and not corrective:
-        try:official_pilot=official_ig_pilot(c,known_urls)
-        except Exception as e:official_pilot={'status':'FAILED','error_type':type(e).__name__}
     rotation_status={'status':'not_executed'};batch={'accounts':[]}
     try:
         if corrective:raise RuntimeError('ROTATION_NOT_REPEATED_IN_FRONTIER_CORRECTION')
@@ -85,6 +82,12 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     except Exception as e:
         manifest={'searches':[],'documents':[],'instagram_attempts':[]}
         rotation_status={'status':'not_repeated_in_corrective' if corrective else 'phase_failed','error':type(e).__name__+': '+str(e)[:160]}
+    if full and not corrective:
+        try:
+            official_pilot=official_ig_pilot(c,known_urls,
+                [a['username'] for a in batch.get('accounts',[])])
+        except Exception as e:
+            official_pilot={'status':'FAILED','error_type':type(e).__name__}
     try:source_report=discover_links(c,conn,known_urls,limit=12 if full else 6,refresh_candidates=corrective)
     except Exception as e:source_report={'status':'phase_failed','error':type(e).__name__+': '+str(e)[:160]}
     # Rejected non-cultural documents remain auditable but leave the private

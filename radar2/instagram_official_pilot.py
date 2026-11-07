@@ -15,10 +15,19 @@ ACCOUNTS = ("guajira.bar", "lutitravelguide", "escenario40", "teatroargentinopba
 REQUIRED = ("META_IG_USER_ID", "META_ACCESS_TOKEN", "META_GRAPH_VERSION")
 PERMALINK = re.compile(r"https://(?:www\.)?instagram\.com/(?:p|reel)/[A-Za-z0-9_-]+/?\Z")
 
-def acquire(collector, known_urls):
-    """Return concise receipts. Never turn absent credentials into a PASS."""
-    report = {"kind": "instagram_official_four_account_pilot",
-              "accounts": list(ACCOUNTS), "method": "meta_business_discovery",
+def acquire(collector, known_urls, rotating_accounts=()):
+    """Four controls plus at most ten unique users from the persisted daily batch."""
+    rotating=[]
+    for raw in rotating_accounts:
+        username=raw.strip().lower() if isinstance(raw,str) else ""
+        if (re.fullmatch(r"[a-z0-9_.]{1,30}",username) and
+                username not in ACCOUNTS and username not in rotating):
+            rotating.append(username)
+        if len(rotating)>=10: break
+    accounts=list(ACCOUNTS)+rotating
+    report={"kind":"instagram_official_rotating_pilot",
+              "accounts":accounts,"controls":list(ACCOUNTS),
+              "rotating_accounts":rotating,"method":"meta_business_discovery",
               "enabled": False, "queries_sent": 0,
               "new_documents": 0, "new_cultural_candidates": 0,
               "results": []}
@@ -29,7 +38,7 @@ def acquire(collector, known_urls):
 
     report["enabled"] = True
     # Each target is requested once only. Official errors never retry.
-    for username in ACCOUNTS:
+    for username in accounts:
         official = discover(username)
         report["queries_sent"] += 1
         summary = {"username": username, "status": official.get("status", "UNKNOWN"),
@@ -60,7 +69,11 @@ def acquire(collector, known_urls):
             report["new_documents"] += 1
             summary["new_documents"] += 1
             if CULTURAL.search(norm(caption)):
-                key=collector.add(d,d["title"],state="investigable",
+                # Use a distinct title per post, not just the profile name.
+                first_line=next((re.sub(r"\s+"," ",line).strip()
+                                 for line in caption.splitlines() if line.strip()),"")
+                title="Instagram @"+username+" · "+(first_line[:110] or url)
+                key=collector.add(d,title,state="investigable",
                                   evidence=caption,origin_account=username)
                 if key:
                     collector.proposals[key].update(
