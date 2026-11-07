@@ -1,0 +1,63 @@
+{
+  "schema": "radar2-category-replay-v1",
+  "date_art": "2026-11-07",
+  "repository": "diegomontenegroext-hash/poraca-explorador",
+  "branch": "main",
+  "environment": {
+    "neon_project": "frosty-union-52906378",
+    "neon_branch": "br-mute-recipe-b4odj2bl",
+    "schema": "radar2"
+  },
+  "parser_versions": {
+    "compound": "compound-v1.2",
+    "Genda": "genda_category_v1"
+  },
+  "scope": {
+    "eldia": {
+      "original": "https://www.eldia.com/espectaculos/agenda-espectaculos_1793938267",
+      "stored_records": 89,
+      "dated_event_records": 88,
+      "reinterpreted_event_records": 88,
+      "matching_ids": 88,
+      "structural_differences": 0,
+      "category_versions_added": 33,
+      "original_document_preserved": true
+    },
+    "genda": {
+      "sources": 17,
+      "total_proposals": 144,
+      "category_versions_added": 62,
+      "countdown_label_rows": 24,
+      "compound_label_rows": 38,
+      "remaining_noncanonical": 0,
+      "remaining_countdown_labels": 0
+    }
+  },
+  "postconditions": {
+    "documents": 974,
+    "proposals": 1781,
+    "proposal_versions": 6635,
+    "auto_approved_proposals": 0,
+    "changed_categories": 95,
+    "mismatched_category_audit": 0,
+    "future_dated_private_discoveries": 340,
+    "active_undated_private_discoveries": 425,
+    "undated_active_kind_event": 0,
+    "preserved_previous_category_in_evidence": true,
+    "proposal_ids_unchanged": true,
+    "dates_times_venues_unchanged": true,
+    "historical_versions_trigger": "radar2.preserve_proposal_v1"
+  },
+  "verification": {
+    "tests_command": "python3 -m unittest discover -s tests -q",
+    "executed": 536,
+    "passed": 535,
+    "skipped": 1,
+    "failures": 0,
+    "evidence_origin": "Neon SELECT snapshots, sandbox parser comparison, guarded versioned SQL UPDATE, Neon SELECT readback",
+    "production_natural_cadence": "not certified",
+    "independent_editorial_review": "not certified",
+    "api_ss0_browser": "not tested in this replay"
+  },
+  "decision": "Category data cleanup verified, not certification of Radar 2 as autonomous cultural curation"
+}
