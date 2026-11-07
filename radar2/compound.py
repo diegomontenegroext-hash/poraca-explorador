@@ -8,7 +8,7 @@ from pathlib import Path
 from collector import norm,compact,sha
 from semantics import normalized_original,proof,credits,clean_title
 
-VERSION='compound-v1.1'
+VERSION='compound-v1.2'
 ZONE=ZoneInfo('America/Argentina/Buenos_Aires')
 DAYS=['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
 CATS={'musica':'Música','teatro':'Teatro','cine':'Cine','literarias':'Literatura','charlas':'Charlas','eventos':'Cultura','infantiles':'Infantiles','opera':'Música','zarzuela':'Teatro','exposiciones':'Arte'}
@@ -198,12 +198,204 @@ def bullet_schedule(c,d,classification):
  out=[];current=None;label=None;previous=0
  for ix,(a,b,sched) in enumerate(bounds):
   prefix=text[previous:a]
-  heading=list(re.finditer(r'\b(Hoy|Mañana|Domingo|Sábado|Viernes|Jueves|Lunes|Martes|Miércoles)\s+(?=Música|Teatro|Cine|Literarias|Eventos|Charlas|Infantiles|Ópera|Zarzuela|Exposiciones)',prefix,re.I))
-  if heading:
-   label_day=norm(heading[-1][1])
+  # A category is a real section heading, NOT any matching word in the
+  # previous event's description, artist name or venue ("Teatro Bar").
+  # HTML is flattened by the collector: genuine headings look like
+  # "... . Teatro Obra..." or "... Mañana Música Banda...".
+  section=r'Música|Teatro|Cine|Literarias|Eventos|Charlas|Infantiles|Ópera|Zarzuela|Exposiciones'
+  day_sections=list(re.finditer(r'\b(Hoy|Mañana|'+DAY+r')\s+('+section+r')\b',prefix,re.I))
+  if day_sections:
+   day_heading=day_sections[-1]
+   label_day=norm(day_heading[1])
    current=base+timedelta(days=(DAYS.index(label_day)-base.weekday())%7) if label_day in DAYS else base+timedelta(days=int(label_day=='manana'))
-  categories=list(re.finditer(r'\b(Música|Teatro|Cine|Literarias|Eventos|Charlas|Infantiles|Ópera|Zarzuela|Exposiciones)\b',prefix,re.I))
-  if categories:label=CATS.get(norm(categories[-1][1]))
+   label=CATS.get(norm(day_heading[2]),label)
+  # The title starts AFTER the heading because its prefix was stripped
+  # when locating the ".-" schedule marker. Only a trailing standalone
+  # category token is accepted: names such as "Teatro Comunitario" and
+  # venues mentioned earlier in a paragraph cannot change the section.
+  bare=re.search(r'(?:^|[.!?]\s+)('+section+r')\s*
+  end=bounds[ix+1][0] if ix+1<len(bounds) else len(text)
+  block=text[sched:end];stop=re.search(r'Las noticias locales nunca|Notas relacionadas|PUBLICIDAD',block)
+  if stop:block=block[:stop.start()];end=sched+len(block)
+  title=text[a:b].strip();segment=text[a:end].strip()
+  en=re.search(r'\ben\s+(?:(?-i:el|la)\s+)?(.+?)(?:,|\. |$)',block,re.I)
+  venue=en[1].strip() if en else None
+  if venue and re.search(r'diferentes|varias|distintas',norm(venue)):venue=None
+  schedule=block[:en.start()] if en else block.split('. ')[0]
+  times=re.findall(CLOCK,schedule)
+  if not times:
+   p=emit(c,d,title,current,None,venue,segment,classification['source_role'],classification['type'],'editorial_day_heading_from_publication_art',category=label)
+   if p:p['ambiguities'].append('unresolved_clock');out.append(p)
+   previous=end;continue
+  # Ranges are one interval; an explicit 'y' separates multiple functions.
+  times=times if re.search(r'\d\s+y\s+\d',schedule) else times[:1]
+  address=None
+  if en:
+   after=block[en.end():];address=after.split('. ')[0].strip(' ,') or None
+  for raw in times:
+   parts=raw.replace('.',':').split(':');hour=f'{int(parts[0]):02}:{parts[1] if len(parts)>1 else "00"}'
+   conflict='horario no informado' in norm(block)
+   p=emit(c,d,title,current,None if hour=='00:00' or conflict else hour,venue,segment,classification['source_role'],classification['type'],'editorial_day_heading_from_publication_art',category=label,address=address)
+   if p:
+    p['field_evidence']['time']=raw
+    if conflict:p['ambiguities'].append('conflicting_time_statement')
+    if hour=='00:00':p.update(announced_date=p['date'],announced_time=hour,ambiguities=p['ambiguities']+['midnight_calendar_day_requires_review'])
+    out.append(p)
+  if p:out.extend(narrative_activities(c,d,p,current,segment,classification))
+  previous=b
+ return out
+
+
+def row_schedule(c,d,classification,places):
+ text=d['text'];base=anchor(d)
+ if not base:return []
+ begin=re.search(r'Agenda cultural(?: completa)?\s+(?=(?:'+DAY+r')\b)',text,re.I);tail=re.search(r'\bTemas:',text[begin.end():]) if begin else None
+ if not begin:return []
+ offset=begin.end();body=text[offset:offset+tail.start()] if tail else text[offset:]
+ days=list(re.finditer(r'\b('+DAY+r')\s+([0-3]?\d)\b',body,re.I));out=[]
+ for ix,m in enumerate(days):
+  resolved,_,basis=dates_for_heading(m[0],base);day=resolved[0] if resolved else None
+  a=m.end();b=days[ix+1].start() if ix+1<len(days) else len(body);scope=body[a:b]
+  rows=list(re.finditer(r'(?<!\S)('+CLOCK+r')(?:\s+a\s+('+CLOCK+r'))?\s*[-–]\s*',scope))
+  for j,r in enumerate(rows):
+   end=rows[j+1].start() if j+1<len(rows) else len(scope)
+   entry=scope[r.end():end].strip();venue=None;title=entry;address=None
+   for name in places:
+    at=entry.lower().rfind(name.lower())
+    if at>0 and len(entry[at+len(name):].strip(' .'))<30:
+     venue=entry[at:at+len(name)];title=entry[:at].strip();break
+   if not venue:
+    location=re.search(r'\b(?:Centro Cultural|Teatro|Camping|Basílica|Piedra Fundacional de|Facultad de|Museo y Archivo de|Auditorio de|Terraza de)\s+.+$',entry)
+    if location and location.start()>0:
+     venue=location[0].strip(' .');title=entry[:location.start()].strip()
+   if not venue:
+    address_match=re.search(r'\bCalle\s+\d.+$',entry)
+    if address_match:address=address_match[0];title=entry[:address_match.start()].strip()
+   parts=r[1].replace('.',':').split(':');hour=f'{int(parts[0]):02}:{parts[1] if len(parts)>1 else "00"}'
+   segment=body[a+r.start():a+end].strip()
+   p=emit(c,d,title,day,None if hour=='00:00' else hour,venue,segment,classification['source_role'],classification['type'],basis,address=address)
+   if p:
+    p['field_evidence']['date']=m[0];p['field_evidence']['time']=r[1]
+    if not venue and not address:p['ambiguities'].append('title_venue_boundary_unresolved');p['title_precision']='unresolved_title_place_boundary'
+    out.append(p)
+ return out
+
+
+def paragraph_schedule(c,d,classification):
+ from caption import CLOCK
+ raw=d['text'];text,positions=normalized_original(raw);base=anchor(d)
+ if not base:return []
+ paragraphs=list(re.finditer(r'\S[^\n]*(?:\n(?!\s*\n)[^\n]*)*',text))
+ units=[]
+ for paragraph in paragraphs:
+  if paragraph[0].lstrip().startswith('🗓'):
+   units.append(paragraph);continue
+  for line in re.finditer(r'[^\n]+',paragraph[0]):
+   a=paragraph.start()+line.start();b=paragraph.start()+line.end()
+   split=re.search(r'\s+y\s+(?=a las\s+\d)',text[a:b],re.I)
+   if split:
+    for sa,sb in [(a,a+split.start()),(a+split.end(),b)]:
+     match=re.compile(r'.+',re.S).search(text,sa,sb)
+     if match:units.append(match)
+   else:
+    match=re.compile(r'.+').search(text,a,b)
+    if match:units.append(match)
+ paragraphs=units
+ out=[];current=[];ending=None;basis='unresolved';previous_heading=None
+ for m in paragraphs:
+  content=m[0].strip();lines=content.splitlines();first=lines[0].strip(' 🗓️✨')
+  if re.search(r'^#|merci|gracias|comentar|compartir|planes recomendados|anticipo de planes|aprovechen|donde nos vemos|^y a la vuelta',norm(first)):continue
+  # Giveaways can mention a real activity without announcing its schedule.
+  giveaway=re.match(r'^(?:dos|tres|cuatro|\d+) entradas para (.+)',first,re.I)
+  if giveaway:
+   schedule=re.search(r'\bel ('+DAY+r')\b',giveaway[1],re.I)
+   ds,_,gbasis=dates_for_heading(schedule[1],base) if schedule else ([],None,'giveaway_without_event_date')
+   title=re.sub(r'^el (?:'+DAY+r') en\s+','',giveaway[1],flags=re.I)
+   for day in ds or [None]:
+    span=proof(raw,positions,m.start(),m.end())
+    p=emit(c,d,title,day,None,None,span['quote'],classification['source_role'],classification['type'],gbasis)
+    if p:out.append(p)
+   continue
+  # Only heading-like date expressions establish scope; dates in an offer do not.
+  headed=bool(re.match(r'^(?:(?:el|desde el|del)\s+)?(?:'+DAY+r')\b',first,re.I) or re.match(r'^\d{1,2}\s+(?:de|y)\s+',first) or content.startswith('🗓'))
+  if headed:
+   resolved,ending,basis=dates_for_heading(first,base)
+   if resolved:current=resolved
+   else:current=[]
+   previous_heading=first
+   remainder=re.sub(r'^(?:(?:el|desde el|del)\s+)?(?:'+DAY+r')(?:\s*(?:,|y)?\s*(?:'+DAY+r'))*\s*:?\s*','',first,flags=re.I)
+   if content.startswith('🗓') or re.fullmatch(r'(?:'+DAY+r')(?:\s*(?:y|,)?\s*(?:'+DAY+r'))*\s*:?',first,re.I):
+    body='\n'.join(lines[1:]).strip()
+   else:body='\n'.join([remainder]+lines[1:]).strip()
+  else:body=content
+  if not current or not body or re.match(r'^#',body):continue
+  # A separate paragraph starting 'y' inherits the previous explicit day only.
+  body=re.sub(r'^y\s+','',body,flags=re.I)
+  body_lines=[l.strip() for l in body.splitlines() if l.strip()]
+  if not body_lines:continue
+  title=body_lines[0]
+  if len(body_lines)>1 and re.search(r'presenta\s*$',norm(title)):title=body_lines[1]
+  elif len(body_lines)>1 and re.fullmatch(r'[a-z0-9_.]+',title) and not body_lines[1].startswith('📍'):title=body_lines[1]
+  title=re.split(r'\btenemos c[oó]digo|\bc[oó]digo de descuento|\bconsegu[ií]|\bentradas gratuitas',title,flags=re.I)[0].strip()
+  marker=re.search(r'📍\s*([^\n]+)',body);venue=marker[1].strip() if marker else None
+  if not venue:
+   explicit_place=re.search(r'\ben\s+([a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*)\b',body)
+   venue=explicit_place[1] if explicit_place and ('.' in explicit_place[1] or '_' in explicit_place[1] or re.search(r'lp$|laplata$|delasartes$|degatos$|winehouse$|8y61$',explicit_place[1])) else None
+  hour,clock=timing(body)
+  organizer=re.search(r'(?:^|\n)([\w.]+)\s+presenta\b',body,re.I)
+  for day in current:
+   # Evidence uses the untouched source, not the normalized Unicode view.
+   span=proof(raw,positions,m.start(),m.end());segment=span['quote']
+   p=emit(c,d,clean_title(title),day,hour,venue,segment,classification['source_role'],classification['type'],basis,ending,organizer=organizer[1] if organizer else None)
+   if p:
+    if venue and ' y ' in venue and all(re.search(r'[A-Za-z]{3}',v) for v in venue.split(' y ')):
+     p['venue']=None;p['kind']='program';p['multiple_places']=venue.split(' y ');p['ambiguities'].append('multiple_places_program_occurrences_unresolved');p['entities']=[e for e in p['entities'] if e['role']!='venue']+[{'name':v,'role':'venue','evidence':segment} for v in p['multiple_places']]
+    p['field_evidence']['date']=first if headed else None;p['date_heading_evidence']=first if headed else previous_heading
+    p['field_evidence']['time']=clock
+    if len(current)>1:p['multiple_explicit_days']=True
+    out.append(p)
+  if headed:previous_heading=first
+ return out
+
+
+def interpret(c,d,accounts,baseline=()):
+ info=classify(d,accounts)
+ if not info['compound']:return None
+ d['document_type']=info['type'];d['source_role']=info['source_role']
+ if info['shape']=='bullet_schedule':return bullet_schedule(c,d,info)
+ if info['shape']=='time_rows':return row_schedule(c,d,info,known_places(accounts,baseline))
+ return paragraph_schedule(c,d,info)
+
+def permanent_recommendations(c,d,accounts):
+ info=classify(d,accounts)
+ if not curator(d,accounts) or info['compound'] or info['type'] not in ('recomendacion_permanente','retrospectiva'):return None
+ out=[]
+ for block in re.split(r'\n\s*\n',d['text']):
+  lines=block.strip().splitlines()
+  handles=[l.strip() for l in lines if re.fullmatch(r'[a-z][a-z0-9_.]{2,40}',l.strip())]
+  for name in handles:
+   if name in ('laplata','planazo','recomendado'):continue
+   marker=re.search(r'📍\s*([^\n]+)',block)
+   p=emit(c,d,name,None,None,name,block,'curator',info['type'],'permanent_recommendation_not_an_event',address=marker[1] if marker else None)
+   if p:p.update(kind='place_recommendation',geographic_scope='outside_local_area_explicit' if re.search(r'Castelli|ruta 2',d['text'],re.I) else 'pending_locality_review');out.append(p)
+ return out or None
+
+
+def effective_version(d,accounts):
+ info=classify(d,accounts)
+ if info['compound'] or (curator(d,accounts) and info['type'] in ('recomendacion_permanente','retrospectiva') and re.search(r'^[a-z][a-z0-9_.]{2,40}$',d.get('text',''),re.M)):return VERSION
+ from caption import VERSION as caption_version
+ return caption_version
+
+
+def requires_interpretation(d,accounts,previous,proposals):
+ version=effective_version(d,accounts)
+ if previous and previous.get('published_at')!=d.get('published_at'):return True
+ if previous and previous.get('sha256')==d.get('sha256') and previous.get('published_at')==d.get('published_at') and previous.get('interpretation_version')==version:return False
+ return not any(p.get('parser_version')==version and p.get('source_document_sha256')==d.get('sha256') for p in proposals)
+,prefix,re.I)
+  if bare and (not day_sections or bare.start()>day_sections[-1].start()):
+   label=CATS.get(norm(bare[1]),label)
   end=bounds[ix+1][0] if ix+1<len(bounds) else len(text)
   block=text[sched:end];stop=re.search(r'Las noticias locales nunca|Notas relacionadas|PUBLICIDAD',block)
   if stop:block=block[:stop.start()];end=sched+len(block)
