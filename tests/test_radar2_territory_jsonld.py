@@ -51,7 +51,14 @@ class JsonLdTerritoryTests(unittest.TestCase):
         self.assertEqual(result['version'],VERSION)
 
     def test_contradictory_address_stays_pending(self):
-        self.assertEqual(event_location(event('City Bell','CABA','C1020'))['status'],'pending')
+        result=event_location(event('City Bell','CABA','C1020'))
+        self.assertEqual(result['status'],'pending')
+        self.assertEqual(result['basis'],'conflicting_structured_location')
+        city_conflict=event_location(event('La Plata','CABA'))
+        self.assertEqual(city_conflict['status'],'pending')
+        self.assertEqual(city_conflict['basis'],'conflicting_structured_location')
+        coordinate_conflict=event_location(event('La Plata','Buenos Aires',None,-34.60,-58.40))
+        self.assertEqual(coordinate_conflict['basis'],'conflicting_structured_location')
 
     def test_venue_name_alone_is_not_geography(self):
         item={'url':'https://www.eventbrite.com.ar/e/123',
