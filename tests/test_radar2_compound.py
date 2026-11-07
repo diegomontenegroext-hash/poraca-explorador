@@ -160,7 +160,10 @@ class ScheduleCategoryRegression(unittest.TestCase):
     'Gratis Muestra - Expo':'Arte',
     'Teatro Stand Up En 19 h 41 min':'Teatro',
     'Literatura Muestra - Expo':'Literatura',
-    'Infantil Actividad Danza Baile Gastronomía Juegos':'Danza'
+    'Infantil Actividad Danza Baile Gastronomía Juegos':'Danza',
+    'Gratis Charla':'Charlas',
+    'Charla Literatura':'Charlas',
+    'Cine En menos de 1 min':'Cine'
   }
   for raw,expected in cases.items():
    with self.subTest(raw=raw):self.assertEqual(genda_category(raw),expected)
