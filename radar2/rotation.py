@@ -114,11 +114,15 @@ def complete(conn,run_id,manifest):
                 if official['status'] in ('MEDIA_RETURNED','NO_MEDIA_RETURNED'):
                     a['last_review_at']=timestamp(at)
                     a['review_count']+=int(not success)
+                a['official_eligibility']='eligible_observed' if official['status'] in ('MEDIA_RETURNED','NO_MEDIA_RETURNED') else 'restricted_or_unknown'
+                previous=a.get('productive_observations',0)
+                a['productive_observations']=previous+int(official.get('new_candidates',0)>0)
+                a['quiet_streak']=0 if official.get('new_documents',0)>0 else a.get('quiet_streak',0)+1
                 if official['status']=='MEDIA_RETURNED':
                     a['official_success_count']=a.get('official_success_count',0)+1
                     a['last_successful_post_at']=timestamp(at)
                     a['result']='official_posts_recovered'
-                    a['next_review_at']=timestamp(at+timedelta(hours=24 if a['priority']==1 else 48))
+                    a['next_review_at']=timestamp(at+timedelta(hours=min(72,24 if a['priority']==1 else 48+8*min(a['quiet_streak'],3))))
                 elif official.get('meta_error_code')==110:
                     a['next_review_at']=timestamp(at+timedelta(days=14))
             results.append(dict(username=u,**a['last_result'],result=a['result'],next_review_at=a['next_review_at']))
@@ -139,3 +143,47 @@ def main():
     print(json.dumps({'action':a.action,'accounts':len(result.get('accounts',result.get('results',[]))),'out':a.out}))
 
 if __name__=='__main__':main()
+
+def source_hints(proposals):
+    """Explicit structured organizer links at a local dated event, not co-mentions."""
+    from urllib.parse import urlsplit
+    hints={}
+    for p in proposals:
+        if not (p.get('event_date') or p.get('date')) or not p.get('venue'):continue
+        evidence=p.get('evidence') or {};evidence=json.loads(evidence) if isinstance(evidence,str) else evidence
+        if not isinstance(evidence,dict):continue
+        for e in evidence.get('entities',[]):
+            if e.get('role')!='organizer':continue
+            try:event=json.loads(e.get('evidence',''))
+            except (ValueError,TypeError):continue
+            if not isinstance(event,dict):continue
+            organizer=event.get('organizer') or {};location=event.get('location') or {}
+            if not isinstance(organizer,dict) or not isinstance(location,dict):continue
+            address=location.get('address') or {}
+            if not isinstance(address,dict) or address.get('addressLocality','').lower() not in ('la plata','city bell','gonnet','tolosa'):continue
+            if organizer.get('name')!=e.get('name'):continue
+            url=organizer.get('url') or '';link=urlsplit(url);username=link.path.strip('/').lower()
+            if link.hostname not in ('instagram.com','www.instagram.com') or not re.fullmatch(r'[a-z0-9_.]{1,30}',username) or username in ('p','reel','explore'):continue
+            hints[username]={'username':username,'handle':username,'name':e['name'],'evidence_url':e.get('evidence_url') or p.get('document_url'),'evidence':organizer,'discovery_state':'explicit_local_organizer_link_pending_meta_eligibility'}
+    return hints
+
+def admit_discovered(conn,proposals):
+    """At most one new source per ART day, cap 200; preserve original roster.
+    Discovery authorizes a bounded official attempt, never identity approval.
+    """
+    from zoneinfo import ZoneInfo
+    day=now().astimezone(ZoneInfo('America/Argentina/Buenos_Aires')).date().isoformat()
+    hints=source_hints(proposals)
+    for _ in range(4):
+        state=read(conn);version=state['version'];candidates=state.setdefault('discovered_candidates',{})
+        for u,h in sorted(hints.items()):
+            if u not in state['accounts'] and len(candidates)<200:candidates[u]=h
+        admitted=[]
+        days=state.setdefault('source_admissions',{})
+        if day not in days and len(state['accounts'])<200:
+            for u,h in sorted(candidates.items()):
+                if u in state['accounts']:continue
+                state['accounts'][u]=dict(h,priority=2,review_count=0,last_review_at=None,last_attempt_at=None,next_review_at=None,result='discovered_not_attempted',official_eligibility='not_checked')
+                days[day]=u;admitted.append(h);break
+        if cas(conn,state,version):return {'explicit_new_source_candidates':len(candidates),'admitted':admitted,'roster_size':len(state['accounts']),'daily_admission_limit':1,'max_accounts':200}
+    raise RuntimeError('SOURCE_ADMISSION_CAS_RETRY_LATER')

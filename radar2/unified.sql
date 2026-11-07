@@ -33,21 +33,28 @@ SELECT 'proposal:'||p.proposal_id,'proposals',jsonb_build_object(
  'stage','cultural_candidate','publication_approved',false) FROM radar2.proposals p
 UNION ALL
 SELECT 'occurrence:'||p.proposal_id,'occurrences',jsonb_build_object(
- 'id','occurrence:'||p.proposal_id,'event_id','event:'||p.proposal_id,
- 'date',p.event_date,'time',p.event_time,'timezone','America/Argentina/Buenos_Aires',
+ 'id','occurrence:'||p.proposal_id,'event_id','event:'||coalesce(p.evidence->>'event_identity_key',p.proposal_id),
+ 'announced_date',p.evidence->'announced_date','announced_time',p.evidence->'announced_time',
+ 'date_resolution',CASE WHEN p.evidence->'ambiguities' ? 'midnight_calendar_day_requires_review' THEN 'announced_day_requires_midnight_review' ELSE 'resolved' END,
+ 'date',CASE WHEN p.evidence->'ambiguities' ? 'midnight_calendar_day_requires_review' THEN NULL ELSE p.event_date END,'time',p.event_time,'timezone','America/Argentina/Buenos_Aires',
+ 'event_status',coalesce(p.evidence->>'event_status','scheduled_pending_review'),
  'time_precision',CASE WHEN p.event_time IS NULL THEN 'unknown' ELSE 'minute' END,
  'venue',p.venue,'state',p.review_state,'stage','structured_unapproved_event',
  'evidence',p.evidence,'publication_approved',false) FROM radar2.private_discoveries p
 WHERE p.event_date IS NOT NULL AND coalesce(p.evidence->>'kind','event') IN ('event','program')
 UNION ALL
-SELECT 'event:'||p.proposal_id,'events',jsonb_build_object(
- 'id','event:'||p.proposal_id,'title',p.title,'category',p.category,
- 'occurrence_ids',jsonb_build_array('occurrence:'||p.proposal_id),
- 'document_ids',coalesce((SELECT jsonb_agg(DISTINCT 'document:'||q.document_url) FROM radar2.proposals q
- WHERE q.proposal_id=p.proposal_id OR q.evidence->>'duplicate_of'=p.proposal_id),jsonb_build_array('document:'||p.document_url)),
- 'stage','structured_unapproved_event','state',p.review_state,'publication_approved',false,
- 'identity_policy','conservative_per_occurrence_pending_work_identity_review') FROM radar2.private_discoveries p
+SELECT 'event:'||coalesce(p.evidence->>'event_identity_key',p.proposal_id),'events',jsonb_build_object(
+ 'id','event:'||coalesce(p.evidence->>'event_identity_key',p.proposal_id),'title',min(p.title),'category',min(p.category),
+ 'occurrence_ids',jsonb_agg('occurrence:'||p.proposal_id ORDER BY p.event_date,p.event_time,p.proposal_id),
+ 'document_ids',jsonb_agg(DISTINCT 'document:'||p.document_url),
+ 'work',CASE WHEN min(p.evidence->>'work_identity_key') IS NOT NULL THEN jsonb_build_object(
+   'id','work:'||min(p.evidence->>'work_identity_key'),'title',min(p.title),
+   'identity_status','document_scoped_work_pending_review') ELSE NULL END,
+ 'stage','structured_unapproved_event','state',min(p.review_state),'publication_approved',false,
+ 'identity_policy',coalesce(min(p.evidence->>'identity_scope'),'conservative_per_occurrence_pending_work_identity_review'))
+FROM radar2.private_discoveries p
 WHERE p.event_date IS NOT NULL AND coalesce(p.evidence->>'kind','event') IN ('event','program')
+GROUP BY coalesce(p.evidence->>'event_identity_key',p.proposal_id)
 UNION ALL
 SELECT 'entity:'||n.key,CASE WHEN n.value->>'role'='venue' THEN 'places' ELSE 'actors' END,
  n.value || jsonb_build_object('id','entity:'||n.key,'stage','identified_name_candidate',
@@ -57,13 +64,13 @@ WHERE r.run_id='radar2-cultural-memory-state-v1' AND NOT n.value ? 'alias_of'
 UNION ALL
 SELECT 'relation:'||n.key,'relationships',n.value || jsonb_build_object(
  'id','relation:'||n.key,'verified',false,'original_subject',n.value->>'subject',
- 'subject',CASE WHEN representative.proposal_id IS NOT NULL THEN 'event:'||representative.proposal_id ELSE NULL END,
+ 'subject',CASE WHEN representative.proposal_id IS NOT NULL THEN 'event:'||coalesce(representative.event_identity_key,representative.proposal_id) ELSE NULL END,
  'object','entity:'||coalesce(r.summary->'nodes'->(n.value->>'object')->>'alias_of',n.value->>'object'),
  'reference_state',CASE WHEN representative.proposal_id IS NOT NULL THEN 'resolved' ELSE 'pending_event_identity_review' END)
 FROM radar2.runs r CROSS JOIN LATERAL jsonb_each(coalesce(r.summary->'relationships','{}')) n
 LEFT JOIN radar2.proposals p ON p.proposal_id=substring(n.value->>'subject' from 7)
 LEFT JOIN LATERAL (
- SELECT q.proposal_id FROM radar2.private_discoveries q
+ SELECT q.proposal_id,q.evidence->>'event_identity_key' event_identity_key FROM radar2.private_discoveries q
  WHERE q.event_date IS NOT NULL AND coalesce(q.evidence->>'kind','event') IN ('event','program') AND
  (q.proposal_id=coalesce(p.evidence->>'duplicate_of',p.proposal_id) OR
  (q.title=p.title AND q.event_date=p.event_date AND q.event_time IS NOT DISTINCT FROM p.event_time AND q.venue IS NOT DISTINCT FROM p.venue))

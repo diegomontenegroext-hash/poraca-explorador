@@ -1,0 +1,416 @@
+{
+  "annotation": "agent_labeled_development_field_review_not_independent",
+  "cases": [
+    {
+      "url": "https://www.instagram.com/p/DTF90_WleY_/",
+      "expected": {
+        "count": 1,
+        "titles": [
+          "Tangos"
+        ],
+        "venue": "RunRun Bar",
+        "cancelled": true
+      },
+      "extracted": [
+        {
+          "title": "🌧️ FECHA SUSPENDIDA POR LLUVIAS 🌧️ Sábado 10.01 hay noche de Tangos en la vereda, vuelven aldo.voi & sebazasali a Run Run ⚡",
+          "date": "2026-01-10",
+          "time": "21:00",
+          "venue": "RunRun Bar",
+          "actors": []
+        }
+      ],
+      "occurrences_expected": 1,
+      "occurrences_found": 1,
+      "title_hits": 1,
+      "title_total": 1,
+      "venue_hits": 1,
+      "venue_total": 1,
+      "actors_expected": [],
+      "actors_extracted": [],
+      "components_found": 0
+    },
+    {
+      "url": "https://www.instagram.com/p/DbT31faAWmv/",
+      "expected": {
+        "count": 1,
+        "titles": [
+          "Festival de Cine"
+        ],
+        "venue": null
+      },
+      "extracted": [
+        {
+          "title": "Festival de Cine!!!",
+          "date": "2026-07-28",
+          "time": null,
+          "venue": null,
+          "actors": []
+        }
+      ],
+      "occurrences_expected": 1,
+      "occurrences_found": 1,
+      "title_hits": 1,
+      "title_total": 1,
+      "venue_hits": 1,
+      "venue_total": 1,
+      "actors_expected": [],
+      "actors_extracted": [],
+      "components_found": 0
+    },
+    {
+      "url": "https://www.instagram.com/p/Dd9418IGojp/",
+      "expected": {
+        "count": 0,
+        "titles": [],
+        "unresolved_components": 5
+      },
+      "extracted": [],
+      "occurrences_expected": 0,
+      "occurrences_found": 0,
+      "title_hits": 0,
+      "title_total": 0,
+      "venue_hits": 0,
+      "venue_total": 0,
+      "actors_expected": [],
+      "actors_extracted": [],
+      "components_found": 5
+    },
+    {
+      "url": "https://www.instagram.com/p/Dd96aHxGip1/",
+      "expected": {
+        "count": 0,
+        "titles": [],
+        "unresolved_components": 6
+      },
+      "extracted": [],
+      "occurrences_expected": 0,
+      "occurrences_found": 0,
+      "title_hits": 0,
+      "title_total": 0,
+      "venue_hits": 0,
+      "venue_total": 0,
+      "actors_expected": [],
+      "actors_extracted": [],
+      "components_found": 6
+    },
+    {
+      "url": "https://www.instagram.com/p/DdSlzs2xAGT/",
+      "expected": {
+        "count": 3,
+        "titles": [
+          "Reunión de padres",
+          "Reunión de padres",
+          "Reunión de padres"
+        ],
+        "venue": "Escenario 40"
+      },
+      "extracted": [
+        {
+          "title": "Reunión de padres",
+          "date": "2026-09-19",
+          "time": "21:00",
+          "venue": "Escenario 40",
+          "actors": []
+        },
+        {
+          "title": "Reunión de padres",
+          "date": "2026-09-20",
+          "time": "19:00",
+          "venue": "Escenario 40",
+          "actors": []
+        },
+        {
+          "title": "Reunión de padres",
+          "date": "2026-09-25",
+          "time": "21:30",
+          "venue": "Escenario 40",
+          "actors": []
+        }
+      ],
+      "occurrences_expected": 3,
+      "occurrences_found": 3,
+      "title_hits": 3,
+      "title_total": 3,
+      "venue_hits": 3,
+      "venue_total": 3,
+      "actors_expected": [],
+      "actors_extracted": [],
+      "components_found": 0
+    },
+    {
+      "url": "https://www.instagram.com/p/DeXTssHI_Mc/",
+      "expected": {
+        "count": 1,
+        "titles": [
+          "Workshop de Lámparas"
+        ],
+        "venue": "Casa Mandala"
+      },
+      "extracted": [
+        {
+          "title": "Workshop de Lámparas",
+          "date": "2026-10-17",
+          "time": "18:00",
+          "venue": "Casa Mandala",
+          "actors": []
+        }
+      ],
+      "occurrences_expected": 1,
+      "occurrences_found": 1,
+      "title_hits": 1,
+      "title_total": 1,
+      "venue_hits": 1,
+      "venue_total": 1,
+      "actors_expected": [],
+      "actors_extracted": [],
+      "components_found": 0
+    },
+    {
+      "url": "https://www.instagram.com/p/DfPab8rkR21/",
+      "expected": {
+        "count": 1,
+        "titles": [
+          "SALUD DIGESTIVA"
+        ],
+        "venue": "La Selva",
+        "actors": [
+          "Anna Skrypnyk",
+          "Lucía Gamba"
+        ]
+      },
+      "extracted": [
+        {
+          "title": "SALUD DIGESTIVA EN LA SELVA",
+          "date": "2026-11-14",
+          "time": "10:00",
+          "venue": "La Selva",
+          "actors": [
+            {
+              "name": "Anna Skrypnyk",
+              "role": "performer",
+              "evidence": "Facilitan:\nAnna Skrypnyk"
+            },
+            {
+              "name": "Lucía Gamba",
+              "role": "performer",
+              "evidence": "Facilitan:\nLucía Gamba"
+            }
+          ]
+        }
+      ],
+      "occurrences_expected": 1,
+      "occurrences_found": 1,
+      "title_hits": 1,
+      "title_total": 1,
+      "venue_hits": 1,
+      "venue_total": 1,
+      "actors_expected": [
+        "Anna Skrypnyk",
+        "Lucía Gamba"
+      ],
+      "actors_extracted": [
+        "Anna Skrypnyk",
+        "Lucía Gamba"
+      ],
+      "components_found": 0
+    },
+    {
+      "url": "https://www.instagram.com/p/DfQOVDWmRMd/",
+      "expected": {
+        "count": 10,
+        "titles": [
+          "chaza_pena",
+          "ciudadpantano",
+          "Ciclo Ardiente",
+          "doblepar",
+          "gauchitokill",
+          "panter",
+          "Ciclo Ardiente",
+          "paramo_sur",
+          "Noche Tramposa",
+          "loloomorales"
+        ],
+        "venue": "Guajira"
+      },
+      "extracted": [
+        {
+          "title": "chaza_pena",
+          "date": "2026-11-05",
+          "time": "21:00",
+          "venue": "Guajira",
+          "actors": []
+        },
+        {
+          "title": "ciudadpantano temblores.banda lasarpias.musica",
+          "date": "2026-11-06",
+          "time": "20:00",
+          "venue": "Guajira",
+          "actors": []
+        },
+        {
+          "title": "Ciclo Ardiente djurielgm",
+          "date": "2026-11-06",
+          "time": null,
+          "venue": "Guajira",
+          "actors": [
+            {
+              "name": "Ciclo Ardiente",
+              "role": "cycle",
+              "evidence": "Ciclo Ardiente djurielgm"
+            }
+          ]
+        },
+        {
+          "title": "doblepar_oficial maratonatokio",
+          "date": "2026-11-07",
+          "time": "21:00",
+          "venue": "Guajira",
+          "actors": []
+        },
+        {
+          "title": "gauchitokill + djlimonsonidero",
+          "date": "2026-11-07",
+          "time": null,
+          "venue": "Guajira",
+          "actors": []
+        },
+        {
+          "title": "panter_giuliano",
+          "date": "2026-11-13",
+          "time": "21:00",
+          "venue": "Guajira",
+          "actors": []
+        },
+        {
+          "title": "Ciclo Ardiente djurielgm",
+          "date": "2026-11-13",
+          "time": null,
+          "venue": "Guajira",
+          "actors": [
+            {
+              "name": "Ciclo Ardiente",
+              "role": "cycle",
+              "evidence": "Ciclo Ardiente djurielgm"
+            }
+          ]
+        },
+        {
+          "title": "paramo_sur delaorillarock",
+          "date": "2026-11-14",
+          "time": "21:00",
+          "venue": "Guajira",
+          "actors": []
+        },
+        {
+          "title": "Noche Tramposa 🌹 denisylasperlas",
+          "date": "2026-11-14",
+          "time": null,
+          "venue": "Guajira",
+          "actors": []
+        },
+        {
+          "title": "loloomorales",
+          "date": "2026-11-15",
+          "time": "20:00",
+          "venue": "Guajira",
+          "actors": []
+        }
+      ],
+      "occurrences_expected": 10,
+      "occurrences_found": 10,
+      "title_hits": 10,
+      "title_total": 10,
+      "venue_hits": 10,
+      "venue_total": 10,
+      "actors_expected": [],
+      "actors_extracted": [],
+      "components_found": 0
+    },
+    {
+      "url": "https://www.instagram.com/p/DfartNwlwom/",
+      "expected": {
+        "count": 3,
+        "titles": [
+          "NUESTRA TIERRA",
+          "MARIA ANTONIETA",
+          "LAS VÍRGENES SUICIDAS"
+        ],
+        "venue": null
+      },
+      "extracted": [
+        {
+          "title": "NUESTRA TIERRA",
+          "date": "2026-11-07",
+          "time": "19:30",
+          "venue": null,
+          "actors": []
+        },
+        {
+          "title": "MARIA ANTONIETA",
+          "date": "2026-11-07",
+          "time": "22:00",
+          "venue": null,
+          "actors": []
+        },
+        {
+          "title": "LAS VÍRGENES SUICIDAS",
+          "date": "2026-11-07",
+          "time": null,
+          "venue": null,
+          "actors": []
+        }
+      ],
+      "occurrences_expected": 3,
+      "occurrences_found": 3,
+      "title_hits": 3,
+      "title_total": 3,
+      "venue_hits": 3,
+      "venue_total": 3,
+      "actors_expected": [],
+      "actors_extracted": [],
+      "components_found": 0
+    },
+    {
+      "url": "https://www.instagram.com/reel/DfH8BVuCLIy/",
+      "expected": {
+        "count": 1,
+        "titles": [
+          "Alfarería experimental"
+        ],
+        "venue": "Taller Laura Gan",
+        "actors": [
+          "Josefina Araneda"
+        ]
+      },
+      "extracted": [
+        {
+          "title": "Alfarería experimental: técnica neriage🏺",
+          "date": "2026-11-14",
+          "time": "16:30",
+          "venue": "Taller Laura Gan",
+          "actors": [
+            {
+              "name": "Josefina Araneda",
+              "role": "performer",
+              "evidence": "Profe Josefina Araneda(Unlp)\nJosefina Araneda(Unlp)"
+            }
+          ]
+        }
+      ],
+      "occurrences_expected": 1,
+      "occurrences_found": 1,
+      "title_hits": 1,
+      "title_total": 1,
+      "venue_hits": 1,
+      "venue_total": 1,
+      "actors_expected": [
+        "Josefina Araneda"
+      ],
+      "actors_extracted": [
+        "Josefina Araneda"
+      ],
+      "components_found": 0
+    }
+  ]
+}

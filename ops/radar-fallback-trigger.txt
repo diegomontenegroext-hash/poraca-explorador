@@ -1,8 +1,7 @@
-# Una sola corrida Actions; FULL y dos incrementales limitadas para aceptación.
-trigger_date=2026-11-06
-trigger_slot=unified_contract_validation_20261107
+# Una verificacion agrupada; reprocesar originales, sin consultar fuentes otra vez.
+trigger_date=2026-11-07
+trigger_slot=maturity_replay_20261107
 trigger_mode=radar2_pilot
-trigger_reason=full_and_two_incrementals_with_official_rotation_and_readback
-trigger_scope=standard_daily_acquisition
+trigger_reason=preserved_original_replay_idempotence_and_meta_health
+trigger_scope=maturity_replay
 certification_batches=1
-certification_modes=full,incremental,incremental

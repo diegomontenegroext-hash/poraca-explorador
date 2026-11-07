@@ -60,3 +60,57 @@ Errores Meta de autenticación/cuota cortan el lote, sin intentos HTML. Fuentes 
 `evidence/caption-30-review-20261107.json` contiene 30 URLs reales anotadas por el agente: no es muestra independiente ni holdout. Precisión/recuperación de fechas por ocurrencia no equivalen a precisión de títulos, roles o todos los campos. Faltan actos secundarios de medianoche y muestra de festival etiquetada independientemente. Las pruebas unitarias simulan fallos Meta/Neon y verifican límites; no acreditan varios días de continuidad natural.
 
 **NO GO para certificación integral 10/10** mientras existan esos defectos internos, circuitos/identidad incompletos o contrato no validado completamente. El funcionamiento técnico y los hallazgos reales se reportan por separado. No se cierra el maestro ni se archivan obligaciones incumplidas como completadas.
+
+
+## Enmienda de madurez — 07/11/2026 UTC
+
+El parser `caption-v2.1` segmenta múltiples horarios por fecha. Los IDs de
+ocurrencia conservan título, fecha y horario, incluyendo candidatos distintos de
+medianoche; nunca se colapsan solo por fecha. Los eventos de la misma publicación,
+título y sede agrupan sus funciones; `events.work` representa la obra documental
+cuando la fuente anuncia una obra/funciones. Esta agrupación no fusiona homónimos
+entre fuentes. Los IDs de evento de captions pueden cambiar al pasar de un evento
+por ocurrencia a una agrupación; cada ocurrencia devuelve su referencia vigente.
+Los eventos legados conservan su ID. Las propuestas y versiones anteriores siguen
+consultables, marcadas `interpretation_superseded_by` y fuera de la vista activa.
+
+Una fecha a medianoche sigue siendo **fecha anunciada**, sin día civil resuelto:
+`occurrences.date/time=null`, `announced_date`, `announced_time` y `date_resolution`
+conservan el anuncio y el motivo. Un componente de festival sin fecha de calendario
+permanece `program_component` en propuestas; no crea una ocurrencia ficticia. La
+recurrencia sin intervalo explícito se conserva como regla documental pendiente,
+sin expansión infinita. Cancelaciones tienen `event_status=cancelled`; nunca se
+promueven automáticamente a agenda. La API v1 consume los campos adicionales en
+el endpoint y despliegue privado existentes, sin otro servicio.
+
+Los spans de `evidence_spans` son offsets del texto original, incluso si las cifras
+están estilizadas con Unicode. La evidencia por campo y los créditos son observados,
+no corroboración independiente. El grafo admite ciclos explícitos (`part_of_cycle`);
+una coaparición o etiqueta temática no demuestra un circuito emergente.
+
+Las fuentes nuevas provienen de enlaces explícitos de organizadores en eventos
+locales estructurados. Se admite como máximo una cuenta nueva por día ART, hasta
+200; las 123 originales se conservan. La admisión permite intentar Business
+Discovery, no declara elegibilidad ni identidad aprobada. La frontera web limita
+1500 enlaces y 60 altas por corrida; las consultas mantienen sus presupuestos.
+
+El journal escribe primero a disco y luego guarda cada original en Neon. Ante fallo
+del job, el mismo workflow conserva un artifact 7 días; la siguiente corrida restaura
+como máximo un artifact de 40 MB, sin ejecutar archivos. Se descartan versiones
+anteriores si Neon ya tiene una observación más nueva. No se promete supervivencia
+a la pérdida del runner antes del upload del artifact ni recuperación si fallan
+simultáneamente Neon y el almacenamiento de artifacts. La restauración cross-run
+se implementó, pero una prueba unitaria de disco no acredita ese recorrido real.
+
+`debug_token` introspecta token/acceso a datos si Meta permite al token desarrollador
+consultarse; opcionalmente usa App ID/Secret del almacenamiento existente. No hay
+refresh genérico implementado ni autonomía de credenciales. Se emiten warnings
+de vencimiento ≤14 días/expiración desconocida y se detiene Meta si se verifica
+credencial inválida. El resto de las fuentes puede continuar. No se publica el token.
+
+Renovación mínima: usar [Access Token Debugger](https://developers.facebook.com/tools/debug/accesstoken/)
+con la app correcta; reautorizar/obtener credencial compatible con los permisos
+existentes; sustituir únicamente `META_ACCESS_TOKEN` en GitHub Secrets; ejecutar
+una validación puntual de salud antes de reanudar adquisiciones ordinarias. No
+copiar secretos al informe, Neon ni issues. Renovación desatendida sigue pendiente
+si no se acredita un mecanismo compatible y almacenamiento de reemplazo.

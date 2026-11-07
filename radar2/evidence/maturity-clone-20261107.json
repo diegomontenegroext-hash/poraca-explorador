@@ -1,0 +1,47 @@
+{
+  "branch": "br-calm-queen-b46np7a8",
+  "write": {
+    "documents_written": "499",
+    "proposals_written": "600"
+  },
+  "memory": {
+    "nodes_observed": 76,
+    "new_to_radar_evidence": 65,
+    "new_to_memory": 54,
+    "relationships_observed": 122,
+    "new_relationships_in_memory": 72,
+    "total_nodes": 176,
+    "active_nodes": 173,
+    "total_relationships": 318,
+    "active_relationships": 308
+  },
+  "counts_before_second_write": [
+    {
+      "documents": "825",
+      "proposals": "1112",
+      "occurrences": "497"
+    }
+  ],
+  "counts_after_second_write": [
+    {
+      "documents": "825",
+      "proposals": "1112",
+      "occurrences": "497"
+    }
+  ],
+  "dangling_references": [
+    {
+      "n": "0"
+    }
+  ],
+  "examples": [
+    {
+      "resource": "events",
+      "data": "{\"id\": \"event:0dee1d859f0b69e6501e60f8c7f6bcfcac258576f319ea67e188fa356ecf2a3c\", \"work\": {\"id\": \"work:0dee1d859f0b69e6501e60f8c7f6bcfcac258576f319ea67e188fa356ecf2a3c\", \"title\": \"Reunión de padres\", \"identity_status\": \"document_scoped_work_pending_review\"}, \"stage\": \"structured_unapproved_event\", \"state\": \"historico\", \"title\": \"Reunión de padres\", \"category\": \"Teatro\", \"document_ids\": [\"document:https://www.instagram.com/p/DdSlzs2xAGT/\"], \"occurrence_ids\": [\"occurrence:56d2f251315c19c7f9961a98240dc4bd6f40a5fe26768333f68009e45e1bc32f\", \"occurrence:da9a2b041daab5993db2d135411bdb76be9422476fe37872f2360833c13cec00\", \"occurrence:1664c8cfc966f69a4bb6c3ff2e9bb1856b67222706679b54da49987dd01add29\"], \"identity_policy\": \"same_document_title_venue_pending_editorial_review\", \"publication_approved\": false}"
+    },
+    {
+      "resource": "actors",
+      "data": "{\"id\": \"entity:00b53182a3bc634f02765f2d39b136e41b31a00d82824f843334562f07de6567\", \"name\": \"Ciclo Ardiente\", \"role\": \"cycle\", \"stage\": \"identified_name_candidate\", \"node_id\": \"00b53182a3bc634f02765f2d39b136e41b31a00d82824f843334562f07de6567\", \"evidence\": [{\"url\": \"https://www.instagram.com/p/DedD9_PjRrD/\", \"excerpt\": \"El Ciclo Ardiente 🔥 tu perreito de confianza\", \"proposal_id\": \"682a88e919f03758855530f1fca1096a5384d8f8418a37313088195f8fbf5b81\"}, {\"url\": \"https://www.instagram.com/p/DevGNvtjdS5/\", \"excerpt\": \"Otro viernes de Ciclo Ardiente 🔥\", \"proposal_id\": \"01b34fdfd2dd321a7e24a26e632d9e2277defabe847d6d28c8d10f0b10422ddb\"}, {\"url\": \"https://www.instagram.com/p/DfQOVDWmRMd/\", \"excerpt\": \"Ciclo Ardiente djurielgm\", \"proposal_id\": \"80027c22c6489aabbcd23fd03a3471ec1652acf7cde6c6a27959d02e754a749d\"}, {\"url\": \"https://www.instagram.com/p/DfQOVDWmRMd/\", \"excerpt\": \"Ciclo Ardiente djurielgm\", \"proposal_id\": \"9ccbf994b74985a937ff17e40e2585d584e3ccb961ddb1c99f1858c2a782b9b2\"}, {\"url\": \"https://www.instagram.com/p/DfSzHR9mbbX/\", \"excerpt\": \"Otro viernes de Ciclo Ardiente 🔥\", \"proposal_id\": \"09d345d20c4346673502aaa12a27eb4f043bc42f6e8ce2ed53889236742fc4bd\"}], \"verified\": false, \"last_run_id\": \"maturity-clone-validation-20261107\", \"first_run_id\": \"maturity-clone-validation-20261107\", \"identity_status\": \"pending_identity_review\", \"new_to_radar_evidence\": true, \"existing_identity_candidates\": []}"
+    }
+  ]
+}

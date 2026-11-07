@@ -1,0 +1,927 @@
+{
+  "annotation": "agent_labeled_reserved_before_implementation_not_independent_human_validation",
+  "before": {
+    "tp": 9,
+    "fp": 1,
+    "fn": 4,
+    "joint_date_time_precision": 0.9,
+    "joint_date_time_recall": 0.6923076923076923,
+    "date_time_venue_complete": 0,
+    "predicted": 10,
+    "cases": [
+      {
+        "url": "https://www.instagram.com/p/DfQHj1BIOY8/",
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "expected": [],
+        "extracted": [
+          [
+            "2026-11-04",
+            null
+          ]
+        ],
+        "titles": [
+          "CYBER WEEK 2026 💥"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DeiG3dUIwms/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DZTOb94O-K4/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DfVQPF5zxH1/",
+        "tp": 5,
+        "fp": 0,
+        "fn": 2,
+        "expected": [
+          [
+            "2026-11-04",
+            "20:00"
+          ],
+          [
+            "2026-11-05",
+            "21:00"
+          ],
+          [
+            "2026-11-06",
+            "21:00"
+          ],
+          [
+            "2026-11-06",
+            null
+          ],
+          [
+            "2026-11-07",
+            "21:00"
+          ],
+          [
+            "2026-11-07",
+            null
+          ],
+          [
+            "2026-11-08",
+            "21:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-04",
+            "20:00"
+          ],
+          [
+            "2026-11-05",
+            "21:00"
+          ],
+          [
+            "2026-11-06",
+            "21:00"
+          ],
+          [
+            "2026-11-07",
+            "21:00"
+          ],
+          [
+            "2026-11-08",
+            "21:00"
+          ]
+        ],
+        "titles": [
+          "• grumel__",
+          "• hotelandcasino_",
+          "• mmce.band",
+          "• sofia.uzal",
+          "• FESTI PURA •"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/DeQLPZiMlXX/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DeFlq8FlOeJ/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DeSv835xnPR/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DdkYz1wTBNi/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-09-25",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-09-25",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "Este viernes se cierra septiembre con🔥LA GRAN BARATA LATINOS🔥"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/DeZaqDMPm7j/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "expected": [
+          [
+            "2026-11-01",
+            "19:00"
+          ]
+        ],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/Dd7kpcdmmVB/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "expected": [
+          [
+            "2026-10-17",
+            "17:00"
+          ]
+        ],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DctOcxSDrKC/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DTboiUXjmnx/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-01-13",
+            null
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-01-13",
+            null
+          ]
+        ],
+        "titles": [
+          "No es solo bailar un Tango"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DfNK38AoODr/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-11-01",
+            "21:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-01",
+            "21:00"
+          ]
+        ],
+        "titles": [
+          "💀 HOY • 21HS 💀"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DeP3psFiVaw/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DexCg1jmTas/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DZQZa89zNkr/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/Dem1QrlNrry/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DedD9_PjRrD/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-10-16",
+            null
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-10-16",
+            null
+          ]
+        ],
+        "titles": [
+          "El Ciclo Ardiente 🔥 tu perreito de confianza"
+        ]
+      }
+    ]
+  },
+  "after": {
+    "tp": 12,
+    "fp": 1,
+    "fn": 1,
+    "joint_date_time_precision": 0.9230769230769231,
+    "joint_date_time_recall": 0.9230769230769231,
+    "date_time_venue_complete": 0,
+    "predicted": 13,
+    "cases": [
+      {
+        "url": "https://www.instagram.com/p/DfQHj1BIOY8/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DeiG3dUIwms/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DZTOb94O-K4/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DfVQPF5zxH1/",
+        "tp": 7,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-11-04",
+            "20:00"
+          ],
+          [
+            "2026-11-05",
+            "21:00"
+          ],
+          [
+            "2026-11-06",
+            "21:00"
+          ],
+          [
+            "2026-11-06",
+            null
+          ],
+          [
+            "2026-11-07",
+            "21:00"
+          ],
+          [
+            "2026-11-07",
+            null
+          ],
+          [
+            "2026-11-08",
+            "21:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-04",
+            "20:00"
+          ],
+          [
+            "2026-11-05",
+            "21:00"
+          ],
+          [
+            "2026-11-06",
+            "21:00"
+          ],
+          [
+            "2026-11-06",
+            null
+          ],
+          [
+            "2026-11-07",
+            "21:00"
+          ],
+          [
+            "2026-11-07",
+            null
+          ],
+          [
+            "2026-11-08",
+            "21:00"
+          ]
+        ],
+        "titles": [
+          "💀 AGENDA SEMANAL 💀",
+          "💀 AGENDA SEMANAL 💀",
+          "💀 AGENDA SEMANAL 💀",
+          "💀 AGENDA SEMANAL 💀",
+          "💀 AGENDA SEMANAL 💀",
+          "💀 AGENDA SEMANAL 💀",
+          "💀 AGENDA SEMANAL 💀"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/DeQLPZiMlXX/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DeFlq8FlOeJ/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DeSv835xnPR/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DdkYz1wTBNi/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-09-25",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-09-25",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "Este viernes se cierra septiembre con🔥LA GRAN BARATA LATINOS🔥"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/DeZaqDMPm7j/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-11-01",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-01",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "🔊Llega a la sala uno de los actores mas reconocidos y talentosos de nuestro país con su multipremiado unipersonal muerde___"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/Dd7kpcdmmVB/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "expected": [
+          [
+            "2026-10-17",
+            "17:00"
+          ]
+        ],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DctOcxSDrKC/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DTboiUXjmnx/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-01-13",
+            null
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-01-13",
+            null
+          ]
+        ],
+        "titles": [
+          "No es solo bailar un Tango"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DfNK38AoODr/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-11-01",
+            "21:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-01",
+            "21:00"
+          ]
+        ],
+        "titles": [
+          "💀 HOY • 21HS 💀"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DeP3psFiVaw/",
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "expected": [],
+        "extracted": [
+          [
+            "2026-10-08",
+            null
+          ]
+        ],
+        "titles": [
+          "🖼️ JUAN BATLLE PLANAS / A 60 años de su partida"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DexCg1jmTas/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DZQZa89zNkr/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/Dem1QrlNrry/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DedD9_PjRrD/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-10-16",
+            null
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-10-16",
+            null
+          ]
+        ],
+        "titles": [
+          "El Ciclo Ardiente 🔥 tu perreito de confianza"
+        ]
+      }
+    ]
+  },
+  "certification": false,
+  "unmeasured": [
+    "independent human field labels",
+    "representative festival recall",
+    "actor identity precision",
+    "title accuracy across entire corpus"
+  ],
+  "after_development_review": {
+    "tp": 13,
+    "fp": 0,
+    "fn": 0,
+    "joint_date_time_precision": 1.0,
+    "joint_date_time_recall": 1.0,
+    "date_time_venue_complete": 2,
+    "predicted": 13,
+    "cases": [
+      {
+        "url": "https://www.instagram.com/p/DfQHj1BIOY8/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DeiG3dUIwms/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DZTOb94O-K4/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DfVQPF5zxH1/",
+        "tp": 7,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-11-04",
+            "20:00"
+          ],
+          [
+            "2026-11-05",
+            "21:00"
+          ],
+          [
+            "2026-11-06",
+            "21:00"
+          ],
+          [
+            "2026-11-06",
+            null
+          ],
+          [
+            "2026-11-07",
+            "21:00"
+          ],
+          [
+            "2026-11-07",
+            null
+          ],
+          [
+            "2026-11-08",
+            "21:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-04",
+            "20:00"
+          ],
+          [
+            "2026-11-05",
+            "21:00"
+          ],
+          [
+            "2026-11-06",
+            "21:00"
+          ],
+          [
+            "2026-11-06",
+            null
+          ],
+          [
+            "2026-11-07",
+            "21:00"
+          ],
+          [
+            "2026-11-07",
+            null
+          ],
+          [
+            "2026-11-08",
+            "21:00"
+          ]
+        ],
+        "titles": [
+          "💀 AGENDA SEMANAL 💀",
+          "💀 AGENDA SEMANAL 💀",
+          "💀 AGENDA SEMANAL 💀",
+          "💀 AGENDA SEMANAL 💀",
+          "💀 AGENDA SEMANAL 💀",
+          "💀 AGENDA SEMANAL 💀",
+          "💀 AGENDA SEMANAL 💀"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/DeQLPZiMlXX/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DeFlq8FlOeJ/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DeSv835xnPR/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DdkYz1wTBNi/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-09-25",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-09-25",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "Este viernes se cierra septiembre con🔥LA GRAN BARATA LATINOS🔥"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/reel/DeZaqDMPm7j/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-11-01",
+            "19:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-01",
+            "19:00"
+          ]
+        ],
+        "titles": [
+          "🔊Llega a la sala uno de los actores mas reconocidos y talentosos de nuestro país con su multipremiado unipersonal muerde___"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/Dd7kpcdmmVB/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-10-17",
+            "17:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-10-17",
+            "17:00"
+          ]
+        ],
+        "titles": [
+          "Se viene un planazo🩷💙"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DctOcxSDrKC/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DTboiUXjmnx/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-01-13",
+            null
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-01-13",
+            null
+          ]
+        ],
+        "titles": [
+          "No es solo bailar un Tango"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DfNK38AoODr/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-11-01",
+            "21:00"
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-11-01",
+            "21:00"
+          ]
+        ],
+        "titles": [
+          "💀 HOY • 21HS 💀"
+        ]
+      },
+      {
+        "url": "https://www.instagram.com/p/DeP3psFiVaw/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DexCg1jmTas/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/DZQZa89zNkr/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/reel/Dem1QrlNrry/",
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "expected": [],
+        "extracted": [],
+        "titles": []
+      },
+      {
+        "url": "https://www.instagram.com/p/DedD9_PjRrD/",
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "expected": [
+          [
+            "2026-10-16",
+            null
+          ]
+        ],
+        "extracted": [
+          [
+            "2026-10-16",
+            null
+          ]
+        ],
+        "titles": [
+          "El Ciclo Ardiente 🔥 tu perreito de confianza"
+        ]
+      }
+    ],
+    "independence": "Consumed development set after first-pass failures, NOT a holdout"
+  }
+}

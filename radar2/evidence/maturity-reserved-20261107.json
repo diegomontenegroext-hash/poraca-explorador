@@ -1,0 +1,405 @@
+{
+  "annotation": "agent_labeled_reserved_before_implementation_not_human_validated",
+  "selection": "first 18 SHA256(URL), excluding previous 30; frozen before v2 implementation; no rule tuning on these cases",
+  "limitations": [
+    "Not independent human annotation",
+    "Small positive sample; no certification of whole cultural corpus"
+  ],
+  "cases": [
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DfQHj1BIOY8/",
+        "text": "CYBER WEEK 2026 💥\nNos sumamos para que no te pierdas ningún show! \n\n👉 Este 2,3 y 4 de Noviembre vas a poder conseguir tus entradas con -20% usando el código: CYBEROPERA \n\n🎫 Conseguilo ahora ingresando en livepass.com.ar \n✅ Con Banco Provincia podés hacerlo en 6 cuotas sin interés! \n\nEN QUE SHOW TE VEMOS? ✨",
+        "title": "Publicación de @operalaplata",
+        "sha256": "e17540b5db898a3bda84e3ad51d8a48a222e495c9c3228b15b12b6d85b2707e8",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DfQHj1BIOY8/",
+        "fetched_at": "2026-11-07T01:58:21.481776+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "17917810575528468",
+        "text_sha256": "e17540b5db898a3bda84e3ad51d8a48a222e495c9c3228b15b12b6d85b2707e8",
+        "published_at": "2026-11-02T20:01:49+0000",
+        "content_scope": "caption",
+        "profile_username": "operalaplata",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DeiG3dUIwms/",
+        "text": "EL CLÁSICO QUE NUNCA FALLA\nfani.crew X lebrel.larambla",
+        "title": "Publicación de @lebrel.larambla",
+        "sha256": "4d8cc464fc98d929f049a202cfc582dcb0dc46fddc6388f22207a3c1c75c006d",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DeiG3dUIwms/",
+        "fetched_at": "2026-11-07T01:32:27.914222+00:00",
+        "text_sha256": "4d8cc464fc98d929f049a202cfc582dcb0dc46fddc6388f22207a3c1c75c006d",
+        "published_at": "2026-10-15T23:10:42+0000",
+        "content_scope": "caption",
+        "profile_username": "lebrel.larambla",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DZTOb94O-K4/",
+        "text": "Tentadores. Nuestros alfajores hechos 100% por nosotros con ingredientes reales 🤍",
+        "title": "Publicación de @somospatiocafe",
+        "sha256": "d97e63681e35eba7616187fa033af4a0ddf667a3b743c9b1a18734fb46dade04",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DZTOb94O-K4/",
+        "fetched_at": "2026-11-07T02:00:40.996427+00:00",
+        "media_type": "IMAGE",
+        "external_id": "17859506121641822",
+        "text_sha256": "d97e63681e35eba7616187fa033af4a0ddf667a3b743c9b1a18734fb46dade04",
+        "published_at": "2026-06-07T21:53:10+0000",
+        "content_scope": "caption",
+        "profile_username": "somospatiocafe",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DfVQPF5zxH1/",
+        "text": "💀 AGENDA SEMANAL 💀\n\n🗓️ MIERCOLES 4 DE NOVIEMBRE • 20HS \n\n• grumel__ \n• cancelado.laplata \n• tamburomalato \n• hematoma_mth \n• edorasfolk \n• kidgoth2003 \n• zeologia \n• solmedinaxoxo \n• alphajores_ \n• lechesucia \n• bad.mufo.triplex \n• #lamaldicionalsina\n\n🗓️ JUEVES 5 DE NOVIEMBRE • 21HS \n\n• hotelandcasino_ \n• babydollstributeband \n\n🗓️ VIERNES 6 DE NOVIEMBRE • 21HS \n\n• mmce.band \n• negra_mula \n\n🕛 MEDIANOCHE 🕛 \n\n• viudanegralp \n• gordavikinga \n• julieta.kesner \n\n🗓️ SÁBADO 7 DE NOVIEMBRE • 21HS \n\n• sofia.uzal \n• mnabanda \n• losinmovilesok \n\n🕛 MEDIANOCHE 🕛 \n\n• un_los_b_boys \n• candido_________ \n• alanleopardo \n• fr4nco.d \n\n🗓️ DOMINGO 8 DE NOVIEMBRE • 21HS \n• FESTI PURA • \n\n• losescepticos_ \n• pastafrola_oficial \n• gordoronaldo.banda \n• depto.d.banda \n\nLXS ESPERAMOS!",
+        "title": "Publicación de @puravidalaplata2008",
+        "sha256": "0166179e30b934f7da1b9e54d31230216b48f3047adb9ef5e5107f9b95218a5c",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DfVQPF5zxH1/",
+        "fetched_at": "2026-11-07T01:59:36.954822+00:00",
+        "media_type": "IMAGE",
+        "external_id": "18110246273350738",
+        "text_sha256": "0166179e30b934f7da1b9e54d31230216b48f3047adb9ef5e5107f9b95218a5c",
+        "published_at": "2026-11-04T20:02:11+0000",
+        "content_scope": "caption",
+        "profile_username": "puravidalaplata2008",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-11-04",
+          "time": "20:00"
+        },
+        {
+          "date": "2026-11-05",
+          "time": "21:00"
+        },
+        {
+          "date": "2026-11-06",
+          "time": "21:00"
+        },
+        {
+          "date": "2026-11-06",
+          "time": null
+        },
+        {
+          "date": "2026-11-07",
+          "time": "21:00"
+        },
+        {
+          "date": "2026-11-07",
+          "time": null
+        },
+        {
+          "date": "2026-11-08",
+          "time": "21:00"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/reel/DeQLPZiMlXX/",
+        "text": "✨ Apertura de la exposición colectiva \"Imaginerías\".\n\nUn encuentro con obras, objetos y universos donde la imaginación se cruza con la memoria, la magia y la fantasía.\n\nPorque crear también es un acto de fe 💫",
+        "title": "Publicación de @teatrodecamaracitybell",
+        "sha256": "ab040adb6427343277589e338d11a857ddb6d044b50f00173012c97d00641957",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/reel/DeQLPZiMlXX/",
+        "fetched_at": "2026-11-07T02:00:42.315741+00:00",
+        "media_type": "VIDEO",
+        "external_id": "18070019069744592",
+        "text_sha256": "ab040adb6427343277589e338d11a857ddb6d044b50f00173012c97d00641957",
+        "published_at": "2026-10-09T00:07:37+0000",
+        "content_scope": "caption",
+        "profile_username": "teatrodecamaracitybell",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DeFlq8FlOeJ/",
+        "text": "Restauración de mural ✨✨\nGracias vasoga y ines.cordoba.16121 \n\n❤️❤️❤️❤️",
+        "title": "Publicación de @vachug_humedalurbano",
+        "sha256": "6c749746455e30315ae9cee3cd04d4f6daa43b462acaafb7028fbfd78abf4d04",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DeFlq8FlOeJ/",
+        "fetched_at": "2026-11-07T02:00:46.902210+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "18117450271771394",
+        "text_sha256": "6c749746455e30315ae9cee3cd04d4f6daa43b462acaafb7028fbfd78abf4d04",
+        "published_at": "2026-10-04T21:21:54+0000",
+        "content_scope": "caption",
+        "profile_username": "vachug_humedalurbano",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/reel/DeSv835xnPR/",
+        "text": "Este Día de la Madre regalá un momento especial🩷\n\nNos vemos en moro.fincayfonda para compartir un tarde diferente 🍃☕️\n\nReservas por privado 📩",
+        "title": "Publicación de @solciceramica",
+        "sha256": "14f9e064e5da7f84c3f545b3a3d76e0dc59f8e61cf6c530cea6643b884a51cb3",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/reel/DeSv835xnPR/",
+        "fetched_at": "2026-11-07T02:00:40.332652+00:00",
+        "media_type": "VIDEO",
+        "external_id": "17909968023306444",
+        "text_sha256": "14f9e064e5da7f84c3f545b3a3d76e0dc59f8e61cf6c530cea6643b884a51cb3",
+        "published_at": "2026-10-10T00:02:40+0000",
+        "content_scope": "caption",
+        "profile_username": "solciceramica",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/reel/DdkYz1wTBNi/",
+        "text": "Este viernes se cierra septiembre con🔥LA GRAN BARATA LATINOS🔥\n\n👉🏼 Porque en la primera la rompimos pero esta se pica para que salgan los prohibidos 💃🏻🕺🏻\n\n🤤 Los amigos de amichi_pasta , byb.cateringyeventos y deportivo.milanga nos aseguran alto morfi\n😎 La barra como siempre a disposición \n❤️‍🔥 y todo, absolutamente todo, A PRECIO AMIGX!!!\n\nPara que la noche sea completa, la música no se negocia y esta vez hay ritmo latino ¿los DJ’s? para saberlo vas a tener que venir 💣⚡️🎶🎧\n\n¡Les esperamos a todxs! Precios amigos & Comida bien sabrosa 🌶️\n\n📅 Viernes 25.09 a partir de las 19 hs\n📍 Run Run | Diag. 74 #471 \n🆓 Entrada Libre & Gratuita\n\n💁🏼‍♀️ aien__malen \n💁🏻‍♂️ felixorozco.k",
+        "title": "Publicación de @runrun.bar",
+        "sha256": "8805ce6d7d822744bdcf11e75b27f323624bec1b6419ee51cf8f8b26a464bc41",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/reel/DdkYz1wTBNi/",
+        "fetched_at": "2026-11-07T01:59:40.113543+00:00",
+        "media_type": "VIDEO",
+        "external_id": "18113814623009718",
+        "text_sha256": "8805ce6d7d822744bdcf11e75b27f323624bec1b6419ee51cf8f8b26a464bc41",
+        "published_at": "2026-09-21T23:59:37+0000",
+        "content_scope": "caption",
+        "profile_username": "runrun.bar",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-09-25",
+          "time": "19:00"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/reel/DeZaqDMPm7j/",
+        "text": "🔊Llega a la sala uno de los actores mas reconocidos y talentosos de nuestro país con su multipremiado unipersonal muerde___ \n\n📅 1 de noviembre 19 hs\n🎭 sala 420 (42 num 571 LA PLATA)\n🎟 Alternativa teatral\n\nA René lo abandonaron en el taller familiar cuando tenía diez años. Desde ese momento: ¿Cuánto tiempo pasó?\nEso no lo puede saber.\nAhora está manchado de sangre y no entiende por qué. Intenta controlar sus pensamientos, pero las palabras aúllan, golpean y perforan, como un clavo a la madera o los dientes a la carne. Sangre. Aserrín. Ladridos. Sus pensamientos se desatan sin vuelta atrás.\nMuerde es un thriller en solitario, casi policial, en el que René intentará averiguar de dónde vienen sus heridas; mientras Rosa, y su pasado lo acechan en todo lo que calló.\n\nMuerde ganó el 2do premio de obras inéditas del Fondo Nacional de las Artes 2015\n\nPremio Estrella de Mar- Mejor Unipersonal- 2024\n\nPremio de Escuela de espectadores de Buenos Aires 2023 a Luciano Cáceres.\n\nFicha técnico artística\n\nDRAMATURGIA Y DIRECCION: flumerman\nACTUA: lucianocaceresok \nESCENOGRAFÍA: Agustin Garbelloto\nDISEÑO DE LUCES: Ricardo Sica\nDISEÑO DE SONIDO: Agustin Lumerman",
+        "title": "Publicación de @sala420_lp",
+        "sha256": "bddfc1ef5676c54eca317eacfb93c2c30007eb44215f54a5de6577cd51b9519e",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/reel/DeZaqDMPm7j/",
+        "fetched_at": "2026-11-07T01:59:42.043653+00:00",
+        "media_type": "VIDEO",
+        "external_id": "18231615763326323",
+        "text_sha256": "bddfc1ef5676c54eca317eacfb93c2c30007eb44215f54a5de6577cd51b9519e",
+        "published_at": "2026-10-12T14:16:58+0000",
+        "content_scope": "caption",
+        "profile_username": "sala420_lp",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-11-01",
+          "time": "19:00"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/Dd7kpcdmmVB/",
+        "text": "Se viene un planazo🩷💙\n\nEste Día de la Madre nos vamos de Pop-Up a moro.fincayfonda y no podemos estar más felicesss!\nCerámica, una merienda súper completa y una tarde para compartir, crear y disfrutar sin apuro🙌\n\nPara venir con mamá o para sorprenderla regalándole la experiencia 🎁\n\n📍Club Hípico y Golf City Bell\nSábado 17 de octubre · 17 hs\nCupos limitados — reservas por privado 💌",
+        "title": "Publicación de @solciceramica",
+        "sha256": "911eb779d403e7f69f79cad97135fe02435fba881566114f841eb42d8bd27fd7",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/Dd7kpcdmmVB/",
+        "fetched_at": "2026-11-07T02:00:40.332688+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "18112182811844647",
+        "text_sha256": "911eb779d403e7f69f79cad97135fe02435fba881566114f841eb42d8bd27fd7",
+        "published_at": "2026-10-01T00:00:01+0000",
+        "content_scope": "caption",
+        "profile_username": "solciceramica",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-10-17",
+          "time": "17:00"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DctOcxSDrKC/",
+        "text": "Desde la dirección artística de la feria, GRACIAS!!! Por esta inolvidable cuarta edición de PLATEADA, a lxs artistas, las galerías, colectivos, editoriales, proyectos, al publico que nos visitó y al equipo de producción que nos acompañó, especialmente a Tote que sin ella nada seria igual. Pasaron muchísimas cosas lindas, premiaciones, adquisiciones, recorridos, fiesta, y un compartir muy cálido y amoroso.\nEsta Plateada fue una celebración de arte!! Felicidad absoluta!\nHasta Pronto \nFede, Facu y Vir <3",
+        "title": "Publicación de @plateadaferia",
+        "sha256": "0a4db0b9b0a703de11dda6589a62e2126d316cf71942214771e4e068db0c6653",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DctOcxSDrKC/",
+        "fetched_at": "2026-11-07T01:58:24.351784+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "18208546126318205",
+        "text_sha256": "0a4db0b9b0a703de11dda6589a62e2126d316cf71942214771e4e068db0c6653",
+        "published_at": "2026-08-31T13:45:49+0000",
+        "content_scope": "caption",
+        "profile_username": "plateadaferia",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DTboiUXjmnx/",
+        "text": "No es solo bailar un Tango \nEs encontrarse con el otro , reirse, sentir...\nEs compartir con amigos una noche de milonga.\nEn fin, este martes venis y bailamos?\n\nPh: car.coriafotos ❤️",
+        "title": "Publicación de @milongagaggiotti",
+        "sha256": "66b819ef492678c3110c34ca310ac70e202d2def19c5bca1490a0f7e96f7767f",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DTboiUXjmnx/",
+        "fetched_at": "2026-11-07T01:32:29.967647+00:00",
+        "text_sha256": "66b819ef492678c3110c34ca310ac70e202d2def19c5bca1490a0f7e96f7767f",
+        "published_at": "2026-01-13T01:04:53+0000",
+        "content_scope": "caption",
+        "profile_username": "milongagaggiotti",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-01-13",
+          "time": null
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DfNK38AoODr/",
+        "text": "💀 HOY • 21HS 💀\n\n• _bazzito \n• tintamusica \n• microclimabanda \n\n🎫 ANTICIPADAS $2000 POR MD A LAS BANDAS 🎫",
+        "title": "Publicación de @puravidalaplata2008",
+        "sha256": "75f828d162a198e2584a1bfa4816c0cec6c1312343a9947597c7d76bcb9f039b",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DfNK38AoODr/",
+        "fetched_at": "2026-11-07T01:59:36.955058+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "18111256028239234",
+        "text_sha256": "75f828d162a198e2584a1bfa4816c0cec6c1312343a9947597c7d76bcb9f039b",
+        "published_at": "2026-11-01T16:33:03+0000",
+        "content_scope": "caption",
+        "profile_username": "puravidalaplata2008",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-11-01",
+          "time": "21:00"
+        }
+      ]
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DeP3psFiVaw/",
+        "text": "🖼️ JUAN BATLLE PLANAS / A 60 años de su partida\n\nHoy se cumplen seis décadas del fallecimiento de Juan Batlle Planas (1911–1966), una de las figuras fundamentales del surrealismo en Argentina.\n\nPintor, grabador, dibujante, muralista e ilustrador, Batlle Planas desarrolló una obra atravesada por el automatismo, el mundo onírico, el psicoanálisis y la exploración de la psicología de las formas visuales.\n\nEn 2015 el Museo presentó “Visiones ensambladas. Reencuadres a la obra de Batlle Planas” en el marco del Programa de Pasantías en Investigación y Producción de Exposiciones (PIPE), coordinado por el ihaaa_fda (IHAAA) y arteyc_fda.\n\nHoy, a 60 años de su muerte, volvemos sobre su obra y su memoria. Actualmente trabajamos en una nueva exposición dedicada al inagotable legado de Batlle Planas y a su lugar en la historia del arte argentino.\n\n🔎 Recorré el carrusel para descubrir “Composición”, una témpera sobre cartón de Juan Batlle Planas perteneciente a la Colección de Arte del museobancoprovincia.\n\n#JuanBatllePlanas #ArteArgentino #Surrealismo #MuseoPettoruti #HistoriaDelArte\n\nprovinciaba buenosairescultura kicillofok fsaintout victoriaonetto fruvituso batlleplanas.artista",
+        "title": "Publicación de @museopettoruti",
+        "sha256": "98b142224b5433c5833259d649c64eea446f98790a7e18d2f57a7ca32c1ad39a",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DeP3psFiVaw/",
+        "fetched_at": "2026-11-07T01:58:17.545618+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "17949280494299776",
+        "text_sha256": "98b142224b5433c5833259d649c64eea446f98790a7e18d2f57a7ca32c1ad39a",
+        "published_at": "2026-10-08T21:11:25+0000",
+        "content_scope": "caption",
+        "profile_username": "museopettoruti",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DexCg1jmTas/",
+        "text": "¡El Argentino te espera! 🤩✨\n\n📅 Agendá tu próximo programa para visitarnos esta semana. 😉\n\n👉Toda la información sobre estos espectáculos en nuestra web: teatroargentino.gba.gob.ar (link en bio).\n\n#TeatroArgentino #conciertos #música #piano #sinfónico\nprovinciaba kicillofok fsaintout buenosairescultura victoriaonetto",
+        "title": "Publicación de @teatroargentinopba",
+        "sha256": "a1354836f1c9841274bba99a8738b234789d81a52db7e4f74f85f1b7c38f1c1c",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DexCg1jmTas/",
+        "fetched_at": "2026-11-07T01:58:16.000774+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "18105428786196471",
+        "text_sha256": "a1354836f1c9841274bba99a8738b234789d81a52db7e4f74f85f1b7c38f1c1c",
+        "published_at": "2026-10-21T18:21:16+0000",
+        "content_scope": "caption",
+        "profile_username": "teatroargentinopba",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/reel/DZQZa89zNkr/",
+        "text": "Y vos, ¿Qué cosas del taller de cerámica no querés que pasen de moda? \n\nTe leo en comentarios, Juli😘",
+        "title": "Publicación de @mandaladearena",
+        "sha256": "04a90ac8e1295d4bf435d123ebcb84192c4f0c5c335ba38e6f234cc169253477",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/reel/DZQZa89zNkr/",
+        "fetched_at": "2026-11-07T01:32:29.489154+00:00",
+        "text_sha256": "04a90ac8e1295d4bf435d123ebcb84192c4f0c5c335ba38e6f234cc169253477",
+        "published_at": "2026-06-06T19:35:08+0000",
+        "content_scope": "caption",
+        "profile_username": "mandaladearena",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/reel/Dem1QrlNrry/",
+        "text": "🏀💙 La Plata recibió al clubderegataslima de Perú, en una experiencia que combinó deporte, cultura y turismo.\n\nDel 9 al 13 de octubre, 20 deportistas de las categorías femeninas U15 y U17 llegaron a nuestra ciudad junto a sus familias para participar de experiencias deportivas frente a sus similares de clubbancoprovincialaplata, clubjuventudlp y con gimnasiabasquet en el imponente Polideportivo Víctor Nethol de gimnasia_oficial\n.\n\nAdemás de la competencia, la delegación recorrió algunos de los lugares más emblemáticos de la ciudad, como el Museo de Ciencias Naturales y la Catedral, y tuvo la oportunidad de alentar a Gimnasia en el partido frente a Atlético Tucumán.\n\nEn total, 40 personas entre deportistas y acompañantes disfrutaron de una estadía que unió el intercambio deportivo con el descubrimiento de los atractivos platenses.\n\n✨ La Plata, un destino para encontrarse, compartir y vivir nuevas experiencias a través del deporte y la cultura.\n\nlaplata.capital julio_alak  pichicerisolalp",
+        "title": "Publicación de @turismo.laplata",
+        "sha256": "e65a7408d93743cf19e2f89ee9ec7c9e4a03837f18c6768e3b646bbb73939322",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/reel/Dem1QrlNrry/",
+        "fetched_at": "2026-11-07T02:00:46.231809+00:00",
+        "media_type": "VIDEO",
+        "external_id": "18133557544707682",
+        "text_sha256": "e65a7408d93743cf19e2f89ee9ec7c9e4a03837f18c6768e3b646bbb73939322",
+        "published_at": "2026-10-17T19:15:08+0000",
+        "content_scope": "caption",
+        "profile_username": "turismo.laplata",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": []
+    },
+    {
+      "document": {
+        "url": "https://www.instagram.com/p/DedD9_PjRrD/",
+        "text": "✶ Viernes 16.10 ✶ 00 h\n\nEl Ciclo Ardiente 🔥 tu perreito de confianza\ndjurielgm + BAILAN fortezaisabella + juanseeornat + ampibressa ‼️\n\nHay lista 🆓 hasta las 2 am❗️para Ixs que: den like ❤️ y comentan etiquetando a sus amigxs 🗯️\n\n🎫Después entrada $6000\n\n👆 todesdefiesta \n\n ✧ 𝓖𝓊𝒶𝒿𝒾𝓇𝒶 ✧ 49 e/ 4 y 5",
+        "title": "Publicación de @guajira.bar",
+        "sha256": "b681658970143173fddbc05c8e45f770f2ed2287cd44015b02943ed87e1eff7d",
+        "source": "Instagram",
+        "final_url": "https://www.instagram.com/p/DedD9_PjRrD/",
+        "fetched_at": "2026-11-07T01:58:14.067969+00:00",
+        "media_type": "CAROUSEL_ALBUM",
+        "external_id": "18113968691269748",
+        "text_sha256": "b681658970143173fddbc05c8e45f770f2ed2287cd44015b02943ed87e1eff7d",
+        "published_at": "2026-10-14T00:09:10+0000",
+        "content_scope": "caption",
+        "profile_username": "guajira.bar",
+        "acquisition_method": "official_meta_api"
+      },
+      "expected_occurrences": [
+        {
+          "date": "2026-10-16",
+          "time": null
+        }
+      ]
+    }
+  ]
+}

@@ -21,7 +21,7 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True):
     for raw in rotating_accounts:
         username=raw.strip().lower() if isinstance(raw,str) else ""
         if (re.fullmatch(r"[a-z0-9_.]{1,30}",username) and
-                username not in ACCOUNTS and username not in rotating):
+                (not include_controls or username not in ACCOUNTS) and username not in rotating):
             rotating.append(username)
         if len(rotating)>=10: break
     accounts=(list(ACCOUNTS) if include_controls else [])+rotating
@@ -68,6 +68,7 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True):
                "content_scope":"caption","profile_username":username,
                "published_at":post.get("timestamp"),"external_id":post.get("id"),"media_type":post.get("media_type")}
             collector.docs[url]=d
+            if getattr(collector,"checkpoint",None):collector.checkpoint(d)
             report["new_documents"] += int(url not in known_urls)
             summary["new_documents"] += int(url not in known_urls)
             if CULTURAL.search(norm(caption)):

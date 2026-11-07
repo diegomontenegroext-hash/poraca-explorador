@@ -64,6 +64,7 @@ class Collector:
     def __init__(self,out,previous=None):
         self.out=Path(out);self.out.mkdir(parents=True,exist_ok=True)
         self.docs={};self.proposals={};self.checks=[];self.robots={};self.policy_errors={}
+        self.checkpoint=None
         self.previous=previous or {};self.previous_docs={d['url']:d for d in self.previous.get('documents',[])}
         self.run_id='radar2-'+datetime.now(ZoneInfo('UTC')).strftime('%Y%m%dT%H%M%SZ')
         self.code_sha256=sha(Path(__file__).read_text())
@@ -107,6 +108,7 @@ class Collector:
                 self.docs[url]=d;check.update(status=r.status,sha256=h)
         except Exception as e:
             check.update(error=type(e).__name__+': '+str(e)[:180]);d=None
+        if d and self.checkpoint:self.checkpoint(d)
         self.checks.append(check);time.sleep(.25);return d
     def add(self,d,title,day=None,hour=None,venue=None,category=None,state='investigable',evidence='',origin_account=None,source_id=None):
         if not title:return

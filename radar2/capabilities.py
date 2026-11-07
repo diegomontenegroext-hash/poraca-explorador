@@ -221,6 +221,7 @@ def discover_links(c,conn,known_urls,limit=12,refresh_candidates=False):
             url=normalized_url(urljoin(doc['final_url'],n.a['href']));p=urlsplit(url)
             label=compact(n.text() or n.a.get('aria-label') or n.a.get('title') or ' '.join(x.a.get('alt','') for x in n.walk()))[:240]
             if url in seen or not cultural_link(url,label):continue
+            if url not in frontier and (len(frontier)>=1500 or len(candidates)>=60):continue
             if p.scheme!='https' or p.username or p.password:continue
             foreign=p.hostname!=urlsplit(doc['url']).hostname
             score=5*int(p.hostname not in known_hosts)+2*int(foreign)+2*int(bool(LOCAL.search(norm(doc['text'][:10000]))))+int(bool(re.search(r'event|obra|program|cartel|ticket|festival',p.path,re.I)))
@@ -269,7 +270,8 @@ def discover_links(c,conn,known_urls,limit=12,refresh_candidates=False):
         else:
             last=next((x for x in reversed(c.checks) if x.get('url')==item['url']),{})
             item.update(status='inaccessible',error=last.get('error','FETCH_FAILED'),monitoring_certified=False)
-        item['next_check_at']=(datetime.now(timezone.utc)+timedelta(hours=24 if item['status']=='productive_observed' else 96)).isoformat()
+        item['quiet_streak']=0 if item.get('event_proposals',0)>0 else item.get('quiet_streak',0)+1
+        item['next_check_at']=(datetime.now(timezone.utc)+timedelta(hours=24 if item['status']=='productive_observed' else min(336,96+24*item['quiet_streak']))).isoformat()
         checked.append(dict(item))
     # Persist the evaluated frontier even when all sources are inaccessible.
     save_state(conn,SOURCE_STATE,state)
@@ -297,7 +299,7 @@ def enrich_graph(result,baseline):
         accepted=[]
         for e in p['entities']:
             name=compact(e.get('name',''));role=e.get('role');evidence=e.get('evidence') or p.get('evidence','')
-            if not name or len(name)<2 or len(name)>160 or role not in ('venue','organizer','performer','director'):continue
+            if not name or len(name)<2 or len(name)>160 or role not in ('venue','organizer','performer','director','cycle','collective'):continue
             # Only explicit parser evidence can create nodes and role edges.
             if norm(name) not in norm(evidence):continue
             proof_url=e.get('evidence_url') or p['document_url']
@@ -306,7 +308,7 @@ def enrich_graph(result,baseline):
             n=nodes.setdefault(nid,{'node_id':nid,'name':name,'role':role,'new_to_radar_evidence':(role,identity(role,name)) not in known,'evidence':[]})
             n['evidence'].append({'proposal_id':p['id'],'url':proof_url,'excerpt':compact(evidence)[:1000]})
             if p.get('kind') not in ('event','program') or not p.get('date'):continue
-            predicate={'venue':'takes_place_at','organizer':'organized_by','performer':'features','director':'directed_by'}[role]
+            predicate={'venue':'takes_place_at','organizer':'organized_by','performer':'features','director':'directed_by','cycle':'part_of_cycle','collective':'organized_by'}[role]
             edge={'subject':event_id,'predicate':predicate,'object':nid,'proposal_id':p['id'],'evidence_url':proof_url,'excerpt':compact(evidence)[:1000],'status':'observed_pending_editorial_review'}
             e['event_relationship']=edge;p['relationships'].append(edge);edges[sha(event_id+predicate+nid)]=edge
         p['entities']=list({(e['node_id'],e['role']):e for e in accepted}.values())

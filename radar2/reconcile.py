@@ -17,7 +17,9 @@ def title_name(t,v):
  s=re.sub(r'\s+en la plata$','',s)
  return s.strip()
 def reconcile(result,baseline):
- baseline=[p for p in baseline if not ((json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}).get('duplicate_of'))]
+ baseline=[p for p in baseline if not ((json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}).get('duplicate_of') or (json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}).get('interpretation_superseded_by'))]
+ refreshed={p['document_url'] for p in result['proposals'] if p.get('parser_version')}
+ baseline=[p for p in baseline if not (p.get('document_url') in refreshed and (json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}).get('parser_version') not in {q.get('parser_version') for q in result['proposals'] if q['document_url']==p['document_url']})]
  old=[dict(p,date=(p.get('event_date') or '')[:10] or None,time=p.get('event_time'),id=p.get('proposal_id'),kind='event' if p.get('event_date') else 'document') for p in baseline]
  def priority(p):return (0 if p.get('source')=='www.passline.com' else 1,p.get('document_url',''),p['id'])
  known=list(old);decisions=[]
@@ -28,6 +30,7 @@ def reconcile(result,baseline):
   matched=None
   for q in known:
    if p['id']==q['id']:continue
+   if not p.get('time') or not q.get('time'):continue
    if p['date']!=q.get('date') or p.get('time')!=q.get('time'):continue
    a=venue_name(p.get('venue'));b=venue_name(q.get('venue'))
    if not a or not b or not(a==b or a.startswith(b) or b.startswith(a)):continue
