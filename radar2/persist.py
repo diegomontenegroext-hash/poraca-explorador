@@ -39,7 +39,27 @@ r AS (
  SELECT x->>'id',x->>'document_url',x->>'title',NULLIF(x->>'date','')::date,x->>'time',x->>'venue',x->>'category',x->>'state',r.run_id,x
  FROM input CROSS JOIN r CROSS JOIN LATERAL jsonb_array_elements(j->'proposals') x
  JOIN d ON d.url=x->>'document_url'
- ON CONFLICT(proposal_id) DO UPDATE SET title=excluded.title,event_date=excluded.event_date,event_time=excluded.event_time,venue=excluded.venue,category=excluded.category,review_state=excluded.review_state,last_seen_at=now(),last_run_id=excluded.last_run_id,evidence=excluded.evidence || CASE WHEN radar2.proposals.evidence->>'known_before_intervention'='true' THEN jsonb_build_object('known_before_intervention',true,'previous_evidence_url',radar2.proposals.evidence->'previous_evidence_url') ELSE '{}'::jsonb END
+ ON CONFLICT(proposal_id) DO UPDATE SET
+ title=excluded.title,event_date=excluded.event_date,event_time=excluded.event_time,venue=excluded.venue,
+ category=CASE
+  WHEN radar2.proposals.evidence->'category_revision'->>'corrected'=radar2.proposals.category
+   AND radar2.proposals.evidence->>'parser_version'=excluded.evidence->>'parser_version'
+  THEN radar2.proposals.category
+  ELSE excluded.category END,
+ review_state=CASE
+  WHEN radar2.proposals.review_state='historico'
+   AND radar2.proposals.evidence ? 'editorial_exclusion'
+  THEN 'historico' ELSE excluded.review_state END,
+ last_seen_at=now(),last_run_id=excluded.last_run_id,
+ evidence=excluded.evidence
+  || CASE WHEN radar2.proposals.evidence->>'known_before_intervention'='true'
+     THEN jsonb_build_object('known_before_intervention',true,
+       'previous_evidence_url',radar2.proposals.evidence->'previous_evidence_url')
+     ELSE '{}'::jsonb END
+  || COALESCE((SELECT jsonb_object_agg(k,v)
+    FROM jsonb_each(radar2.proposals.evidence) AS preserved(k,v)
+    WHERE k IN ('category_revision','territory_revision','editorial_exclusion','exclusion_run_id')
+      AND NOT (excluded.evidence ? k)), '{}'::jsonb)
  RETURNING proposal_id
 ) SELECT (SELECT count(*) FROM d) AS documents_written,(SELECT count(*) FROM p) AS proposals_written
 """
