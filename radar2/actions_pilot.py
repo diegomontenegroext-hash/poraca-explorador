@@ -134,7 +134,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
             f.write('## Radar 2: '+run_id+'\n\n')
             f.write('Neon readback: '+json.dumps(read)+'. New unique proposals: '+str(metrics['new_visible_unique'])+'; dated: '+str(metrics['new_unique_dated_proposals'])+'.\n\n')
             f.write('Instagram: '+str(ig['accounts_attempted'])+' policy/access attempts, '+str(ig['profiles_accessible'])+' accessible profiles, '+str(ig['posts_recovered'])+' actual posts. Rotation: '+rotation_status['status']+'.\n\n')
-            f.write('Instagram piloto Meta (4 cuentas): '+str(official_pilot.get('status'))+', nuevos documentos '+str(official_pilot.get('new_documents',0))+'.\n\n')
+            f.write('Instagram Meta oficial (4 controles + hasta 10 cuentas rotativas): '+str(official_pilot.get('status'))+', consultas '+str(official_pilot.get('queries_sent',0))+', documentos nuevos '+str(official_pilot.get('new_documents',0))+'.\n\n')
             f.write('New source domains observed: '+', '.join(source_report.get('new_domains_observed',[]))+'. Graph: '+json.dumps(graph_report)+'.\n\n')
             f.write('No editorial promotion. API HTTP verification is a separate authenticated check.\n\n')
     return report

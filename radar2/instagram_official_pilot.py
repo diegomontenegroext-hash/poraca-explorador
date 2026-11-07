@@ -1,7 +1,7 @@
-"""Four-account daily Instagram pilot using Meta Business Discovery only.
+"""Bounded Meta Business Discovery: four stable controls plus ten rotating accounts.
 
-Runs inside the existing Radar 2 schedule (05:27 ART). With no real Meta
-credentials the pilot is explicitly NOT_CONFIGURED and performs zero requests.
+Runs inside the existing Radar 2 schedule (05:27 ART). Without valid Meta
+credentials the pilot is NOT_CONFIGURED and performs zero requests.
 No HTML profile collection, browser automation, bypass, or new scheduler.
 """
 import os

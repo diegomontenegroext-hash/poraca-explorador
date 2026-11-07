@@ -1,6 +1,6 @@
-# Radar 2 — estado vigente al 05/11/2026 ART
+# Radar 2 — estado operativo al 06/11/2026 ART
 
-**GO PARCIAL.** Ejecuta adquisición, exploración por enlaces, rotación persistente y memoria cultural en el workflow existente de GitHub. Instagram no aportó publicaciones. La primera ejecución natural del cron actualizado aún no fue observada.
+**GO OPERATIVO PARCIAL.** Adquisición de agendas, exploración de enlaces, rotación persistente, memoria cultural y Meta Business Discovery están ejecutándose en el workflow existente de GitHub. La primera consulta oficial exitosa (4 cuentas, 48 documentos) fue ampliada mediante rotación real a 14 cuentas consultadas, 118 documentos nuevos y 64 candidatos culturales adicionales: GitHub run #42324533672, SUCCESS; Neon readback confirmado. La deduplicación SQL preserva actualmente las 100 propuestas oficiales (en estado investigable). La corrida cron del 06/11 ocurrió antes de conectar Meta; la continuidad automática de varios días con Instagram aún no está certificada. No equivale a 100 eventos aprobados.
 
 Acta verificable: [cierre de misión](../docs/RADAR2_FINAL_20261105.md). Evidencia estructurada: [certificación](evidence/final-certification-20261105.json). Los informes anteriores describen cortes históricos; la dependencia operativa de herramientas de Work fue sustituida por Python estándar dentro de GitHub.
 
@@ -32,7 +32,7 @@ No hubo migración ni nuevos grants. Se reutilizan `runs`, `documents`, `proposa
 
 `review_count` conserva la revisión por buscador exitosa; `attempt_count` gobierna la rotación justa incluso ante bloqueos. `last_successful_post_at` solo se actualiza al obtener publicaciones. Se conserva el motivo y la huella de robots por cuenta. No se solicitan páginas de perfiles cuando existe restricción explícita ni se usan proxies, CAPTCHA o autenticación privada.
 
-Las credenciales Meta faltan: no se ejecutó Business Discovery real ni se acreditó elegibilidad de las 123 cuentas. `META_IG_USER_ID`, `META_ACCESS_TOKEN` y `META_GRAPH_VERSION` siguen siendo requisitos del adaptador oficial, no servicios contratados o permisos ampliados por esta intervención.
+Al cierre histórico del 05/11 faltaban las credenciales Meta; fueron cargadas y probadas el 06/11. De las 123 cuentas del padrón se han probado 10 por el método oficial rotativo, todas con publicaciones, además de los cuatro controles fijos. La elegibilidad de las cuentas restantes aún no está acreditada. `META_IG_USER_ID`, `META_ACCESS_TOKEN` y `META_GRAPH_VERSION` siguen siendo requisitos del adaptador oficial, no servicios contratados o permisos ampliados por esta intervención.
 
 Los documentos irrelevantes se archivan con `review_state=historico`, `kind=rejected_document` y razón explícita; esto usa el estado de archivo existente y no afirma que sean eventos pasados. Los precursores sin interpretar usan `kind=superseded_document`. Nada se borra.
 
