@@ -20,11 +20,14 @@ def initial(roster):
     if len(accounts)!=123 or any(not re.fullmatch(r'[a-z0-9_.]{1,30}',u) for u in accounts):raise ValueError('ROSTER_123_FENCE')
     return {'type':'instagram_rotation_control','status':'control_state','version':0,'accounts':accounts,'batches':{}}
 
-def select(state,at,limit=10):
+def eligible_accounts(state,at):
     eligible=[a for a in state['accounts'].values() if (not a.get('next_review_at') or a['next_review_at']<=timestamp(at))
         and (not a.get('lease_until') or a['lease_until']<=timestamp(at))]
     # Fairness first: all accounts in a sweep, cultural priority within a sweep.
-    return sorted(eligible,key=lambda a:(a.get('attempt_count',a['review_count']),a['priority'],a.get('last_review_at') or '',a['username']))[:max(0,min(limit,10))]
+    return sorted(eligible,key=lambda a:(a.get('official_attempt_count',0),a.get('attempt_count',a['review_count']),a['priority'],a.get('last_review_at') or '',a['username']))
+
+def select(state,at,limit=10):
+    return eligible_accounts(state,at)[:max(0,min(limit,10))]
 
 def read(conn):
     rows=execute(conn,'SELECT summary FROM radar2.runs WHERE run_id=$1',[STATE_ID])['rows']
@@ -48,9 +51,10 @@ def claim(conn,run_id,limit=10):
             owned=[state['accounts'][u] for u in batch['usernames'] if state['accounts'][u].get('lease_run_id')==run_id
                    and (state['accounts'][u].get('lease_until') or '')>timestamp(at)]
             return dict(run_id=run_id,accounts=owned if batch['status']!='completed' else [],batch=batch,replayed=True)
-        selected=select(state,at,limit)
-        for a in selected:a.update(lease_run_id=run_id,lease_until=timestamp(at+timedelta(hours=2)),last_attempt_at=timestamp(at))
-        batch={'usernames':[a['username'] for a in selected],'claimed_at':timestamp(at),'status':'claimed'}
+        eligible=eligible_accounts(state,at)
+        selected=eligible[:max(0,min(limit,10))]
+        for a in selected:a.update(lease_run_id=run_id,lease_until=timestamp(at+timedelta(hours=2)))
+        batch={'eligible_at_claim':len(eligible),'usernames':[a['username'] for a in selected],'claimed_at':timestamp(at),'status':'claimed'}
         state['batches'][run_id]=batch
         # Keep resumable audit for recent runs; finished attempts are also in their run summaries.
         if len(state['batches'])>60:
@@ -71,12 +75,18 @@ def complete(conn,run_id,manifest):
         for u in batch['usernames']:
             a=state['accounts'][u]
             if a.get('lease_run_id')!=run_id:continue # expired/reclaimed lease cannot be finalized by an old worker
+            official=next((item for item in manifest.get('official_results',[]) if item.get('username')==u),None)
+            if 'official_results' in manifest and official is None and not (manifest.get('searches') or manifest.get('instagram_attempts')):
+                a.update(lease_until=None,lease_run_id=None)
+                results.append(dict(username=u,run_id=run_id,result='not_queried',next_review_at=a.get('next_review_at')))
+                continue
+            a['last_attempt_at']=(official or {}).get('checked_at') or batch['claimed_at']
             searches=[s for s in manifest.get('searches',[]) if u in s['query'].get('accounts',[])]
             docs=[d for d in manifest.get('documents',[]) if any(u in s.get('accounts',[]) for s in d['searches'])]
             success=any(not s.get('error') for s in searches)
             ig_docs=[d for d in docs if d.get('acquisition_method')=='public_search_index']
             index_searches=[s for s in searches if s['query']['id'].startswith('ig-public-index-')]
-            index_status=('search_failed' if not index_searches or all(s.get('error') for s in index_searches)
+            index_status=('not_queried' if not index_searches else 'search_failed' if all(s.get('error') for s in index_searches)
                           else 'instagram_results' if ig_docs else 'no_instagram_results')
             status=('instagram_indexed' if ig_docs else 'web_references_only' if docs else 'no_indexed_results') if success else 'search_failed'
             delay=24 if docs and a['priority']==1 else 72 if docs else 96 if success else 8
@@ -100,28 +110,32 @@ def complete(conn,run_id,manifest):
                     a['last_successful_post_at']=attempt['checked_at']
                 a['next_review_at']=timestamp(at+timedelta(hours=24 if attempt['posts_recovered'] else 96))
             # Persist official results distinctly from public index/access checks.
-            official=next((x for x in manifest.get('official_results',[]) if x.get('username')==u),None)
             if official:
                 safe={'status':official['status'],'items_returned':official.get('items_returned',0),
                       'new_documents':official.get('new_documents',0),
                       'new_candidates':official.get('new_candidates',0),
                       'latest_publication_at':official.get('latest_publication_at'),
                       'http_status':official.get('http_status'),
-                      'meta_error_code':official.get('meta_error_code')}
-                a['official_last_result']=dict(safe,checked_at=timestamp(at),run_id=run_id)
+                      'meta_error_code':official.get('meta_error_code'),
+                      'meta_error_subcode':official.get('meta_error_subcode'),
+                      'operational_status':official.get('operational_status')}
+                a['official_last_result']=dict(safe,checked_at=official.get('checked_at') or timestamp(at),run_id=run_id)
                 a['official_attempt_count']=a.get('official_attempt_count',0)+1
                 a['last_result']['official']=safe
                 if official['status'] in ('MEDIA_RETURNED','NO_MEDIA_RETURNED'):
                     a['last_review_at']=timestamp(at)
                     a['review_count']+=int(not success)
                 a['official_eligibility']='eligible_observed' if official['status'] in ('MEDIA_RETURNED','NO_MEDIA_RETURNED') else 'restricted_or_unknown'
+                if official['status'] not in ('MEDIA_RETURNED','NO_MEDIA_RETURNED'):
+                    a['result']='official_query_failed'
                 previous=a.get('productive_observations',0)
                 a['productive_observations']=previous+int(official.get('new_candidates',0)>0)
-                a['quiet_streak']=0 if official.get('new_documents',0)>0 else a.get('quiet_streak',0)+1
-                if official['status']=='MEDIA_RETURNED':
+                if official['status'] in ('MEDIA_RETURNED','NO_MEDIA_RETURNED'):
+                    a['quiet_streak']=0 if official.get('new_documents',0)>0 else a.get('quiet_streak',0)+1
                     a['official_success_count']=a.get('official_success_count',0)+1
-                    a['last_successful_post_at']=timestamp(at)
-                    a['result']='official_posts_recovered'
+                    if official['status']=='MEDIA_RETURNED':
+                        a['last_successful_post_at']=a['official_last_result']['checked_at']
+                    a['result']='official_posts_recovered' if official.get('new_documents') else 'official_queried_no_new'
                     a['next_review_at']=timestamp(at+timedelta(hours=min(72,24 if a['priority']==1 else 48+8*min(a['quiet_streak'],3))))
                 elif official.get('meta_error_code')==110:
                     a['next_review_at']=timestamp(at+timedelta(days=14))

@@ -19,9 +19,19 @@ def discover(username):
     fields='business_discovery.username('+username+'){username,media.limit(12){id,caption,permalink,timestamp,media_type}}'
     url=f'https://graph.facebook.com/{version}/{own}?'+urlencode({'fields':fields})
     try:
-        with urlopen(Request(url,headers={'Authorization':'Bearer '+token}),timeout=20) as r:data=json.load(r)
-        bd=data.get('business_discovery',{});media=bd.get('media',{})
-        return {'username':username,'checked_at':utc(),'status':'MEDIA_RETURNED' if media.get('data') else 'NO_MEDIA_RETURNED','posts':media.get('data',[]),'has_more':bool(media.get('paging',{}).get('next') or media.get('paging',{}).get('cursors',{}).get('after')),'limit':12,'stories':'THIRD_PARTY_STORIES_NOT_SUPPORTED'}
+        with urlopen(Request(url,headers={'Authorization':'Bearer '+token}),timeout=20) as response:
+            http_status = response.status
+            data = json.load(response)
+        discovery = data.get('business_discovery') if isinstance(data, dict) else None
+        media = discovery.get('media') if isinstance(discovery, dict) else None
+        posts = media.get('data') if isinstance(media, dict) else None
+        receipt = {'username': username, 'checked_at': utc(), 'http_status': http_status}
+        if not isinstance(posts, list) or any(not isinstance(post, dict) for post in posts):
+            return dict(receipt, status='OFFICIAL_API_ERROR', error_type='InvalidMediaResponse', posts=[])
+        paging = media.get('paging') or {}
+        return dict(receipt, status='MEDIA_RETURNED' if posts else 'NO_MEDIA_RETURNED',
+                    posts=posts, has_more=bool(paging.get('next') or (paging.get('cursors') or {}).get('after')),
+                    limit=12, stories='THIRD_PARTY_STORIES_NOT_SUPPORTED')
     except HTTPError as e:
         # Only structured status/codes reach logs and Neon; never persist raw Meta error text.
         try:

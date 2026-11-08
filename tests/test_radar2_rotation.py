@@ -2,7 +2,8 @@ import copy,json,sys,tempfile,unittest
 from pathlib import Path
 from datetime import datetime,timedelta,timezone
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'radar2'))
-from rotation import initial,select
+from rotation import initial,select,claim,complete
+from unittest.mock import patch
 from collector import Collector
 class Rotation(unittest.TestCase):
  def setUp(self):
@@ -18,6 +19,22 @@ class Rotation(unittest.TestCase):
   self.assertFalse({a['username'] for a in first}&{a['username'] for a in select(self.state,self.at)})
   for a in self.state['accounts'].values():a['next_review_at']=(self.at+timedelta(days=1)).isoformat()
   self.assertEqual(select(self.state,self.at),[])
+ def test_due_count_and_unattempted_after_partial_batch(self):
+  with patch('rotation.read',return_value=self.state), patch('rotation.cas',return_value=True), patch('rotation.execute',return_value={'rows':[{}]}):
+   batch=claim(None,'run',2)
+   self.assertEqual(batch['batch']['eligible_at_claim'],123)
+   first,second=batch['accounts']
+   receipt={'username':first['username'],'checked_at':self.at.isoformat(),'status':'NO_MEDIA_RETURNED','http_status':200}
+   complete(None,'run',{'official_results':[receipt]})
+   self.assertEqual(first['result'],'official_queried_no_new')
+   self.assertEqual(first['official_success_count'],1)
+   self.assertEqual(first['official_last_result']['checked_at'],receipt['checked_at'])
+   self.assertIsNone(second['next_review_at'])
+   self.assertIsNone(second['lease_until'])
+   self.assertNotIn('official_attempt_count',second)
+   self.assertIn(second,select(self.state,self.at))
+   complete(None,'run',{'official_results':[receipt]})
+   self.assertEqual(first['official_success_count'],1)
  def test_index_excerpt_never_fetches_or_asserts_date(self):
   with tempfile.TemporaryDirectory() as out:
    c=Collector(out)

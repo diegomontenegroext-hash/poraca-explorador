@@ -68,8 +68,22 @@ class OfficialInstagramPilot(unittest.TestCase):
         self.assertEqual(report["status"],"PARTIAL_OFFICIAL_API_ERRORS")
         self.assertEqual(report["accounts_successful"],3)
         self.assertEqual(report["accounts_failed"],1)
+        self.assertEqual([r["operational_status"] for r in report["results"]],
+                         ["QUERIED_NO_NEW","QUERY_FAILED","QUERIED_NO_NEW","QUERIED_NO_NEW"])
         self.assertEqual(report["queries_sent"],4)
         self.assertEqual(report["last_successful_query_at"],"2026-11-08T14:00:00Z")
+
+    def test_http_receipt_distinguishes_empty_media_from_missing_media(self):
+        from instagram import discover
+        creds = {"META_IG_USER_ID":"id","META_ACCESS_TOKEN":"dummy","META_GRAPH_VERSION":"v27.0"}
+        for body, status in [({"business_discovery":{"media":{"data":[]}}}, "NO_MEDIA_RETURNED"),
+                             ({}, "OFFICIAL_API_ERROR"), ({"business_discovery":{"media":{"data":[None]}}}, "OFFICIAL_API_ERROR")]:
+            with self.subTest(body=body):
+                response = io.BytesIO(json.dumps(body).encode())
+                response.status = 200
+                with patch.dict(os.environ,creds), patch("instagram.urlopen",return_value=response):
+                    result = discover("example")
+                self.assertEqual((result["http_status"],result["status"]), (200,status))
 
     def test_meta_http_error_records_only_safe_codes(self):
         from instagram import discover

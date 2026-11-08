@@ -31,7 +31,7 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,ex
         if isinstance(u,str) and re.fullmatch(r'[a-z0-9_.]{1,30}',u) and u not in accounts:extra.append(u);accounts.append(u)
         if len(extra)>=1:break
     report={"extra_curators":extra,"kind":"instagram_official_rotating_pilot",
-              "accounts":accounts,"controls":list(ACCOUNTS),
+              "accounts":accounts,"controls":list(ACCOUNTS) if include_controls else [],
               "rotating_accounts":rotating,"method":"meta_business_discovery",
               "enabled": False, "queries_sent": 0,
               "accounts_eligible": len(accounts), "accounts_successful": 0,
@@ -95,6 +95,9 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,ex
                         related_accounts=[])
                     summary["new_candidates"] += 1
                     report["new_cultural_candidates"] += 1
+        summary["operational_status"] = "QUERY_FAILED"
+        if summary["status"] in ("MEDIA_RETURNED", "NO_MEDIA_RETURNED"):
+            summary["operational_status"] = "POSTS_ACQUIRED" if summary["new_documents"] else "QUERIED_NO_NEW"
         report["results"].append(summary)
         if (summary["meta_error_code"] in (4, 17, 32, 613, 80002, 190)
                 or summary["http_status"] == 429):

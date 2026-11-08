@@ -128,20 +128,21 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     except Exception as e:
         manifest={'searches':[],'documents':[],'instagram_attempts':[]}
         rotation_status={'status':'not_repeated_in_corrective' if corrective else 'phase_failed','error':type(e).__name__+': '+str(e)[:160]}
-    extra_curators=[]
     if not corrective:
         try:
-            from source_cadence import curator_due
-            if not full:extra_curators=curator_due(conn,[a['username'] for a in batch.get('accounts',[])])
-            if credential_health().get('credential_usable') is False:raise RuntimeError('META_CREDENTIAL_INVALID_ACQUISITION_HALTED')
-            official_pilot=official_ig_pilot(c,known_urls,
-                [a['username'] for a in batch.get('accounts',[])],include_controls=full,extra_curators=extra_curators)
+            if credential_health().get('credential_usable') is False:
+                official_pilot={'status':'META_AUTH_ERROR','queries_sent':0}
+            else:
+                official_pilot=official_ig_pilot(c,known_urls,
+                    [a['username'] for a in batch['accounts']],include_controls=False)
         except Exception as e:
             official_pilot={'status':'FAILED','error_type':type(e).__name__}
         # Report independent rotation errors instead of silently saying there were no posts.
-        official_pilot['rotation_accounts_due']=len(batch.get('accounts',[]))
+        official_pilot['rotation_accounts_selected']=len(batch['accounts'])
+        official_pilot['rotation_accounts_due']=batch.get('batch',{}).get('eligible_at_claim')
         official_pilot['rotation_state']=rotation_status['status']
         if rotation_status['status']=='phase_failed':
+            print('::warning title=Instagram rotation::ROTATION_FAILED during selection')
             official_pilot['rotation_error']=rotation_status.get('error','ROTATION_PHASE_FAILED')
             if not official_pilot.get('queries_sent',0):
                 official_pilot['status']='ROTATION_FAILED'
@@ -218,20 +219,20 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     if read['status']!='completed' or int(read['proposals'])!=int(write['proposals_written']) or int(read['documents'])!=int(write['documents_written']):raise RuntimeError('SAME_RUN_READBACK_MISMATCH')
     try:graph_report=persist_graph(conn,run_id,graph)
     except Exception as e:graph_report={'status':'memory_write_failed','error':type(e).__name__}
-    if batch['accounts']:
+    if 'batch' in batch:
         try:
             completed=rotation.complete(conn,run_id,manifest)
             rotation_status.update(status=completed['status'],results=completed.get('results',[]))
-        except Exception as e:rotation_status.update(status='completion_failed',error=type(e).__name__+': '+str(e)[:160])
-    if extra_curators:
-        from source_cadence import record_curator_checks
-        record_curator_checks(conn,extra_curators,manifest.get('official_results',[]),run_id)
+        except Exception as e:
+            rotation_status.update(status='completion_failed',error=type(e).__name__)
+            official_pilot['rotation_state']='ROTATION_FAILED'
+            print('::warning title=Instagram rotation::ROTATION_FAILED during finalization')
     admissions=rotation.admit_discovered(conn,baseline(conn)) if full else {'status':'full_only_no_extra_acquisition'}
     m=execute(conn,NEW_DISCOVERY_METRICS_SQL,[run_id,started_at])['rows'][0]
     metrics={k:int(v) for k,v in m.items()}
     attempts=manifest['instagram_attempts']
     ig={'accounts_attempted':len(attempts),'accounts_with_profile_http_request':sum(bool(a.get('profile_http_requested')) for a in attempts),'profiles_accessible':sum(bool(a['profile_accessible']) for a in attempts),'accounts_with_posts':sum(a['posts_recovered']>0 for a in attempts),'posts_recovered':sum(a['posts_recovered'] for a in attempts),'errors_or_restrictions':sum(bool(a.get('error')) for a in attempts),'receipts':attempts,'index_searches':len(manifest['searches']),'search_failures':sum(bool(s.get('error')) for s in manifest['searches']),'search_receipts':manifest['searches']}
-    report={'execution_context':'GitHub Actions','github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'mode':'full' if full else 'incremental','caption_documents_processed':reprocessed,'journal_recovered_documents':recovered,'credential_health':credential_health(),'scope':'full' if full else 'incremental','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'instagram_official_pilot':official_pilot,'rotation':rotation_status,'source_discovery':source_report,'cultural_memory':graph_report,'source_admission':admissions,'urgent_source_refresh':urgent_refresh,'primary_source_followup':primary_handoff,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'supplemented_representatives':supplemented,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0}
+    report={'execution_context':'GitHub Actions','github_event':os.environ.get('GITHUB_EVENT_NAME'),'github_schedule':os.environ.get('RADAR2_SCHEDULE'),'github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'mode':'full' if full else 'incremental','caption_documents_processed':reprocessed,'journal_recovered_documents':recovered,'credential_health':credential_health(),'scope':'full' if full else 'incremental','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'instagram_official_pilot':official_pilot,'rotation':rotation_status,'source_discovery':source_report,'cultural_memory':graph_report,'source_admission':admissions,'urgent_source_refresh':urgent_refresh,'primary_source_followup':primary_handoff,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'supplemented_representatives':supplemented,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0}
     saved=execute(conn,"UPDATE radar2.runs SET summary=summary || $2::jsonb WHERE run_id=$1 RETURNING run_id",[run_id,json.dumps(report,ensure_ascii=False)])['rows']
     if len(saved)!=1:raise RuntimeError('RUN_SUMMARY_NOT_SAVED')
     print(json.dumps({k:v for k,v in report.items() if k not in ('proposal_ids','rotation','instagram','source_discovery')}))
@@ -242,7 +243,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
             f.write('## Radar 2: '+run_id+'\n\n')
             f.write('Neon readback: '+json.dumps(read)+'. New unique proposals: '+str(metrics['new_visible_unique'])+'; dated: '+str(metrics['new_unique_dated_proposals'])+'.\n\n')
             f.write('Instagram: '+str(ig['accounts_attempted'])+' policy/access attempts, '+str(ig['profiles_accessible'])+' accessible profiles, '+str(ig['posts_recovered'])+' actual posts. Rotation: '+rotation_status['status']+'.\n\n')
-            f.write('Instagram Meta oficial (controles FULL + rotacion): '+str(official_pilot.get('status'))+', cuentas seleccionadas '+str(official_pilot.get('rotation_accounts_due',0))+', consultas '+str(official_pilot.get('queries_sent',0))+', exitosas '+str(official_pilot.get('accounts_successful',0))+', fallidas '+str(official_pilot.get('accounts_failed',0))+', documentos nuevos '+str(official_pilot.get('new_documents',0))+'.\n\n')
+            f.write('Instagram Meta oficial (rotacion): '+str(official_pilot.get('status'))+', cuentas seleccionadas '+str(official_pilot.get('rotation_accounts_selected',0))+', consultas '+str(official_pilot.get('queries_sent',0))+', exitosas '+str(official_pilot.get('accounts_successful',0))+', fallidas '+str(official_pilot.get('accounts_failed',0))+', documentos nuevos '+str(official_pilot.get('new_documents',0))+'.\n\n')
             f.write('New source domains observed: '+', '.join(source_report.get('new_domains_observed',[]))+'. Graph: '+json.dumps(graph_report)+'.\n\n')
             f.write('No editorial promotion. API HTTP verification is a separate authenticated check.\n\n')
     return report

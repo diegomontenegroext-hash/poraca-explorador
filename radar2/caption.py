@@ -10,13 +10,13 @@ from collector import norm, compact
 from extract import MONTHS,category
 from semantics import normalized_original,proof,clocks_in,activity_title,credits,identity,CANCEL,clean_title
 from account_context import location_for,preflight
-VERSION='caption-v2.4'
+VERSION='caption-v2.5'
 ZONE=ZoneInfo('America/Argentina/Buenos_Aires')
 WEEK=['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
 DATE=re.compile(r'\b([0-3]?\d)\s*(?:[/.]+\s*(1[0-2]|0?[1-9])\b|(?:de\s+)?('+('|'.join(MONTHS))+r')\b)(?:\s*(?:de\s+|/)(20\d{2}))?',re.I)
 CLOCK=re.compile(r'(?<![\d.])([01]?\d|2[0-3])(?:[:.]([0-5]\d))?\s*(?:a\s*\d{1,2}(?:[:.]\d{2})?\s*)?(?:hs?\b|horas\b)|\b(medianoche)\b',re.I)
 PAST=re.compile(r'\b(postales|pasado|vivimos|presentaron|presento|nos quedaron|gracias por acompanarnos|asi vivimos|despide)\b')
-CULTURE=re.compile(r'tango|ceramica|cine|obra|teatro|taller|workshop|masterclass|milonga|fiesta|ciclo|concierto|recital|inaugur|muestra|festival|musica|musicaliza|libros|lectura|banda|entrada|cabina|en vivo')
+CULTURE=re.compile(r'proyeccion|tango|ceramica|cine|obra|teatro|taller|workshop|masterclass|milonga|fiesta|ciclo|concierto|recital|inaugur|muestra|festival|musica|musicaliza|libros|lectura|banda|entrada|cabina|en vivo')
 
 def anchor(d):
  try:return datetime.fromisoformat(d['published_at'].replace('Z','+00:00')).astimezone(ZONE).date()
@@ -37,7 +37,23 @@ def dates(text,base):
    day=datetime(year,month,int(m[1])).date()
    out.append((m.start(),m.end(),day,'explicit_day_month' if m[4] else 'day_month_year_from_publication'))
   except ValueError:pass
- if out:return out
+ if out:
+  # "viernes 28, sábado 29 y domingo 30 de abril" shares one explicit month.
+  for start,end,day,basis in list(out):
+   prefix=n[:start]
+   chain=re.search(r'((?:(?:'+('|'.join(WEEK))+r')\s+\d{1,2}\s*(?:,|y)\s*)+)(?:'+('|'.join(WEEK))+r')\s+$',prefix)
+   if not chain:continue
+   for item in re.finditer(r'('+('|'.join(WEEK))+r')\s+(\d{1,2})',chain[1]):
+    try:earlier=day.replace(day=int(item[2]))
+    except ValueError:continue
+    if earlier<day and earlier.weekday()==WEEK.index(item[1]):
+     out.append((chain.start()+item.start(),chain.start()+item.end(),earlier,'shared_explicit_month_weekday_verified'))
+  return sorted(out)
+ if re.search(r'\besta semana\b',n[:100]):
+  weekdays=list(re.finditer(r'^(?:[^\w\n]{0,4})('+('|'.join(WEEK))+r')\b',n,re.M))
+  if len({m[1] for m in weekdays})>=2:
+   monday=base-timedelta(days=base.weekday())
+   return [(m.start(),m.end(),monday+timedelta(days=WEEK.index(m[1])),'weekday_in_explicit_publication_week') for m in weekdays]
  # A named month plus a day without month is ambiguous: leave for review.
  if re.search(r'\b(hoy|manana)\b',n[:300]) and not re.search(r'hoy y siempre',n) and not re.search(r'hoy (?:compartimos|mostramos|recordamos)',n):
   m=re.search(r'\b(hoy|manana)\b',n[:300]);return [(m.start(),m.end(),base+timedelta(days=int(m[1]=='manana')),'relative_to_publication')]
@@ -83,7 +99,7 @@ def interpret(c,d,accounts):
   marker=re.search(r'📍\s*([^\n]{3,120})',text)
   if marker:
    value=re.split(r'[|,;🚫]| —|\(',marker[1],maxsplit=1)[0].strip()
-   sala=re.match(r'Sala\s+\d+',value,re.I)
+   sala=re.match(r'Sala\s+\d+\b',value,re.I) or re.fullmatch(r'(?:Espacio|Casa|Galpón|Centro Cultural)\s+\d+',value.strip(),re.I)
    candidate=sala[0] if sala else re.split(r'\s+(?:Av\.?|Calle|Diag\.?|Diagonal|[0-9])',value,maxsplit=1)[0].strip()
    candidate=candidate.rstrip(' .—')
    invalid=re.search(r'calle|avenida|^diag|^av\b|^en |youtube|esperamos|\bfue\b|\b(?:lunes|martes|miercoles|jueves|viernes|sabado|domingo)\b',norm(candidate))
@@ -103,6 +119,8 @@ def interpret(c,d,accounts):
  retail_relative=bool(re.search(r'(?:manana|hoy).{0,30}(?:subo|subimos|tienda|catalogo)',n))
  if commemorative or retail_relative:schedules=[]
  if (retrospective and not re.search(r'te esperamos|veni|proxim|se presenta|ultima funcion',n)) or regular or not cultural or re.search(r'hoy (?:compartimos|mostramos|recordamos)',n):schedules=[]
+ rescheduled=bool(re.search(r'\b(?:se reprograma|reprogramad[ao]|cambio de fecha|se posterga|se pospone)\b',n))
+ if rescheduled and len(schedules)>1:schedules=[]
  for ix,(start,end,day,basis) in enumerate(schedules):
   block_end=schedules[ix+1][0] if ix+1<len(schedules) else len(text)
   block=text[start:block_end]
@@ -120,6 +138,22 @@ def interpret(c,d,accounts):
    scope=text[clock_origin:block_end] if clock_origin==0 else block
    next_clock=clocks[ci+1].start() if ci+1<len(clocks) else len(scope)
    local_title=activity_title(scope,clock,next_clock,title,len(clocks)>1 or len(schedules)>2)
+   # In a dated itinerary the first line may describe a previous performance.
+   # Keep each title attached to its own dated section, including untimed stops.
+   territory_review=False
+   if len(schedules)>1 and re.match(r'^\s*\|',text[end:block_end]):
+    lines=text[end:block_end].strip().splitlines()
+    labels=[part.strip().strip('#').strip() for part in lines[0].split('|') if part.strip(' #')]
+    if labels:
+     locality=norm(labels[0])
+     territory_review=locality in ('bsas','buenos aires','azul','caba','tv','youtube','lanzamientoalbum')
+     if locality in ('lp','la plata','bsas','buenos aires','azul','caba','tv','youtube','lanzamientoalbum'):
+      description=next((line.strip(' 🌹') for line in lines[1:] if re.match(r'^[\s🌹"“]*[A-Za-zÁÉÍÓÚÑáéíóúñ]',line) and not re.match(r'^\s*(junto|invitad|gratis|entrada)',line,re.I)),None)
+      if description:local_title=description[:160]
+     elif not clock and len(labels[0].split())>=3:
+      local_title=labels[0][:160]
+   if basis=='weekday_in_explicit_publication_week':
+    local_title=text[end:block_end].strip().splitlines()[0][:160] if text[end:block_end].strip() else title
    if not local_title:local_title=title
    # Multiple dates of the same work keep one title. Never deduplicate by date alone.
    local_venues=[a for a in venues if norm(a['entity']) in norm(scope)]
@@ -132,7 +166,7 @@ def interpret(c,d,accounts):
    host_location=location_for(d,scope)
    local_venue=host_location['venue'] or venue
    local_venue_proof=host_location.get('quote') if host_location['venue'] else venue_proof
-   state='historico' if day<now else 'incompleto' if ambiguous_midnight or not local_venue or cancelled else 'observado_agenda'
+   state='historico' if day<now else 'incompleto' if ambiguous_midnight or not local_venue or cancelled or territory_review else 'observado_agenda'
    key=c.add(d,local_title,day.isoformat(),hour,local_venue,category(n),state,raw,origin_account=d.get('profile_username'))
    p=c.proposals[key]
    title_at=text.find(local_title)
@@ -151,7 +185,7 @@ def interpret(c,d,accounts):
     venue_entity_id=host_location.get('venue_entity_id') if host_location.get('venue') else None,
     venue_profile_evidence_url=host_location.get('profile_evidence_url') if host_location.get('venue') or host_location.get('candidate') else None,
     evidence_spans={'date':proof(raw,positions,start,end),'time':proof(raw,positions,clock_origin+clock.start(),clock_origin+clock.end()) if clock else None,'title':title_proof},
-    ambiguities=(['midnight_calendar_day_requires_review'] if ambiguous_midnight else [])+(['venue_unresolved'] if not local_venue else []))
+    ambiguities=(['nonlocal_or_digital_program_section'] if territory_review else [])+(['midnight_calendar_day_requires_review'] if ambiguous_midnight else [])+(['venue_unresolved'] if not local_venue else []))
    p['event_identity_key']=identity(p)
    p['identity_scope']='same_document_title_venue_pending_editorial_review'
    p['work_identity_key']=p['event_identity_key'] if re.search(r'obra|funciones|funcion',n) else None
@@ -190,5 +224,5 @@ def interpret(c,d,accounts):
     ambiguities=['calendar_date_unresolved'],entities=credits(segment))
  if not produced:
   key=c.add(d,title,state='historico' if retrospective else 'investigable',evidence=text,origin_account=d.get('profile_username'))
-  c.proposals[key].update(kind='historical' if retrospective else 'document',content_type=kind,parser_version=VERSION,acquisition_method='official_meta_api',date_basis='no_resolved_event_date',publication_approved=False,recurrence_rule=text if regular else None,event_status='cancelled' if cancelled else 'undetermined')
+  c.proposals[key].update(kind='historical' if retrospective else 'document',content_type=kind,parser_version=VERSION,acquisition_method='official_meta_api',date_basis='no_resolved_event_date',publication_approved=False,recurrence_rule=text if regular else None,event_status='cancelled' if cancelled else 'rescheduled_pending_review' if rescheduled else 'undetermined')
  return produced

@@ -23,6 +23,23 @@ class Runtime(unittest.TestCase):
    ps=interpret(c,d,[{'entity':'Escenario 40','identity':'catalog'}])
    self.assertEqual([p['date'] for p in ps],['2026-09-19','2026-09-20','2026-09-25'])
    self.assertTrue(all(not p['publication_approved'] for p in ps))
+ def test_numbered_venue_and_mixed_itinerary(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   c=Collector(tmp)
+   d={'url':'https://www.instagram.com/p/fixture/','source':'Instagram','fetched_at':'2026-11-08T20:00:00Z','published_at':'2026-11-01T16:00:00Z','text':'Teatro de sombras\n14/11 a las 21 hs\n📍 Galpón 12, La Plata'}
+   self.assertEqual(interpret(c,d,[])[0]['venue'],'Galpón 12')
+   d=dict(d,url='https://www.instagram.com/p/tour/',text='Conciertos de noviembre\n14/11 | BSAS\nMarea Roja en concierto\n27/11 | Trío en el Coliseo')
+   stops=interpret(c,d,[])
+   self.assertEqual([p['title'] for p in stops],['Marea Roja en concierto','Trío en el Coliseo'])
+   self.assertIn('nonlocal_or_digital_program_section',stops[0]['ambiguities'])
+ def test_shared_month_and_explicit_week_stay_anchored(self):
+  self.assertEqual([x[2].day for x in dates('viernes 28, sábado 29 y domingo 30 de abril',date(2023,4,26))],[28,29,30])
+  self.assertEqual([x[2].isoformat() for x in dates('Esta semana en la sala\nViernes Concierto\nSábado Teatro',date(2026,11,2))],['2026-11-06','2026-11-07'])
+ def test_date_change_is_retained_for_review(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   c=Collector(tmp);d={'url':'https://www.instagram.com/p/change/','source':'Instagram','fetched_at':'2026-11-08T20:00:00Z','published_at':'2026-11-07T12:00:00Z','text':'Cambio de fecha del concierto del 14/11 al 21/11'}
+   self.assertEqual(interpret(c,d,[]),[])
+   self.assertEqual(next(iter(c.proposals.values()))['event_status'],'rescheduled_pending_review')
  def test_meta_failure_does_not_mutate_post_documents(self):
   from instagram_official_pilot import acquire
   from types import SimpleNamespace
