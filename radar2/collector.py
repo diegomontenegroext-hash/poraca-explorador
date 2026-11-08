@@ -92,6 +92,7 @@ class Collector:
     def __init__(self,out,previous=None):
         self.out=Path(out);self.out.mkdir(parents=True,exist_ok=True)
         self.docs={};self.proposals={};self.checks=[];self.robots={};self.policy_errors={}
+        self.source_followups=[]
         self.checkpoint=None;self.baseline=[]
         self.previous=previous or {};self.previous_docs={d['url']:d for d in self.previous.get('documents',[])}
         self.run_id='radar2-'+datetime.now(ZoneInfo('UTC')).strftime('%Y%m%dT%H%M%SZ')
@@ -431,7 +432,8 @@ class Collector:
             key=sha('|'.join([d['url'],norm(title),day,hour or '']))
             if key in self.proposals:self.proposals[key]['original_url']=n.a.get('href')
     def save(self):
-        result={'run_id':self.run_id,'collector_sha256':self.code_sha256,'finished_at':utc(),'documents':list(self.docs.values()),'proposals':list(self.proposals.values()),'checks':self.checks}
+        result={'run_id':self.run_id,'collector_sha256':self.code_sha256,'finished_at':utc(),'documents':list(self.docs.values()),'proposals':list(self.proposals.values()),'checks':self.checks,
+                'source_followups':list(self.source_followups)}
         processor=Path(__file__).with_name('extract.py')
         if processor.exists():result['processor_sha256']=sha(processor.read_text())
         (self.out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));return result
