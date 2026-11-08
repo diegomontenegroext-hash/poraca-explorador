@@ -115,7 +115,7 @@ class CaptionVenueResolution(unittest.TestCase):
   self.assertEqual(p['venue_candidate_basis'],'unverified_text_mention')
   self.assertEqual(p['state'],'incompleto')
   self.assertFalse(p['publication_approved'])
-  def test_identical_id_before_and_after_add_venue(self):
+ def test_identical_id_before_and_after_add_venue(self):
   d=self.doc('teatrounlp','La Nona sábado 7/11 21hs 📌 Teatro UNLP')
   from collector import sha,norm
   p=self.parse(d)[0]
