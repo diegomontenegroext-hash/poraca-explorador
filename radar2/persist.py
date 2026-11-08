@@ -58,7 +58,7 @@ r AS (
      ELSE '{}'::jsonb END
   || COALESCE((SELECT jsonb_object_agg(k,v)
     FROM jsonb_each(radar2.proposals.evidence) AS preserved(k,v)
-    WHERE k IN ('category_revision','territory_revision','editorial_exclusion','exclusion_run_id')
+    WHERE k IN ('category_revision','territory_revision','editorial_exclusion','exclusion_run_id','primary_source_followup')
       AND NOT (excluded.evidence ? k)), '{}'::jsonb)
  RETURNING proposal_id
 ) SELECT (SELECT count(*) FROM d) AS documents_written,(SELECT count(*) FROM p) AS proposals_written
