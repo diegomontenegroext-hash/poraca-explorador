@@ -40,7 +40,36 @@ class OfficialInstagramPilot(unittest.TestCase):
         self.assertEqual(discover.call_count, 4)
         self.assertEqual([c.args[0] for c in discover.call_args_list], list(ACCOUNTS))
         self.assertEqual(outcome["new_documents"], 0)
-        self.assertEqual(outcome["status"], "NO_NEW_POSTS_OR_UNAVAILABLE")
+        self.assertEqual(outcome["status"], "QUERIED_NO_NEW")
+
+    def test_no_due_accounts_is_not_reported_as_no_news(self):
+        fake=SimpleNamespace(docs={},proposals={})
+        creds={"META_IG_USER_ID":"test","META_ACCESS_TOKEN":"dummy","META_GRAPH_VERSION":"v27.0"}
+        with patch.dict(os.environ,creds,clear=True),patch(
+            "instagram_official_pilot.discover") as discover:
+            report=acquire(fake,set(),include_controls=False)
+        self.assertEqual(report["status"],"NOT_DUE")
+        self.assertEqual(report["accounts_eligible"],0)
+        self.assertEqual(report["queries_sent"],0)
+        discover.assert_not_called()
+
+    def test_mixed_api_failure_does_not_look_like_no_news(self):
+        fake=SimpleNamespace(docs={},proposals={})
+        creds={"META_IG_USER_ID":"test","META_ACCESS_TOKEN":"dummy","META_GRAPH_VERSION":"v27.0"}
+        responses=iter([
+            {"status":"NO_MEDIA_RETURNED","posts":[],"checked_at":"2026-11-08T14:00:00Z"},
+            {"status":"OFFICIAL_API_ERROR","http_status":403,"meta_error_code":10,"posts":[]},
+            {"status":"NO_MEDIA_RETURNED","posts":[]},
+            {"status":"NO_MEDIA_RETURNED","posts":[]}
+        ])
+        with patch.dict(os.environ,creds,clear=True),patch(
+            "instagram_official_pilot.discover",side_effect=lambda _:next(responses)):
+            report=acquire(fake,set())
+        self.assertEqual(report["status"],"PARTIAL_OFFICIAL_API_ERRORS")
+        self.assertEqual(report["accounts_successful"],3)
+        self.assertEqual(report["accounts_failed"],1)
+        self.assertEqual(report["queries_sent"],4)
+        self.assertEqual(report["last_successful_query_at"],"2026-11-08T14:00:00Z")
 
     def test_meta_http_error_records_only_safe_codes(self):
         from instagram import discover
