@@ -49,24 +49,44 @@ def record_curator_checks(conn,usernames,results,run_id):
 URGENT_REFRESH_SQL="""
 SELECT p.document_url AS url,max(d.source) AS source,
        min(p.event_date)::text AS first_event_date,
-       max(d.fetched_at)::text AS last_fetched
+       max(d.fetched_at)::text AS last_fetched,
+       bool_or(
+         (d.source='festival.freezer.com.ar'
+          AND p.document_url='https://festival.freezer.com.ar/2026/programacion/')
+         OR (d.source='www.passline.com'
+          AND p.document_url ~ '^https://www[.]passline[.]com/eventos/[a-z0-9-]{5,160}$')
+       ) AS priority_original
 FROM radar2.proposals p
 JOIN radar2.documents d ON d.url=p.document_url
 WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
-  AND (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date + 2
+  AND (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date + 7
   AND p.review_state<>'historico'
   AND p.evidence->>'kind'='event'
-  AND p.last_seen_at<now()-interval '24 hours'
-  AND d.fetched_at<now()-interval '12 hours'
   AND d.source NOT IN ('Instagram','Genda','Genda teatro','El Día','0221')
   AND p.document_url ~ '^https://'
+  AND (
+    (
+      (
+       (d.source='festival.freezer.com.ar'
+        AND p.document_url='https://festival.freezer.com.ar/2026/programacion/')
+       OR (d.source='www.passline.com'
+        AND p.document_url ~ '^https://www[.]passline[.]com/eventos/[a-z0-9-]{5,160}$')
+      )
+      AND d.fetched_at<now()-interval '36 hours'
+    )
+    OR (
+      p.event_date<=(now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date + 2
+      AND p.last_seen_at<now()-interval '24 hours'
+      AND d.fetched_at<now()-interval '12 hours'
+    )
+  )
 GROUP BY p.document_url
-ORDER BY min(p.event_date),max(d.fetched_at),p.document_url
+ORDER BY priority_original DESC,min(p.event_date),max(d.fetched_at),p.document_url
 LIMIT 18
 """
 
 def urgent_source_rechecks(conn,limit=3):
- """At most one URL per origin and three in total, with natural 12h cooldown.
+ """At most one URL per origin and three total; originals have 36h cooldown.
 
  Preserve the existing fetch robots/permission checks and never turn a
  successful HTTP fetch into independent editorial confirmation.
