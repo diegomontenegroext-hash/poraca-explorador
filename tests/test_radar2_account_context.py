@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import unittest
+from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -62,7 +63,10 @@ class CaptionVenueResolution(unittest.TestCase):
  def parse(self,d):
   with tempfile.TemporaryDirectory() as root:
    c=Collector(root)
-   return interpret(c,d,[])
+   observed = datetime.fromisoformat(d["fetched_at"].replace("Z", "+00:00"))
+   with patch("caption.datetime", wraps=datetime) as clock:
+    clock.now.side_effect = observed.astimezone
+    return interpret(c,d,[])
  def test_explicit_theatre_with_city_address(self):
   p=self.parse(self.doc('teatrounlp','ÚLTIMA FUNCIÓN DE LA NONA 🎭\nSábado 7/11 21hs\n📌 Teatro UNLP (10 e/ 54 y 55)'))[0]
   self.assertEqual((p['venue'],p['venue_entity_id']),('Teatro UNLP','teatro-unlp'))
