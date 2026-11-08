@@ -9,6 +9,7 @@ from primary_followups import (ticket_detail,secondary_detail,dates_in,classify_
 class PrimarySourceFollowupTests(unittest.TestCase):
  def test_exact_specific_ticket_url_only(self):
   self.assertTrue(ticket_detail('https://www.casualpass.net/e/ligadeimprovisadores'))
+  self.assertTrue(ticket_detail('https://centralticket.net/event/lololaplata'))
   self.assertTrue(ticket_detail('https://catpass.net/eventos/los-espiritus-en-la-plata-07-11-2026-mG2'))
   for url in ('http://www.casualpass.net/e/show','https://www.plateanet.com/teatro/13?teatro=COLISEO-PODESTA',
               'https://instagram.com/ciudaddegatos','https://localhost/e/ligadeimprovisadores',
@@ -24,10 +25,17 @@ class PrimarySourceFollowupTests(unittest.TestCase):
   url='https://www.passline.com/eventos/joystick-presenta-diarios-de-humo-en-la-plata-junto-a-ktacumbas-y-cikes'
   doc={'url':url,'final_url':url,'http_status':200,'text':'Joystick presenta Diarios de Humo en La Plata (Junto a Ktacumbas y Cikes) Sábado 21 de Noviembre 2026 - 20:00 hrs. Guajira 49 n 484 Buenos Aires, LA PLATA'}
   self.assertEqual(classify_ticket(row,doc),('PRIMARY_RECEIPT_REVIEW_REQUIRED',['date','title','venue']))
+ def test_future_centralticket_exact_proof(self):
+  row={'event_day':'2026-11-15','title':'LOLO MORALES','venue':'GUAJIRA'}
+  url='https://centralticket.net/event/lololaplata'
+  doc={'url':url,'final_url':url,'http_status':200,
+   'text':'LOLO MORALES en LA PLATA (15/11) Domingo 15 de noviembre 20:00 GUAJIRA 15 de nov de 2026'}
+  self.assertEqual(classify_ticket(row,doc),('PRIMARY_RECEIPT_REVIEW_REQUIRED',['date','title','venue']))
  def test_dates_explicit_year(self):
   self.assertIn('2026-10-23',dates_in('viernes, 23 de octubre de 2026, 20:30'))
   self.assertIn('2026-11-13',dates_in('13/11/2026'))
   self.assertIn('2026-11-21',dates_in('Sábado 21 de Noviembre 2026 - 20:00 hrs.'))
+  self.assertIn('2026-11-15',dates_in('15 de nov de 2026'))
   self.assertEqual(dates_in('viernes 13 de noviembre'),[])
  def test_contradictory_ticket_not_admissible(self):
   row={'event_day':'2026-11-13','title':'Liga de improvisadores','venue':'Espacio Sudaka'}

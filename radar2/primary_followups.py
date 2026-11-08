@@ -50,11 +50,15 @@ TICKETING_PATHS = {
     'catpass.net': r'^/eventos/[a-z0-9-]{5,180}/?$',
     'www.catpass.net': r'^/eventos/[a-z0-9-]{5,180}/?$',
     'wearebombo.com': r'^/eventos/[a-z0-9-]{5,180}/?$',
+    'centralticket.net': r'^/event/[a-z0-9-]{4,160}/?$',
+    'www.centralticket.net': r'^/event/[a-z0-9-]{4,160}/?$',
 }
 MONTHS = {'enero':1,'febrero':2,'marzo':3,'abril':4,'mayo':5,
           'junio':6,'julio':7,'agosto':8,'septiembre':9,
           'octubre':10,'noviembre':11,'diciembre':12}
-MONTH_NAMES = '|'.join(MONTHS)
+MONTHS.update({'ene':1,'feb':2,'mar':3,'abr':4,'may':5,'jun':6,
+               'jul':7,'ago':8,'sep':9,'sept':9,'oct':10,'nov':11,'dic':12})
+MONTH_NAMES = '|'.join(sorted(MONTHS,key=len,reverse=True))
 
 def secondary_detail(url):
     try:
