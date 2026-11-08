@@ -34,6 +34,8 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,ex
               "accounts":accounts,"controls":list(ACCOUNTS),
               "rotating_accounts":rotating,"method":"meta_business_discovery",
               "enabled": False, "queries_sent": 0,
+              "accounts_eligible": len(accounts), "accounts_successful": 0,
+              "accounts_failed": 0, "last_successful_query_at": None,
               "new_documents": 0, "new_cultural_candidates": 0,
               "results": [],
               "account_preflight": [preflight(username) for username in accounts]}
@@ -48,6 +50,7 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,ex
         official = discover(username)
         report["queries_sent"] += 1
         summary = {"username": username, "preflight": preflight(username),
+                   "checked_at": official.get("checked_at"),
                    "status": official.get("status", "UNKNOWN"),
                    "items_returned": len(official.get("posts") or []),
                    "new_documents": 0, "new_candidates": 0, "known_documents":0,
@@ -101,16 +104,22 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,ex
     report["unattempted_accounts"] = accounts[len(report["results"]):]
     # Do not misreport authentication failure as a quiet day with no posts.
     results = report["results"]
-    if report.get("halt_reason") == "META_RATE_LIMIT":
+    successful = [r for r in results if r["status"] in ("MEDIA_RETURNED", "NO_MEDIA_RETURNED")]
+    report["accounts_successful"] = len(successful)
+    report["accounts_failed"] = len(results) - len(successful)
+    report["last_successful_query_at"] = max(
+        (r["checked_at"] for r in successful if r.get("checked_at")), default=None)
+    if not accounts:
+        report["status"] = "NOT_DUE"
+    elif report.get("halt_reason") == "META_RATE_LIMIT":
         report["status"] = "META_RATE_LIMITED"
     elif any(r.get("meta_error_code") == 190 and
              r.get("meta_error_subcode") == 463 for r in results):
         report["status"] = "META_TOKEN_EXPIRED"
     elif report.get("halt_reason") == "META_AUTH":
         report["status"] = "META_AUTH_ERROR"
-    elif results and all(r.get("status") == "OFFICIAL_API_ERROR" for r in results):
-        report["status"] = "OFFICIAL_API_ERRORS"
+    elif report["accounts_failed"]:
+        report["status"] = ("PARTIAL_OFFICIAL_API_ERRORS" if successful else "OFFICIAL_API_ERRORS")
     else:
-        report["status"] = ("POSTS_ACQUIRED" if report["new_documents"] else
-                            "NO_NEW_POSTS_OR_UNAVAILABLE")
+        report["status"] = "POSTS_ACQUIRED" if report["new_documents"] else "QUERIED_NO_NEW"
     return report
