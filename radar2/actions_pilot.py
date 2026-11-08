@@ -175,13 +175,13 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
                 if p['document_url']==d['url']:p['source_document_sha256']=d.get('sha256')
         d['interpretation_version']=effective_version(d,accounts)
     # Follow only event-specific external originals from Genda's individual
-    # secondary detail pages. Bounded to three in this EXISTING incremental;
+    # secondary detail pages. Bounded to eight per ordinary run;
     # not a publication or an independent editorial decision.
-    primary_handoff={'status':'not_checked_full_or_corrective','selected':0}
-    if not full and not corrective:
+    primary_handoff={'status':'not_checked_corrective','selected':0}
+    if not corrective:
         try:
             from primary_followups import follow_secondary
-            primary_handoff=follow_secondary(conn,c,limit=3)
+            primary_handoff=follow_secondary(conn,c,limit=8)
             primary_handoff['status']='evidence_collected_not_published'
         except Exception as exc:
             primary_handoff={'status':'followup_failed','error_type':type(exc).__name__}
