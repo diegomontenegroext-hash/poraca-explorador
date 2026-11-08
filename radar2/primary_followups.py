@@ -15,23 +15,28 @@ CANDIDATES_SQL = """
 SELECT * FROM (
 SELECT DISTINCT ON (p.event_date,p.evidence->>'original_url')
        p.proposal_id,p.title,p.event_date::text event_day,p.event_time,p.venue,
-       p.evidence->>'original_url' detail_url
+       p.evidence->>'original_url' detail_url,d.source AS secondary_source
 FROM radar2.proposals p JOIN radar2.documents d ON d.url=p.document_url
 WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
-                      AND (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date+7
+                      AND (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date+14
   AND (p.event_date>(now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
        OR p.event_time IS NULL
        OR p.event_time>to_char((now() AT TIME ZONE 'America/Argentina/Buenos_Aires'),'HH24:MI'))
   AND p.evidence->>'kind'='event'
   AND p.review_state NOT IN ('historico','contradictorio')
   AND coalesce(p.evidence->>'duplicate_of','')=''
-  AND d.source IN ('Genda','Genda teatro')
-  AND p.evidence->>'original_url' ~ '^https://agendalaplata[.]ar/evento/[a-z0-9-]{8,220}$'
+  AND (
+    (d.source IN ('Genda','Genda teatro')
+      AND p.evidence->>'original_url' ~ '^https://agendalaplata[.]ar/evento/[a-z0-9-]{8,220}$')
+    OR (d.source='elevenflow.app'
+      AND p.evidence->>'original_url' ~ '^https://elevenflow[.]app/events/[a-z0-9-]{8,220}$')
+  )
   AND coalesce(p.evidence->'primary_source_followup'->>'checkedAt','2000-01-01T00:00:00+00:00')::timestamptz
       < now()-interval '24 hours'
 ORDER BY p.event_date,p.evidence->>'original_url',p.proposal_id
 ) selected
-ORDER BY selected.event_day,selected.event_time NULLS LAST,selected.proposal_id
+ORDER BY CASE WHEN selected.secondary_source='elevenflow.app' THEN 0 ELSE 1 END,
+         selected.event_day,selected.event_time NULLS LAST,selected.proposal_id
 LIMIT 18
 """
 
@@ -50,6 +55,19 @@ MONTHS = {'enero':1,'febrero':2,'marzo':3,'abril':4,'mayo':5,
           'junio':6,'julio':7,'agosto':8,'septiembre':9,
           'octubre':10,'noviembre':11,'diciembre':12}
 MONTH_NAMES = '|'.join(MONTHS)
+
+def secondary_detail(url):
+    try:
+        p=urlsplit(url)
+        if p.scheme!='https' or p.username or p.password or p.query or p.fragment:
+            return False
+        return bool(
+            ((p.hostname or '').lower()=='agendalaplata.ar' and
+             re.fullmatch(r'/evento/[a-z0-9-]{8,220}',p.path,re.I))
+            or ((p.hostname or '').lower()=='elevenflow.app' and
+                re.fullmatch(r'/events/[a-z0-9-]{8,220}',p.path,re.I)))
+    except ValueError:
+        return False
 
 def ticket_detail(url):
     try:
@@ -72,7 +90,7 @@ def dates_in(text):
         try:found.add(date(y,m,d).isoformat())
         except ValueError:pass
     ascii_text=norm(text)
-    for match in re.finditer(r'(?<!\d)(0?[1-9]|[12]\d|3[01])\s+de\s+('+MONTH_NAMES+r')\s+de\s+(20\d{2})(?!\d)',ascii_text):
+    for match in re.finditer(r'(?<!\d)(0?[1-9]|[12]\d|3[01])\s+de\s+('+MONTH_NAMES+r')\s+(?:de\s+)?(20\d{2})(?!\d)',ascii_text):
         d,m,y=match.groups()
         try:found.add(date(int(y),MONTHS[m],int(d)).isoformat())
         except ValueError:pass
@@ -113,11 +131,12 @@ def follow_secondary(conn,collector,limit=3):
               'requiresIndependentEditorialReview':True,
               'reviewerRole':'poraca_editorial_prod',
               'reviewBy':row['event_day']+'T08:00:00-03:00',
-              'sourceRole':'secondary_event_detail'}
+              'sourceRole':'secondary_event_detail',
+              'secondaryPublisher':row.get('secondary_source')}
         detail_url=row['detail_url']
-        if not detail_url.startswith('https://agendalaplata.ar/evento/') or not safe_url(detail_url):
+        if not secondary_detail(detail_url) or not safe_url(detail_url):
             base.update(status='SECONDARY_URL_REJECTED');result.append(base);stats['held']+=1;continue
-        d=collector.fetch(detail_url,'Genda secondary detail')
+        d=collector.fetch(detail_url,'Secondary event detail · '+str(row.get('secondary_source','unknown')))
         if not d or d.get('http_status')!=200 or d.get('final_url')!=detail_url:
             base.update(status='SECONDARY_FETCH_BLOCKED');result.append(base);stats['held']+=1;continue
         stats['detailFetched']+=1

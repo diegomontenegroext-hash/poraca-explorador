@@ -3,7 +3,7 @@ from unittest.mock import patch
 import sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'radar2'))
-from primary_followups import (ticket_detail,dates_in,classify_ticket,
+from primary_followups import (ticket_detail,secondary_detail,dates_in,classify_ticket,
                                follow_secondary,CANDIDATES_SQL,FOLLOWUP_STAGE_SQL)
 
 class PrimarySourceFollowupTests(unittest.TestCase):
@@ -14,9 +14,20 @@ class PrimarySourceFollowupTests(unittest.TestCase):
               'https://instagram.com/ciudaddegatos','https://localhost/e/ligadeimprovisadores',
               'https://www.casualpass.net/','https://www.casualpass.net/e/id?token=secret'):
    self.assertFalse(ticket_detail(url),url)
+ def test_secondary_detail_allowlist(self):
+  self.assertTrue(secondary_detail('https://elevenflow.app/events/joystick-presenta-diarios-de-humo-en-la-plata-junto-a-ktacumbas-y-cikes-20261121-hsmp'))
+  self.assertTrue(secondary_detail('https://agendalaplata.ar/evento/liga-de-improvisadores-espacio-sudaka-20261104185007'))
+  self.assertFalse(secondary_detail('https://elevenflow.app/latest'))
+  self.assertFalse(secondary_detail('https://instagram.com/mujercebra'))
+ def test_future_passline_exact_three_fields(self):
+  row={'event_day':'2026-11-21','title':'Joystick presenta Diarios de Humo en La Plata (Junto a Ktacumbas y Cikes)','venue':'Guajira'}
+  url='https://www.passline.com/eventos/joystick-presenta-diarios-de-humo-en-la-plata-junto-a-ktacumbas-y-cikes'
+  doc={'url':url,'final_url':url,'http_status':200,'text':'Joystick presenta Diarios de Humo en La Plata (Junto a Ktacumbas y Cikes) Sábado 21 de Noviembre 2026 - 20:00 hrs. Guajira 49 n 484 Buenos Aires, LA PLATA'}
+  self.assertEqual(classify_ticket(row,doc),('PRIMARY_RECEIPT_REVIEW_REQUIRED',['date','title','venue']))
  def test_dates_explicit_year(self):
   self.assertIn('2026-10-23',dates_in('viernes, 23 de octubre de 2026, 20:30'))
   self.assertIn('2026-11-13',dates_in('13/11/2026'))
+  self.assertIn('2026-11-21',dates_in('Sábado 21 de Noviembre 2026 - 20:00 hrs.'))
   self.assertEqual(dates_in('viernes 13 de noviembre'),[])
  def test_contradictory_ticket_not_admissible(self):
   row={'event_day':'2026-11-13','title':'Liga de improvisadores','venue':'Espacio Sudaka'}
