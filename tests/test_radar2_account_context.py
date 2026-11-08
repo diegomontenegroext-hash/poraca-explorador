@@ -60,13 +60,13 @@ class CaptionVenueResolution(unittest.TestCase):
           'final_url':'https://www.instagram.com/p/TEST_'+handle.replace('.','')+'/',
           'source':'Instagram','text':text,'profile_username':handle,
           'published_at':stamp,'fetched_at':'2026-11-06T00:00:00Z','sha256':'original-preserved'}
- def parse(self,d):
+ def parse(self,d,accounts=None):
   with tempfile.TemporaryDirectory() as root:
    c=Collector(root)
    observed = datetime.fromisoformat(d["fetched_at"].replace("Z", "+00:00"))
    with patch("caption.datetime", wraps=datetime) as clock:
     clock.now.side_effect = observed.astimezone
-    return interpret(c,d,[])
+    return interpret(c,d,accounts or [])
  def test_explicit_theatre_with_city_address(self):
   p=self.parse(self.doc('teatrounlp','ÚLTIMA FUNCIÓN DE LA NONA 🎭\nSábado 7/11 21hs\n📌 Teatro UNLP (10 e/ 54 y 55)'))[0]
   self.assertEqual((p['venue'],p['venue_entity_id']),('Teatro UNLP','teatro-unlp'))
@@ -101,7 +101,21 @@ class CaptionVenueResolution(unittest.TestCase):
   self.assertGreaterEqual(len(ps),1)
   self.assertTrue(all(p['venue'] is None for p in ps))
   self.assertTrue(all(p.get('venue_candidate') is None for p in ps))
- def test_identical_id_before_and_after_add_venue(self):
+ def test_unverified_interview_teaser_is_not_a_venue_fact(self):
+  caption=('Siguiendo con los residentes INTRA, hoy hablamos con marquez.x__ sobre que siente acerca de INTRA y la musica electrónica.\n\n'
+   'Este SÁBADO 14.11 cerramos el año con él y el resto de residentes en nuestro amado bosque 🌳 TICKETS DISPONIBLES EN BIO\n\n'
+   '#INTRA: Arcano Vivo ⚛️ Capítulo Final de la narrativa 2026 “ARCANO VIVO”')
+  d=self.doc('intra.prod',caption,stamp='2026-11-08T00:05:22+00:00')
+  d['fetched_at']='2026-11-08T20:39:35Z'
+  p=self.parse(d,[{'identity':'confirmed','entity':'INTRA'}])[0]
+  self.assertEqual(p['title'],'INTRA: Arcano Vivo')
+  self.assertEqual(p['date'],'2026-11-14')
+  self.assertIsNone(p['venue'])
+  self.assertEqual(p['venue_candidate'],'INTRA')
+  self.assertEqual(p['venue_candidate_basis'],'unverified_text_mention')
+  self.assertEqual(p['state'],'incompleto')
+  self.assertFalse(p['publication_approved'])
+  def test_identical_id_before_and_after_add_venue(self):
   d=self.doc('teatrounlp','La Nona sábado 7/11 21hs 📌 Teatro UNLP')
   from collector import sha,norm
   p=self.parse(d)[0]

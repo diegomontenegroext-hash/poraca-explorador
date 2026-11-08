@@ -115,6 +115,13 @@ def interpret(c,d,accounts):
   lines=[compact(l) for l in text.splitlines() if l.strip() and not re.search(r'link|entrada|anticipad|bio|^\W*(?:'+('|'.join(WEEK))+')',norm(l))]
   title=next((l for l in lines if len(norm(l))>6),title)[:160]
  if norm(title) in ('volvemos','con una nueva fecha'):title=next((compact(l) for l in text.splitlines() if re.search(r'milonga|concierto|taller|fiesta',norm(l))),title)[:160]
+ # Interview teasers are not event names: accept a literal branded label only
+ # when the caption also contains an event date; keep the original permalink.
+ if schedules and re.search(r'\bhoy hablamos con\b',n[:160]):
+  branded=re.search(r'(?m)^#([A-Za-z][A-Za-z0-9_.-]{1,30}):\s*([^\n]{3,90})',text)
+  if branded:
+   proper=re.split(r'[⚛✨💫🎵🎶🌳]',branded[2],maxsplit=1)[0].strip(' .—:-')
+   if 3<=len(proper)<=70:title=(branded[1]+': '+proper)[:160]
  commemorative=bool(re.search(r'aniversario del|anos de (?:su muerte|su partida|su fallecimiento)|hoy se cumplen',n)) and not bool(re.search(r'te esperamos|veni|inauguracion|a las \d',n))
  retail_relative=bool(re.search(r'(?:manana|hoy).{0,30}(?:subo|subimos|tienda|catalogo)',n))
  if commemorative or retail_relative:schedules=[]
@@ -164,8 +171,13 @@ def interpret(c,d,accounts):
    # Match a real venue name/address inside THIS activity scope; profile ownership
    # alone produces a candidate, never a confirmed event place.
    host_location=location_for(d,scope)
-   local_venue=host_location['venue'] or venue
-   local_venue_proof=host_location.get('quote') if host_location['venue'] else venue_proof
+   # A bare catalogue mention from an unverified source is not a venue fact.
+   # Preserve the location as a candidate unless this block says "en X" or "📍 X".
+   venue_mention_only=bool(venue and not host_location.get('venue')
+     and not preflight(d.get('profile_username')).get('account_verified')
+     and not re.search(r'(?:\ben(?:\s+el|\s+la)?|📍)\s+'+re.escape(venue)+r'\b',scope,re.I))
+   local_venue=host_location['venue'] or (None if venue_mention_only else venue)
+   local_venue_proof=host_location.get('quote') if host_location['venue'] else venue_proof if local_venue else None
    state='historico' if day<now else 'incompleto' if ambiguous_midnight or not local_venue or cancelled or territory_review else 'observado_agenda'
    key=c.add(d,local_title,day.isoformat(),hour,local_venue,category(n),state,raw,origin_account=d.get('profile_username'))
    p=c.proposals[key]
@@ -180,8 +192,8 @@ def interpret(c,d,accounts):
      'venue':local_venue_proof,'title':(title_proof or {}).get('quote')},
     account_context=preflight(d.get('profile_username')),
     venue_basis=host_location['basis'] if host_location.get('venue') or host_location.get('candidate') else 'existing_literal_heuristic' if local_venue else host_location['basis'],
-    venue_candidate=host_location.get('candidate') if not local_venue else None,
-    venue_candidate_basis=host_location.get('basis') if host_location.get('candidate') and not local_venue else None,
+    venue_candidate=(host_location.get('candidate') or (venue if venue_mention_only else None)) if not local_venue else None,
+    venue_candidate_basis='unverified_text_mention' if venue_mention_only else host_location.get('basis') if host_location.get('candidate') and not local_venue else None,
     venue_entity_id=host_location.get('venue_entity_id') if host_location.get('venue') else None,
     venue_profile_evidence_url=host_location.get('profile_evidence_url') if host_location.get('venue') or host_location.get('candidate') else None,
     evidence_spans={'date':proof(raw,positions,start,end),'time':proof(raw,positions,clock_origin+clock.start(),clock_origin+clock.end()) if clock else None,'title':title_proof},
