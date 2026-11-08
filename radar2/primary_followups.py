@@ -14,7 +14,7 @@ from capabilities import safe_url
 CANDIDATES_SQL = """
 SELECT * FROM (
 SELECT DISTINCT ON (p.event_date,p.evidence->>'original_url')
-       p.proposal_id,p.title,p.event_date::text event_day,p.event_time,p.venue,
+       p.proposal_id,p.first_seen_at,p.title,p.event_date::text event_day,p.event_time,p.venue,
        p.evidence->>'original_url' detail_url,d.source AS secondary_source
 FROM radar2.proposals p JOIN radar2.documents d ON d.url=p.document_url
 WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
@@ -35,8 +35,7 @@ WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')
       < now()-interval '24 hours'
 ORDER BY p.event_date,p.evidence->>'original_url',p.proposal_id
 ) selected
-ORDER BY CASE WHEN selected.secondary_source='elevenflow.app' THEN 0 ELSE 1 END,
-         selected.event_day,selected.event_time NULLS LAST,selected.proposal_id
+ORDER BY selected.event_day,selected.first_seen_at,selected.event_time NULLS LAST,selected.proposal_id
 LIMIT 18
 """
 
@@ -126,7 +125,7 @@ def follow_secondary(conn,collector,limit=3):
     rows=execute(conn,CANDIDATES_SQL)['rows']
     result=[];stats={'selected':0,'detailFetched':0,'primaryFetched':0,
                      'readyForReview':0,'conflicts':0,'held':0}
-    for row in rows[:max(1,min(int(limit),3))]:
+    for row in rows[:max(1,min(int(limit),8))]:
         stats['selected']+=1
         base={'proposalId':row['proposal_id'],'date':row['event_day'],
               'title':row['title'],'venue':row['venue'],
