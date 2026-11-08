@@ -38,6 +38,10 @@ class PrimarySourceFollowupTests(unittest.TestCase):
                "p.proposal_id=x.receipt->>'proposalId'"):
    self.assertIn(term,FOLLOWUP_STAGE_SQL)
   self.assertNotIn('public.radar_agenda_events',FOLLOWUP_STAGE_SQL)
+  self.assertIn('DISTINCT ON (p.event_date',CANDIDATES_SQL)
+  self.assertIn('p.event_time IS NULL',CANDIDATES_SQL)
+  self.assertIn("p.event_time>to_char",CANDIDATES_SQL)
+  self.assertIn("x.receipt->>'secondarySha256' IS NULL",FOLLOWUP_STAGE_SQL)
  def test_detail_without_primary_is_held(self):
   row={'proposal_id':'x','event_day':'2026-11-13','title':'Mujer Cebra','venue':'Ciudad de Gatos',
        'detail_url':'https://agendalaplata.ar/evento/mujer-cebra-ciudad-de-gatos-20261023172701'}

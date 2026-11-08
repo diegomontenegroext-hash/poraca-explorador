@@ -12,11 +12,16 @@ from persist import execute
 from capabilities import safe_url
 
 CANDIDATES_SQL = """
-SELECT p.proposal_id,p.title,p.event_date::text event_day,p.event_time,p.venue,
+SELECT * FROM (
+SELECT DISTINCT ON (p.event_date,p.evidence->>'original_url')
+       p.proposal_id,p.title,p.event_date::text event_day,p.event_time,p.venue,
        p.evidence->>'original_url' detail_url
 FROM radar2.proposals p JOIN radar2.documents d ON d.url=p.document_url
 WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
                       AND (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date+7
+  AND (p.event_date>(now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
+       OR p.event_time IS NULL
+       OR p.event_time>to_char((now() AT TIME ZONE 'America/Argentina/Buenos_Aires'),'HH24:MI'))
   AND p.evidence->>'kind'='event'
   AND p.review_state NOT IN ('historico','contradictorio')
   AND coalesce(p.evidence->>'duplicate_of','')=''
@@ -24,7 +29,9 @@ WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')
   AND p.evidence->>'original_url' ~ '^https://agendalaplata[.]ar/evento/[a-z0-9-]{8,220}$'
   AND coalesce(p.evidence->'primary_source_followup'->>'checkedAt','2000-01-01T00:00:00+00:00')::timestamptz
       < now()-interval '24 hours'
-ORDER BY p.event_date,p.event_time NULLS LAST,p.proposal_id
+ORDER BY p.event_date,p.evidence->>'original_url',p.proposal_id
+) selected
+ORDER BY selected.event_day,selected.event_time NULLS LAST,selected.proposal_id
 LIMIT 18
 """
 
@@ -105,7 +112,7 @@ def follow_secondary(conn,collector,limit=3):
               'runId':collector.run_id,'publicationApproved':False,
               'requiresIndependentEditorialReview':True,
               'reviewerRole':'poraca_editorial_prod',
-              'reviewBy':row['event_day']+'T12:00:00-03:00',
+              'reviewBy':row['event_day']+'T08:00:00-03:00',
               'sourceRole':'secondary_event_detail'}
         detail_url=row['detail_url']
         if not detail_url.startswith('https://agendalaplata.ar/evento/') or not safe_url(detail_url):
@@ -155,10 +162,11 @@ WHERE p.proposal_id=x.receipt->>'proposalId'
   AND p.event_date::text=x.receipt->>'date'
   AND p.evidence->>'original_url'=x.receipt->>'secondaryDetailUrl'
   AND p.evidence->>'kind'='event'
-  AND EXISTS (SELECT 1 FROM radar2.documents d
+  AND (x.receipt->>'secondarySha256' IS NULL OR EXISTS (
+    SELECT 1 FROM radar2.documents d
     WHERE d.url=x.receipt->>'secondaryDetailUrl'
       AND d.sha256=x.receipt->>'secondarySha256'
-      AND d.last_run_id=$2)
+      AND d.last_run_id=$2))
   AND (x.receipt->>'primarySha256' IS NULL OR EXISTS (
     SELECT 1 FROM radar2.documents src
     WHERE src.url=x.receipt->>'primaryUrl'
@@ -169,8 +177,7 @@ RETURNING p.proposal_id
 
 def stage_followups(conn,run_id,receipts):
     """Stage only if the source documents were persisted in the same run."""
-    valid=[r for r in receipts if r.get('secondarySha256')]
-    if not valid:return 0
-    written=execute(conn,FOLLOWUP_STAGE_SQL,[__import__('json').dumps(valid,ensure_ascii=False),run_id])['rows']
-    if len(written)!=len(valid):raise RuntimeError('PRIMARY_FOLLOWUP_SAME_RUN_READBACK_MISMATCH')
+    if not receipts:return 0
+    written=execute(conn,FOLLOWUP_STAGE_SQL,[__import__('json').dumps(receipts,ensure_ascii=False),run_id])['rows']
+    if len(written)!=len(receipts):raise RuntimeError('PRIMARY_FOLLOWUP_SAME_RUN_READBACK_MISMATCH')
     return len(written)
