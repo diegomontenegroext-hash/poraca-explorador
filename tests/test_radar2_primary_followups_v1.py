@@ -50,7 +50,7 @@ class PrimarySourceFollowupTests(unittest.TestCase):
   doc['final_url']='https://redirect.invalid'
   self.assertEqual(classify_ticket(row,doc),('ORIGINAL_FETCH_NOT_VERIFIED',[]))
  def test_query_has_bounded_identity_and_freshness(self):
-  for term in ('LIMIT 18','event_date BETWEEN','duplicate_of','primary_source_followup','24 hours',
+  for term in ('LIMIT 120','event_date BETWEEN','duplicate_of','primary_source_followup','24 hours',
                'agendalaplata','ORDER BY'):
    self.assertIn(term,CANDIDATES_SQL)
   for term in ("UPDATE radar2.proposals","source_followup","d.last_run_id=$2","src.last_run_id=$2",
@@ -58,6 +58,11 @@ class PrimarySourceFollowupTests(unittest.TestCase):
    self.assertIn(term,FOLLOWUP_STAGE_SQL)
   self.assertNotIn('public.radar_agenda_events',FOLLOWUP_STAGE_SQL)
   self.assertIn('DISTINCT ON (p.event_date',CANDIDATES_SQL)
+  self.assertIn('PARTITION BY selected.event_day',CANDIDATES_SQL)
+  self.assertIn('ORDER BY ranked.day_slot,ranked.event_day',CANDIDATES_SQL)
+  self.assertIn('LIMIT 120',CANDIDATES_SQL)
+  self.assertNotIn('INSERT INTO',CANDIDATES_SQL)
+  self.assertNotIn('UPDATE radar2',CANDIDATES_SQL)
   self.assertIn('p.event_time IS NULL',CANDIDATES_SQL)
   self.assertIn("p.event_time>to_char",CANDIDATES_SQL)
   self.assertIn("x.receipt->>'secondarySha256' IS NULL",FOLLOWUP_STAGE_SQL)

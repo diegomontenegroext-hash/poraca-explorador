@@ -13,6 +13,11 @@ from capabilities import safe_url
 
 CANDIDATES_SQL = """
 SELECT * FROM (
+SELECT selected.*,row_number() OVER (
+ PARTITION BY selected.event_day
+ ORDER BY selected.first_seen_at,selected.event_time NULLS LAST,selected.proposal_id
+) AS day_slot
+FROM (
 SELECT DISTINCT ON (p.event_date,p.evidence->>'original_url')
        p.proposal_id,p.first_seen_at,p.title,p.event_date::text event_day,p.event_time,p.venue,
        p.evidence->>'original_url' detail_url,d.source AS secondary_source
@@ -35,8 +40,11 @@ WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')
       < now()-interval '24 hours'
 ORDER BY p.event_date,p.evidence->>'original_url',p.proposal_id
 ) selected
-ORDER BY selected.event_day,selected.first_seen_at,selected.event_time NULLS LAST,selected.proposal_id
-LIMIT 18
+) ranked
+-- One dated session per day before a second. Preserve first-seen priority within each day.
+-- This prevents the nearest single day from exhausting all eight safe primary checks.
+ORDER BY ranked.day_slot,ranked.event_day,ranked.first_seen_at,ranked.event_time NULLS LAST,ranked.proposal_id
+LIMIT 120
 """
 
 # Ticket detail only. Plateanet /teatro/13 is a theatre CATALOG, not
