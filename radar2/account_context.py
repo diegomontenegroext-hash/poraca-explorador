@@ -85,7 +85,7 @@ def location_for(d,block):
                quote=m[0],candidate=None)
  # Physical address + "in the room" is stronger than a profile-only guess.
  address=ADDRESS.search(block)
- if address and re.search(r'\b(?:sala|nos vemos|encontramos|cineclub|funci[oó]n|proyecci[oó]n)\b',fold(block),re.I):
+ if address and re.search(r'\b(?:sala|nos vemos|encontramos|cineclub|funci[oó]n|proyecci[oó]n|abrimos nuestra casa)\b',fold(block),re.I):
   return dict(base,venue=venue,basis='owned_venue_with_explicit_address',
               quote=address['loc'],candidate=None)
  # Host owns the profile, but could be announcing someone else's activity.

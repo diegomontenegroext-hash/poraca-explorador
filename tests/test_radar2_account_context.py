@@ -99,6 +99,36 @@ class CaptionVenueResolution(unittest.TestCase):
   self.assertEqual(p['venue_candidate'],'Pura Vida')
   self.assertEqual(p['state'],'incompleto')
   self.assertNotIn('venue', [e['role'] for e in p['entities']])
+ def test_verified_residencia_announces_open_house_address_before_date(self):
+  source=('Cumple 20 Universal & Diagonal!\n'
+    'Celebramos 20 años con exposiciones, proyecciones y músicos. '
+    'Abrimos nuestra casa y salimos a la calle con amigos.\n'
+    '📍 Calle 2 entre 46 y 47, La Plata\n'
+    '🗓 Domingo 22 de noviembre · desde las 18 hs\n'
+    'Todxs invitadxs. residenciacorazon')
+  p=self.parse(self.doc('residenciacorazon',source))[0]
+  self.assertEqual(p['date'],'2026-11-22')
+  self.assertEqual(p['time'],'18:00')
+  self.assertEqual(p['venue'],'Residencia Corazón')
+  self.assertEqual(p['venue_entity_id'],'residencia-corazon')
+  self.assertEqual(p['venue_basis'],'owned_venue_with_explicit_address')
+  self.assertEqual(p['state'],'observado_agenda')
+  self.assertFalse(p['publication_approved'])
+ def test_other_account_cannot_inherit_residencia_open_house(self):
+  caption=('Aniversario de un lugar amigo. Abrimos nuestra casa en La Plata. '
+   '📍 Calle 2 entre 46 y 47, La Plata\nDomingo 22 de noviembre a las 18 hs')
+  for handle in ('tribusocialclub','teatroespacio44','sindicatoargentinodeboleros'):
+   p=self.parse(self.doc(handle,caption))[0]
+   self.assertIsNone(p['venue'])
+   self.assertEqual(p['state'],'incompleto')
+ def test_multi_stop_program_never_inherits_owned_house(self):
+  caption=('Programa cultural y exposición. Abrimos nuestra casa. '
+   '📍 Calle 2 entre 46 y 47, La Plata\n'
+   'Domingo 22 de noviembre a las 18 hs música\n'
+   'Lunes 23 de noviembre a las 19 hs proyección en otra sala')
+  ps=self.parse(self.doc('residenciacorazon',caption))
+  self.assertGreaterEqual(len(ps),2)
+  self.assertTrue(all(x.get('venue_basis')!='owned_venue_with_explicit_address' for x in ps))
  def test_internal_venue_profile_is_not_autoapproved(self):
   p=self.parse(self.doc('teatroespacio44','Yuna soy yo\nSábado 7 de noviembre, 18:00hs\nEntradas en Alternativa Teatral'))[0]
   self.assertIsNone(p['venue'])

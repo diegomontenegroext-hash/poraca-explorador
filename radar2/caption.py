@@ -177,6 +177,16 @@ def interpret(c,d,accounts):
    # Match a real venue name/address inside THIS activity scope; profile ownership
    # alone produces a candidate, never a confirmed event place.
    host_location=location_for(d,scope)
+   # With ONE dated activity, a verified venue may announce opening its
+   # own house and print the 📍 street BEFORE the date. Read that earlier
+   # paragraph ONLY for an explicit own-house + physical-address receipt,
+   # not for arbitrary account ownership or a multi-stop itinerary.
+   if not host_location.get('venue') and len(schedules)==1 and start>0:
+    earlier=text[:start]
+    if re.search(r'abrimos nuestra casa',norm(earlier)):
+     preceding=location_for(d,earlier)
+     if preceding.get('basis')=='owned_venue_with_explicit_address':
+      host_location=preceding
    # A bare catalogue mention from an unverified source is not a venue fact.
    # Preserve the location as a candidate unless this block says "en X" or "📍 X".
    venue_mention_only=bool(venue and not host_location.get('venue')
