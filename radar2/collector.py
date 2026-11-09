@@ -373,7 +373,7 @@ class Collector:
                 # Only the producer's own linked event pages; HTTP/robots still
                 # control every request. No fixed future dates or trust by label.
                 if not self.reuse(d):
-                    self.add(d,source,state='investigable',evidence=d['text'][:4000])
+                    self.add(d,source,state='actor',evidence=d['text'][:4000])
                 from extract import extract_document
                 accounts=json.loads(Path(__file__).with_name('accounts.json').read_text())
                 visited=set()

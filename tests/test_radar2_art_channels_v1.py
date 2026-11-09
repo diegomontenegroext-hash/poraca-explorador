@@ -40,6 +40,7 @@ class ArtSources(unittest.TestCase):
    self.assertEqual(set(seen),{'Laura Gan institucional','Sincronía Eventbrite organizador'})
    self.assertEqual(len(collector.proposals),2)
    self.assertTrue(all(p['date'] is None for p in collector.proposals.values()))
+   self.assertTrue(all(p['state']=='actor' for p in collector.proposals.values()))
  def test_organizer_link_scope_and_original_before_proposal(self):
   with tempfile.TemporaryDirectory() as tmp:
    collector=Collector(tmp);parsed=[]

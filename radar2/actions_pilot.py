@@ -160,7 +160,8 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
             origin_receipts.append({'source':name,'url':url,
               'status':'fetched_original' if url in c.docs else 'blocked_or_unavailable',
               'http_status':check.get('status'),'error':check.get('error')})
-    open_search={'status':'rss_provider_robots_disallowed_use_original_sources',
+    open_search={'status':'rss_provider_robots_disallowed_use_original_sources'
+        if full and not corrective else 'not_due_incremental',
       'queries':0,'blocked_provider':'bing.com/search',
       'original_sources':origin_receipts,
       'policy':'No bypass of robots, no event dates from search results'}
