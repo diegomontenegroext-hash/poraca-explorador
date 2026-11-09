@@ -178,14 +178,31 @@ def instagram_batch(c,batch,access):
     return manifest
 
 
-def public_search(c,access,batch,limit=4):
-    """Optional public search RSS. Robots gate precedes every query; no paid API."""
+def public_search(c,access,batch,limit=4,focus=None):
+    """Optional public RSS lookup; existing robots/HTTP gate, no paid search.
+
+    For the natural FULL only, four bounded topical queries close documented
+    blind spots. These are REQUESTS, not evidence of a successful search or
+    an approved event. Never fan out account queries in this mode.
+    """
     manifest={'searches':[],'documents':[]}
     month=datetime.now(timezone.utc).astimezone(__import__('zoneinfo').ZoneInfo('America/Argentina/Buenos_Aires')).strftime('%Y-%m')
-    topics=['teatro independiente cartelera','exposiciones galerías inauguración','cata vinos feria','taller especial cerámica yoga','música ciclos recitales']
-    day=datetime.now(timezone.utc).day
-    queries=[{'id':'open-'+str(day%len(topics)),'query':'"La Plata" '+month+' '+topics[day%len(topics)],'accounts':[]}]
-    for a in batch.get('accounts',[]):queries.append({'id':'ig-public-index-'+a['username'],'query':'site:instagram.com "'+a['username']+'" "La Plata"','accounts':[a['username']]})
+    if focus=='activity_gaps':
+        terms=[
+          ('open-art','inauguracion exposicion galeria'),
+          ('open-yoga','yoga masterclass encuentro taller'),
+          ('open-ceramica','ceramica alfareria taller intensivo'),
+          ('open-outdoors','running ciclismo pedaleada kayak rollers senderismo')
+        ]
+        queries=[{'id':key,'query':'"La Plata" '+month+' '+phrase,'accounts':[]}
+                 for key,phrase in terms]
+    else:
+        topics=['teatro independiente cartelera','exposiciones galerías inauguración','cata vinos feria','taller especial cerámica yoga','música ciclos recitales']
+        day=datetime.now(timezone.utc).day
+        queries=[{'id':'open-'+str(day%len(topics)),'query':'"La Plata" '+month+' '+topics[day%len(topics)],'accounts':[]}]
+        for a in batch.get('accounts',[]):
+            queries.append({'id':'ig-public-index-'+a['username'],
+                'query':'site:instagram.com "'+a['username']+'" "La Plata"','accounts':[a['username']]})
     for q in queries:
         url='https://www.bing.com/search?'+urlencode({'q':q['query'],'format':'rss'})
         raw,receipt=access.get(url);row={'query':q,'receipt':receipt,'searched_at':utc()}

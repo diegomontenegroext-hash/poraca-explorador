@@ -134,6 +134,33 @@ class Capabilities(unittest.TestCase):
    self.assertEqual(len(c.proposals),1,'Footer mention of a finished OTHER event is not a veto')
    self.assertEqual(next(iter(c.proposals.values()))['date'],'2026-12-20')
 
+ def test_full_public_search_focus_is_bounded_and_has_receipts(self):
+  from capabilities import public_search
+  from urllib.parse import parse_qs,urlsplit
+  class StubCollector:
+   def __init__(self):self.manifest=None
+   def discovery(self,manifest,limit_per_query):
+    self.manifest=manifest
+    self.limit=limit_per_query
+  class StubAccess:
+   def __init__(self):self.urls=[]
+   def get(self,url):
+    self.urls.append(url)
+    return '<rss><channel><item><title>Evento de prueba</title><link>https://test.example/evento/1</link><description>La Plata 2026</description></item></channel></rss>',{'allowed':True,'http_status':200}
+  collector=StubCollector();access=StubAccess()
+  with patch('capabilities.safe_url',return_value=True):
+   out=public_search(collector,access,{'accounts':[{'username':'irrelevant'}]},limit=2,focus='activity_gaps')
+  self.assertEqual(len(out['searches']),4,'One bounded FULL only; not every account')
+  self.assertEqual([x['query']['id'] for x in out['searches']],
+   ['open-art','open-yoga','open-ceramica','open-outdoors'])
+  self.assertEqual(len(access.urls),4)
+  self.assertEqual(collector.limit,2)
+  self.assertTrue(all(x['receipt']['http_status']==200 for x in out['searches']))
+  self.assertTrue(all('format=rss' in url for url in access.urls))
+  self.assertNotIn('irrelevant',' '.join(access.urls))
+  source=Path(__file__).resolve().parents[1].joinpath('radar2/actions_pilot.py').read_text()
+  self.assertIn("public_search(c,access,{'accounts':[]},limit=2,focus='activity_gaps')",source)
+  self.assertIn("'open_search':open_search",source)
  def test_frontier_rejects_utility_links_in_existing_and_new_sources(self):
   from capabilities import cultural_link
   for url,label in [('https://wa.me/123','Reservas'),('https://t.me/share/url?url=cultura','Compartir'),('https://automattic.com/cookies/','Cookie Policy'),('https://funebres.eldia.com/','Fúnebres'),('https://sponsor.example/',''),('https://www.dbyz.com.ar/','Design')]:

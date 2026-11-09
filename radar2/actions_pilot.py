@@ -147,6 +147,24 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
             if not official_pilot.get('queries_sent',0):
                 official_pilot['status']='ROTATION_FAILED'
         manifest['official_results']=official_pilot.get('results',[])
+    # Search templates run by Work are not automatically executed by GitHub.
+    # This calls the EXISTING Python public_search only in the ordinary FULL,
+    # with four robots-gated RSS requests and at most two links per query.
+    # Failures remain visible; the rest of the Radar pipeline continues.
+    open_search={'status':'not_due_incremental','queries':0}
+    if full and not corrective:
+        try:
+            found=public_search(c,access,{'accounts':[]},limit=2,focus='activity_gaps')
+            receipts=[{'id':x['query']['id'],'http_status':x['receipt'].get('http_status'),
+                'allowed':bool(x['receipt'].get('allowed')),'error':x.get('error')} for x in found['searches']]
+            open_search={'status':'attempted_with_receipts','queries':len(receipts),
+                'result_links':len(found['documents']),
+                'blocked_or_failed':sum(bool(x.get('error')) or not x['allowed'] for x in receipts),
+                'receipts':receipts}
+        except Exception as exc:
+            open_search={'status':'phase_failed','error_type':type(exc).__name__,
+                         'error':str(exc)[:160]}
+            c.checks.append({'phase':'open_search','error':open_search['error']})
     try:source_report=discover_links(c,conn,known_urls,limit=12 if full else 6,refresh_candidates=corrective)
     except Exception as e:source_report={'status':'phase_failed','error':type(e).__name__+': '+str(e)[:160]}
     # Rejected non-cultural documents remain auditable but leave the private
@@ -232,7 +250,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     metrics={k:int(v) for k,v in m.items()}
     attempts=manifest['instagram_attempts']
     ig={'accounts_attempted':len(attempts),'accounts_with_profile_http_request':sum(bool(a.get('profile_http_requested')) for a in attempts),'profiles_accessible':sum(bool(a['profile_accessible']) for a in attempts),'accounts_with_posts':sum(a['posts_recovered']>0 for a in attempts),'posts_recovered':sum(a['posts_recovered'] for a in attempts),'errors_or_restrictions':sum(bool(a.get('error')) for a in attempts),'receipts':attempts,'index_searches':len(manifest['searches']),'search_failures':sum(bool(s.get('error')) for s in manifest['searches']),'search_receipts':manifest['searches']}
-    report={'execution_context':'GitHub Actions','github_event':os.environ.get('GITHUB_EVENT_NAME'),'github_schedule':os.environ.get('RADAR2_SCHEDULE'),'github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'mode':'full' if full else 'incremental','caption_documents_processed':reprocessed,'journal_recovered_documents':recovered,'credential_health':credential_health(),'scope':'full' if full else 'incremental','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'instagram_official_pilot':official_pilot,'rotation':rotation_status,'source_discovery':source_report,'cultural_memory':graph_report,'source_admission':admissions,'urgent_source_refresh':urgent_refresh,'primary_source_followup':primary_handoff,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'supplemented_representatives':supplemented,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0}
+    report={'execution_context':'GitHub Actions','github_event':os.environ.get('GITHUB_EVENT_NAME'),'github_schedule':os.environ.get('RADAR2_SCHEDULE'),'github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'mode':'full' if full else 'incremental','caption_documents_processed':reprocessed,'journal_recovered_documents':recovered,'credential_health':credential_health(),'scope':'full' if full else 'incremental','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'instagram_official_pilot':official_pilot,'rotation':rotation_status,'source_discovery':source_report,'open_search':open_search,'cultural_memory':graph_report,'source_admission':admissions,'urgent_source_refresh':urgent_refresh,'primary_source_followup':primary_handoff,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'supplemented_representatives':supplemented,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0}
     saved=execute(conn,"UPDATE radar2.runs SET summary=summary || $2::jsonb WHERE run_id=$1 RETURNING run_id",[run_id,json.dumps(report,ensure_ascii=False)])['rows']
     if len(saved)!=1:raise RuntimeError('RUN_SUMMARY_NOT_SAVED')
     print(json.dumps({k:v for k,v in report.items() if k not in ('proposal_ids','rotation','instagram','source_discovery')}))
