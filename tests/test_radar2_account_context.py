@@ -142,6 +142,16 @@ class CaptionVenueResolution(unittest.TestCase):
   self.assertTrue(all(p['venue'] is None for p in results))
   self.assertTrue(all(p['state']=='incompleto' for p in results))
   self.assertTrue(all(not p['publication_approved'] for p in results))
+ def test_multiple_pinned_list_headings_remain_unlocated(self):
+  for label in ('Bibliotecas participantes:', 'Espacios adheridos:', 'Lugares asociados:'):
+   with self.subTest(label=label):
+    caption='Encuentro cultural y libros\nSábado 14 de noviembre\n📍 '+label+'\nConsultar programación'
+    d=self.doc('unknown_agenda',caption,stamp='2026-11-05T13:00:00+00:00')
+    d['fetched_at']='2026-11-07T15:00:00Z'
+    proposals=self.parse(d)
+    self.assertGreaterEqual(len(proposals),1)
+    self.assertTrue(all(p['venue'] is None for p in proposals))
+    self.assertTrue(all(not p['publication_approved'] for p in proposals))
  def test_marker_venue_literal_still_works(self):
   caption=('Teatro independiente, función el 14 de noviembre a las 21 hs\n'
    '📍 Sala Ginastera, La Plata\nReservas disponibles')
