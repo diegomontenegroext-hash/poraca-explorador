@@ -139,6 +139,21 @@ class OfficialInstagramPilot(unittest.TestCase):
         self.assertEqual(len(report["unattempted_accounts"]),0)
         self.assertEqual(discover.call_count,20)
 
+    def test_controls_share_absolute_twenty_request_budget(self):
+        fake=SimpleNamespace(docs={},proposals={})
+        creds={"META_IG_USER_ID":"test","META_ACCESS_TOKEN":"dummy","META_GRAPH_VERSION":"v27.0"}
+        candidates=["venue_"+str(i) for i in range(30)]
+        with patch.dict(os.environ,creds,clear=True),patch(
+            "instagram_official_pilot.discover",
+            return_value={"status":"NO_MEDIA_RETURNED","posts":[]}) as discover:
+            report=acquire(fake,set(),candidates,include_controls=True,
+                           extra_curators=["extra_curator"])
+        self.assertEqual(report["queries_sent"],20)
+        self.assertEqual(len(report["controls"]),4)
+        self.assertEqual(len(report["rotating_accounts"]),16)
+        self.assertEqual(report["extra_curators"],[])
+        self.assertEqual(discover.call_count,20)
+
     def test_rate_limit_stops_remaining_requests(self):
         fake=SimpleNamespace(docs={},proposals={})
         creds={"META_IG_USER_ID":"test","META_ACCESS_TOKEN":"dummy","META_GRAPH_VERSION":"v27.0"}
