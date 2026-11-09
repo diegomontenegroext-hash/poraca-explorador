@@ -18,6 +18,12 @@ UA = 'PorAcá/2.0 (+https://github.com/diegomontenegroext-hash/poraca-explorador
 UA = UA.encode('ascii','ignore').decode()
 VOID = {'area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'}
 BLOCKED = {'instagram.com','facebook.com','imginn.com','pikory.com','pixnoy.com','pixwox.com'}
+# Require identity AND a relevant activity term in indexed-source matches.
+TARGETED_EVENT_SIGNALS=re.compile(
+ r'teatro|recital|musica|electronica|fiesta|cultura|galeria|exposicion|'
+ r'arte|taller|feria|vino|cata|yoga|ceramica|'
+ r'running|run club|pedalead|ciclismo|cicloturismo|biciclet|kayak|'
+ r'travesia|rollers|patinaje|senderismo|caminata grupal|stand up paddle',re.I)
 
 def platform_host(host):return any(host==base or (host or '').endswith('.'+base) for base in BLOCKED)
 
@@ -167,7 +173,7 @@ class Collector:
             if targeted:
                 content=norm(row['title']+' '+row.get('excerpt','')+' '+u)
                 identity=any(norm(a['handle']) in content or norm(a['name'].split(' — ')[0].split(' · ')[0]) in content for a in targeted)
-                cultural=re.search(r'teatro|recital|musica|electronic|fiesta|cultura|galeria|exposicion|\barte\b|taller|feria|vino|cata|yoga|ceramica',content)
+                cultural=TARGETED_EVENT_SIGNALS.search(content)
                 if not identity or not cultural:
                     self.checks.append({'url':u,'status':'discarded_unrelated_rotation_result','discovery':row['searches']});continue
             if any(host.endswith(x) for x in rejected) or re.search(r'/202[0-5](?:/|-)',urlsplit(u).path):
@@ -338,6 +344,7 @@ class Collector:
           ('https://institutocultural.gba.gob.ar/taxonomy/term/1746','Islas Malvinas institutional','laplata.ciudadcultural'),
           ('https://www.casadionisio.com.ar/expoarte','ExpoArte Casa Dionisio','dionisio_vinoteca'),
           ('https://www.casadionisio.com.ar/','Casa Dionisio','dionisio_vinoteca'),
+          ('https://tickets.sincroniadeportiva.com.ar/','Sincronía Deportiva original',None),
           ('https://linktr.ee/lutitravelguide','Luti','lutitravelguide'),
           ('https://linktr.ee/circus_ofc','Circus links','circus_ofc'),
           ('https://linktr.ee/guajirabar','Guajira','guajira.bar'),
@@ -359,6 +366,26 @@ class Collector:
                     d['acquisition_method']='institutional_art_original_v1'
                     extract_document(self,d,json.loads(Path(__file__).with_name('accounts.json').read_text()),
                                      'institutional_art_original_v1')
+                continue
+            if source=='Sincronía Deportiva original':
+                # Inside the existing daily FULL; only links published by the
+                # organizer itself. No weekly events invented, no new workflow.
+                from extract import extract_document
+                accounts=json.loads(Path(__file__).with_name('accounts.json').read_text())
+                if not self.reuse(d):
+                    d['acquisition_method']='institutional_sports_original_v1'
+                    extract_document(self,d,accounts,'institutional_sports_original_v1')
+                visited=set()
+                for u in self.links(d):
+                    if len(visited)>=3:break
+                    link=urlsplit(u)
+                    if link.scheme!='https' or link.hostname!='tickets.sincroniadeportiva.com.ar' or not link.path.startswith('/event/'):continue
+                    if u in visited:continue
+                    visited.add(u)
+                    child=self.fetch(u,source,d['url'])
+                    if child and not self.reuse(child):
+                        child['acquisition_method']='institutional_sports_original_detail_v1'
+                        extract_document(self,child,accounts,'institutional_sports_original_detail_v1')
                 continue
             if not self.reuse(d):self.add(d,source,state='actor',evidence=d['text'],origin_account=account)
             if source=='Sunset Wine Mixology':

@@ -14,7 +14,7 @@ def category(text):
  # Preserve source labels in revisions; never guess film from a venue or poster alone.
  if re.search(r'^\s*cine\s+(?:eco)?select\s*[:\-]\s*\S',text or '',re.I):
   return 'Cine'
- for pattern,label in [(r'vino|bodega|degustacion|cata\b','Vino'),(r'teatro|obra|escenario','Teatro'),(r'fotografia|exposicion|fotolibro|inauguracion|cianotipia|mosaico','Arte'),(r'taller|seminario','Taller especial'),(r'electronica|techno|circus|intra|\b999\b','Electrónica'),(r'musica|recital|banda|concierto|guajira','Música')]:
+ for pattern,label in [(r'vino|bodega|degustacion|cata\b','Vino'),(r'teatro|obra|escenario','Teatro'),(r'fotografia|exposicion|fotolibro|inauguracion|cianotipia|mosaico','Arte'),(r'taller|seminario','Taller especial'),(r'running|carrera|\bcorre\b|ciclismo|cicloturismo|kayak|rollers|senderismo','Deporte'),(r'electronica|techno|circus|intra|\b999\b','Electrónica'),(r'musica|recital|banda|concierto|guajira','Música')]:
   if re.search(pattern,norm(text)):return label
  return 'Cultura'
 
@@ -48,7 +48,7 @@ def extract_document(c,d,accounts,method):
   if not day:return
   if (day< (now-timedelta(days=2)).isoformat() and not(end_date and end_date>=now.isoformat())) or day>(now+timedelta(days=120)).isoformat():
    c.checks.append({'url':d['url'],'status':'discarded_historical_or_outside_horizon','title':title,'date':day});return
-  if not re.search(r'la plata|berisso|ensenada|gonnet|gorina|city bell|villa elisa',norm(d['text'])):return
+  if not re.search(r'la plata|berisso|ensenada|gonnet|gorina|city bell|villa elisa|tolosa|punta lara|abasto',norm(d['text'])):return
   if re.search(r'\bberazategui\b|\bquilmes\b',norm(venue or '')+' '+norm(evidence)):
    c.checks.append({'url':d['url'],'status':'discarded_out_of_area','title':title});return
   related=account_links((venue or '')+' '+evidence,accounts)
@@ -201,7 +201,7 @@ def extract_document(c,d,accounts,method):
    add(title,current_day,f'{int(hour[1]):02}:{hour[2] or "00"}' if hour else None,venue[1] if venue else None,text,kind='program' if end_date and end_date!=current_day else 'event',end_date=end_date)
  # Do not turn an unparsed article, homepage or old announcement into an event.
  if not produced:
-  if not re.search(r'la plata|berisso|ensenada|gonnet|gorina|city bell|villa elisa',norm(d['text'])):
+  if not re.search(r'la plata|berisso|ensenada|gonnet|gorina|city bell|villa elisa|tolosa|punta lara|abasto',norm(d['text'])):
    c.checks.append({'url':d['url'],'status':'discarded_no_local_cultural_evidence'});return []
   historical=bool(published and str(published)[:10]<(now-timedelta(days=60)).isoformat())
   c.document_lead(d,state='historico' if historical else 'investigable')
