@@ -1,6 +1,6 @@
-"""Bounded Meta Business Discovery: four stable controls plus ten rotating accounts.
+"""Bounded Meta Business Discovery: controls plus at most 20 due accounts.
 
-Runs inside the existing Radar 2 schedule (05:27 ART). Without valid Meta
+Runs inside the existing Radar 2 schedule (FULL and incrementals). Without valid Meta
 credentials the pilot is NOT_CONFIGURED and performs zero requests.
 No HTML profile collection, browser automation, bypass, or new scheduler.
 """
@@ -32,14 +32,14 @@ def publication_age_bucket(timestamp, checked_at):
         return "unknown"
 
 def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,extra_curators=()):
-    """Four controls plus at most ten unique users from the persisted daily batch."""
+    """Four optional controls plus at most 20 unique due users per natural batch."""
     rotating=[]
     for raw in rotating_accounts:
         username=raw.strip().lower() if isinstance(raw,str) else ""
         if (re.fullmatch(r"[a-z0-9_.]{1,30}",username) and
                 (not include_controls or username not in ACCOUNTS) and username not in rotating):
             rotating.append(username)
-        if len(rotating)>=10: break
+        if len(rotating)>=20: break
     accounts=(list(ACCOUNTS) if include_controls else [])+rotating
     extra=[]
     for u in extra_curators:
