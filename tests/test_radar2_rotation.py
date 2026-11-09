@@ -2,7 +2,7 @@ import copy,json,sys,tempfile,unittest
 from pathlib import Path
 from datetime import datetime,timedelta,timezone
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'radar2'))
-from rotation import initial,select,claim,complete
+from rotation import initial,select,claim,complete,adaptive_query_budget
 from unittest.mock import patch
 from collector import Collector
 class Rotation(unittest.TestCase):
@@ -35,6 +35,20 @@ class Rotation(unittest.TestCase):
    self.assertIn(second,select(self.state,self.at))
    complete(None,'run',{'official_results':[receipt]})
    self.assertEqual(first['official_success_count'],1)
+ def test_adaptive_capacity_is_capped_and_only_due_accounts_count(self):
+  self.assertEqual([adaptive_query_budget(n) for n in (0,10,20,21,33,40,41,125)],
+                   [10,10,10,15,15,15,20,20])
+  self.assertEqual(len(select(self.state,self.at,20)),20)
+  for i,a in enumerate(self.state['accounts'].values()):
+   if i>=33:a['next_review_at']=(self.at+timedelta(days=1)).isoformat()
+  self.assertEqual(len(select(self.state,self.at,20)),15)
+  with patch('rotation.read',return_value=self.state), patch('rotation.cas',return_value=True):
+   batch=claim(None,'adaptive',20)
+  self.assertEqual(batch['batch']['eligible_at_claim'],33)
+  self.assertEqual(batch['batch']['budget'],15)
+  self.assertEqual(batch['batch']['due_remaining_at_claim'],18)
+  self.assertEqual(len(batch['accounts']),15)
+  self.assertEqual(len({a['username'] for a in batch['accounts']}),15)
  def test_index_excerpt_never_fetches_or_asserts_date(self):
   with tempfile.TemporaryDirectory() as out:
    c=Collector(out)
