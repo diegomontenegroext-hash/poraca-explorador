@@ -26,7 +26,7 @@ def timestamp(t):return t.isoformat()
 def initial(roster):
     accounts={a['handle'].lower():dict(a,username=a['handle'].lower(),priority=1 if a['handle'].lower() in PRIORITY else 2,
         review_count=0,last_review_at=None,last_attempt_at=None,next_review_at=None,result='never_reviewed') for a in roster}
-    if len(accounts)!=123 or any(not re.fullmatch(r'[a-z0-9_.]{1,30}',u) for u in accounts):raise ValueError('ROSTER_123_FENCE')
+    if len(accounts)!=124 or any(not re.fullmatch(r'[a-z0-9_.]{1,30}',u) for u in accounts):raise ValueError('ROSTER_124_FENCE')
     return {'type':'instagram_rotation_control','status':'control_state','version':0,'accounts':accounts,'batches':{}}
 
 def eligible_accounts(state,at):

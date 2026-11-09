@@ -1192,5 +1192,17 @@
     ],
     "status": "piloto",
     "kind": "organizador"
+  },
+  {
+    "id": "src-editorial-residencia-corazon-20261109",
+    "name": "Residencia Corazón",
+    "handle": "residenciacorazon",
+    "disciplines": [
+      "artes",
+      "exposiciones",
+      "residencias"
+    ],
+    "status": "piloto",
+    "kind": "organizador"
   }
 ]

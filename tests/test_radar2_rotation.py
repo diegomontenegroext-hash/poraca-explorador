@@ -10,6 +10,8 @@ class Rotation(unittest.TestCase):
   self.state=initial(json.loads((Path(__file__).resolve().parents[1]/'radar2/instagram_roster.json').read_text()))
   self.at=datetime.now(timezone.utc)
  def test_roster_and_fairness(self):
+  self.assertIn('residenciacorazon',self.state['accounts'])
+  self.assertEqual(self.state['accounts']['residenciacorazon']['priority'],1)
   first=select(self.state,self.at);self.assertEqual(len(first),10)
   for a in first:a.update(review_count=1,next_review_at=(self.at-timedelta(seconds=1)).isoformat())
   second=select(self.state,self.at);self.assertFalse({a['username'] for a in first}&{a['username'] for a in second})
@@ -22,7 +24,7 @@ class Rotation(unittest.TestCase):
  def test_due_count_and_unattempted_after_partial_batch(self):
   with patch('rotation.read',return_value=self.state), patch('rotation.cas',return_value=True), patch('rotation.execute',return_value={'rows':[{}]}):
    batch=claim(None,'run',2)
-   self.assertEqual(batch['batch']['eligible_at_claim'],123)
+   self.assertEqual(batch['batch']['eligible_at_claim'],124)
    first,second=batch['accounts']
    receipt={'username':first['username'],'checked_at':self.at.isoformat(),'status':'NO_MEDIA_RETURNED','http_status':200}
    complete(None,'run',{'official_results':[receipt]})

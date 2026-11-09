@@ -333,6 +333,10 @@ class Collector:
           ('https://compras.evento-simple.com/sunsetwinemix','Sunset Wine Mixology','sunsetwine.mixology'),
           ('https://circusproduce.com/','Circus','circus_ofc'),
           ('https://residenciacorazon.com.ar/','Residencia Corazón','residenciacorazon'),
+          ('https://maclamuseo.com.ar/','MACLA original exhibitions','maclamuseo'),
+          ('https://www.gba.gob.ar/museo_pettoruti/muestras','Pettoruti original exhibitions','museopettoruti'),
+          ('https://institutocultural.gba.gob.ar/taxonomy/term/1746','Islas Malvinas institutional','laplata.ciudadcultural'),
+          ('https://www.casadionisio.com.ar/expoarte','ExpoArte Casa Dionisio','dionisio_vinoteca'),
           ('https://www.casadionisio.com.ar/','Casa Dionisio','dionisio_vinoteca'),
           ('https://linktr.ee/lutitravelguide','Luti','lutitravelguide'),
           ('https://linktr.ee/circus_ofc','Circus links','circus_ofc'),
@@ -345,6 +349,17 @@ class Collector:
             if only and source not in only:continue
             d=self.fetch(url,source)
             if not d:continue
+            if source in ('MACLA original exhibitions','Pettoruti original exhibitions',
+                          'Islas Malvinas institutional','ExpoArte Casa Dionisio'):
+                # Existing FULL only. An exhibition period must not be rewritten
+                # into individual daily performances. The original yields an
+                # evidence-backed research proposal, NEVER a confirmed event.
+                if not self.reuse(d):
+                    from extract import extract_document
+                    d['acquisition_method']='institutional_art_original_v1'
+                    extract_document(self,d,json.loads(Path(__file__).with_name('accounts.json').read_text()),
+                                     'institutional_art_original_v1')
+                continue
             if not self.reuse(d):self.add(d,source,state='actor',evidence=d['text'],origin_account=account)
             if source=='Sunset Wine Mixology':
                 for u in [u for u in self.links(d) if '/sunsetwinemix/eventos/' in u][:3]:
