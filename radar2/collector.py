@@ -21,7 +21,7 @@ BLOCKED = {'instagram.com','facebook.com','imginn.com','pikory.com','pixnoy.com'
 # Require identity AND a relevant activity term in indexed-source matches.
 TARGETED_EVENT_SIGNALS=re.compile(
  r'teatro|recital|musica|electronica|fiesta|cultura|galeria|exposicion|'
- r'arte|taller|feria|vino|cata|yoga|ceramica|'
+ r'\barte\b|taller|feria|vino|cata|yoga|ceramica|'
  r'running|run club|pedalead|ciclismo|cicloturismo|biciclet|kayak|'
  r'travesia|rollers|patinaje|senderismo|caminata grupal|stand up paddle',re.I)
 
