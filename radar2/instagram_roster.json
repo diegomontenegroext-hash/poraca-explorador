@@ -1,5 +1,17 @@
 [
   {
+    "id": "src-rb-cafe",
+    "name": "R&B Café",
+    "handle": "_rbcafe",
+    "disciplines": [
+      "cafe",
+      "libros",
+      "talleres"
+    ],
+    "status": "piloto",
+    "kind": "organizador"
+  },
+  {
     "id": "src-888-casa-villa-elisa",
     "name": "888 Casa",
     "handle": "888casa",
@@ -9,6 +21,30 @@
       "gastronomia"
     ],
     "status": "piloto",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-asoc-mayo",
+    "name": "Asociación Mayo",
+    "handle": "asoc.mayo",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-hist-luti-12-20261011",
+    "name": "Astor Birra",
+    "handle": "astorbirra",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-aulavivafcnym-ok",
+    "name": "Aula Viva — Vivero FCNyM",
+    "handle": "aulavivafcnym.ok",
+    "disciplines": [],
+    "status": "propuesta",
     "kind": "organizador"
   },
   {
@@ -24,13 +60,79 @@
     "kind": "organizador"
   },
   {
-    "id": "src-casa-cultura-villa-elisa",
-    "name": "Casa de Cultura Villa Elisa",
-    "handle": "casadeculturavillaelisa",
+    "id": "src-hist-luti-11-20261011",
+    "name": "Bar La Unión — encuentros",
+    "handle": "barlaunion",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-curad-20261012-meridianov",
+    "name": "Barrio Meridiano V",
+    "handle": "barrio_meridianov",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "curadora"
+  },
+  {
+    "id": "src-exp-blondie-20261012",
+    "name": "Blondie Cultural",
+    "handle": "blondie.cultural",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-bocanada-bar",
+    "name": "Bocanada",
+    "handle": "bocanada.bar",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-hist-luti-04-20261011",
+    "name": "Bon Odori La Plata",
+    "handle": "bonodori_laplata",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-radar65-20261011-17",
+    "name": "Instituto Cultural PBA",
+    "handle": "buenosairescultura",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-c-f-josehernandez",
+    "name": "Centro Fomento José Hernández",
+    "handle": "c.f.josehernandez",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-cariniolibreria-20261018",
+    "name": "Cariño Librería · Villa Elisa",
+    "handle": "cariniolibreria",
     "disciplines": [
-      "arte",
-      "talleres",
-      "comunidad"
+      "literatura",
+      "libros"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-radar65-20261011-05",
+    "name": "Casa Unclan",
+    "handle": "casa_unclan",
+    "disciplines": [
+      "musica_en_vivo",
+      "arte"
     ],
     "status": "propuesta",
     "kind": "organizador"
@@ -62,6 +164,127 @@
     "kind": "organizador"
   },
   {
+    "id": "src-casa-cultura-villa-elisa",
+    "name": "Casa de Cultura Villa Elisa",
+    "handle": "casadeculturavillaelisa",
+    "disciplines": [
+      "arte",
+      "talleres",
+      "comunidad"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-radar65-20261011-08",
+    "name": "Casa Metro",
+    "handle": "casametrolp",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-hist-luti-09-20261011",
+    "name": "Casa Pulsar",
+    "handle": "casapulsarlaplata",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-radar65-20261011-16",
+    "name": "Casa 62",
+    "handle": "casasesentaydos",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-exp-casasuiza-20261012",
+    "name": "Casa Suiza La Plata",
+    "handle": "casasuizalp",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-casatomadawinehouse",
+    "name": "Casa Tomada Wine House",
+    "handle": "casatomadawinehouse",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-radar65-20261011-13",
+    "name": "Centro de Arte UNLP",
+    "handle": "centrodearteunlp",
+    "disciplines": [
+      "arte",
+      "teatro",
+      "musica",
+      "exposiciones"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-hist-luti-15-20261011",
+    "name": "Cerveza Bärfuss",
+    "handle": "cervezabarfuss",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-manual-ceramica-charo-20261013",
+    "name": "Charo Perelli Taller · cerámica",
+    "handle": "charoperellitaller",
+    "disciplines": [
+      "ceramica",
+      "talleres",
+      "formacion"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-radar65-20261011-09",
+    "name": "Cine Caminante",
+    "handle": "ciclodecinecaminante",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-social-cicloturismo-20261109",
+    "name": "Cicloturismo La Plata",
+    "handle": "cicloturismolaplata",
+    "disciplines": [
+      "ciclismo",
+      "cicloturismo",
+      "deporte"
+    ],
+    "status": "piloto",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-radar65-20261011-07",
+    "name": "Cine EcoSelect",
+    "handle": "cineecoselect",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-hist-luti-01-20261011",
+    "name": "Cine Municipal Select",
+    "handle": "cineselect",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
     "id": "src-ciudad-de-gatos",
     "name": "Ciudad de Gatos",
     "handle": "ciudaddegatos",
@@ -69,6 +292,46 @@
       "musica_electronica",
       "arte",
       "fiestas"
+    ],
+    "status": "piloto",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-manual-gasav-20261013",
+    "name": "GASAV · Club Náutico Punta Lara",
+    "handle": "club_gasav",
+    "disciplines": [
+      "nautica",
+      "deporte_nautico",
+      "vela",
+      "windsurf",
+      "kayak",
+      "sup",
+      "formacion_nautica"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-clubdeartistas-cb",
+    "name": "Club de Artistas City Bell",
+    "handle": "clubdeartistas.cb",
+    "disciplines": [
+      "arte",
+      "talleres"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-comunidadferroviaria",
+    "name": "Comunidad Ferroviaria",
+    "handle": "comunidadferroviaria",
+    "disciplines": [
+      "musica_en_vivo",
+      "teatro",
+      "ferias",
+      "talleres"
     ],
     "status": "piloto",
     "kind": "organizador"
@@ -86,29 +349,40 @@
     "kind": "organizador"
   },
   {
-    "id": "src-curad-20261012-ciudadcultural",
-    "name": "Ciudad Cultural — Municipalidad de La Plata",
-    "handle": "laplata.ciudadcultural",
+    "id": "src-exp-aconcagua-20261012",
+    "name": "Club Aconcagua",
+    "handle": "cscdaconcagua",
     "disciplines": [],
     "status": "propuesta",
-    "kind": "curadora"
+    "kind": "organizador"
   },
   {
-    "id": "src-curad-20261012-ematur",
-    "name": "EMATUR — Turismo La Plata",
-    "handle": "turismo.laplata",
+    "id": "src-radar65-20261011-02",
+    "name": "Desafinado Club",
+    "handle": "desafinadoclub",
     "disciplines": [],
     "status": "propuesta",
-    "kind": "curadora"
+    "kind": "organizador"
   },
   {
-    "id": "src-curad-20261012-fulgor",
-    "name": "Fulgor — fiesta y ciclo Ciudad de Gatos",
-    "handle": "fulgor.fiesta",
+    "id": "src-manual-edita-feria-20261013",
+    "name": "EDITA · Feria de Editoriales Independientes",
+    "handle": "edita.feria",
     "disciplines": [
-      "musica_electronica",
-      "fiestas"
+      "literatura",
+      "edicion",
+      "ferias",
+      "charlas",
+      "talleres"
     ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-curado-12-20261011",
+    "name": "El Cafecito de Cocoliche",
+    "handle": "elcafecitodecocoliche",
+    "disciplines": [],
     "status": "propuesta",
     "kind": "organizador"
   },
@@ -125,59 +399,30 @@
     "kind": "organizador"
   },
   {
-    "id": "src-curad-20261012-gonnago",
-    "name": "Gonna Go — productora",
-    "handle": "gonnagoprod",
+    "id": "src-exp-elteatrobar-20261012",
+    "name": "El Teatro Bar La Plata",
+    "handle": "elteatrobarlp",
     "disciplines": [],
     "status": "propuesta",
     "kind": "organizador"
   },
   {
-    "id": "src-curad-20261012-macla",
-    "name": "MACLA — Museo de Arte Contemporáneo Latinoamericano",
-    "handle": "maclamuseo",
-    "disciplines": [
-      "arte_contemporaneo",
-      "exposiciones"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curad-20261012-mam",
-    "name": "Museo de Arte y Memoria",
-    "handle": "museodearteymemoria",
-    "disciplines": [
-      "arte",
-      "memoria",
-      "exposiciones"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curad-20261012-meridianov",
-    "name": "Barrio Meridiano V",
-    "handle": "barrio_meridianov",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "curadora"
-  },
-  {
-    "id": "src-curad-20261012-opera",
-    "name": "Teatro Ópera La Plata",
-    "handle": "operalaplata",
+    "id": "src-radar65-20261011-18",
+    "name": "En Eso Estamos",
+    "handle": "en_eso_estamos",
     "disciplines": [],
     "status": "propuesta",
     "kind": "organizador"
   },
   {
-    "id": "src-curad-20261012-putipary",
-    "name": "Puti Pary — ciclo Ciudad de Gatos",
-    "handle": "putipary",
+    "id": "src-manual-ceramica-ermides-20261013",
+    "name": "Ermides Pottery · taller y tienda",
+    "handle": "ermidespottery",
     "disciplines": [
-      "musica",
-      "fiestas"
+      "ceramica",
+      "talleres",
+      "formacion",
+      "artesania"
     ],
     "status": "propuesta",
     "kind": "organizador"
@@ -207,111 +452,6 @@
     "kind": "organizador"
   },
   {
-    "id": "src-curado-01-20261011",
-    "name": "Cineclub Proyecciones Terrestres",
-    "handle": "proyeccionesterrestres",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curado-02-20261011",
-    "name": "La Bici — Creación Colectiva",
-    "handle": "labicicreacioncolectiva",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curado-03-20261011",
-    "name": "Librería Mascaró",
-    "handle": "libreriamascaro",
-    "disciplines": [
-      "literatura",
-      "libros"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curado-04-20261011",
-    "name": "Pivot Café",
-    "handle": "pivot.cafe",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curado-05-20261011",
-    "name": "Museo Provincial Emilio Pettoruti",
-    "handle": "museopettoruti",
-    "disciplines": [
-      "arte_contemporaneo",
-      "exposiciones"
-    ],
-    "status": "piloto",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curado-06-20261011",
-    "name": "Events La Plata — teatro en inglés",
-    "handle": "events_laplata",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curado-07-20261011",
-    "name": "Prisma — espacio cultural",
-    "handle": "proyecto.prisma",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curado-08-20261011",
-    "name": "Plateada — feria de arte contemporáneo",
-    "handle": "plateadaferia",
-    "disciplines": [
-      "arte_contemporaneo",
-      "ferias"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curado-09-20261011",
-    "name": "Sifón Producciones",
-    "handle": "sifon.producciones",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curado-10-20261011",
-    "name": "Veredita",
-    "handle": "veredita.bar",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curado-11-20261011",
-    "name": "Patio Café City Bell",
-    "handle": "somospatiocafe",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-curado-12-20261011",
-    "name": "El Cafecito de Cocoliche",
-    "handle": "elcafecitodecocoliche",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
     "id": "src-espacio-foli",
     "name": "Espacio Foli",
     "handle": "espacio_foli",
@@ -324,38 +464,6 @@
     "kind": "organizador"
   },
   {
-    "id": "src-exp-aconcagua-20261012",
-    "name": "Club Aconcagua",
-    "handle": "cscdaconcagua",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-exp-blondie-20261012",
-    "name": "Blondie Cultural",
-    "handle": "blondie.cultural",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-exp-casasuiza-20261012",
-    "name": "Casa Suiza La Plata",
-    "handle": "casasuizalp",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-exp-elteatrobar-20261012",
-    "name": "El Teatro Bar La Plata",
-    "handle": "elteatrobarlp",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
     "id": "src-exp-espaciolive-20261012",
     "name": "Espacio Live La Plata",
     "handle": "espaciolivelaplata",
@@ -364,74 +472,13 @@
     "kind": "organizador"
   },
   {
-    "id": "src-exp-festivalcapital-20261012",
-    "name": "Noches Capitales",
-    "handle": "festivalcapital",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-exp-intra-20261012",
-    "name": "INTRA — arte electrónico",
-    "handle": "intra.prod",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-exp-sala420-20261012",
-    "name": "Sala 420",
-    "handle": "sala420_lp",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-hist-luti-01-20261011",
-    "name": "Cine Municipal Select",
-    "handle": "cineselect",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-hist-luti-02-20261011",
-    "name": "Handicap — Morfi & Cultura Local",
-    "handle": "handicap.morfiyculturalocal",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-hist-luti-03-20261011",
-    "name": "La Noche de las Ferias",
-    "handle": "lanochedelasferias",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-hist-luti-04-20261011",
-    "name": "Bon Odori La Plata",
-    "handle": "bonodori_laplata",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-hist-luti-05-20261011",
-    "name": "La Juana Milonga",
-    "handle": "lajuanamilonga",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-hist-luti-06-20261011",
-    "name": "La Plata Lúdica",
-    "handle": "laplataludica",
-    "disciplines": [],
+    "id": "src-lab-espaciomoliere-cb",
+    "name": "Espacio Molière City Bell",
+    "handle": "espaciomoliere_cb",
+    "disciplines": [
+      "teatro",
+      "talleres"
+    ],
     "status": "propuesta",
     "kind": "organizador"
   },
@@ -448,43 +495,23 @@
     "kind": "organizador"
   },
   {
-    "id": "src-hist-luti-08-20261011",
-    "name": "Teatro UNLP",
-    "handle": "teatrounlp",
+    "id": "src-curado-06-20261011",
+    "name": "Events La Plata — teatro en inglés",
+    "handle": "events_laplata",
     "disciplines": [],
     "status": "propuesta",
     "kind": "organizador"
   },
   {
-    "id": "src-hist-luti-09-20261011",
-    "name": "Casa Pulsar",
-    "handle": "casapulsarlaplata",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-hist-luti-10-20261011",
-    "name": "Run Run",
-    "handle": "runrun.bar",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-hist-luti-11-20261011",
-    "name": "Bar La Unión — encuentros",
-    "handle": "barlaunion",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-hist-luti-12-20261011",
-    "name": "Astor Birra",
-    "handle": "astorbirra",
-    "disciplines": [],
-    "status": "propuesta",
+    "id": "src-social-kayak-20261109",
+    "name": "Experiencia Kayak",
+    "handle": "exp.kayak",
+    "disciplines": [
+      "kayak",
+      "nautica",
+      "deporte"
+    ],
+    "status": "piloto",
     "kind": "organizador"
   },
   {
@@ -496,131 +523,17 @@
     "kind": "organizador"
   },
   {
-    "id": "src-hist-luti-14-20261011",
-    "name": "Hipódromo de La Plata — espacio de eventos",
-    "handle": "hipodromolaplata",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-hist-luti-15-20261011",
-    "name": "Cerveza Bärfuss",
-    "handle": "cervezabarfuss",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-hist-luti-16-20261011",
-    "name": "Räuber Cerveza",
-    "handle": "rauber.cerveza",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-la-filial-danza",
-    "name": "La Filial — espacio cultural",
-    "handle": "lafilial_espaciocultural",
-    "disciplines": [
-      "danza",
-      "artes_escenicas",
-      "talleres"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-asoc-mayo",
-    "name": "Asociación Mayo",
-    "handle": "asoc.mayo",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-aulavivafcnym-ok",
-    "name": "Aula Viva — Vivero FCNyM",
-    "handle": "aulavivafcnym.ok",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-bocanada-bar",
-    "name": "Bocanada",
-    "handle": "bocanada.bar",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-c-f-josehernandez",
-    "name": "Centro Fomento José Hernández",
-    "handle": "c.f.josehernandez",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-cariniolibreria-20261018",
-    "name": "Cariño Librería · Villa Elisa",
-    "handle": "cariniolibreria",
-    "disciplines": [
-      "literatura",
-      "libros"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-casatomadawinehouse",
-    "name": "Casa Tomada Wine House",
-    "handle": "casatomadawinehouse",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-clubdeartistas-cb",
-    "name": "Club de Artistas City Bell",
-    "handle": "clubdeartistas.cb",
-    "disciplines": [
-      "arte",
-      "talleres"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-comunidadferroviaria",
-    "name": "Comunidad Ferroviaria",
-    "handle": "comunidadferroviaria",
-    "disciplines": [
-      "musica_en_vivo",
-      "teatro",
-      "ferias",
-      "talleres"
-    ],
-    "status": "piloto",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-espaciomoliere-cb",
-    "name": "Espacio Molière City Bell",
-    "handle": "espaciomoliere_cb",
-    "disciplines": [
-      "teatro",
-      "talleres"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
     "id": "src-lab-feriaentramadas",
     "name": "Feria Entramadas",
     "handle": "feriaentramadas",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-exp-festivalcapital-20261012",
+    "name": "Noches Capitales",
+    "handle": "festivalcapital",
     "disciplines": [],
     "status": "propuesta",
     "kind": "organizador"
@@ -634,6 +547,46 @@
     "kind": "organizador"
   },
   {
+    "id": "src-curad-20261012-fulgor",
+    "name": "Fulgor — fiesta y ciclo Ciudad de Gatos",
+    "handle": "fulgor.fiesta",
+    "disciplines": [
+      "musica_electronica",
+      "fiestas"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-curad-20261012-gonnago",
+    "name": "Gonna Go — productora",
+    "handle": "gonnagoprod",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-manual-gonnago-records-20261013",
+    "name": "Gonna Go Records · Sello y Agencia",
+    "handle": "gonnagorecords",
+    "disciplines": [
+      "musica",
+      "produccion",
+      "sello",
+      "lanzamientos"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-radar65-20261011-03",
+    "name": "Gritos en el Planetario",
+    "handle": "gritosenelplanetario",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
     "id": "src-lab-guajira-bar",
     "name": "Guajira",
     "handle": "guajira.bar",
@@ -642,9 +595,25 @@
     "kind": "organizador"
   },
   {
+    "id": "src-hist-luti-02-20261011",
+    "name": "Handicap — Morfi & Cultura Local",
+    "handle": "handicap.morfiyculturalocal",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
     "id": "src-lab-hazana-bardebarrio",
     "name": "Hazaña Bar de Barrio",
     "handle": "hazana.bardebarrio",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-hist-luti-14-20261011",
+    "name": "Hipódromo de La Plata — espacio de eventos",
+    "handle": "hipodromolaplata",
     "disciplines": [],
     "status": "propuesta",
     "kind": "organizador"
@@ -694,6 +663,14 @@
     "kind": "organizador"
   },
   {
+    "id": "src-exp-intra-20261012",
+    "name": "INTRA — arte electrónico",
+    "handle": "intra.prod",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
     "id": "src-lab-jardinprimitivo-bar",
     "name": "Jardín Primitivo",
     "handle": "jardinprimitivo.bar",
@@ -722,6 +699,98 @@
     "kind": "organizador"
   },
   {
+    "id": "src-radar65-20261011-06",
+    "name": "La Compostera",
+    "handle": "la_compostera",
+    "disciplines": [
+      "ambiente",
+      "huerta",
+      "comunidad"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-social-pedalea-20261109",
+    "name": "La Plata Pedalea",
+    "handle": "la_plata_pedalea",
+    "disciplines": [
+      "ciclismo",
+      "cicloturismo",
+      "deporte"
+    ],
+    "status": "piloto",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-curado-02-20261011",
+    "name": "La Bici — Creación Colectiva",
+    "handle": "labicicreacioncolectiva",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-radar65-20261011-01",
+    "name": "La Culturosa",
+    "handle": "laculturosa_",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-la-filial-danza",
+    "name": "La Filial — espacio cultural",
+    "handle": "lafilial_espaciocultural",
+    "disciplines": [
+      "danza",
+      "artes_escenicas",
+      "talleres"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-hist-luti-05-20261011",
+    "name": "La Juana Milonga",
+    "handle": "lajuanamilonga",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-hist-luti-03-20261011",
+    "name": "La Noche de las Ferias",
+    "handle": "lanochedelasferias",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-radar65-20261011-10",
+    "name": "La Plata Guía",
+    "handle": "laplata_guia",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "curadora"
+  },
+  {
+    "id": "src-lab-laplata-sport",
+    "name": "La Plata Sport",
+    "handle": "laplata_sport",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-curad-20261012-ciudadcultural",
+    "name": "Ciudad Cultural — Municipalidad de La Plata",
+    "handle": "laplata.ciudadcultural",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "curadora"
+  },
+  {
     "id": "src-lab-laplata-muerde",
     "name": "La Plata Muerde",
     "handle": "laplata.muerde",
@@ -730,9 +799,9 @@
     "kind": "organizador"
   },
   {
-    "id": "src-lab-laplata-sport",
-    "name": "La Plata Sport",
-    "handle": "laplata_sport",
+    "id": "src-hist-luti-06-20261011",
+    "name": "La Plata Lúdica",
+    "handle": "laplataludica",
     "disciplines": [],
     "status": "propuesta",
     "kind": "organizador"
@@ -745,218 +814,6 @@
       "yoga",
       "bienestar",
       "cafe"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-lebrel-larambla",
-    "name": "Lebrel La Rambla",
-    "handle": "lebrel.larambla",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-mirafloreslp",
-    "name": "Miraflores",
-    "handle": "mirafloreslp",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-nacional-cafe",
-    "name": "Nacional Café",
-    "handle": "nacional.cafe",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-puravidalaplata2008",
-    "name": "Pura Vida",
-    "handle": "puravidalaplata2008",
-    "disciplines": [
-      "rock",
-      "musica_en_vivo"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-sindicatoargentinodeboleros",
-    "name": "Sindicato Argentino de Boleros",
-    "handle": "sindicatoargentinodeboleros",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-tallerdehuerta",
-    "name": "Taller de Huerta",
-    "handle": "tallerdehuerta",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-tranzafestival",
-    "name": "Tranza — Encuentro Federal de Gráfica",
-    "handle": "tranzafestival",
-    "disciplines": [
-      "arte_grafico",
-      "ferias",
-      "talleres"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-vachug-humedalurbano",
-    "name": "VACHUG — Humedal Urbano Génova",
-    "handle": "vachug_humedalurbano",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-vermu-interferencia",
-    "name": "Vermú Interferencia",
-    "handle": "vermu_interferencia",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lab-vonharveventos",
-    "name": "Vonharv Eventos",
-    "handle": "vonharveventos",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-lutitravelguide",
-    "name": "Luti — planes de La Plata",
-    "handle": "lutitravelguide",
-    "disciplines": [],
-    "status": "piloto",
-    "kind": "curadora"
-  },
-  {
-    "id": "src-malisia-libros",
-    "name": "Malisia Libros",
-    "handle": "malisialibros",
-    "disciplines": [
-      "literatura",
-      "libros",
-      "ferias"
-    ],
-    "status": "piloto",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-manual-ceramica-charo-20261013",
-    "name": "Charo Perelli Taller · cerámica",
-    "handle": "charoperellitaller",
-    "disciplines": [
-      "ceramica",
-      "talleres",
-      "formacion"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-manual-ceramica-ermides-20261013",
-    "name": "Ermides Pottery · taller y tienda",
-    "handle": "ermidespottery",
-    "disciplines": [
-      "ceramica",
-      "talleres",
-      "formacion",
-      "artesania"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-manual-ceramica-mandala-20261013",
-    "name": "Mándala de Arena · cerámica ilustrada",
-    "handle": "mandaladearena",
-    "disciplines": [
-      "ceramica",
-      "diseno",
-      "talleres"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-manual-ceramica-solci-20261013",
-    "name": "Solci Cerámica · talleres y Pop-Up",
-    "handle": "solciceramica",
-    "disciplines": [
-      "ceramica",
-      "talleres",
-      "formacion",
-      "encuentros"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-manual-ceramica-tulum-20261013",
-    "name": "Tulum Cerámica · clases y producción",
-    "handle": "tulumceramica",
-    "disciplines": [
-      "ceramica",
-      "talleres",
-      "formacion"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-manual-edita-feria-20261013",
-    "name": "EDITA · Feria de Editoriales Independientes",
-    "handle": "edita.feria",
-    "disciplines": [
-      "literatura",
-      "edicion",
-      "ferias",
-      "charlas",
-      "talleres"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-manual-gasav-20261013",
-    "name": "GASAV · Club Náutico Punta Lara",
-    "handle": "club_gasav",
-    "disciplines": [
-      "nautica",
-      "deporte_nautico",
-      "vela",
-      "windsurf",
-      "kayak",
-      "sup",
-      "formacion_nautica"
-    ],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-manual-gonnago-records-20261013",
-    "name": "Gonna Go Records · Sello y Agencia",
-    "handle": "gonnagorecords",
-    "disciplines": [
-      "musica",
-      "produccion",
-      "sello",
-      "lanzamientos"
     ],
     "status": "propuesta",
     "kind": "organizador"
@@ -977,6 +834,80 @@
     "kind": "organizador"
   },
   {
+    "id": "src-lab-lebrel-larambla",
+    "name": "Lebrel La Rambla",
+    "handle": "lebrel.larambla",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-curado-03-20261011",
+    "name": "Librería Mascaró",
+    "handle": "libreriamascaro",
+    "disciplines": [
+      "literatura",
+      "libros"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-social-paralelos-20261109",
+    "name": "Los Paralelos MTB",
+    "handle": "los_para_lelos",
+    "disciplines": [
+      "ciclismo",
+      "cicloturismo",
+      "deporte"
+    ],
+    "status": "piloto",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lutitravelguide",
+    "name": "Luti — planes de La Plata",
+    "handle": "lutitravelguide",
+    "disciplines": [],
+    "status": "piloto",
+    "kind": "curadora"
+  },
+  {
+    "id": "src-curad-20261012-macla",
+    "name": "MACLA — Museo de Arte Contemporáneo Latinoamericano",
+    "handle": "maclamuseo",
+    "disciplines": [
+      "arte_contemporaneo",
+      "exposiciones"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-malisia-libros",
+    "name": "Malisia Libros",
+    "handle": "malisialibros",
+    "disciplines": [
+      "literatura",
+      "libros",
+      "ferias"
+    ],
+    "status": "piloto",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-manual-ceramica-mandala-20261013",
+    "name": "Mándala de Arena · cerámica ilustrada",
+    "handle": "mandaladearena",
+    "disciplines": [
+      "ceramica",
+      "diseno",
+      "talleres"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
     "id": "src-milonga-gaggiotti",
     "name": "Milonga Lo de Raúl Gaggiotti",
     "handle": "milongagaggiotti",
@@ -986,6 +917,45 @@
       "musica_en_vivo"
     ],
     "status": "piloto",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-mirafloreslp",
+    "name": "Miraflores",
+    "handle": "mirafloreslp",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-curad-20261012-mam",
+    "name": "Museo de Arte y Memoria",
+    "handle": "museodearteymemoria",
+    "disciplines": [
+      "arte",
+      "memoria",
+      "exposiciones"
+    ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-curado-05-20261011",
+    "name": "Museo Provincial Emilio Pettoruti",
+    "handle": "museopettoruti",
+    "disciplines": [
+      "arte_contemporaneo",
+      "exposiciones"
+    ],
+    "status": "piloto",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-nacional-cafe",
+    "name": "Nacional Café",
+    "handle": "nacional.cafe",
+    "disciplines": [],
+    "status": "propuesta",
     "kind": "organizador"
   },
   {
@@ -1013,25 +983,17 @@
     "kind": "organizador"
   },
   {
-    "id": "src-radar65-20261011-01",
-    "name": "La Culturosa",
-    "handle": "laculturosa_",
+    "id": "src-curad-20261012-opera",
+    "name": "Teatro Ópera La Plata",
+    "handle": "operalaplata",
     "disciplines": [],
     "status": "propuesta",
     "kind": "organizador"
   },
   {
-    "id": "src-radar65-20261011-02",
-    "name": "Desafinado Club",
-    "handle": "desafinadoclub",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-radar65-20261011-03",
-    "name": "Gritos en el Planetario",
-    "handle": "gritosenelplanetario",
+    "id": "src-curado-04-20261011",
+    "name": "Pivot Café",
+    "handle": "pivot.cafe",
     "disciplines": [],
     "status": "propuesta",
     "kind": "organizador"
@@ -1049,70 +1011,87 @@
     "kind": "organizador"
   },
   {
-    "id": "src-radar65-20261011-05",
-    "name": "Casa Unclan",
-    "handle": "casa_unclan",
+    "id": "src-curado-08-20261011",
+    "name": "Plateada — feria de arte contemporáneo",
+    "handle": "plateadaferia",
     "disciplines": [
-      "musica_en_vivo",
-      "arte"
+      "arte_contemporaneo",
+      "ferias"
     ],
     "status": "propuesta",
     "kind": "organizador"
   },
   {
-    "id": "src-radar65-20261011-06",
-    "name": "La Compostera",
-    "handle": "la_compostera",
+    "id": "src-curado-01-20261011",
+    "name": "Cineclub Proyecciones Terrestres",
+    "handle": "proyeccionesterrestres",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-curado-07-20261011",
+    "name": "Prisma — espacio cultural",
+    "handle": "proyecto.prisma",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-puravidalaplata2008",
+    "name": "Pura Vida",
+    "handle": "puravidalaplata2008",
     "disciplines": [
-      "ambiente",
-      "huerta",
-      "comunidad"
+      "rock",
+      "musica_en_vivo"
     ],
     "status": "propuesta",
     "kind": "organizador"
   },
   {
-    "id": "src-radar65-20261011-07",
-    "name": "Cine EcoSelect",
-    "handle": "cineecoselect",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-radar65-20261011-08",
-    "name": "Casa Metro",
-    "handle": "casametrolp",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-radar65-20261011-09",
-    "name": "Cine Caminante",
-    "handle": "ciclodecinecaminante",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-radar65-20261011-10",
-    "name": "La Plata Guía",
-    "handle": "laplata_guia",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "curadora"
-  },
-  {
-    "id": "src-radar65-20261011-11",
-    "name": "Teatro Argentino",
-    "handle": "teatroargentinopba",
+    "id": "src-curad-20261012-putipary",
+    "name": "Puti Pary — ciclo Ciudad de Gatos",
+    "handle": "putipary",
     "disciplines": [
-      "teatro",
-      "opera",
       "musica",
-      "danza"
+      "fiestas"
     ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-hist-luti-16-20261011",
+    "name": "Räuber Cerveza",
+    "handle": "rauber.cerveza",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-editorial-residencia-corazon-20261109",
+    "name": "Residencia Corazón",
+    "handle": "residenciacorazon",
+    "disciplines": [
+      "artes",
+      "exposiciones",
+      "residencias"
+    ],
+    "status": "piloto",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-radar65-20261011-14",
+    "name": "Revolución Otaku Oficial",
+    "handle": "revolucionotakuoficial",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-hist-luti-10-20261011",
+    "name": "Run Run",
+    "handle": "runrun.bar",
+    "disciplines": [],
     "status": "propuesta",
     "kind": "organizador"
   },
@@ -1125,23 +1104,68 @@
     "kind": "organizador"
   },
   {
-    "id": "src-radar65-20261011-13",
-    "name": "Centro de Arte UNLP",
-    "handle": "centrodearteunlp",
+    "id": "src-exp-sala420-20261012",
+    "name": "Sala 420",
+    "handle": "sala420_lp",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-curado-09-20261011",
+    "name": "Sifón Producciones",
+    "handle": "sifon.producciones",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-sindicatoargentinodeboleros",
+    "name": "Sindicato Argentino de Boleros",
+    "handle": "sindicatoargentinodeboleros",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-manual-ceramica-solci-20261013",
+    "name": "Solci Cerámica · talleres y Pop-Up",
+    "handle": "solciceramica",
     "disciplines": [
-      "arte",
-      "teatro",
-      "musica",
-      "exposiciones"
+      "ceramica",
+      "talleres",
+      "formacion",
+      "encuentros"
     ],
     "status": "propuesta",
     "kind": "organizador"
   },
   {
-    "id": "src-radar65-20261011-14",
-    "name": "Revolución Otaku Oficial",
-    "handle": "revolucionotakuoficial",
+    "id": "src-curado-11-20261011",
+    "name": "Patio Café City Bell",
+    "handle": "somospatiocafe",
     "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-tallerdehuerta",
+    "name": "Taller de Huerta",
+    "handle": "tallerdehuerta",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-radar65-20261011-11",
+    "name": "Teatro Argentino",
+    "handle": "teatroargentinopba",
+    "disciplines": [
+      "teatro",
+      "opera",
+      "musica",
+      "danza"
+    ],
     "status": "propuesta",
     "kind": "organizador"
   },
@@ -1158,51 +1182,87 @@
     "kind": "organizador"
   },
   {
-    "id": "src-radar65-20261011-16",
-    "name": "Casa 62",
-    "handle": "casasesentaydos",
+    "id": "src-hist-luti-08-20261011",
+    "name": "Teatro UNLP",
+    "handle": "teatrounlp",
     "disciplines": [],
     "status": "propuesta",
     "kind": "organizador"
   },
   {
-    "id": "src-radar65-20261011-17",
-    "name": "Instituto Cultural PBA",
-    "handle": "buenosairescultura",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-radar65-20261011-18",
-    "name": "En Eso Estamos",
-    "handle": "en_eso_estamos",
-    "disciplines": [],
-    "status": "propuesta",
-    "kind": "organizador"
-  },
-  {
-    "id": "src-rb-cafe",
-    "name": "R&B Café",
-    "handle": "_rbcafe",
+    "id": "src-lab-tranzafestival",
+    "name": "Tranza — Encuentro Federal de Gráfica",
+    "handle": "tranzafestival",
     "disciplines": [
-      "cafe",
-      "libros",
+      "arte_grafico",
+      "ferias",
       "talleres"
     ],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-social-tribu-20261109",
+    "name": "Tribu Social Club · running social",
+    "handle": "tribusocialclub",
+    "disciplines": [
+      "running",
+      "deporte",
+      "encuentros_sociales"
+    ],
     "status": "piloto",
     "kind": "organizador"
   },
   {
-    "id": "src-editorial-residencia-corazon-20261109",
-    "name": "Residencia Corazón",
-    "handle": "residenciacorazon",
+    "id": "src-manual-ceramica-tulum-20261013",
+    "name": "Tulum Cerámica · clases y producción",
+    "handle": "tulumceramica",
     "disciplines": [
-      "artes",
-      "exposiciones",
-      "residencias"
+      "ceramica",
+      "talleres",
+      "formacion"
     ],
-    "status": "piloto",
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-curad-20261012-ematur",
+    "name": "EMATUR — Turismo La Plata",
+    "handle": "turismo.laplata",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "curadora"
+  },
+  {
+    "id": "src-lab-vachug-humedalurbano",
+    "name": "VACHUG — Humedal Urbano Génova",
+    "handle": "vachug_humedalurbano",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-curado-10-20261011",
+    "name": "Veredita",
+    "handle": "veredita.bar",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-vermu-interferencia",
+    "name": "Vermú Interferencia",
+    "handle": "vermu_interferencia",
+    "disciplines": [],
+    "status": "propuesta",
+    "kind": "organizador"
+  },
+  {
+    "id": "src-lab-vonharveventos",
+    "name": "Vonharv Eventos",
+    "handle": "vonharveventos",
+    "disciplines": [],
+    "status": "propuesta",
     "kind": "organizador"
   }
 ]

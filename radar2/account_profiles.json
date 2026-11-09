@@ -230,6 +230,17 @@
       "source_project": "public.poraca_knowledge_entities"
     },
     {
+      "handle": "cicloturismolaplata",
+      "role": "organizer",
+      "name": "Cicloturismo La Plata",
+      "identity_state": "source_attributed_not_public_entity",
+      "account_evidence_url": "https://biciclub.com/agrupaciones/",
+      "account_evidence_basis": "linked_social_account_from_public_2026_source",
+      "aliases": [],
+      "source_project": "social_outdoor_source_research_20261109",
+      "group_id": "cicloturismo-lp"
+    },
+    {
       "handle": "cineecoselect",
       "role": "venue",
       "entity_id": "cine-ecoselect",
@@ -358,6 +369,17 @@
       "source_project": "public.poraca_knowledge_entities"
     },
     {
+      "handle": "exp.kayak",
+      "role": "organizer",
+      "name": "Experiencia Kayak",
+      "identity_state": "source_attributed_not_public_entity",
+      "account_evidence_url": "https://linktr.ee/exp.kayak",
+      "account_evidence_basis": "linked_social_account_from_public_2026_source",
+      "aliases": [],
+      "source_project": "social_outdoor_source_research_20261109",
+      "group_id": "experiencia-kayak-regional"
+    },
+    {
       "handle": "guajira.bar",
       "role": "venue",
       "entity_id": "guajira",
@@ -388,6 +410,17 @@
         "jardinprimitivo.bar"
       ],
       "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "la_plata_pedalea",
+      "role": "organizer",
+      "name": "La Plata Pedalea",
+      "identity_state": "source_attributed_not_public_entity",
+      "account_evidence_url": "https://medios.unlp.edu.ar/la-plata-pedalea-realizara-una-bicicleteada-solidaria-por-el-dia-de-la-ninez/",
+      "account_evidence_basis": "linked_social_account_from_public_2026_source",
+      "aliases": [],
+      "source_project": "social_outdoor_source_research_20261109",
+      "group_id": "la-plata-pedalea"
     },
     {
       "handle": "labicicreacioncolectiva",
@@ -468,6 +501,17 @@
         "lauraganceramica"
       ],
       "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "los_para_lelos",
+      "role": "organizer",
+      "name": "Los Paralelos MTB",
+      "identity_state": "source_attributed_not_public_entity",
+      "account_evidence_url": "https://biciclub.com/agrupaciones/",
+      "account_evidence_basis": "linked_social_account_from_public_2026_source",
+      "aliases": [],
+      "source_project": "social_outdoor_source_research_20261109",
+      "group_id": "los-paralelos-mtb-lp"
     },
     {
       "handle": "lutitravelguide",
@@ -679,6 +723,17 @@
         "teatrounlp"
       ],
       "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "tribusocialclub",
+      "role": "organizer",
+      "name": "Tribu Social Club · running social",
+      "identity_state": "source_attributed_not_public_entity",
+      "account_evidence_url": "https://www.agendarunning.com/running-teams/tribu-social-club",
+      "account_evidence_basis": "linked_social_account_from_public_2026_source",
+      "aliases": [],
+      "source_project": "social_outdoor_source_research_20261109",
+      "group_id": "tribu-social-club-lp"
     },
     {
       "handle": "veredita.bar",

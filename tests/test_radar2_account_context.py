@@ -22,6 +22,11 @@ class ProfilePreflight(unittest.TestCase):
   self.assertTrue(a['account_verified'])
   self.assertTrue(a['evidence_url'].startswith('https://'))
   self.assertEqual(preflight('lutitravelguide')['role'],'curator')
+  for account in ('tribusocialclub','la_plata_pedalea','cicloturismolaplata','los_para_lelos','exp.kayak'):
+   profile=preflight(account)
+   self.assertEqual(profile['role'],'organizer')
+   self.assertFalse(profile['account_verified'],'Documented group must not become approved venue')
+   self.assertIsNone(profile.get('venue_entity_id'))
   rc=preflight('residenciacorazon')
   self.assertEqual((rc['role'],rc['venue_entity_id']),('venue','residencia-corazon'))
   self.assertTrue(rc['account_verified'])
