@@ -105,9 +105,11 @@ def interpret(c,d,accounts):
    candidate=sala[0] if sala else re.split(r'\s+(?:Av\.?|Calle|Diag\.?|Diagonal|[0-9])',value,maxsplit=1)[0].strip()
    candidate=candidate.rstrip(' .—')
    invalid=re.search(r'calle|avenida|^diag|^av\b|^en |youtube|esperamos|\bfue\b|\b(?:lunes|martes|miercoles|jueves|viernes|sabado|domingo)\b',norm(candidate))
-   # A pin may introduce a list (e.g. "📍 Librerías participantes:") rather than a venue.
-   # Preserve the original receipt, but do not turn that heading into a room.
-   is_list_heading=bool(re.search(r':\s*
+   # A marker may introduce a list (e.g. "Librerías participantes:"),
+   # not a physical venue. Keep the source while withholding location.
+   is_list_heading=bool(candidate.endswith(':') or re.search(
+    r'\b(?:participantes|sedes participantes|lugares adheridos)\b', norm(candidate)))
+   if 5<len(candidate)<75 and len(candidate.split())<=8 and re.match(r'[A-Za-zÁÉÍÓÚÑáéíóúñ]',candidate) and not invalid and not is_list_heading and candidate.lower() not in ('sala','lugar'):
     venue=candidate;venue_proof=marker[0]
  title=next((compact(l).strip(' ✨🔥📚💃🦚⭐️✶⊹!') for l in text.splitlines() if l.strip()),d.get('title',''))[:160]
  heading=re.search(r'(?:^|\n|Primer )[^\w\n]{0,3}((?:Workshop de|Festival de|Taller de) [^\n]+)',text,re.I)

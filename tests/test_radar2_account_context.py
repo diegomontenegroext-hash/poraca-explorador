@@ -130,10 +130,10 @@ class CaptionVenueResolution(unittest.TestCase):
   self.assertFalse(p['publication_approved'])
  def test_marker_list_heading_is_not_a_place(self):
   # Reproduces the municipal calendar's "Librerías participantes:" false venue.
-  caption=('Noviembre se vive en La Plata. Teatro, música y libros.\\n'
-   'Domingo 8 de noviembre, distintas actividades culturales.\\n'
-   '📍 Librerías participantes:\\n'
-   'La Colmena: 56 entre 21 y 22.\\n'
+  caption=('Noviembre se vive en La Plata. Teatro, música y libros.\n'
+   'Domingo 8 de noviembre, distintas actividades culturales.\n'
+   '📍 Librerías participantes:\n'
+   'La Colmena: 56 entre 21 y 22.\n'
    'Rayuela Libros: Plaza Italia, La Plata.')
   d=self.doc('unknown_agenda',caption,stamp='2026-11-05T13:00:00+00:00')
   d['fetched_at']='2026-11-07T15:00:00Z'
@@ -143,8 +143,8 @@ class CaptionVenueResolution(unittest.TestCase):
   self.assertTrue(all(p['state']=='incompleto' for p in results))
   self.assertTrue(all(not p['publication_approved'] for p in results))
  def test_marker_venue_literal_still_works(self):
-  caption=('Teatro independiente, función el 14 de noviembre a las 21 hs\\n'
-   '📍 Sala Ginastera, La Plata\\nReservas disponibles')
+  caption=('Teatro independiente, función el 14 de noviembre a las 21 hs\n'
+   '📍 Sala Ginastera, La Plata\nReservas disponibles')
   d=self.doc('unknown_agenda',caption,stamp='2026-11-05T13:00:00+00:00')
   d['fetched_at']='2026-11-07T15:00:00Z'
   results=self.parse(d)
