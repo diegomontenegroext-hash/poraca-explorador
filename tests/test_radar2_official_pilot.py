@@ -138,6 +138,53 @@ class OfficialInstagramPilot(unittest.TestCase):
         self.assertEqual(len(report["unattempted_accounts"]),4)
         discover.assert_called_once()
 
+    def test_new_documents_are_split_by_publication_age_not_ingest_time(self):
+        class FakeCollector:
+            def __init__(self):
+                self.docs={}
+                self.proposals={}
+            def add(self,d,title,**kwargs):
+                self.proposals[d["url"]]={"title":title,**kwargs}
+                return d["url"]
+        fake=FakeCollector()
+        creds={"META_IG_USER_ID":"id", "META_ACCESS_TOKEN":"mock", "META_GRAPH_VERSION":"v27.0"}
+        posts=[
+            {"permalink":"https://www.instagram.com/p/RECENT1/",
+             "caption":"Teatro del viernes", "timestamp":"2026-11-07T19:00:00+0000"},
+            {"permalink":"https://www.instagram.com/p/OLD2019/",
+             "caption":"Concierto del año anterior", "timestamp":"2019-11-07T19:00:00+0000"},
+            {"permalink":"https://www.instagram.com/p/NODATE1/",
+             "caption":"Música sin sello temporal"},
+            {"permalink":"https://www.instagram.com/p/KNOWN001/",
+             "caption":"Festival viejo", "timestamp":"2018-11-07T19:00:00+0000"}
+        ]
+        with patch.dict(os.environ,creds,clear=True),patch(
+            "instagram_official_pilot.discover",return_value={
+                "status":"MEDIA_RETURNED","checked_at":"2026-11-08T20:39:37Z","posts":posts
+            }):
+            report=acquire(fake,{"https://www.instagram.com/p/KNOWN001/"},
+                           rotating_accounts=["venue_test"],include_controls=False)
+        self.assertEqual(report["status"],"POSTS_ACQUIRED")
+        self.assertEqual(report["new_documents"],3)
+        self.assertEqual(report["new_recent_documents_7d"],1)
+        self.assertEqual(report["new_backfill_documents_older_7d"],1)
+        self.assertEqual(report["new_documents_date_unknown"],1)
+        self.assertEqual(sum(report[k] for k in (
+            "new_recent_documents_7d","new_backfill_documents_older_7d",
+            "new_documents_date_unknown")),report["new_documents"])
+        self.assertEqual(report["results"][0]["known_documents"],1)
+        self.assertEqual(len(fake.docs),4)
+        self.assertTrue(all(not p.get("publication_approved",False) for p in fake.proposals.values()))
+
+    def test_age_bucket_is_fail_closed_for_invalid_and_future_dates(self):
+        from instagram_official_pilot import publication_age_bucket
+        at="2026-11-08T20:39:37Z"
+        self.assertEqual(publication_age_bucket("2026-11-08T19:00:00+0000",at),"recent_7d")
+        self.assertEqual(publication_age_bucket("2026-10-01T19:00:00+0000",at),"backfill_older_7d")
+        self.assertEqual(publication_age_bucket("2026-11-14T19:00:00+0000",at),"unknown")
+        self.assertEqual(publication_age_bucket(None,at),"unknown")
+        self.assertEqual(publication_age_bucket("not a timestamp",at),"unknown")
+
     def test_official_post_becomes_investigable_not_canonical(self):
         class FakeCollector:
             def __init__(self):

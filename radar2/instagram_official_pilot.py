@@ -6,6 +6,7 @@ No HTML profile collection, browser automation, bypass, or new scheduler.
 """
 import os
 import re
+from datetime import datetime, timedelta, timezone
 from collector import sha, utc
 from instagram import discover
 from capabilities import CULTURAL, norm
@@ -15,6 +16,20 @@ from account_context import preflight
 ACCOUNTS = ("guajira.bar", "lutitravelguide", "escenario40", "teatroargentinopba")
 REQUIRED = ("META_IG_USER_ID", "META_ACCESS_TOKEN", "META_GRAPH_VERSION")
 PERMALINK = re.compile(r"https://(?:www\.)?instagram\.com/(?:p|reel)/[A-Za-z0-9_-]+/?\Z")
+
+def publication_age_bucket(timestamp, checked_at):
+    """Distinguish newly found old posts from truly recent posts; no inferred dates."""
+    try:
+        published = datetime.fromisoformat(str(timestamp).replace("Z", "+00:00"))
+        checked = datetime.fromisoformat(str(checked_at).replace("Z", "+00:00"))
+        if published.tzinfo is None or checked.tzinfo is None:
+            return "unknown"
+        lag = checked - published
+        if lag < -timedelta(minutes=5):
+            return "unknown"
+        return "recent_7d" if lag <= timedelta(days=7) else "backfill_older_7d"
+    except (TypeError, ValueError, OverflowError):
+        return "unknown"
 
 def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,extra_curators=()):
     """Four controls plus at most ten unique users from the persisted daily batch."""
@@ -37,6 +52,8 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,ex
               "accounts_eligible": len(accounts), "accounts_successful": 0,
               "accounts_failed": 0, "last_successful_query_at": None,
               "new_documents": 0, "new_cultural_candidates": 0,
+              "new_recent_documents_7d": 0, "new_backfill_documents_older_7d": 0,
+              "new_documents_date_unknown": 0,
               "results": [],
               "account_preflight": [preflight(username) for username in accounts]}
     missing = [k for k in REQUIRED if not os.environ.get(k)]
@@ -54,6 +71,8 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,ex
                    "status": official.get("status", "UNKNOWN"),
                    "items_returned": len(official.get("posts") or []),
                    "new_documents": 0, "new_candidates": 0, "known_documents":0,
+                   "new_recent_documents_7d":0, "new_backfill_documents_older_7d":0,
+                   "new_documents_date_unknown":0,
                    "latest_publication_at":max((p.get("timestamp") or "" for p in official.get("posts",[])),default=None),
                    "error_type": official.get("error_type"),
                    "http_status": official.get("http_status"),
@@ -79,8 +98,17 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,ex
                "published_at":post.get("timestamp"),"external_id":post.get("id"),"media_type":post.get("media_type")}
             collector.docs[url]=d
             if getattr(collector,"checkpoint",None):collector.checkpoint(d)
-            report["new_documents"] += int(url not in known_urls)
-            summary["new_documents"] += int(url not in known_urls)
+            if url not in known_urls:
+                report["new_documents"] += 1
+                summary["new_documents"] += 1
+                # This classifier is informational only: never filters receipts,
+                # changes event dates, or approves a cultural event for publishing.
+                age = publication_age_bucket(post.get("timestamp"), official.get("checked_at") or fetched_at)
+                counter = {"recent_7d":"new_recent_documents_7d",
+                           "backfill_older_7d":"new_backfill_documents_older_7d",
+                           "unknown":"new_documents_date_unknown"}[age]
+                report[counter] += 1
+                summary[counter] += 1
             if CULTURAL.search(norm(caption)):
                 # Use a distinct title per post, not just the profile name.
                 first_line=next((re.sub(r"\s+"," ",line).strip()
