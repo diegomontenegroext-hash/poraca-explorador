@@ -9,6 +9,15 @@ from datetime import datetime,timedelta,timezone
 from persist import execute
 
 STATE_ID='radar2-instagram-rotation-state-v1'
+MAX_ROTATING_ACCOUNTS=20
+
+def adaptive_query_budget(due_count):
+    """Bounded backlog recovery: normal=10, moderate=15, high=20 per natural run.
+
+    No additional runs or parallel API calls; official collector still stops at
+    the first Meta rate/auth error. Only accounts whose review is due count.
+    """
+    return 10 if due_count<=20 else 15 if due_count<=40 else MAX_ROTATING_ACCOUNTS
 PRIORITY={'lutitravelguide','residenciacorazon','sunsetwine.mixology','dionisio_vinoteca',
           'guajira.bar','escenario40','centrodearteunlp','ciudaddegatos','circus_ofc','intra.prod'}
 
@@ -27,7 +36,9 @@ def eligible_accounts(state,at):
     return sorted(eligible,key=lambda a:(a.get('official_attempt_count',0),a.get('attempt_count',a['review_count']),a['priority'],a.get('last_review_at') or '',a['username']))
 
 def select(state,at,limit=10):
-    return eligible_accounts(state,at)[:max(0,min(limit,10))]
+    eligible=eligible_accounts(state,at)
+    budget=max(0,min(limit,adaptive_query_budget(len(eligible)),MAX_ROTATING_ACCOUNTS))
+    return eligible[:budget]
 
 def read(conn):
     rows=execute(conn,'SELECT summary FROM radar2.runs WHERE run_id=$1',[STATE_ID])['rows']
@@ -52,9 +63,12 @@ def claim(conn,run_id,limit=10):
                    and (state['accounts'][u].get('lease_until') or '')>timestamp(at)]
             return dict(run_id=run_id,accounts=owned if batch['status']!='completed' else [],batch=batch,replayed=True)
         eligible=eligible_accounts(state,at)
-        selected=eligible[:max(0,min(limit,10))]
+        budget=max(0,min(limit,adaptive_query_budget(len(eligible)),MAX_ROTATING_ACCOUNTS))
+        selected=eligible[:budget]
         for a in selected:a.update(lease_run_id=run_id,lease_until=timestamp(at+timedelta(hours=2)))
-        batch={'eligible_at_claim':len(eligible),'usernames':[a['username'] for a in selected],'claimed_at':timestamp(at),'status':'claimed'}
+        batch={'eligible_at_claim':len(eligible),'usernames':[a['username'] for a in selected],
+               'budget':budget,'due_remaining_at_claim':len(eligible)-len(selected),
+               'claimed_at':timestamp(at),'status':'claimed'}
         state['batches'][run_id]=batch
         # Keep resumable audit for recent runs; finished attempts are also in their run summaries.
         if len(state['batches'])>60:
