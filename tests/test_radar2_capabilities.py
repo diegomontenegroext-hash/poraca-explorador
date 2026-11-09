@@ -106,6 +106,34 @@ class Capabilities(unittest.TestCase):
    self.assertEqual(len(c.proposals),1,'Real 2026 edition remains eligible')
    self.assertEqual(next(iter(c.proposals.values()))['date'],'2026-12-20')
 
+ def test_finished_event_same_year_is_never_resurrected(self):
+  import tempfile
+  from collector import Collector
+  from extract import extract_document
+  with tempfile.TemporaryDirectory() as folder:
+   c=Collector(folder)
+   event={'@type':'Event','name':'SEGUI CORRIENDO 2026',
+      'startDate':'2026-11-09T19:00:39.510Z',
+      'location':{'@type':'Place','name':'Calle 416 & Calle 147, Arturo Seguí, La Plata'}}
+   d={'url':'https://tickets.sincroniadeportiva.com.ar/event/seguicorriendo2026',
+      'final_url':'https://tickets.sincroniadeportiva.com.ar/event/seguicorriendo2026',
+      'source':'Sincronía Deportiva original',
+      'title':'SEGUI CORRIENDO 2026',
+      'text':'SEGUI CORRIENDO 2026 | Sincronía Deportiva Event finished SEGUI CORRIENDO 2026. Domingo 24 de Mayo de 2026 en Arturo Seguí, La Plata.',
+      'fetched_at':'2026-11-09T19:00:40+00:00','structured_items':[event]}
+   extract_document(c,d,[],'institutional_sports_original_detail_v1')
+   self.assertFalse(c.proposals,'Historic event within the SAME year is not today')
+   self.assertTrue(any(x.get('evidence')=='official_detail_explicit_finished' for x in c.checks))
+   future={**event,'name':'TOLOSA CORRE 2026 EDICION XVI','startDate':'2026-12-20T11:00:00Z'}
+   d.update(url='https://tickets.sincroniadeportiva.com.ar/event/tolosacorre2026',
+     final_url='https://tickets.sincroniadeportiva.com.ar/event/tolosacorre2026',
+     title='TOLOSA CORRE 2026 EDICION XVI',structured_items=[future],
+     text='TOLOSA CORRE 2026. Domingo 20 de Diciembre de 2026, Tolosa, La Plata.\n'+
+       'Más información: otro evento Event finished del año pasado.')
+   extract_document(c,d,[],'institutional_sports_original_detail_v1')
+   self.assertEqual(len(c.proposals),1,'Footer mention of a finished OTHER event is not a veto')
+   self.assertEqual(next(iter(c.proposals.values()))['date'],'2026-12-20')
+
  def test_frontier_rejects_utility_links_in_existing_and_new_sources(self):
   from capabilities import cultural_link
   for url,label in [('https://wa.me/123','Reservas'),('https://t.me/share/url?url=cultura','Compartir'),('https://automattic.com/cookies/','Cookie Policy'),('https://funebres.eldia.com/','Fúnebres'),('https://sponsor.example/',''),('https://www.dbyz.com.ar/','Design')]:

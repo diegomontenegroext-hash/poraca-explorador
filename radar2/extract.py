@@ -83,17 +83,23 @@ def extract_document(c,d,accounts,method):
     if ending>=dt:end=ending.date().isoformat()
    except (ValueError,TypeError):pass
   title=item['name']
-  # Some finished ticket pages generate a JSON-LD startDate equal to the
-  # CURRENT FETCH INSTANT, despite describing a race from a previous year.
-  # A clearly older edition explicitly marked "Event finished" in the
-  # original cannot be reconstructed as a new event for today.
+  # The original ticket detail may emit the FETCH INSTANT as JSON-LD
+  # startDate even when its own visible header says "Event finished".
+  # This applies to finished editions from THIS year too, not only 2025.
+  # A finished marker on some OTHER event lower in an active page does not
+  # veto the current Event: require it near the start of the official detail.
   named_years={int(y) for y in re.findall(r'(?<![0-9])(20[0-9]{2})(?![0-9])',title)}
-  finished=bool(re.search(r'event finished|evento finalizado|evento terminado',
-                          norm(d.get('text',''))))
-  if finished and named_years and max(named_years)<dt.year:
+  first_text=norm(d.get('text','')[:260])
+  ticket_host=(urlsplit(d['url']).hostname or '').lower()
+  own_finished=bool(ticket_host=='tickets.sincroniadeportiva.com.ar'
+      and re.search(r'\\b(?:event finished|evento finalizado|evento terminado)\\b',first_text))
+  older_finished=bool(named_years and max(named_years)<dt.year
+      and re.search(r'event finished|evento finalizado|evento terminado',norm(d.get('text',''))))
+  if own_finished or older_finished:
    c.checks.append({'url':d['url'],'status':'discarded_stale_structured_date',
-     'title':title,'source_year':max(named_years),
-     'claimed_start':dt.date().isoformat(),'evidence':'explicit_finished_older_edition'})
+     'title':title,'source_year':max(named_years) if named_years else None,
+     'claimed_start':dt.date().isoformat(),
+     'evidence':'official_detail_explicit_finished' if own_finished else 'explicit_finished_older_edition'})
    continue
   if re.search(r'venta de (?:tickets|entradas)',norm(title)):
    performers=item.get('performer') or [];performers=performers if isinstance(performers,list) else [performers]
