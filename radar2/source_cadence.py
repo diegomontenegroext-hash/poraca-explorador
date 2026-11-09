@@ -61,6 +61,11 @@ FROM radar2.proposals p
 JOIN radar2.documents d ON d.url=p.document_url
 WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
   AND (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date + 14
+  -- Ignore already finished dated sessions when selecting scarce refresh URLs.
+  -- Unknown start remains eligible: never infer that an undated hour has ended.
+  AND (p.event_date>(now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
+       OR p.event_time IS NULL
+       OR p.event_time>to_char((now() AT TIME ZONE 'America/Argentina/Buenos_Aires'),'HH24:MI'))
   AND p.review_state<>'historico'
   AND p.evidence->>'kind'='event'
   AND d.source NOT IN ('Instagram','Genda','Genda teatro','El Día','0221')

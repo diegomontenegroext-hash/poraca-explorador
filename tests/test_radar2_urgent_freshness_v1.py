@@ -48,6 +48,9 @@ class NearTermRefreshTests(unittest.TestCase):
    "p.last_seen_at<now()-interval '24 hours'",
    "d.fetched_at<now()-interval '12 hours'",
    "p.review_state<>'historico'",
+   "p.event_time>to_char",
+   "OR p.event_time IS NULL",
+   "p.event_date>(now() AT TIME ZONE",
    "LIMIT 18"):
    self.assertIn(fragment,sql)
   self.assertNotIn('INSERT',sql.upper())
