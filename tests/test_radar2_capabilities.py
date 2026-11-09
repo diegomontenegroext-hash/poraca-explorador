@@ -143,6 +143,21 @@ class Capabilities(unittest.TestCase):
   self.assertIn("'queries':0",source)
   self.assertIn("'original_sources':origin_receipts",source)
 
+ def test_social_group_links_are_candidates_not_dates(self):
+  from capabilities import cultural_link
+  for u,caption in (
+    ('https://salidas.example/actividades','Running social La Plata'),
+    ('https://salidas.example/travesias','Kayak en Berisso'),
+    ('https://salidas.example/circuitos','Cicloturismo La Plata'),
+    ('https://salidas.example/rutas','Rollers urbanos'),
+    ('https://salidas.example/encuentros','Caminata grupal en Parque Pereyra'),
+    ('https://salidas.example/fechas','Carrera 10K Cruz Roja La Plata')):
+   self.assertTrue(cultural_link(u,caption),(u,caption))
+  for u,caption in (
+    ('https://gimnasio.example/tarifas','Planes y rutinas de musculación'),
+    ('https://tienda.example/productos','Rodillos de bicicleta'),
+    ('https://comediante.example/cartel','Stand up comedy')):
+   self.assertFalse(cultural_link(u,caption),(u,caption))
  def test_frontier_rejects_utility_links_in_existing_and_new_sources(self):
   from capabilities import cultural_link
   for url,label in [('https://wa.me/123','Reservas'),('https://t.me/share/url?url=cultura','Compartir'),('https://automattic.com/cookies/','Cookie Policy'),('https://funebres.eldia.com/','Fúnebres'),('https://sponsor.example/',''),('https://www.dbyz.com.ar/','Design')]:

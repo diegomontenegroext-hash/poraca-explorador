@@ -22,7 +22,7 @@ from instagram import discover as meta_discover
 
 SOURCE_STATE = 'radar2-source-discovery-state-v1'
 GRAPH_STATE = 'radar2-cultural-memory-state-v1'
-CULTURAL = re.compile(r'teatro|musica|music|recital|festival|cultur|galeria|exposici|arte\b|taller|ceramica|yoga|vino|wine|cata\b|fiesta|ciclo|entradas|tickets|eventos?|cartelera|agenda|programaci|residenc|artista|concierto', re.I)
+CULTURAL = re.compile(r'teatro|musica|music|recital|festival|cultur|galeria|exposici|arte\b|taller|ceramica|yoga|vino|wine|cata\b|fiesta|ciclo|entradas|tickets|eventos?|cartelera|agenda|programaci|residenc|artista|concierto|running|run club|carrera|ciclismo|cicloturismo|biciclet|pedalead|kayak|remo|rollers|patinaje|senderismo|caminata grupal|travesia|stand up paddle|duatlon|triatlon', re.I)
 LOCAL = re.compile(r'la plata|platense|berisso|ensenada|gonnet|gorina|city bell|villa elisa|tolosa', re.I)
 REJECT = re.compile(r'/admin(?:/|$)|login|sign.?in|checkout|carrito|privacy|privacidad|terminos|terms|contact|/share/|/sharer|t\.me/|cookies|clasificad|funebre|tiendanube|mustang\.cloud|creativecommons|afip\.gov|\.pdf$|\.jpg$|\.png$|\.mp4$|\.zip$|/wp-json|/feed(?:/|$)', re.I)
 
