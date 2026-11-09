@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'radar2'))
 from primary_followups import (ticket_detail,secondary_detail,dates_in,classify_ticket,
-                               follow_secondary,CANDIDATES_SQL,FOLLOWUP_STAGE_SQL)
+                               follow_secondary,social_profile_leads,CANDIDATES_SQL,FOLLOWUP_STAGE_SQL)
 
 class PrimarySourceFollowupTests(unittest.TestCase):
  def test_exact_specific_ticket_url_only(self):
@@ -20,6 +20,19 @@ class PrimarySourceFollowupTests(unittest.TestCase):
   self.assertTrue(secondary_detail('https://agendalaplata.ar/evento/liga-de-improvisadores-espacio-sudaka-20261104185007'))
   self.assertFalse(secondary_detail('https://elevenflow.app/latest'))
   self.assertFalse(secondary_detail('https://instagram.com/mujercebra'))
+ def test_social_profiles_are_only_unverified_leads(self):
+  urls=['https://instagram.com/espaciosudaka_?igsh=share',
+        'https://www.instagram.com/marcosesguleba/',
+        'https://www.instagram.com/p/DfQOVDWmRMd/',
+        'https://www.instagram.com/reel/DfQOVDWmRMd/',
+        'https://instagram.com/accounts/login/',
+        'https://evil.example/espaciosudaka_',
+        'http://instagram.com/espaciosudaka_']
+  self.assertEqual(social_profile_leads(urls),[
+   'https://www.instagram.com/espaciosudaka_/',
+   'https://www.instagram.com/marcosesguleba/'])
+  self.assertEqual(social_profile_leads(urls,limit=1),[
+   'https://www.instagram.com/espaciosudaka_/'])
  def test_future_passline_exact_three_fields(self):
   row={'event_day':'2026-11-21','title':'Joystick presenta Diarios de Humo en La Plata (Junto a Ktacumbas y Cikes)','venue':'Guajira'}
   url='https://www.passline.com/eventos/joystick-presenta-diarios-de-humo-en-la-plata-junto-a-ktacumbas-y-cikes'
@@ -84,5 +97,8 @@ class PrimarySourceFollowupTests(unittest.TestCase):
   self.assertEqual(status['selected'],1)
   self.assertEqual(obj.source_followups[0]['status'],'NO_EXPLICIT_PRIMARY_EVENT_LINK')
   self.assertFalse(obj.source_followups[0]['publicationApproved'])
+  self.assertEqual(obj.source_followups[0]['socialProfileLeads'],['https://www.instagram.com/ciudaddegatos/'])
+  self.assertEqual(obj.source_followups[0]['socialLeadRole'],'unverified_public_profile_link_not_original_evidence')
+  self.assertEqual(status['primaryFetched'],0)
 
 if __name__=='__main__':unittest.main()

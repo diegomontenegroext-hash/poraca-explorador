@@ -67,6 +67,28 @@ MONTHS.update({'ene':1,'feb':2,'mar':3,'abr':4,'may':5,'jun':6,
                'jul':7,'ago':8,'sep':9,'sept':9,'oct':10,'nov':11,'dic':12})
 MONTH_NAMES = '|'.join(sorted(MONTHS,key=len,reverse=True))
 
+def social_profile_leads(urls,limit=4):
+    """Only outbound public Instagram profile URLs in the already-read secondary HTML.
+    These are unverified editorial leads, NOT primary event receipts or approvals.
+    """
+    leads=set()
+    reserved={'p','reel','reels','stories','explore','accounts','tv','direct',
+              'about','developer','legal','static','graphql','instagram'}
+    for url in urls:
+        try:
+            u=urlsplit(str(url))
+            if u.scheme!='https' or u.username or u.password or u.port not in (None,443):
+                continue
+            if (u.hostname or '').lower() not in ('instagram.com','www.instagram.com'):
+                continue
+            handle=u.path.strip('/')
+            if not re.fullmatch(r'[A-Za-z0-9._]{2,30}',handle) or handle.lower() in reserved:
+                continue
+            leads.add('https://www.instagram.com/'+handle.lower()+'/')
+        except (ValueError,TypeError):
+            continue
+    return sorted(leads)[:max(0,min(int(limit),4))]
+
 def secondary_detail(url):
     try:
         p=urlsplit(url)
@@ -154,10 +176,16 @@ def follow_secondary(conn,collector,limit=3):
         base['secondarySha256']=d['sha256']
         base['secondaryFetchedAt']=d['fetched_at']
         # A valid detail is not enough; prefer an event-specific ticket link.
-        links=sorted({u for u in collector.links(d) if ticket_detail(u)})
+        outbound=collector.links(d)
+        links=sorted({u for u in outbound if ticket_detail(u)})
+        # Do not request social platforms here. An explicit profile in Genda
+        # helps editorial follow-up but cannot validate a dated performance.
+        profile_leads=social_profile_leads(outbound)
         if not links:
             base.update(status='NO_EXPLICIT_PRIMARY_EVENT_LINK',
-                        reason='Secondary detail has no allowlisted per-event ticket link')
+                        reason='Secondary detail has no allowlisted per-event ticket link',
+                        socialProfileLeads=profile_leads,
+                        socialLeadRole='unverified_public_profile_link_not_original_evidence')
             result.append(base);stats['held']+=1;continue
         original=links[0]
         base['primaryUrl']=original
