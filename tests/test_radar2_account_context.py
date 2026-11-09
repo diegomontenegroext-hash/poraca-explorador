@@ -115,6 +115,19 @@ class CaptionVenueResolution(unittest.TestCase):
   self.assertEqual(p['venue_candidate_basis'],'unverified_text_mention')
   self.assertEqual(p['state'],'incompleto')
   self.assertFalse(p['publication_approved'])
+ def test_explicit_unapproved_profile_venue_is_not_canonical(self):
+  caption=('🎭 ¡Vuelve ROJA!\nDespués de una gran recepción, la última función del año.\n'
+   '📅 Sábado 14 de noviembre\n🕘 21 hs\n📍 Espacio 44, La Plata\n🎟️ Entradas: Alternativateatral')
+  d=self.doc('teatroespacio44',caption,stamp='2026-11-08T00:05:22+00:00')
+  d['fetched_at']='2026-11-08T20:39:35Z'
+  p=self.parse(d,[{'identity':'confirmed','entity':'Espacio'}])[0]
+  self.assertEqual(p['date'],'2026-11-14')
+  self.assertEqual(p['time'],'21:00')
+  self.assertIsNone(p['venue'])
+  self.assertEqual(p['venue_candidate'],'Espacio 44')
+  self.assertEqual(p['venue_candidate_basis'],'explicit_literal_venue_pending_profile_identity')
+  self.assertEqual(p['state'],'incompleto')
+  self.assertFalse(p['publication_approved'])
  def test_identical_id_before_and_after_add_venue(self):
   d=self.doc('teatrounlp','La Nona sábado 7/11 21hs 📌 Teatro UNLP')
   from collector import sha,norm

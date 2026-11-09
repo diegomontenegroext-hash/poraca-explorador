@@ -88,7 +88,9 @@ def interpret(c,d,accounts):
  kind='retrospective' if retrospective else 'regular_class' if regular else 'cultural_document' if cultural else 'irrelevant'
  produced=[]
  # Actor catalog is evidence of account identity, not evidence of event venue.
- venues=[a for a in accounts if a.get('identity')!='ambiguous' and len(a.get('entity',''))>3 and norm(a['entity']) in n and a['entity'] not in ('Luti','Genda')]
+ # Generic terms in the cultural graph are never sufficient venue identities.
+ generic_venue_labels={'espacio','sala','teatro','casa','centro','bar','club','galpon','auditorio'}
+ venues=[a for a in accounts if a.get('identity')!='ambiguous' and len(a.get('entity',''))>3 and norm(a['entity']) in n and a['entity'] not in ('Luti','Genda') and norm(a['entity']) not in generic_venue_labels]
  venue=next((a['entity'] for a in venues),None)
  venue_proof=text if venue else None
  # Explicit named places unknown to the catalog remain identity candidates.
@@ -176,7 +178,11 @@ def interpret(c,d,accounts):
    venue_mention_only=bool(venue and not host_location.get('venue')
      and not preflight(d.get('profile_username')).get('account_verified')
      and not re.search(r'(?:\ben(?:\s+el|\s+la)?|📍)\s+'+re.escape(venue)+r'\b',scope,re.I))
-   local_venue=host_location['venue'] or (None if venue_mention_only else venue)
+   # Accounts pending verification may name a room explicitly, but that
+   # identifies a candidate, not an approved canonical place relationship.
+   pending_profile_venue=bool(venue and not host_location.get('venue')
+     and preflight(d.get('profile_username')).get('role')=='venue_candidate')
+   local_venue=host_location['venue'] or (None if venue_mention_only or pending_profile_venue else venue)
    local_venue_proof=host_location.get('quote') if host_location['venue'] else venue_proof if local_venue else None
    state='historico' if day<now else 'incompleto' if ambiguous_midnight or not local_venue or cancelled or territory_review else 'observado_agenda'
    key=c.add(d,local_title,day.isoformat(),hour,local_venue,category(n),state,raw,origin_account=d.get('profile_username'))
@@ -192,8 +198,9 @@ def interpret(c,d,accounts):
      'venue':local_venue_proof,'title':(title_proof or {}).get('quote')},
     account_context=preflight(d.get('profile_username')),
     venue_basis=host_location['basis'] if host_location.get('venue') or host_location.get('candidate') else 'existing_literal_heuristic' if local_venue else host_location['basis'],
-    venue_candidate=(host_location.get('candidate') or (venue if venue_mention_only else None)) if not local_venue else None,
-    venue_candidate_basis='unverified_text_mention' if venue_mention_only else host_location.get('basis') if host_location.get('candidate') and not local_venue else None,
+    venue_candidate=(venue if pending_profile_venue else host_location.get('candidate') or (venue if venue_mention_only else None)) if not local_venue else None,
+    venue_candidate_basis=('explicit_literal_venue_pending_profile_identity' if pending_profile_venue else 'unverified_text_mention' if venue_mention_only else host_location.get('basis') if host_location.get('candidate') else None) if not local_venue else None,
+    venue_candidate_evidence=venue_proof if pending_profile_venue else None,
     venue_entity_id=host_location.get('venue_entity_id') if host_location.get('venue') else None,
     venue_profile_evidence_url=host_location.get('profile_evidence_url') if host_location.get('venue') or host_location.get('candidate') else None,
     evidence_spans={'date':proof(raw,positions,start,end),'time':proof(raw,positions,clock_origin+clock.start(),clock_origin+clock.end()) if clock else None,'title':title_proof},
