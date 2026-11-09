@@ -40,7 +40,7 @@ class NearTermRefreshTests(unittest.TestCase):
    "JOIN radar2.documents d",
    "AT TIME ZONE 'America/Argentina/Buenos_Aires'",
    "p.event_date BETWEEN",
-   "::date + 7",
+   "::date + 14",
    "priority_original DESC",
    "d.source='festival.freezer.com.ar'",
    "d.source='www.passline.com'",
@@ -52,6 +52,11 @@ class NearTermRefreshTests(unittest.TestCase):
    self.assertIn(fragment,sql)
   self.assertNotIn('INSERT',sql.upper())
   self.assertNotIn('UPDATE',sql.upper())
+  self.assertIn("d.fetched_at<now()-interval '36 hours'",sql)
+  self.assertIn('LIMIT 18',sql)
+  self.assertNotIn("::date + 7",sql)
+  # The live 8/11 SELECT now includes 21/11 Joystick (freshness overdue),
+  # while the runner still hard-caps actual HTTP checks to three origins.
 
  def test_persist_keeps_earlier_explicit_editorial_decisions(self):
   self.assertIn("'category_revision'",SQL)

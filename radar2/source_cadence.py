@@ -45,7 +45,8 @@ def record_curator_checks(conn,usernames,results,run_id):
 
 
 # Date-sensitive, bounded re-check of *existing* documents inside the already
-# scheduled incremental. Does not create new cron, source identity or publication.
+# scheduled incremental. The 14-day horizon matches editorial follow-ups, so
+# official ticket receipts do not age out before their event enters the next week. Does not create new cron, source identity or publication.
 URGENT_REFRESH_SQL="""
 SELECT p.document_url AS url,max(d.source) AS source,
        min(p.event_date)::text AS first_event_date,
@@ -59,7 +60,7 @@ SELECT p.document_url AS url,max(d.source) AS source,
 FROM radar2.proposals p
 JOIN radar2.documents d ON d.url=p.document_url
 WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
-  AND (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date + 7
+  AND (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date + 14
   AND p.review_state<>'historico'
   AND p.evidence->>'kind'='event'
   AND d.source NOT IN ('Instagram','Genda','Genda teatro','El Día','0221')
