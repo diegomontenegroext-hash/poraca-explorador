@@ -122,7 +122,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     try:
         if corrective:raise RuntimeError('ROTATION_NOT_REPEATED_IN_FRONTIER_CORRECTION')
         rotation.initialize(conn,json.loads((ROOT/'radar2/instagram_roster.json').read_text()))
-        batch=rotation.claim(conn,run_id,10)
+        batch=rotation.claim(conn,run_id,rotation.MAX_ROTATING_ACCOUNTS)
         manifest={'searches':[],'documents':[],'instagram_attempts':[]}
         rotation_status={'status':'acquired_or_blocked_with_receipts','accounts':len(batch['accounts'])}
     except Exception as e:
