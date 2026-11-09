@@ -345,6 +345,8 @@ class Collector:
           ('https://www.casadionisio.com.ar/expoarte','ExpoArte Casa Dionisio','dionisio_vinoteca'),
           ('https://www.casadionisio.com.ar/','Casa Dionisio','dionisio_vinoteca'),
           ('https://tickets.sincroniadeportiva.com.ar/','Sincronía Deportiva original',None),
+          ('https://lauragan.com.ar/','Laura Gan institucional','lauraganceramica'),
+          ('https://www.eventbrite.com.ar/o/sincronia-deportiva-eventos-17694669676','Sincronía Eventbrite organizador',None),
           ('https://linktr.ee/lutitravelguide','Luti','lutitravelguide'),
           ('https://linktr.ee/circus_ofc','Circus links','circus_ofc'),
           ('https://linktr.ee/guajirabar','Guajira','guajira.bar'),
@@ -366,6 +368,33 @@ class Collector:
                     d['acquisition_method']='institutional_art_original_v1'
                     extract_document(self,d,json.loads(Path(__file__).with_name('accounts.json').read_text()),
                                      'institutional_art_original_v1')
+                continue
+            if source=='Sincronía Eventbrite organizador':
+                # Only the producer's own linked event pages; HTTP/robots still
+                # control every request. No fixed future dates or trust by label.
+                if not self.reuse(d):
+                    self.add(d,source,state='investigable',evidence=d['text'][:4000])
+                from extract import extract_document
+                accounts=json.loads(Path(__file__).with_name('accounts.json').read_text())
+                visited=set()
+                for u in self.links(d):
+                    if len(visited)>=4:break
+                    p=urlsplit(u)
+                    if p.scheme!='https' or p.hostname not in ('eventbrite.com.ar','www.eventbrite.com.ar'):continue
+                    if not re.fullmatch(r'/e/[a-z0-9-]+-tickets-\d+/?',p.path,re.I):continue
+                    u=p._replace(query='',fragment='').geturl()
+                    if u in visited:continue
+                    visited.add(u)
+                    child=self.fetch(u,source,d['url'])
+                    if not child or self.reuse(child):continue
+                    if 'sincronía deportiva eventos' not in child['text'][:3500].lower() and 'sincronia deportiva eventos' not in child['text'][:3500].lower():
+                        self.checks.append({'url':u,'status':'organizer_not_proven'})
+                        continue
+                    if re.search(r'evento finalizado|event finished|event ended',child['text'][:400],re.I):
+                        self.checks.append({'url':u,'status':'organizer_event_already_finished'})
+                        continue
+                    child['acquisition_method']='original_eventbrite_organizer_v1'
+                    extract_document(self,child,accounts,'original_eventbrite_organizer_v1')
                 continue
             if source=='Sincronía Deportiva original':
                 # Inside the existing daily FULL; only links published by the

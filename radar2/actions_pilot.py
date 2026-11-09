@@ -16,7 +16,7 @@ import rotation
 from caption import interpret, VERSION as CAPTION_VERSION
 from runtime import resolve_mode, credential_health,announce_credential_health
 from checkpoint import Journal,restore_artifact
-from capabilities import PublicAccess, instagram_batch, public_search, discover_links, enrich_graph, persist_graph, carry_forward, supplement_representatives
+from capabilities import PublicAccess, instagram_batch, discover_links, enrich_graph, persist_graph, carry_forward, supplement_representatives
 from instagram_official_pilot import acquire as official_ig_pilot
 
 PROJECT='frosty-union-52906378'
@@ -147,24 +147,23 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
             if not official_pilot.get('queries_sent',0):
                 official_pilot['status']='ROTATION_FAILED'
         manifest['official_results']=official_pilot.get('results',[])
-    # Search templates run by Work are not automatically executed by GitHub.
-    # This calls the EXISTING Python public_search only in the ordinary FULL,
-    # with four robots-gated RSS requests and at most two links per query.
-    # Failures remain visible; the rest of the Radar pipeline continues.
-    open_search={'status':'not_due_incremental','queries':0}
+    # Bing robots.txt disallows /search. Never fetch its RSS search URL.
+    # The FULL's pre-existing cultural_channels now includes two additional
+    # first-party origins; retain independent HTTP and policy receipts.
+    focus_urls=[('Laura Gan institucional','https://lauragan.com.ar/'),
+      ('Sincronía Eventbrite organizador',
+       'https://www.eventbrite.com.ar/o/sincronia-deportiva-eventos-17694669676')]
+    origin_receipts=[]
     if full and not corrective:
-        try:
-            found=public_search(c,access,{'accounts':[]},limit=2,focus='activity_gaps')
-            receipts=[{'id':x['query']['id'],'http_status':x['receipt'].get('http_status'),
-                'allowed':bool(x['receipt'].get('allowed')),'error':x.get('error')} for x in found['searches']]
-            open_search={'status':'attempted_with_receipts','queries':len(receipts),
-                'result_links':len(found['documents']),
-                'blocked_or_failed':sum(bool(x.get('error')) or not x['allowed'] for x in receipts),
-                'receipts':receipts}
-        except Exception as exc:
-            open_search={'status':'phase_failed','error_type':type(exc).__name__,
-                         'error':str(exc)[:160]}
-            c.checks.append({'phase':'open_search','error':open_search['error']})
+        for name,url in focus_urls:
+            check=next((x for x in c.checks if x.get('url')==url),{})
+            origin_receipts.append({'source':name,'url':url,
+              'status':'fetched_original' if url in c.docs else 'blocked_or_unavailable',
+              'http_status':check.get('status'),'error':check.get('error')})
+    open_search={'status':'rss_provider_robots_disallowed_use_original_sources',
+      'queries':0,'blocked_provider':'bing.com/search',
+      'original_sources':origin_receipts,
+      'policy':'No bypass of robots, no event dates from search results'}
     try:source_report=discover_links(c,conn,known_urls,limit=12 if full else 6,refresh_candidates=corrective)
     except Exception as e:source_report={'status':'phase_failed','error':type(e).__name__+': '+str(e)[:160]}
     # Rejected non-cultural documents remain auditable but leave the private
