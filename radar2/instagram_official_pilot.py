@@ -1,4 +1,4 @@
-"""Bounded Meta Business Discovery: controls plus at most 20 due accounts.
+"""Bounded Meta Business Discovery: 20 official requests maximum per run.
 
 Runs inside the existing Radar 2 schedule (FULL and incrementals). Without valid Meta
 credentials the pilot is NOT_CONFIGURED and performs zero requests.
@@ -32,18 +32,22 @@ def publication_age_bucket(timestamp, checked_at):
         return "unknown"
 
 def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,extra_curators=()):
-    """Four optional controls plus at most 20 unique due users per natural batch."""
+    """At most 20 official queries total, including controls and extra curators."""
+    controls=list(ACCOUNTS) if include_controls else []
+    rotating_cap=max(0,20-len(controls))
     rotating=[]
     for raw in rotating_accounts:
         username=raw.strip().lower() if isinstance(raw,str) else ""
         if (re.fullmatch(r"[a-z0-9_.]{1,30}",username) and
                 (not include_controls or username not in ACCOUNTS) and username not in rotating):
             rotating.append(username)
-        if len(rotating)>=20: break
-    accounts=(list(ACCOUNTS) if include_controls else [])+rotating
+        if len(rotating)>=rotating_cap: break
+    accounts=controls+rotating
     extra=[]
     for u in extra_curators:
-        if isinstance(u,str) and re.fullmatch(r'[a-z0-9_.]{1,30}',u) and u not in accounts:extra.append(u);accounts.append(u)
+        if (len(accounts)<20 and isinstance(u,str) and
+                re.fullmatch(r'[a-z0-9_.]{1,30}',u) and u not in accounts):
+            extra.append(u);accounts.append(u)
         if len(extra)>=1:break
     report={"extra_curators":extra,"kind":"instagram_official_rotating_pilot",
               "accounts":accounts,"controls":list(ACCOUNTS) if include_controls else [],
