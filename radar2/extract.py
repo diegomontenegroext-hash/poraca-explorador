@@ -92,7 +92,7 @@ def extract_document(c,d,accounts,method):
   first_text=norm(d.get('text','')[:260])
   ticket_host=(urlsplit(d['url']).hostname or '').lower()
   own_finished=bool(ticket_host=='tickets.sincroniadeportiva.com.ar'
-      and re.search(r'\\b(?:event finished|evento finalizado|evento terminado)\\b',first_text))
+      and re.search(r'\b(?:event finished|evento finalizado|evento terminado)\b',first_text))
   older_finished=bool(named_years and max(named_years)<dt.year
       and re.search(r'event finished|evento finalizado|evento terminado',norm(d.get('text',''))))
   if own_finished or older_finished:
