@@ -1,6 +1,6 @@
 {
   "schema": "radar2-account-preflight-v1",
-  "generated_at_art": "2026-11-07",
+  "generated_at_art": "2026-11-09",
   "policy": "Only approved public venues with exact official Instagram URL receive host-venue semantics. Non-venue and internal candidates cannot assert location. This is a snapshot, not live Neon access.",
   "entries": [
     {
@@ -587,6 +587,22 @@
       "aliases": [
         "Pura Vida",
         "puravidalaplata2008"
+      ],
+      "source_project": "public.poraca_knowledge_entities"
+    },
+    {
+      "handle": "residenciacorazon",
+      "role": "venue",
+      "entity_id": "residencia-corazon",
+      "name": "Residencia Corazón",
+      "venue_name": "Residencia Corazón",
+      "identity_state": "approved_public",
+      "location_scope": "La Plata",
+      "account_evidence_url": "https://residenciacorazon.com.ar/docs/RC_PDF.pdf",
+      "account_evidence_basis": "institutional_pdf_explicit_ig_handle_and_approved_venue",
+      "aliases": [
+        "Residencia Corazón",
+        "Casa de Artistas Residencia Corazón"
       ],
       "source_project": "public.poraca_knowledge_entities"
     },
