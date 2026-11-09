@@ -83,6 +83,18 @@ def extract_document(c,d,accounts,method):
     if ending>=dt:end=ending.date().isoformat()
    except (ValueError,TypeError):pass
   title=item['name']
+  # Some finished ticket pages generate a JSON-LD startDate equal to the
+  # CURRENT FETCH INSTANT, despite describing a race from a previous year.
+  # A clearly older edition explicitly marked "Event finished" in the
+  # original cannot be reconstructed as a new event for today.
+  named_years={int(y) for y in re.findall(r'(?<![0-9])(20[0-9]{2})(?![0-9])',title)}
+  finished=bool(re.search(r'event finished|evento finalizado|evento terminado',
+                          norm(d.get('text',''))))
+  if finished and named_years and max(named_years)<dt.year:
+   c.checks.append({'url':d['url'],'status':'discarded_stale_structured_date',
+     'title':title,'source_year':max(named_years),
+     'claimed_start':dt.date().isoformat(),'evidence':'explicit_finished_older_edition'})
+   continue
   if re.search(r'venta de (?:tickets|entradas)',norm(title)):
    performers=item.get('performer') or [];performers=performers if isinstance(performers,list) else [performers]
    names=[a['name'] for a in performers if isinstance(a,dict) and a.get('name')]

@@ -59,6 +59,53 @@ class Capabilities(unittest.TestCase):
   p.cache['https://www.instagram.com']=(rp,{'permission_notice':'Requires express written permission'})
   self.assertFalse(p.policy('https://www.instagram.com/example/')['allowed'])
 
+ def test_frontier_nullable_image_alt_does_not_break_discovery(self):
+  import tempfile
+  from collector import Collector
+  from capabilities import discover_links
+  with tempfile.TemporaryDirectory() as folder:
+   c=Collector(folder);c.run_id='qa-null-image-alt'
+   raw='<a href="https://new.example/proximos-eventos/"><img alt><img alt="Programación cultural"></a>'
+   Path(folder,'original.html').write_text(raw)
+   c.docs['https://venue.example/']={
+     'url':'https://venue.example/','final_url':'https://venue.example/',
+     'source':'Institution','title':'Agenda','text':'Cultura de La Plata',
+     'html_file':'original.html'}
+   state={'sources':{}}
+   with patch('capabilities.load_state',return_value=state),patch('capabilities.save_state'):
+    result=discover_links(c,None,set(),limit=0)
+   self.assertEqual(result['candidates_discovered'],1)
+   self.assertIn('https://new.example/proximos-eventos/',state['sources'])
+   self.assertIn('Programación',state['sources']['https://new.example/proximos-eventos/']['link_label'])
+
+ def test_finished_previous_edition_cannot_reappear_as_today(self):
+  import tempfile
+  from collector import Collector,Tree
+  from extract import extract_document
+  with tempfile.TemporaryDirectory() as folder:
+   c=Collector(folder)
+   old={'@type':'Event','name':'TOLOSA CORRE 2025 EDICION XV',
+     'startDate':'2026-11-09T19:00:39.510Z',
+     'location':{'@type':'Place','name':'Tolosa, La Plata'}}
+   d={'url':'https://tickets.example/event/2025',
+      'final_url':'https://tickets.example/event/2025',
+      'source':'Sincronía Deportiva original',
+      'title':'TOLOSA CORRE 2025 EDICION XV',
+      'text':'Event finished TOLOSA CORRE 2025 EDICION XV. Domingo 21 de Diciembre de 2025 en Tolosa, La Plata.',
+      'fetched_at':'2026-11-09T19:00:40+00:00',
+      'structured_items':[old]}
+   extract_document(c,d,[],'institutional_sports_original_v1')
+   self.assertEqual(len(c.proposals),0,'Do not resurrect a historic race')
+   self.assertTrue(any(x.get('status')=='discarded_stale_structured_date' for x in c.checks))
+   actual={**old,'name':'TOLOSA CORRE 2026 EDICION XVI',
+     'startDate':'2026-12-20T11:00:00Z'}
+   d['structured_items']=[actual]
+   d['text']='TOLOSA CORRE 2026 EDICION XVI. Domingo 20 de Diciembre de 2026 en Tolosa, La Plata.'
+   d['title']='TOLOSA CORRE 2026 EDICION XVI'
+   extract_document(c,d,[],'institutional_sports_original_v1')
+   self.assertEqual(len(c.proposals),1,'Real 2026 edition remains eligible')
+   self.assertEqual(next(iter(c.proposals.values()))['date'],'2026-12-20')
+
  def test_frontier_rejects_utility_links_in_existing_and_new_sources(self):
   from capabilities import cultural_link
   for url,label in [('https://wa.me/123','Reservas'),('https://t.me/share/url?url=cultura','Compartir'),('https://automattic.com/cookies/','Cookie Policy'),('https://funebres.eldia.com/','Fúnebres'),('https://sponsor.example/',''),('https://www.dbyz.com.ar/','Design')]:

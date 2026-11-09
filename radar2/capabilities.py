@@ -219,7 +219,7 @@ def discover_links(c,conn,known_urls,limit=12,refresh_candidates=False):
         for n in c.tree(doc).walk():
             if n.tag!='a' or not n.a.get('href'):continue
             url=normalized_url(urljoin(doc['final_url'],n.a['href']));p=urlsplit(url)
-            label=compact(n.text() or n.a.get('aria-label') or n.a.get('title') or ' '.join(x.a.get('alt','') for x in n.walk()))[:240]
+            label=compact(n.text() or n.a.get('aria-label') or n.a.get('title') or ' '.join((x.a.get('alt') or '') for x in n.walk()))[:240]
             if url in seen or not cultural_link(url,label):continue
             if url not in frontier and (len(frontier)>=1500 or len(candidates)>=60):continue
             if p.scheme!='https' or p.username or p.password:continue
