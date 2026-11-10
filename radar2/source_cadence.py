@@ -30,6 +30,8 @@ def curator_due(conn,excluded=()):
  return []
 
 def record_curator_checks(conn,usernames,results,run_id):
+ if not usernames or not any(result.get('username') in usernames for result in results):
+  return
  from rotation import read,cas
  at=datetime.now(timezone.utc).isoformat()
  for _ in range(4):
