@@ -84,6 +84,14 @@ def extract_document(c,d,accounts,method):
     if ending>=dt:end=ending.date().isoformat()
    except (ValueError,TypeError):pass
   title=item['name']
+  territory=event_location(item,d.get('final_url'))
+  if territory['status']=='source_stated_outside':
+   # A directory headed "La Plata" can include unrelated CABA events.
+   # An event's own structured locality outranks its directory page.
+   c.checks.append({'url':d['url'],'status':'discarded_out_of_area_original_event',
+     'title':title,'source_locality':territory.get('locality'),
+     'territory_basis':territory['basis']})
+   continue
   # The original ticket detail may emit the FETCH INSTANT as JSON-LD
   # startDate even when its own visible header says "Event finished".
   # This applies to finished editions from THIS year too, not only 2025.
@@ -120,7 +128,7 @@ def extract_document(c,d,accounts,method):
    # Geographic evidence belongs to this specific JSON-LD Event, not the
    # region of its publisher, a search result page, or an Instagram account.
    # A source assertion is NOT independent venue verification or admission.
-   c.proposals[key]['territory_resolution']=event_location(item,d.get('final_url'))
+   c.proposals[key]['territory_resolution']=territory
    for field,role in [('performer','performer'),('director','director')]:
     actors=item.get(field) or [];actors=actors if isinstance(actors,list) else [actors]
     for actor in actors:
