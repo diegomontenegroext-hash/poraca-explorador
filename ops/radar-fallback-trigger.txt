@@ -1,7 +1,7 @@
-# Prueba manual puntual del puente visual IG 2026-11-10; NO ciclo natural ni watchdog.
+# Fallback controlado de la FULL 2026-11-10 05:27 ART; modo unico y slot acotado.
 trigger_date=2026-11-10
-trigger_slot=13
-trigger_mode=incremental
-trigger_scope=manual_visual_probe
+trigger_slot=05
+trigger_mode=full
+trigger_scope=watchdog_fallback
 certification_batches=1
-certification_modes=incremental
+certification_modes=full
