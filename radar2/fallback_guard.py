@@ -54,7 +54,7 @@ def resolved_slot(event, schedule='', fallback_text='', now=None):
     scheduled = datetime(day.year, day.month, day.day, SLOTS[label][1], 27,
                          tzinfo=ZONE)
     lag = at - scheduled
-    if lag < timedelta(minutes=60) or lag > timedelta(hours=18):
+    if lag < timedelta(minutes=90) or lag >= timedelta(hours=18):
         raise ValueError('WATCHDOG_OUTSIDE_RECOVERY_WINDOW')
     return dict(slot=f'{day.date().isoformat()}/{label}', mode=mode,
                 origin='watchdog_fallback')

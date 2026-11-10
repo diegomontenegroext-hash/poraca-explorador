@@ -25,6 +25,14 @@ class FallbackGuards(unittest.TestCase):
  def test_fallback_rejects_too_early_or_stale(self):
   with self.assertRaisesRegex(ValueError,'WINDOW'):resolved_slot('push',fallback_text=text(),now=at('2026-11-10',5,45))
   with self.assertRaisesRegex(ValueError,'WINDOW'):resolved_slot('push',fallback_text=text(),now=at('2026-11-11',1))
+ def test_watchdog_observes_operator_grace_and_expiry(self):
+  for day,hour,minute in [('2026-11-10',6,56),('2026-11-10',23,27)]:
+   with self.subTest(day=day,hour=hour,minute=minute):
+    with self.assertRaisesRegex(ValueError,'WINDOW'):
+     resolved_slot('push',fallback_text=text(),now=at(day,hour,minute))
+  for hour,minute in [(6,57),(23,26)]:
+   with self.subTest(hour=hour,minute=minute):
+    self.assertEqual(resolved_slot('push',fallback_text=text(),now=at('2026-11-10',hour,minute))['slot'],'2026-11-10/05')
  def test_fallback_invalid_mode_fails_closed(self):
   with self.assertRaisesRegex(ValueError,'MODE'):resolved_slot('push',fallback_text=text(slot='05',mode='incremental'),now=at('2026-11-10',8))
  def test_fallback_multi_batch_fails_closed(self):
