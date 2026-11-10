@@ -15,6 +15,7 @@ from reconcile import reconcile
 import rotation
 from caption import interpret, VERSION as CAPTION_VERSION
 from runtime import resolve_mode, credential_health,announce_credential_health
+from fallback_guard import resolved_slot,check_slot
 from checkpoint import Journal,restore_artifact
 from capabilities import PublicAccess, instagram_batch, discover_links, enrich_graph, persist_graph, carry_forward, supplement_representatives
 from instagram_official_pilot import acquire as official_ig_pilot
@@ -57,7 +58,7 @@ def certification_batches():
 
 def run_batch(conn,run_id,work,full,access,corrective=False):
     if execute(conn,"SELECT run_id FROM radar2.runs WHERE run_id=$1 AND summary->>'status'='completed'",[run_id])['rows']:return {'run_id':run_id,'status':'already_completed'}
-    execute(conn,"INSERT INTO radar2.runs(run_id,finished_at,summary) VALUES($1,now(),jsonb_build_object('status','running','mode',$2::text)) ON CONFLICT DO NOTHING",[run_id,'full' if full else 'incremental'])
+    execute(conn,"INSERT INTO radar2.runs(run_id,finished_at,summary) VALUES($1,now(),jsonb_build_object('status','running','mode',$2::text,'recovery_slot',$3::text)) ON CONFLICT DO NOTHING",[run_id,'full' if full else 'incremental',os.environ.get('RADAR2_RECOVERY_SLOT','')])
     started_at=execute(conn,'SELECT clock_timestamp()::text started_at')['rows'][0]['started_at']
     old=baseline(conn)
     known_urls={r['url'] for r in execute(conn,'SELECT url FROM radar2.documents')['rows']}
@@ -250,7 +251,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     metrics={k:int(v) for k,v in m.items()}
     attempts=manifest['instagram_attempts']
     ig={'accounts_attempted':len(attempts),'accounts_with_profile_http_request':sum(bool(a.get('profile_http_requested')) for a in attempts),'profiles_accessible':sum(bool(a['profile_accessible']) for a in attempts),'accounts_with_posts':sum(a['posts_recovered']>0 for a in attempts),'posts_recovered':sum(a['posts_recovered'] for a in attempts),'errors_or_restrictions':sum(bool(a.get('error')) for a in attempts),'receipts':attempts,'index_searches':len(manifest['searches']),'search_failures':sum(bool(s.get('error')) for s in manifest['searches']),'search_receipts':manifest['searches']}
-    report={'execution_context':'GitHub Actions','github_event':os.environ.get('GITHUB_EVENT_NAME'),'github_schedule':os.environ.get('RADAR2_SCHEDULE'),'github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'mode':'full' if full else 'incremental','caption_documents_processed':reprocessed,'journal_recovered_documents':recovered,'credential_health':credential_health(),'scope':'full' if full else 'incremental','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'instagram_official_pilot':official_pilot,'rotation':rotation_status,'source_discovery':source_report,'open_search':open_search,'cultural_memory':graph_report,'source_admission':admissions,'urgent_source_refresh':urgent_refresh,'primary_source_followup':primary_handoff,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'supplemented_representatives':supplemented,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0}
+    report={'execution_context':'GitHub Actions','github_event':os.environ.get('GITHUB_EVENT_NAME'),'github_schedule':os.environ.get('RADAR2_SCHEDULE'),'github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'mode':'full' if full else 'incremental','caption_documents_processed':reprocessed,'journal_recovered_documents':recovered,'credential_health':credential_health(),'scope':'full' if full else 'incremental','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'instagram_official_pilot':official_pilot,'rotation':rotation_status,'source_discovery':source_report,'open_search':open_search,'cultural_memory':graph_report,'source_admission':admissions,'urgent_source_refresh':urgent_refresh,'primary_source_followup':primary_handoff,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'supplemented_representatives':supplemented,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0,'recovery_slot':os.environ.get('RADAR2_RECOVERY_SLOT') or None,'dispatch_kind':'watchdog_fallback' if os.environ.get('GITHUB_EVENT_NAME')=='push' and 'trigger_scope=watchdog_fallback' in (ROOT/'ops/radar-fallback-trigger.txt').read_text() else os.environ.get('GITHUB_EVENT_NAME')}
     saved=execute(conn,"UPDATE radar2.runs SET summary=summary || $2::jsonb WHERE run_id=$1 RETURNING run_id",[run_id,json.dumps(report,ensure_ascii=False)])['rows']
     if len(saved)!=1:raise RuntimeError('RUN_SUMMARY_NOT_SAVED')
     print(json.dumps({k:v for k,v in report.items() if k not in ('proposal_ids','rotation','instagram','source_discovery')}))
@@ -272,8 +273,19 @@ def main():
     if not conn or not (urlsplit(conn).hostname or '').endswith('.neon.tech'):raise RuntimeError('MISSING_OR_INVALID_LIMITED_NEON_SECRET')
     row=execute(conn,"SELECT current_user role,current_setting('neon.project_id',true) project,current_setting('neon.branch_id',true) branch,has_table_privilege(current_user,'radar2.proposals','INSERT') can_write")['rows'][0]
     if (row['role'],row['project'],row['branch'])!=(ROLE,PROJECT,BRANCH) or row['can_write'] not in ('t',True):raise RuntimeError('LIMITED_WRITER_IDENTITY_FENCE')
+    event=os.environ.get('GITHUB_EVENT_NAME')
+    trigger=(ROOT/'ops/radar-fallback-trigger.txt').read_text() if event=='push' else ''
+    resolved=resolved_slot(event,os.environ.get('RADAR2_SCHEDULE',''),trigger)
+    if resolved:
+        slot_check=check_slot(conn,resolved['slot'])
+        print(json.dumps({'slot_preflight':slot_check,'origin':resolved['origin']}))
+        if slot_check['action']=='SKIP_COMPLETED':
+            print('RADAR2_SLOT_ALREADY_COMPLETED; skipping redundant acquisition')
+            return
+        if slot_check['action']=='BLOCK_UNRESOLVED':
+            raise RuntimeError('RADAR2_SLOT_UNRESOLVED_REQUIRES_REVIEW')
+        os.environ['RADAR2_RECOVERY_SLOT']=resolved['slot']
     health=announce_credential_health()
-    trigger=(ROOT/'ops/radar-fallback-trigger.txt').read_text() if os.environ.get('GITHUB_EVENT_NAME')=='push' else ''
     if 'trigger_scope=maturity_replay' in trigger:
         from maturity import replay
         rid='radar2-maturity-'+os.environ['GITHUB_RUN_ID']
@@ -290,7 +302,7 @@ def main():
 
     prefix='radar2-ghdaily-' if os.environ.get('GITHUB_EVENT_NAME')=='schedule' else 'radar2-ghpilot-'
     run_id=prefix+os.environ['GITHUB_RUN_ID']+'-attempt'+os.environ.get('GITHUB_RUN_ATTEMPT','1');access=PublicAccess();reports=[]
-    mode=resolve_mode(os.environ.get('GITHUB_EVENT_NAME'),os.environ.get('RADAR2_SCHEDULE',''),os.environ.get('RADAR2_MODE',''))
+    mode=resolved['mode'] if resolved else resolve_mode(os.environ.get('GITHUB_EVENT_NAME'),os.environ.get('RADAR2_SCHEDULE',''),os.environ.get('RADAR2_MODE',''))
     corrective=os.environ.get('GITHUB_EVENT_NAME')=='push' and 'trigger_scope=frontier_corrective' in (ROOT/'ops/radar-fallback-trigger.txt').read_text()
     restored=restore_artifact(ROOT/'.radar2-checkpoints')
     print(json.dumps({'acquisition_journal_restore':restored}))
