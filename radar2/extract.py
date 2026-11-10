@@ -42,6 +42,7 @@ def extract_document(c,d,accounts,method):
  multi=None if any(re.search(r'Event$',str(item.get('@type',''))) for item in structured_first) else compound_interpret(c,d,accounts,getattr(c,'baseline',[])+list(c.proposals.values()))
  if multi is not None:return multi
  before=set(c.proposals);produced=set();tree=c.tree(d);items=c.structured(d)
+ discarded_finished_detail=False
  now=datetime.fromisoformat(d['fetched_at']).date();published=next((x.get('datePublished') for x in items if x.get('datePublished')),None)
  if published:d['published_at']=published
  def add(title,day,hour,venue,evidence,original=None,organizer=None,kind='event',end_date=None,category_label=None):
@@ -91,11 +92,18 @@ def extract_document(c,d,accounts,method):
   named_years={int(y) for y in re.findall(r'(?<![0-9])(20[0-9]{2})(?![0-9])',title)}
   first_text=norm(d.get('text','')[:260])
   ticket_host=(urlsplit(d['url']).hostname or '').lower()
+  finished_tag=re.search(r'\b(?:event finished|evento finalizado|evento terminado)\b',first_text)
+  prefix=first_text[:finished_tag.start()] if finished_tag else ''
+  # The current detail's finished badge vetoes it, never a footer mention
+  # of a DIFFERENT older event after this event's explicit date.
+  footer_reference=bool(re.search(r'\b(?:mas informacion|otro evento)\b',prefix)
+      or re.search(r'\b\d{1,2}\s+de\s+(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\b',prefix))
   own_finished=bool(ticket_host=='tickets.sincroniadeportiva.com.ar'
-      and re.search(r'\b(?:event finished|evento finalizado|evento terminado)\b',first_text))
+      and finished_tag and not footer_reference)
   older_finished=bool(named_years and max(named_years)<dt.year
       and re.search(r'event finished|evento finalizado|evento terminado',norm(d.get('text',''))))
   if own_finished or older_finished:
+   discarded_finished_detail=True
    c.checks.append({'url':d['url'],'status':'discarded_stale_structured_date',
      'title':title,'source_year':max(named_years) if named_years else None,
      'claimed_start':dt.date().isoformat(),
@@ -217,6 +225,11 @@ def extract_document(c,d,accounts,method):
    title=heading
    if hour and re.search(r'brindis|apertura oficial|inauguración',text,re.I):title+=' · '+('Brindis' if 'brindis' in text.lower() else 'Apertura')
    add(title,current_day,f'{int(hour[1]):02}:{hour[2] or "00"}' if hour else None,venue[1] if venue else None,text,kind='program' if end_date and end_date!=current_day else 'event',end_date=end_date)
+ # Do not reintroduce an explicitly finished ticket as an undated lead.
+ # Other current items on the page still produce their own events above.
+ if not produced and discarded_finished_detail:
+  c.checks.append({'url':d['url'],'status':'discarded_explicit_finished_original'})
+  return []
  # Do not turn an unparsed article, homepage or old announcement into an event.
  if not produced:
   if not re.search(r'la plata|berisso|ensenada|gonnet|gorina|city bell|villa elisa|tolosa|punta lara|abasto',norm(d['text'])):

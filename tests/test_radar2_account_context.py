@@ -115,12 +115,16 @@ class CaptionVenueResolution(unittest.TestCase):
   self.assertEqual(p['state'],'observado_agenda')
   self.assertFalse(p['publication_approved'])
  def test_other_account_cannot_inherit_residencia_open_house(self):
-  caption=('Aniversario de un lugar amigo. Abrimos nuestra casa en La Plata. '
+  caption=('Aniversario de un lugar amigo. Muestra de arte en La Plata. Abrimos nuestra casa. '
    '📍 Calle 2 entre 46 y 47, La Plata\nDomingo 22 de noviembre a las 18 hs')
   for handle in ('tribusocialclub','teatroespacio44','sindicatoargentinodeboleros'):
-   p=self.parse(self.doc(handle,caption))[0]
-   self.assertIsNone(p['venue'])
-   self.assertEqual(p['state'],'incompleto')
+   d=self.doc(handle,caption)
+   d['published_at']='2026-11-08T13:00:00+00:00'
+   proposals=self.parse(d)
+   self.assertTrue(proposals,'With an explicit date and real publication timestamp, preserve the event for review')
+   for p in proposals:
+    self.assertIsNone(p['venue'],'A non-owning account cannot inherit another venue')
+    self.assertEqual(p['state'],'incompleto')
  def test_multi_stop_program_never_inherits_owned_house(self):
   caption=('Programa cultural y exposición. Abrimos nuestra casa. '
    '📍 Calle 2 entre 46 y 47, La Plata\n'
