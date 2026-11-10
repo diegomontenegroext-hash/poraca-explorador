@@ -146,6 +146,11 @@ class Collector:
                 d['structured_items']=self.structured(d)
                 published=next((x.get('datePublished') for x in d['structured_items'] if x.get('datePublished')),None)
                 if published:d['published_at']=published
+                # Capture candidate photo URLs from this already permitted fetch.
+                # The dossier review gate must resolve subject, image quality and
+                # distribution rights; discovery does not download or publish.
+                from media_source_leads import leads
+                d['media_leads_v1']=leads(t,d)
         except Exception as e:
             check.update(error=type(e).__name__+': '+str(e)[:180]);d=None
         if d and self.checkpoint:self.checkpoint(d)
