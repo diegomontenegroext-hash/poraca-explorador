@@ -1,7 +1,7 @@
-# Solo incremental final: verificar limite de un dia Genda y cache de interpretacion.
-trigger_date=2026-11-07
-trigger_slot=compound_incremental_validation_20261107
-trigger_mode=radar2_pilot
-trigger_scope=compound_incremental_validation
+# Fallback controlado de la FULL 2026-11-10 05:27 ART; modo unico y slot acotado.
+trigger_date=2026-11-10
+trigger_slot=05
+trigger_mode=full
+trigger_scope=watchdog_fallback
 certification_batches=1
-certification_modes=incremental
+certification_modes=full
