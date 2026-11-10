@@ -74,6 +74,7 @@ class Capabilities(unittest.TestCase):
    state={'sources':{}}
    with patch('capabilities.load_state',return_value=state),patch('capabilities.save_state'):
     result=discover_links(c,None,set(),limit=0)
+   self.assertEqual(result['status'],'completed')
    self.assertEqual(result['candidates_discovered'],1)
    self.assertIn('https://new.example/proximos-eventos/',state['sources'])
    self.assertIn('Programación',state['sources']['https://new.example/proximos-eventos/']['link_label'])

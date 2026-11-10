@@ -292,7 +292,7 @@ def discover_links(c,conn,known_urls,limit=12,refresh_candidates=False):
         checked.append(dict(item))
     # Persist the evaluated frontier even when all sources are inaccessible.
     save_state(conn,SOURCE_STATE,state)
-    return {'candidates_discovered':len(candidates),'candidates_total':len(frontier),'checked':checked,'new_domains_observed':sorted({urlsplit(s['url']).hostname for s in checked if s['new_domain_at_discovery'] and s['status'] in ('cultural_candidate','productive_observed')}),'productive_sources':[s['url'] for s in checked if s['status']=='productive_observed']}
+    return {'status':'completed','candidates_discovered':len(candidates),'candidates_total':len(frontier),'checked':checked,'new_domains_observed':sorted({urlsplit(s['url']).hostname for s in checked if s['new_domain_at_discovery'] and s['status'] in ('cultural_candidate','productive_observed')}),'productive_sources':[s['url'] for s in checked if s['status']=='productive_observed']}
 
 
 def enrich_graph(result,baseline):
