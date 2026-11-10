@@ -4,8 +4,10 @@ Runs inside the existing Radar 2 schedule (FULL and incrementals). Without valid
 credentials the pilot is NOT_CONFIGURED and performs zero requests.
 No HTML profile collection, browser automation, bypass, or new scheduler.
 """
+import json
 import os
 import re
+from urllib.parse import parse_qsl, urlsplit
 from datetime import datetime, timedelta, timezone
 from collector import sha, utc
 from instagram import discover
@@ -16,6 +18,40 @@ from account_context import preflight
 ACCOUNTS = ("guajira.bar", "lutitravelguide", "escenario40", "teatroargentinopba")
 REQUIRED = ("META_IG_USER_ID", "META_ACCESS_TOKEN", "META_GRAPH_VERSION")
 PERMALINK = re.compile(r"https://(?:www\.)?instagram\.com/(?:p|reel)/[A-Za-z0-9_-]+/?\Z")
+
+def media_references(post):
+    """Keep temporary image renditions only, never a video URL or API credentials."""
+    children = post.get("children")
+    album = post.get("media_type") == "CAROUSEL_ALBUM"
+    items = children.get("data") if album and isinstance(children, dict) else []
+    items = list(items) if isinstance(items, list) else []
+    if not album or not items:
+        items = [post]
+    leads = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        kind = item.get("media_type")
+        field = {"IMAGE": "media_url", "VIDEO": "thumbnail_url", "CAROUSEL_ALBUM": "media_url"}.get(kind)
+        url = item.get(field)
+        if not isinstance(url, str) or len(url) > 4096:
+            continue
+        try:
+            parts = urlsplit(url)
+            if (parts.scheme != "https" or not parts.hostname or parts.username or parts.password
+                    or parts.port or not parts.hostname.endswith((".cdninstagram.com", ".fbcdn.net"))
+                    or any(k.lower() in ("access_token", "appsecret_proof") for k, _ in parse_qsl(parts.query))):
+                continue
+        except ValueError:
+            continue
+        if any(ref["url"] == url for ref in leads):
+            continue
+        leads.append({"media_id": item.get("id") or post.get("id"), "url": url,
+                      "role": "reel_cover" if field == "thumbnail_url" else "publication_image",
+                      "origin": "meta_business_discovery", "temporary": True})
+        if len(leads) == 3:
+            break
+    return leads
 
 def publication_age_bucket(timestamp, checked_at):
     """Distinguish newly found old posts from truly recent posts; no inferred dates."""
@@ -88,7 +124,8 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,ex
             caption = post.get("caption") or ""
             if not isinstance(url,str) or not PERMALINK.fullmatch(url):
                 continue
-            if not isinstance(caption,str) or not caption.strip():
+            leads = media_references(post)
+            if not isinstance(caption,str) or (not caption.strip() and not leads):
                 continue
             if url in collector.docs:
                 continue
@@ -100,6 +137,11 @@ def acquire(collector, known_urls, rotating_accounts=(),include_controls=True,ex
                "text_sha256":sha(caption),"acquisition_method":"official_meta_api",
                "content_scope":"caption","profile_username":username,
                "published_at":post.get("timestamp"),"external_id":post.get("id"),"media_type":post.get("media_type")}
+            d["media_leads_v1"] = leads
+            d["media_status"] = "temporary_references" if leads else "not_returned"
+            if leads:
+                identities = [(ref["media_id"], ref["role"]) for ref in leads]
+                d["sha256"] = sha(json.dumps([caption, post.get("timestamp"), identities], ensure_ascii=False))
             collector.docs[url]=d
             if getattr(collector,"checkpoint",None):collector.checkpoint(d)
             if url not in known_urls:
