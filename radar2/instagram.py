@@ -16,7 +16,7 @@ def discover(username):
         return {'username':username,'checked_at':utc(),'status':'NOT_EXECUTED_MISSING_OFFICIAL_ACCESS','posts':[],
           'requirement':'Own eligible professional Instagram account, Meta app, token with instagram_basic, instagram_manage_insights, pages_read_engagement, applicable Page access and access level. Facebook Login implementation; version supplied explicitly from app configuration.'}
     if not __import__('re').fullmatch(r'[A-Za-z0-9_.]{1,30}',username):raise ValueError('USERNAME')
-    fields='business_discovery.username('+username+'){username,media.limit(12){id,caption,permalink,timestamp,media_type}}'
+    fields='business_discovery.username('+username+'){username,media.limit(12){id,caption,permalink,timestamp,media_type,media_url,thumbnail_url,children.limit(3){id,media_type,media_url,thumbnail_url}}}'
     url=f'https://graph.facebook.com/{version}/{own}?'+urlencode({'fields':fields})
     try:
         with urlopen(Request(url,headers={'Authorization':'Bearer '+token}),timeout=20) as response:
