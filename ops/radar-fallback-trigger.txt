@@ -1,5 +1,5 @@
-# Fallback controlado de la FULL 2026-11-10 05:27 ART; modo unico y slot acotado.
-trigger_date=2026-11-10
+# Rescate watchdog del slot faltante de Radar 2; una sola adquisición.
+trigger_date=2026-11-11
 trigger_slot=05
 trigger_mode=full
 trigger_scope=watchdog_fallback
