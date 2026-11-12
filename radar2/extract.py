@@ -194,8 +194,26 @@ def extract_document(c,d,accounts,method):
   # details; stop when a different day is mentioned rather than inventing a
   # second session for another festival referenced in the same article.
   article_headings=[n.text() for n in article.walk() if n.tag in ('h1','h2','h3')]
-  single_processed=False
-  if year and len(article_headings)==1:
+  # A timetable may put the date, clock and room on one line and the
+  # activity title in the next paragraph. Bind only adjacent explicit blocks.
+  schedule_rows=[]
+  blocks=[node.text() for node in article.walk() if node.tag in ('p','h2','h3','h4','li')]
+  heading_pattern=r'^(lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo)\s+(\d{1,2}\s+de\s+\w+(?:\s+de\s+20\d{2})?)\s*\|\s*([01]?\d|2[0-3])[:.]([0-5]\d)\s*h(?:s)?\s*[-–—]\s*(.{3,140})$'
+  weekdays=('lunes','martes','miercoles','jueves','viernes','sabado','domingo')
+  for index,block in enumerate(blocks[:-1]):
+   heading=re.fullmatch(heading_pattern,block.strip(),re.I)
+   if not heading or not year:continue
+   day=day_from(heading[2],year)
+   if not day or weekdays[datetime.fromisoformat(day).weekday()]!=norm(heading[1]):continue
+   title=blocks[index+1].strip()
+   if not 4<=len(title)<=160 or re.search(r'\d\s*\||https?://',title):continue
+   schedule_rows.append((title,day,f'{int(heading[3]):02}:{heading[4]}',heading[5],block+' '+title))
+  if len(schedule_rows)>=2:
+   for title,day,hour,room,evidence in schedule_rows:
+    key=add(title,day,hour,room,evidence)
+    if key:c.proposals[key]['source_document_sha256']=d.get('sha256')
+  single_processed=len(schedule_rows)>=2
+  if year and len(article_headings)==1 and not single_processed:
    title=article_headings[0]
    paragraphs=[n.text() for n in article.walk() if n.tag=='p']
    for index,text in enumerate(paragraphs):
