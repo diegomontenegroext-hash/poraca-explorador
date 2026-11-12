@@ -5,6 +5,7 @@ This is a versioned, read-only snapshot of approved entity + official handle lin
 Profiles identify a possible home venue; account identity alone is not event evidence.
 """
 import json
+import hashlib
 import re
 import unicodedata
 from functools import lru_cache
@@ -12,6 +13,11 @@ from pathlib import Path
 
 SNAPSHOT=Path(__file__).with_name('account_profiles.json')
 ROLE_VENUE='venue'
+_LIVE_PROFILES=None
+_LIVE_STATUS='offline_snapshot'
+# Explicit, non-generic local aliases; never treat a profile alone as location.
+LIVE_ALIASES={'estacion-provincial':['Estación Provincial'],'teatro-argentino':['Teatro Argentino','Centro Provincial de las Artes'],'teatro-opera-laplata':['Teatro Ópera','El Ópera'],'macla':['MACLA','Museo de Arte Contemporáneo Latinoamericano'],'museo-pettoruti':['Museo Pettoruti'],'cine-select':['Cine Select'],'espacio-moliere':['Espacio Molière'],'gasav-club':['GASAV'],'hipodromo-la-plata':['Hipódromo de La Plata']}
+
 OFFSITE=re.compile(
  r'\b(?:en\s+(?:otro|otra)\s+(?:lugar|espacio|sala|ciudad)|'
  r'fuera\s+de\s+(?:la\s+)?(?:sala|ciudad)|'
@@ -24,8 +30,75 @@ ADDRESS=re.compile(r'(?P<loc>(?:📍|📌)\s*(?:calle|av(?:enida)?\.?|diag(?:ona
 def fold(s):
  return ''.join(c for c in unicodedata.normalize('NFKD',str(s or '')).casefold() if not unicodedata.combining(c))
 
+def configure_live_profiles(conn, executor=None):
+ """Load once per authenticated Radar run. The narrow function exposes only
+ accepted local venue identities, not the knowledge tables or event approvals.
+ On failure continue discovery without asserting stale venue identities."""
+ global _LIVE_PROFILES,_LIVE_STATUS
+ _LIVE_PROFILES=None;_LIVE_STATUS='offline_snapshot';read_profiles.cache_clear()
+ static=read_profiles()
+ try:
+  if executor is None:
+   from persist import execute as executor
+  result=executor(conn,"SELECT current_user AS role,current_setting('neon.project_id',true) AS project,current_setting('neon.branch_id',true) AS branch,public.poraca_radar2_live_account_profiles_v1() AS profiles")
+  row=result['rows'][0]
+  if (row['role'],row['project'],row['branch'])!=('poraca_radar_limited_prod','frosty-union-52906378','br-mute-recipe-b4odj2bl'):
+   raise ValueError('identity_fence')
+  data=row['profiles'];data=json.loads(data) if isinstance(data,str) else data
+  if data.get('schema')!='radar2-live-account-profiles-v1' or not isinstance(data.get('entries'),list):
+   raise ValueError('schema')
+  fresh={h:dict(p) for h,p in static.items() if p.get('role')!='venue'}
+  seen=set()
+  for p in data['entries']:
+   h=p.get('handle','')
+   if (not re.fullmatch(r'[a-z0-9_.]{2,30}',h) or h in seen or p.get('role')!='venue' or
+       p.get('identity_state')!='approved_public' or not p.get('entity_id') or not p.get('venue_name') or
+       not str(p.get('account_evidence_url','')).startswith('https://')):
+    raise ValueError('invalid_identity')
+   seen.add(h)
+   old=static.get(h,{})
+   # A contradictory documented non-venue role needs editorial reconciliation.
+   if old.get('role') not in (None,'venue','venue_candidate'):continue
+   aliases=list(old.get('aliases',[])) if old.get('entity_id')==p['entity_id'] else []
+   aliases += LIVE_ALIASES.get(p['entity_id'],[])
+   fresh[h]=dict(p,aliases=sorted(set(aliases+[p['venue_name']])))
+  _LIVE_PROFILES=fresh;_LIVE_STATUS='live_accepted_crosswalk'
+ except Exception:
+  # Do not use revoked/stale approvals on an unavailable live connection.
+  # Keep known role hints for collection; no new factual venue inference.
+  _LIVE_PROFILES={h:(dict(p,role='venue_candidate',identity_state='live_identity_unavailable') if p.get('role')=='venue' else dict(p)) for h,p in static.items()}
+  _LIVE_STATUS='live_unavailable_discovery_only'
+ read_profiles.cache_clear()
+ return {'status':_LIVE_STATUS,'approved_venues':sum(p.get('role')=='venue' for p in _LIVE_PROFILES.values()),'profiles':len(_LIVE_PROFILES)}
+
+def identity_refresh_report():
+ return {'status':_LIVE_STATUS,'approved_venues':sum(p.get('role')=='venue' for p in read_profiles().values()),'profiles':len(read_profiles())}
+
+def reset_live_profiles():
+ global _LIVE_PROFILES,_LIVE_STATUS
+ _LIVE_PROFILES=None;_LIVE_STATUS='offline_snapshot';read_profiles.cache_clear()
+
+def profile_fingerprint(handle):
+ if _LIVE_STATUS!='live_accepted_crosswalk':return None
+ p=profile_for(handle) or {}
+ fields={k:p.get(k) for k in ('role','entity_id','venue_name','identity_state','location_scope','account_evidence_url','aliases')}
+ return hashlib.sha256(json.dumps(fields,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
+
+def identity_changed(d,previous,proposals):
+ """An unchanged caption must be reinterpreted after its identity changes,
+ without asking Meta again or overwriting on a transient identity-read failure."""
+ if _LIVE_STATUS!='live_accepted_crosswalk':return False
+ handle=d.get('profile_username');fingerprint=profile_fingerprint(handle)
+ if previous and previous.get('account_identity_fingerprint') is not None:
+  return previous['account_identity_fingerprint']!=fingerprint
+ current=preflight(handle)
+ contexts=[p.get('account_context') for p in proposals if isinstance(p.get('account_context'),dict)]
+ if not contexts:return current.get('account_verified') is True
+ return any(any(c.get(k)!=current.get(k) for k in ('role','venue_entity_id','account_verified')) for c in contexts)
+
 @lru_cache(maxsize=1)
 def read_profiles():
+ if _LIVE_PROFILES is not None:return _LIVE_PROFILES
  data=json.loads(SNAPSHOT.read_text(encoding='utf-8'))
  if data.get('schema')!='radar2-account-preflight-v1':raise ValueError('INVALID_ACCOUNT_PROFILE_SCHEMA')
  profiles={}
@@ -52,7 +125,7 @@ def preflight(handle):
          'account_verified':bool(verified),
          'evidence_url':p.get('account_evidence_url'),
          'evidence_basis':p.get('account_evidence_basis'),
-         'snapshot':'radar2-account-preflight-v1'}
+         'snapshot':'radar2-account-preflight-v1','identity_status':_LIVE_STATUS}
 
 def location_for(d,block):
  """Return verified explicit venue or *candidate*, with exact evidence.
