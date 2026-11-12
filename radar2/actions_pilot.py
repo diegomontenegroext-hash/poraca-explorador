@@ -181,6 +181,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     corpus=execute(conn,"SELECT payload FROM radar2.documents WHERE payload->>'acquisition_method'='official_meta_api' ORDER BY url")['rows']
     accounts=json.loads((ROOT/'radar2/accounts.json').read_text())
     from compound import classify,effective_version,requires_interpretation,VERSION as COMPOUND_VERSION
+    from account_context import profile_fingerprint
     prior={}
     for p in old:
         e=json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}
@@ -201,6 +202,8 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
             for p in c.proposals.values():
                 if p['document_url']==d['url']:p['source_document_sha256']=d.get('sha256')
         d['interpretation_version']=effective_version(d,accounts)
+        identity_revision=profile_fingerprint(d.get('profile_username'))
+        if identity_revision is not None:d['account_identity_fingerprint']=identity_revision
     # Follow only event-specific external originals from Genda's individual
     # secondary detail pages. Bounded to eight per ordinary run;
     # not a publication or an independent editorial decision.
@@ -251,7 +254,7 @@ def run_batch(conn,run_id,work,full,access,corrective=False):
     metrics={k:int(v) for k,v in m.items()}
     attempts=manifest['instagram_attempts']
     ig={'accounts_attempted':len(attempts),'accounts_with_profile_http_request':sum(bool(a.get('profile_http_requested')) for a in attempts),'profiles_accessible':sum(bool(a['profile_accessible']) for a in attempts),'accounts_with_posts':sum(a['posts_recovered']>0 for a in attempts),'posts_recovered':sum(a['posts_recovered'] for a in attempts),'errors_or_restrictions':sum(bool(a.get('error')) for a in attempts),'receipts':attempts,'index_searches':len(manifest['searches']),'search_failures':sum(bool(s.get('error')) for s in manifest['searches']),'search_receipts':manifest['searches']}
-    report={'execution_context':'GitHub Actions','github_event':os.environ.get('GITHUB_EVENT_NAME'),'github_schedule':os.environ.get('RADAR2_SCHEDULE'),'github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'mode':'full' if full else 'incremental','caption_documents_processed':reprocessed,'journal_recovered_documents':recovered,'credential_health':credential_health(),'scope':'full' if full else 'incremental','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'instagram_official_pilot':official_pilot,'rotation':rotation_status,'source_discovery':source_report,'open_search':open_search,'cultural_memory':graph_report,'source_admission':admissions,'urgent_source_refresh':urgent_refresh,'primary_source_followup':primary_handoff,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'supplemented_representatives':supplemented,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0,'recovery_slot':os.environ.get('RADAR2_RECOVERY_SLOT') or None,'dispatch_kind':'watchdog_fallback' if os.environ.get('GITHUB_EVENT_NAME')=='push' and 'trigger_scope=watchdog_fallback' in (ROOT/'ops/radar-fallback-trigger.txt').read_text() else os.environ.get('GITHUB_EVENT_NAME')}
+    report={'execution_context':'GitHub Actions','github_event':os.environ.get('GITHUB_EVENT_NAME'),'github_schedule':os.environ.get('RADAR2_SCHEDULE'),'github_run_id':os.environ['GITHUB_RUN_ID'],'commit':os.environ.get('GITHUB_SHA'),'started_at':started_at,'run_id':run_id,'mode':'full' if full else 'incremental','caption_documents_processed':reprocessed,'account_identity_refresh':__import__('account_context').identity_refresh_report(),'journal_recovered_documents':recovered,'credential_health':credential_health(),'scope':'full' if full else 'incremental','neon_readback':read,'discovery_metrics_v1':metrics,'instagram':ig,'instagram_official_pilot':official_pilot,'rotation':rotation_status,'source_discovery':source_report,'open_search':open_search,'cultural_memory':graph_report,'source_admission':admissions,'urgent_source_refresh':urgent_refresh,'primary_source_followup':primary_handoff,'archived_non_cultural_proposals':[r['proposal_id'] for r in archived],'superseded_documents':[r['proposal_id'] for r in superseded],'supplemented_representatives':supplemented,'checks_errors':sum(bool(x.get('error')) for x in c.checks),'proposal_ids':[p['id'] for p in result['proposals']],'publications_approved':0,'recovery_slot':os.environ.get('RADAR2_RECOVERY_SLOT') or None,'dispatch_kind':'watchdog_fallback' if os.environ.get('GITHUB_EVENT_NAME')=='push' and 'trigger_scope=watchdog_fallback' in (ROOT/'ops/radar-fallback-trigger.txt').read_text() else os.environ.get('GITHUB_EVENT_NAME')}
     saved=execute(conn,"UPDATE radar2.runs SET summary=summary || $2::jsonb WHERE run_id=$1 RETURNING run_id",[run_id,json.dumps(report,ensure_ascii=False)])['rows']
     if len(saved)!=1:raise RuntimeError('RUN_SUMMARY_NOT_SAVED')
     print(json.dumps({k:v for k,v in report.items() if k not in ('proposal_ids','rotation','instagram','source_discovery')}))
@@ -285,6 +288,11 @@ def main():
         if slot_check['action']=='BLOCK_UNRESOLVED':
             raise RuntimeError('RADAR2_SLOT_UNRESOLVED_REQUIRES_REVIEW')
         os.environ['RADAR2_RECOVERY_SLOT']=resolved['slot']
+    # Reuse current approved identities on the same limited connection, before
+    # acquisition and any replay. No additional Meta calls or scheduler.
+    from account_context import configure_live_profiles
+    identity_refresh=configure_live_profiles(conn)
+    print(json.dumps({'account_identity_refresh':identity_refresh}))
     health=announce_credential_health()
     if 'trigger_scope=maturity_replay' in trigger:
         from maturity import replay
