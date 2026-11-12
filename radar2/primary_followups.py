@@ -61,6 +61,23 @@ WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')
        AND a.event_time IS NOT DISTINCT FROM p.event_time)
     )
   )
+  -- A unique exact known occurrence is a reconciliation task, not a new
+  -- source search. A first-party reported clock is not a verified start.
+  AND NOT (
+   p.event_time IS NOT NULL AND p.event_time NOT IN ('00:00','23:58','23:59')
+   AND length(coalesce(public.poraca_fact_key_v1(p.title),''))>=8
+   AND length(coalesce(public.poraca_fact_key_v1(p.venue),''))>=4
+   AND 1=(SELECT count(*) FROM public.radar_agenda_events a
+    WHERE a.event_date=p.event_date AND a.status='scheduled' AND a.verification='confirmed'
+      AND public.poraca_fact_key_v1(a.title)=public.poraca_fact_key_v1(p.title)
+      AND public.poraca_fact_key_v1(a.venue)=public.poraca_fact_key_v1(p.venue)
+      AND (a.event_time=p.event_time OR (a.event_time IS NULL AND EXISTS(
+        SELECT 1 FROM jsonb_array_elements(CASE WHEN jsonb_typeof(a.evidence)='array' THEN a.evidence ELSE '[]'::jsonb END) m
+        WHERE m->>'sourceRole'='first_party' AND m->>'url'=a.source_url
+          AND m->>'reportedTime'=p.event_time AND m->>'timeStatus'='reported_unverified'
+      )))
+   )
+  )
   -- Reopen immediately only when the occurrence or a stored source version
   -- changes. An unchanged useful receipt is not a daily work item.
   AND (
