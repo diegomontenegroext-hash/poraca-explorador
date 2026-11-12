@@ -16,7 +16,8 @@ SELECT * FROM (
 SELECT selected.*,row_number() OVER (
  PARTITION BY selected.event_day
  ORDER BY selected.first_seen_at,selected.event_time NULLS LAST,selected.proposal_id
-) AS day_slot
+) AS day_slot,
+ row_number() OVER(PARTITION BY selected.detail_url ORDER BY selected.event_day,selected.first_seen_at,selected.proposal_id) AS detail_slot
 FROM (
 SELECT DISTINCT ON (p.event_date,p.evidence->>'original_url')
        p.proposal_id,p.first_seen_at,p.title,p.event_date::text event_day,p.event_time,p.venue,
@@ -83,9 +84,10 @@ WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')
 ORDER BY p.event_date,p.evidence->>'original_url',p.proposal_id
 ) selected
 ) ranked
--- One dated session per day before a second. Preserve first-seen priority within each day.
--- This prevents the nearest single day from exhausting all eight safe primary checks.
-ORDER BY ranked.day_slot,ranked.event_day,ranked.first_seen_at,ranked.event_time NULLS LAST,ranked.proposal_id
+-- One distinct source detail before repeating its other dates, and one dated
+-- session per day before a second. This keeps repeated exhibition visiting days
+-- from exhausting the eight independent primary checks; no date is deleted.
+ORDER BY ranked.detail_slot,ranked.day_slot,ranked.event_day,ranked.first_seen_at,ranked.event_time NULLS LAST,ranked.proposal_id
 LIMIT 120
 """
 
