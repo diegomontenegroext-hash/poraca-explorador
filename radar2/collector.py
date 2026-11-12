@@ -344,6 +344,7 @@ class Collector:
           ('https://compras.evento-simple.com/sunsetwinemix','Sunset Wine Mixology','sunsetwine.mixology'),
           ('https://circusproduce.com/','Circus','circus_ofc'),
           ('https://residenciacorazon.com.ar/','Residencia Corazón','residenciacorazon'),
+          ('https://biblio.unlp.edu.ar/mes-de-la-plata-2026-2/','Biblioteca Pública UNLP · Mes de La Plata',None),
           ('https://maclamuseo.com.ar/','MACLA original exhibitions','maclamuseo'),
           ('https://www.gba.gob.ar/museo_pettoruti/muestras','Pettoruti original exhibitions','museopettoruti'),
           ('https://institutocultural.gba.gob.ar/taxonomy/term/1746','Islas Malvinas institutional','laplata.ciudadcultural'),
@@ -361,18 +362,19 @@ class Collector:
         ]
         for url,source,account in channels:
             if only and source not in only:continue
+            if source=='Biblioteca Pública UNLP · Mes de La Plata' and datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date().isoformat()>'2026-11-30':continue
             d=self.fetch(url,source)
             if not d:continue
-            if source in ('MACLA original exhibitions','Pettoruti original exhibitions',
+            if source in ('Biblioteca Pública UNLP · Mes de La Plata','MACLA original exhibitions','Pettoruti original exhibitions',
                           'Islas Malvinas institutional','ExpoArte Casa Dionisio'):
                 # Existing FULL only. An exhibition period must not be rewritten
                 # into individual daily performances. The original yields an
                 # evidence-backed research proposal, NEVER a confirmed event.
                 if not self.reuse(d):
                     from extract import extract_document
-                    d['acquisition_method']='institutional_art_original_v1'
-                    extract_document(self,d,json.loads(Path(__file__).with_name('accounts.json').read_text()),
-                                     'institutional_art_original_v1')
+                    method='institutional_program_original_v1' if source.startswith('Biblioteca Pública UNLP ·') else 'institutional_art_original_v1'
+                    d['acquisition_method']=method
+                    extract_document(self,d,json.loads(Path(__file__).with_name('accounts.json').read_text()),method)
                 continue
             if source=='Sincronía Eventbrite organizador':
                 # Only the producer's own linked event pages; HTTP/robots still
