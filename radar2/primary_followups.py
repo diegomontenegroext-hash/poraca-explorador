@@ -219,7 +219,7 @@ def follow_secondary(conn,collector,limit=3):
     for row in rows[:max(1,min(int(limit),8))]:
         stats['selected']+=1
         base={'proposalId':row['proposal_id'],'date':row['event_day'],
-              'title':row['title'],'venue':row['venue'],'reportedTime':row['event_time'],
+              'title':row['title'],'venue':row['venue'],'reportedTime':row.get('event_time'),
               'receiptPolicy':'version_aware_followup_v2',
               'secondaryDetailUrl':row['detail_url'],'checkedAt':utc(),
               'runId':collector.run_id,'publicationApproved':False,
