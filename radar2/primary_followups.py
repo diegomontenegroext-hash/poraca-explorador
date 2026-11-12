@@ -16,12 +16,18 @@ SELECT * FROM (
 SELECT selected.*,row_number() OVER (
  PARTITION BY selected.event_day
  ORDER BY selected.first_seen_at,selected.event_time NULLS LAST,selected.proposal_id
-) AS day_slot
+) AS day_slot,
+ row_number() OVER(PARTITION BY selected.detail_url ORDER BY selected.event_day,selected.first_seen_at,selected.proposal_id) AS detail_slot
 FROM (
 SELECT DISTINCT ON (p.event_date,p.evidence->>'original_url')
        p.proposal_id,p.first_seen_at,p.title,p.event_date::text event_day,p.event_time,p.venue,
        p.evidence->>'original_url' detail_url,d.source AS secondary_source
 FROM radar2.proposals p JOIN radar2.documents d ON d.url=p.document_url
+CROSS JOIN LATERAL (SELECT p.evidence->'primary_source_followup' AS j) receipt
+CROSS JOIN LATERAL (SELECT CASE WHEN pg_input_is_valid(receipt.j->>'checkedAt','timestamptz')
+ THEN (receipt.j->>'checkedAt')::timestamptz ELSE '2000-01-01T00:00:00+00:00'::timestamptz END AS at) checked
+LEFT JOIN radar2.documents detail ON detail.url=p.evidence->>'original_url'
+LEFT JOIN radar2.documents primary_doc ON primary_doc.url=receipt.j->>'primaryUrl'
 WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
                       AND (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date+14
   AND (p.event_date>(now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
@@ -30,20 +36,75 @@ WHERE p.event_date BETWEEN (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')
   AND p.evidence->>'kind'='event'
   AND p.review_state NOT IN ('historico','contradictorio')
   AND coalesce(p.evidence->>'duplicate_of','')=''
+  AND coalesce(p.evidence->>'interpretation_superseded_by','')=''
+  AND NOT(p.evidence ? 'editorial_exclusion')
+  AND coalesce(p.evidence->'territory_resolution'->>'status','')<>'source_stated_outside'
+  AND coalesce(p.evidence->>'event_status','') NOT IN ('cancelled','rescheduled_pending_review')
   AND (
     (d.source IN ('Genda','Genda teatro')
       AND p.evidence->>'original_url' ~ '^https://agendalaplata[.]ar/evento/[a-z0-9-]{8,220}$')
     OR (d.source='elevenflow.app'
       AND p.evidence->>'original_url' ~ '^https://elevenflow[.]app/events/[a-z0-9-]{8,220}$')
   )
-  AND coalesce(p.evidence->'primary_source_followup'->>'checkedAt','2000-01-01T00:00:00+00:00')::timestamptz
-      < now()-interval '24 hours'
+  -- An observation already bound to a confirmed event does not need another
+  -- primary-source search. Require exact receipt or source/date/title/venue.
+  AND NOT EXISTS (
+   SELECT 1 FROM public.radar_agenda_events a
+   WHERE a.event_date=p.event_date AND a.status='scheduled' AND a.verification='confirmed'
+    AND (
+     EXISTS(SELECT 1 FROM jsonb_array_elements(CASE WHEN jsonb_typeof(a.evidence)='array' THEN a.evidence ELSE '[]'::jsonb END) m
+      WHERE m->>'proposalId'=p.proposal_id AND m->>'sourceDocumentSha256'=d.sha256)
+     OR (a.source_url IN (p.document_url,p.evidence->>'original_url',receipt.j->>'primaryUrl')
+       AND public.poraca_fact_key_v1(a.title)=public.poraca_fact_key_v1(p.title)
+       AND length(coalesce(public.poraca_fact_key_v1(p.venue),''))>=4
+       AND public.poraca_fact_key_v1(a.venue)=public.poraca_fact_key_v1(p.venue)
+       AND a.event_time IS NOT DISTINCT FROM p.event_time)
+    )
+  )
+  -- A unique exact known occurrence is a reconciliation task, not a new
+  -- source search. A first-party reported clock is not a verified start.
+  AND NOT (
+   p.event_time IS NOT NULL AND p.event_time NOT IN ('00:00','23:58','23:59')
+   AND length(coalesce(public.poraca_fact_key_v1(p.title),''))>=8
+   AND length(coalesce(public.poraca_fact_key_v1(p.venue),''))>=4
+   AND 1=(SELECT count(*) FROM public.radar_agenda_events a
+    WHERE a.event_date=p.event_date AND a.status='scheduled' AND a.verification='confirmed'
+      AND public.poraca_fact_key_v1(a.title)=public.poraca_fact_key_v1(p.title)
+      AND public.poraca_fact_key_v1(a.venue)=public.poraca_fact_key_v1(p.venue)
+      AND (a.event_time=p.event_time OR (a.event_time IS NULL AND EXISTS(
+        SELECT 1 FROM jsonb_array_elements(CASE WHEN jsonb_typeof(a.evidence)='array' THEN a.evidence ELSE '[]'::jsonb END) m
+        WHERE m->>'sourceRole'='first_party' AND m->>'url'=a.source_url
+          AND m->>'reportedTime'=p.event_time AND m->>'timeStatus'='reported_unverified'
+      )))
+   )
+  )
+  -- Reopen immediately only when the occurrence or a stored source version
+  -- changes. An unchanged useful receipt is not a daily work item.
+  AND (
+   receipt.j IS NULL
+   OR receipt.j->>'title' IS DISTINCT FROM p.title
+   OR receipt.j->>'date' IS DISTINCT FROM p.event_date::text
+   OR receipt.j->>'venue' IS DISTINCT FROM p.venue
+   OR receipt.j->>'secondaryDetailUrl' IS DISTINCT FROM p.evidence->>'original_url'
+   OR (receipt.j ? 'reportedTime' AND receipt.j->>'reportedTime' IS DISTINCT FROM p.event_time)
+   OR (detail.sha256 IS NOT NULL AND receipt.j->>'secondarySha256' IS NOT NULL
+       AND detail.sha256 IS DISTINCT FROM receipt.j->>'secondarySha256')
+   OR (primary_doc.sha256 IS NOT NULL AND receipt.j->>'primarySha256' IS NOT NULL
+       AND primary_doc.sha256 IS DISTINCT FROM receipt.j->>'primarySha256')
+   OR checked.at < now()-CASE
+      WHEN receipt.j->>'status' IN ('PRIMARY_RECEIPT_REVIEW_REQUIRED','NO_EXPLICIT_PRIMARY_EVENT_LINK',
+        'ORIGINAL_DATE_CONFLICT','ORIGINAL_DATE_NOT_PROVEN','ORIGINAL_IDENTITY_INCOMPLETE')
+       THEN CASE WHEN p.event_date<=(now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date+1
+                  THEN interval '48 hours' ELSE interval '7 days' END
+      ELSE interval '24 hours' END
+  )
 ORDER BY p.event_date,p.evidence->>'original_url',p.proposal_id
 ) selected
 ) ranked
--- One dated session per day before a second. Preserve first-seen priority within each day.
--- This prevents the nearest single day from exhausting all eight safe primary checks.
-ORDER BY ranked.day_slot,ranked.event_day,ranked.first_seen_at,ranked.event_time NULLS LAST,ranked.proposal_id
+-- One distinct source detail before repeating its other dates, and one dated
+-- session per day before a second. This keeps repeated exhibition visiting days
+-- from exhausting the eight independent primary checks; no date is deleted.
+ORDER BY ranked.detail_slot,ranked.day_slot,ranked.event_day,ranked.first_seen_at,ranked.event_time NULLS LAST,ranked.proposal_id
 LIMIT 120
 """
 
@@ -158,7 +219,8 @@ def follow_secondary(conn,collector,limit=3):
     for row in rows[:max(1,min(int(limit),8))]:
         stats['selected']+=1
         base={'proposalId':row['proposal_id'],'date':row['event_day'],
-              'title':row['title'],'venue':row['venue'],
+              'title':row['title'],'venue':row['venue'],'reportedTime':row.get('event_time'),
+              'receiptPolicy':'version_aware_followup_v2',
               'secondaryDetailUrl':row['detail_url'],'checkedAt':utc(),
               'runId':collector.run_id,'publicationApproved':False,
               'requiresIndependentEditorialReview':True,
