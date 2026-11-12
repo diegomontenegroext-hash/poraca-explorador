@@ -10,7 +10,7 @@ from collector import norm, compact
 from extract import MONTHS,category
 from semantics import normalized_original,proof,clocks_in,activity_title,credits,identity,CANCEL,clean_title
 from account_context import location_for,preflight
-VERSION='caption-v2.5'
+VERSION='caption-v2.6'
 ZONE=ZoneInfo('America/Argentina/Buenos_Aires')
 WEEK=['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
 DATE=re.compile(r'\b([0-3]?\d)\s*(?:[/.]+\s*(1[0-2]|0?[1-9])\b|(?:de\s+)?('+('|'.join(MONTHS))+r')\b)(?:\s*(?:de\s+|/)(20\d{2}))?',re.I)
@@ -42,7 +42,19 @@ def dates(text,base):
   for start,end,day,basis in list(out):
    prefix=n[:start]
    chain=re.search(r'((?:(?:'+('|'.join(WEEK))+r')\s+\d{1,2}\s*(?:,|y)\s*)+)(?:'+('|'.join(WEEK))+r')\s+$',prefix)
-   if not chain:continue
+   if not chain:
+    # A single weekday can govern several dates sharing one explicit month.
+    repeated=re.search(r'\b('+('|'.join(WEEK))+r')\s+((?:\d{1,2}\s*,\s*)*\d{1,2})\s+y\s*$',prefix)
+    if repeated and day.weekday()==WEEK.index(repeated[1]):
+     siblings=[]
+     for item in re.finditer(r'\d{1,2}',repeated[2]):
+      try:earlier=day.replace(day=int(item[0]))
+      except ValueError:break
+      if earlier>=day or earlier.weekday()!=day.weekday():break
+      pos=repeated.start(2)+item.start()
+      siblings.append((pos,pos+len(item[0]),earlier,'shared_explicit_month_weekday_verified'))
+     else:out.extend(siblings)
+    continue
    for item in re.finditer(r'('+('|'.join(WEEK))+r')\s+(\d{1,2})',chain[1]):
     try:earlier=day.replace(day=int(item[2]))
     except ValueError:continue

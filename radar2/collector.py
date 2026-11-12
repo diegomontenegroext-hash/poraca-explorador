@@ -344,6 +344,10 @@ class Collector:
           ('https://compras.evento-simple.com/sunsetwinemix','Sunset Wine Mixology','sunsetwine.mixology'),
           ('https://circusproduce.com/','Circus','circus_ofc'),
           ('https://residenciacorazon.com.ar/','Residencia Corazón','residenciacorazon'),
+          ('https://biblio.unlp.edu.ar/mes-de-la-plata-2026-2/','Biblioteca Pública UNLP · Mes de La Plata',None),
+          ('https://reddemuseos.unlp.edu.ar/','Red de Museos UNLP',None),
+          ('https://museo.fisica.unlp.edu.ar/','Museo de Física UNLP',None),
+          ('https://www.ucalp.edu.ar/agenda/','Agenda UCALP',None),
           ('https://maclamuseo.com.ar/','MACLA original exhibitions','maclamuseo'),
           ('https://www.gba.gob.ar/museo_pettoruti/muestras','Pettoruti original exhibitions','museopettoruti'),
           ('https://institutocultural.gba.gob.ar/taxonomy/term/1746','Islas Malvinas institutional','laplata.ciudadcultural'),
@@ -359,20 +363,62 @@ class Collector:
           ('https://www.dynamoteatro.com/','Dynamo Teatro',None),
           ('https://jodify.com.ar/profiles/promoter/0244a70e-e89f-4adf-ac27-ae1ed2bce374','Nómade',None),
         ]
+        # Exact current program leads discovered by the editorial review.
+        # They use the same FULL collector, robots, original archive and interpreter.
+        # Expire the edition-specific seeds, not the permanent institution roots.
+        current_programs=[
+          ('https://museo.fisica.unlp.edu.ar/noche-de-museos-a-la-luz-de-la-luna/','Museo de Física UNLP · programa',None,'2026-11-15','institutional_program_original_v1'),
+          ('https://www.ucalp.edu.ar/el-beato-angelico-de-la-ucalp-se-suma-museos-la-luz-de-la-luna-con-arte-y-musica-coral/','UCALP · Beato Angélico programa',None,'2026-11-15','institutional_program_original_v1'),
+          ('https://infolaplata.com/llega-el-11o-encuentro-de-acordeonistas-del-rio-de-la-plata/','Infolaplata · programa acordeonistas',None,'2026-11-15','dated_local_program_secondary_v1'),
+        ]
+        today=datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date().isoformat()
+        for url,source,account,expires,method in current_programs:
+            if today>expires or (only and source not in only):continue
+            d=self.fetch(url,source)
+            if not d or self.reuse(d):continue
+            from extract import extract_document
+            d['acquisition_method']=method
+            extract_document(self,d,json.loads(Path(__file__).with_name('accounts.json').read_text()),method)
         for url,source,account in channels:
             if only and source not in only:continue
+            if source=='Biblioteca Pública UNLP · Mes de La Plata' and datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date().isoformat()>'2026-11-30':continue
             d=self.fetch(url,source)
             if not d:continue
-            if source in ('MACLA original exhibitions','Pettoruti original exhibitions',
+            if source in ('Red de Museos UNLP','Museo de Física UNLP','Agenda UCALP'):
+                from extract import extract_document
+                accounts=json.loads(Path(__file__).with_name('accounts.json').read_text())
+                if not self.reuse(d):
+                    self.document_lead(d,state='investigable')
+                host=urlsplit(d['final_url']).hostname
+                ranked={}
+                for node in self.tree(d).walk():
+                    if node.tag!='a' or not node.a.get('href'):continue
+                    link=urlsplit(urljoin(d['final_url'],node.a['href']))
+                    if link.scheme!='https' or link.hostname!=host or link.username or link.password:continue
+                    path=link.path.rstrip('/')
+                    if not path or path==urlsplit(d['final_url']).path.rstrip('/'):continue
+                    label=norm(path+' '+node.text())
+                    if not re.search(r'noche de museos|museos a la luz|encuentro de coros|feria de artes|muestra temporal|inauguracion|intervencion artistica',label):continue
+                    if re.search(r'\b20\d{2}\b',label) and str(datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).year) not in label:continue
+                    if re.search(r'/category/|/tag/|/wp-content/|/page/|[.](?:pdf|png|jpg)$',path,re.I):continue
+                    target=link._replace(query='',fragment='').geturl()
+                    ranked.setdefault(target,0 if re.search(r'museos a la luz|noche de museos',label) else 1)
+                for target in sorted(ranked,key=ranked.get)[:3]:
+                    item=self.fetch(target,source,d['url'])
+                    if item and not self.reuse(item):
+                        item['acquisition_method']='institutional_art_original_v1'
+                        extract_document(self,item,accounts,'institutional_art_original_v1')
+                continue
+            if source in ('Biblioteca Pública UNLP · Mes de La Plata','MACLA original exhibitions','Pettoruti original exhibitions',
                           'Islas Malvinas institutional','ExpoArte Casa Dionisio'):
                 # Existing FULL only. An exhibition period must not be rewritten
                 # into individual daily performances. The original yields an
                 # evidence-backed research proposal, NEVER a confirmed event.
                 if not self.reuse(d):
                     from extract import extract_document
-                    d['acquisition_method']='institutional_art_original_v1'
-                    extract_document(self,d,json.loads(Path(__file__).with_name('accounts.json').read_text()),
-                                     'institutional_art_original_v1')
+                    method='institutional_program_original_v1' if source.startswith('Biblioteca Pública UNLP ·') else 'institutional_art_original_v1'
+                    d['acquisition_method']=method
+                    extract_document(self,d,json.loads(Path(__file__).with_name('accounts.json').read_text()),method)
                 continue
             if source=='Sincronía Eventbrite organizador':
                 # Only the producer's own linked event pages; HTTP/robots still

@@ -145,6 +145,10 @@ def location_for(d,block):
  if OFFSITE.search(block):return dict(base,basis='offsite_or_remote_requires_review')
  venue=p.get('venue_name')
  if not venue:return base
+ handle=str(username or '').strip().lower()
+ match=re.search(r'\b(?:en|desde)\s+@?'+re.escape(handle)+r'(?![\w.])',block,re.I) if handle else None
+ if match:
+  return dict(base,venue=venue,basis='explicit_name_in_owned_caption',quote=match[0])
  aliases=sorted(set([venue]+p.get('aliases',[])),key=len,reverse=True)
  for alias in aliases:
   if len(alias)<6:continue

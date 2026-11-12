@@ -26,6 +26,9 @@ def clocks_in(block,clock):
  for m in clock.finditer(block):
   line=block[block.rfind('\n',0,m.start())+1:m.start()]
   if PROMO.search(line):continue
+  # Visiting hours and box-office windows are access information.
+  section=block[block.rfind('\n\n',0,m.start())+2:m.start()] if '\n\n' in block[:m.start()] else block[:m.start()]
+  if re.search(r'los d[ií]as siguientes a la inauguraci[oó]n|horarios? de (?:visita|boleter[ií]a)|boleter[ií]a\s*:\s*todos los d[ií]as',section,re.I):continue
   matches.append(m)
  return matches
 

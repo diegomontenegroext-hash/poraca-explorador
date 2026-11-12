@@ -57,4 +57,28 @@ class ArtSources(unittest.TestCase):
    self.assertEqual(parsed,[(good,'original_eventbrite_organizer_v1')])
    self.assertTrue(any(x.get('status')=='organizer_not_proven' for x in collector.checks))
 
+class CurrentProgramExtraction(unittest.TestCase):
+ def parse(self,html,method,source='Institution'):
+  from collector import Tree,sha
+  from extract import extract_document
+  with tempfile.TemporaryDirectory() as tmp:
+   c=Collector(tmp);path=pathlib.Path(tmp)/'original.html';path.write_text(html)
+   d={'url':'https://example.org/programa','final_url':'https://example.org/programa','source':source,'title':'Programa de noviembre · La Plata','text':Tree(html).root.text(),'html_file':path.name,'fetched_at':'2026-11-12T18:00:00Z','sha256':sha(html),'http_status':200}
+   return extract_document(c,d,[],method)
+ def test_labeled_institutional_program_not_three_fake_sessions(self):
+  html='<article><h1>Noche de Museos a la luz de la luna</h1><p>“Hecho en Argentina. Ciencia nacional”. Noche de ciencias, soberanía y memoria 📆 14 de noviembre 🕐 19 a 24 hs 📍Museo de física – 49 y 115</p><p>🏛️ En la Sala del Museo: experiencias. 🎭 En el Anfiteatro: Resonancias. Universidad Nacional de La Plata.</p></article>'
+  p=self.parse(html,'institutional_program_original_v1')
+  self.assertEqual(len(p),1);self.assertEqual((p[0]['date'],p[0]['time'],p[0]['venue']),('2026-11-14','19:00','Museo de física'))
+  self.assertEqual(p[0]['source_role'],'first_party');self.assertFalse(p[0]['publication_approved'])
+ def test_named_museum_program_with_access_window_and_coral(self):
+  html='<article><h1>El Beato Angélico se suma a Museos a la Luz de la Luna</h1><p>El Museo de Arte Contemporáneo Beato Angélico de la Universidad Católica de La Plata abrirá sus puertas.</p><p>La cita será el próximo sábado 14 de noviembre, entre las 19 y las 23 horas, con entrada libre y gratuita en la sede del Museo (diagonal 73, 16 y 47 N° 2137).</p><h4>Encuentro de coros desde las 21</h4><p>A partir de las 21 horas, se desarrollará un Encuentro de Coros.</p></article>'
+  p=self.parse(html,'institutional_program_original_v1')
+  self.assertEqual(len(p),1);self.assertEqual((p[0]['date'],p[0]['time'],p[0]['venue']),('2026-11-14','19:00','Museo de Arte Contemporáneo Beato Angélico'))
+  self.assertIn('Encuentro de Coros',p[0]['program_receipt']['details'])
+ def test_schedule_keeps_distinct_venue_not_inheriting_first_hall(self):
+  html='<article><h1>Encuentro de acordeonistas del Río de la Plata 2026</h1><p>CRONOGRAMA COMPLETO</p><p>Sábado 14 de Noviembre</p><p>11hs – Taller Dimotteando.</p><p>21hs – Show Musical: Natalio Sturla &amp; Isabelle Bazin. Invitada: Noelia Sinkunas. Club Unión y Perseverancia (13 y 153, Berisso). Actividad arancelada.</p><p>Domingo 15 de Noviembre</p><p>Concierto para el humedal</p></article>'
+  p=self.parse(html,'dated_local_program_secondary_v1')
+  self.assertEqual(len(p),1);self.assertEqual((p[0]['title'],p[0]['date'],p[0]['time'],p[0]['venue']),('Natalio Sturla & Isabelle Bazin','2026-11-14','21:00','Club Unión y Perseverancia'))
+  self.assertEqual(p[0]['source_role'],'secondary_publisher');self.assertFalse(p[0]['publication_approved'])
+
 if __name__=='__main__':unittest.main()

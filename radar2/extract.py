@@ -63,6 +63,65 @@ def extract_document(c,d,accounts,method):
   if organizer:p['entities'].append({'name':organizer,'role':'organizer','evidence':compact(evidence)[:1000]})
   p['date_basis']='source event/program date; publication date is never substituted'
   return key
+ # Explicit institutional program notices and multi-venue timetable rows.
+ # This runs only for an already acquired current program, not for generic
+ # search results, opening hours, old event pages or a publication date.
+ if method in ('institutional_program_original_v1','dated_local_program_secondary_v1') and not any(re.search(r'Event$',str(x.get('@type',''))) for x in items):
+  scope=next((n for n in tree.walk() if n.tag=='article'),None) or tree
+  raw=scope.text()
+  headings=[n.text() for n in scope.walk() if n.tag in ('h1','h2','h3','h4') and n.text()]
+  blocks=[n.text() for n in scope.walk() if n.tag in ('p','h1','h2','h3','h4','li') and n.text()]
+  year=int(str(published)[:4]) if published and re.match(r'20\d{2}',str(published)) else now.year
+  weekdays=('lunes','martes','miercoles','jueves','viernes','sabado','domingo')
+  def program_day(value):
+   day=day_from(value,year)
+   if not day:return None
+   weekday=re.search(r'\b(lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo)\b',value,re.I)
+   if weekday and weekdays[datetime.fromisoformat(day).weekday()]!=norm(weekday[1]):return None
+   return day if abs((datetime.fromisoformat(day).date()-now).days)<=30 else None
+  def program_add(title,day,hour,venue,block,role,details=None):
+   key=add(title,day,hour,venue,block,category_label=category(title))
+   if key:
+    p=c.proposals[key];p.update(source_document_sha256=d.get('sha256'),document_type='programa_institucional' if role=='first_party' else 'cartelera',source_role=role,program_receipt={'date':day,'time':hour,'venue':venue,'scope':'literal_dated_program','details':details or block},publication_approved=False)
+    p['field_evidence']={'title':title,'date':day,'time':hour,'venue':venue}
+   return key
+  # Labeled date / interval / place: the window belongs to this program,
+  # not its constituent activities. Do not create fictitious timed sessions.
+  if method=='institutional_program_original_v1':
+   labeled=re.search(r'📆\s*([^📍🕐]{3,65})\s*🕐\s*([01]?\d|2[0-3])(?::([0-5]\d))?\s*(?:a|–|-)\s*(?:\d{1,2})(?::[0-5]\d)?\s*(?:hs|horas)\s*📍\s*([^.!?🌳🏛🎭]{3,120}?)(?=\s+(?:🏛|🎭|🌳|En la |En el )|$)',raw,re.I)
+   if labeled:
+    day=program_day(labeled[1])
+    location=re.split(r'\s+[–—-]\s+',labeled[4].strip(),maxsplit=1)
+    title=next((h for h in reversed(headings) if h and 'museos' in norm(h)),d['title'])
+    # If a heading is absent, the explicit program name precedes the labels.
+    before=raw[:labeled.start()].strip()
+    name=re.search(r'([“"][^”"]+[”"]\s*\.?\s*(?:Noche|Jornada|Encuentro)[^.!?]{3,110})$',before,re.I)
+    if name:title=name[1]
+    if day and title and location[0]:program_add(title,day,f'{int(labeled[2]):02}:{labeled[3] or "00"}',location[0],raw,'first_party')
+   # Narrative institutional notice with a named museum and explicit
+   # venue address; a second clock for a subprogram remains in its evidence.
+   if not produced:
+    named=re.search(r'\b(Museo\s+[^.]{4,100}?)\s+de la Universidad\b',raw,re.I)
+    date_window=re.search(r'(?:próximo\s+)?((?:lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo)\s+\d{1,2}\s+de\s+\w+(?:\s+de\s+20\d{2})?)\s*,?\s+entre las\s+([01]?\d|2[0-3])(?::([0-5]\d))?\s+y las\s+\d{1,2}(?::[0-5]\d)?\s+horas',raw,re.I)
+    address=re.search(r'\bsede del Museo\s*\(([^)]+)\)',raw,re.I)
+    if named and date_window and address:
+     day=program_day(date_window[1]);title=next((h for h in headings if norm(named[1]) in norm(h) or 'museos a la luz' in norm(h)),d['title'])
+     if day:program_add(title,day,f'{int(date_window[2]):02}:{date_window[3] or "00"}',named[1].strip(),raw,'first_party')
+  if method=='dated_local_program_secondary_v1':
+   current=None;in_schedule=False
+   for block in blocks:
+    if norm(block) in ('cronograma completo','programacion completa','programa completo'):in_schedule=True;current=None;continue
+    if not in_schedule:continue
+    if re.fullmatch(r'(?:lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo)\s+\d{1,2}\s+de\s+\w+(?:\s+de\s+20\d{2})?',block,re.I):
+     current=program_day(block);continue
+    row=re.match(r'^([01]?\d|2[0-3])(?::([0-5]\d))?\s*hs?\s*[–—-]\s*(.+)',block,re.I)
+    if not current or not row:continue
+    venue=re.search(r'(?:^|\.\s+)((?:Club|Centro Cultural|Museo|Teatro|Sala|Auditorio|Espacio|Biblioteca)\s+[^.()]{3,100})\s*\(([^)]{3,100})\)',row[3],re.I)
+    if not venue or not re.search(r'la plata|berisso|ensenada|gonnet|gorina|city bell|villa elisa|tolosa',norm(venue[2])):continue
+    title=row[3][:venue.start()].split('. ')[0].strip(' .')
+    title=re.sub(r'^Show Musical:\s*','',title,flags=re.I)
+    if title:program_add(title,current,f'{int(row[1]):02}:{row[2] or "00"}',venue[1].strip(),block,'secondary_publisher')
+  if produced:return [c.proposals[k] for k in produced]
  # Structured events: capture each session, never NewsArticle.datePublished.
  for item in items:
   if not re.search(r'Event$',str(item.get('@type',''))) or not item.get('name') or not item.get('startDate'):continue
@@ -194,8 +253,26 @@ def extract_document(c,d,accounts,method):
   # details; stop when a different day is mentioned rather than inventing a
   # second session for another festival referenced in the same article.
   article_headings=[n.text() for n in article.walk() if n.tag in ('h1','h2','h3')]
-  single_processed=False
-  if year and len(article_headings)==1:
+  # A timetable may put the date, clock and room on one line and the
+  # activity title in the next paragraph. Bind only adjacent explicit blocks.
+  schedule_rows=[]
+  blocks=[node.text() for node in article.walk() if node.tag in ('p','h2','h3','h4','li')]
+  heading_pattern=r'^(lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo)\s+(\d{1,2}\s+de\s+\w+(?:\s+de\s+20\d{2})?)\s*\|\s*([01]?\d|2[0-3])[:.]([0-5]\d)\s*h(?:s)?\s*[-–—]\s*(.{3,140})$'
+  weekdays=('lunes','martes','miercoles','jueves','viernes','sabado','domingo')
+  for index,block in enumerate(blocks[:-1]):
+   heading=re.fullmatch(heading_pattern,block.strip(),re.I)
+   if not heading or not year:continue
+   day=day_from(heading[2],year)
+   if not day or weekdays[datetime.fromisoformat(day).weekday()]!=norm(heading[1]):continue
+   title=blocks[index+1].strip()
+   if not 4<=len(title)<=160 or re.search(r'\d\s*\||https?://',title):continue
+   schedule_rows.append((title,day,f'{int(heading[3]):02}:{heading[4]}',heading[5],block+' '+title))
+  if len(schedule_rows)>=2:
+   for title,day,hour,room,evidence in schedule_rows:
+    key=add(title,day,hour,room,evidence)
+    if key:c.proposals[key]['source_document_sha256']=d.get('sha256')
+  single_processed=len(schedule_rows)>=2
+  if year and len(article_headings)==1 and not single_processed:
    title=article_headings[0]
    paragraphs=[n.text() for n in article.walk() if n.tag=='p']
    for index,text in enumerate(paragraphs):
