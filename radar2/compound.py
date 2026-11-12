@@ -478,6 +478,8 @@ def effective_version(d,accounts):
 
 def requires_interpretation(d,accounts,previous,proposals):
  version=effective_version(d,accounts)
+ from account_context import identity_changed
+ if identity_changed(d,previous,proposals):return True
  if previous and previous.get('published_at')!=d.get('published_at'):return True
  if previous and previous.get('sha256')==d.get('sha256') and previous.get('published_at')==d.get('published_at') and previous.get('interpretation_version')==version:return False
  return not any(p.get('parser_version')==version and p.get('source_document_sha256')==d.get('sha256') for p in proposals)
