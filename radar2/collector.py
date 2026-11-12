@@ -363,6 +363,22 @@ class Collector:
           ('https://www.dynamoteatro.com/','Dynamo Teatro',None),
           ('https://jodify.com.ar/profiles/promoter/0244a70e-e89f-4adf-ac27-ae1ed2bce374','Nómade',None),
         ]
+        # Exact current program leads discovered by the editorial review.
+        # They use the same FULL collector, robots, original archive and interpreter.
+        # Expire the edition-specific seeds, not the permanent institution roots.
+        current_programs=[
+          ('https://museo.fisica.unlp.edu.ar/noche-de-museos-a-la-luz-de-la-luna/','Museo de Física UNLP · programa',None,'2026-11-15','institutional_program_original_v1'),
+          ('https://www.ucalp.edu.ar/el-beato-angelico-de-la-ucalp-se-suma-museos-la-luz-de-la-luna-con-arte-y-musica-coral/','UCALP · Beato Angélico programa',None,'2026-11-15','institutional_program_original_v1'),
+          ('https://infolaplata.com/llega-el-11o-encuentro-de-acordeonistas-del-rio-de-la-plata/','Infolaplata · programa acordeonistas',None,'2026-11-15','dated_local_program_secondary_v1'),
+        ]
+        today=datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date().isoformat()
+        for url,source,account,expires,method in current_programs:
+            if today>expires or (only and source not in only):continue
+            d=self.fetch(url,source)
+            if not d or self.reuse(d):continue
+            from extract import extract_document
+            d['acquisition_method']=method
+            extract_document(self,d,json.loads(Path(__file__).with_name('accounts.json').read_text()),method)
         for url,source,account in channels:
             if only and source not in only:continue
             if source=='Biblioteca Pública UNLP · Mes de La Plata' and datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date().isoformat()>'2026-11-30':continue
