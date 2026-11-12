@@ -8,7 +8,7 @@ from pathlib import Path
 from collector import norm,compact,sha
 from semantics import normalized_original,proof,credits,clean_title
 
-VERSION='compound-v1.2'
+VERSION='compound-v1.3'
 ZONE=ZoneInfo('America/Argentina/Buenos_Aires')
 DAYS=['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
 CATS={'musica':'Música','teatro':'Teatro','cine':'Cine','literarias':'Literatura','charlas':'Charlas','eventos':'Cultura','infantiles':'Infantiles','opera':'Música','zarzuela':'Teatro','exposiciones':'Arte'}
@@ -26,8 +26,97 @@ def curator(d,accounts):
  return any(a.get('username')==d.get('profile_username') and norm(a.get('circuit','')) in ('curaduria','curador') for a in accounts)
 
 
+# A venue's weekly calendar is not a single caption with many clocks.
+# Detect the shape before the generic caption parser, including when the
+# narrative introduction itself mentions a later day.
+WEEK_HEADING=re.compile(r'^\s*('+DAY+r')\s+([0-3]?\d)\s*$',re.I)
+WEEK_SESSION=re.compile(r'^\s*([01]?\d|2[0-3])(?::([0-5]\d))?\s+hs?\s*[-–]\s*(\S.*?)\s*$',re.I)
+MONTH_ROW=re.compile(r'^\s*([0-3]?\d)[/.](1[0-2]|0?[1-9])\s*[-–]\s*(\S.*?)\s*$',re.I)
+
+def calendar_shape(text):
+ from extract import MONTHS
+ lines=text.splitlines()
+ first=next((l for l in lines if l.strip()),'')
+ month_names=[m for m in MONTHS if re.search(r'\b'+m+r'\b',norm(first))]
+ if len(month_names)!=1:return None
+ if len([l for l in lines if WEEK_HEADING.fullmatch(l)])>=2 and len([l for l in lines if WEEK_SESSION.fullmatch(l)])>=2:
+  return 'weekly_dated_rows'
+ if re.search(r'\bagenda\b|\bprogramacion\b|\bcartelera\b',norm(first)) and len([l for l in lines if MONTH_ROW.fullmatch(l)])>=3:
+  return 'monthly_dated_rows'
+ return None
+
+def dated_calendar(c,d,info):
+ from extract import MONTHS,category
+ from account_context import location_for,preflight,OFFSITE
+ raw=d.get('text','');base=anchor(d);lines=raw.splitlines()
+ first=next((l for l in lines if l.strip()),'')
+ months=[MONTHS[m] for m in MONTHS if re.search(r'\b'+m+r'\b',norm(first))]
+ if base is None or len(months)!=1:return []
+ month=months[0];year=base.year+int(base.month==12 and month==1)-int(base.month==1 and month==12)
+ # An explicit conflicting year, or a calendar far from publication, must
+ # stay a document pending review rather than leak into another year.
+ years={int(y) for y in re.findall(r'\b20\d{2}\b',first)}
+ if years and years!={year}:return []
+ location=location_for(d,raw);account=preflight(d.get('profile_username'))
+ # Only a literal named venue or owned address may be inherited across rows.
+ # An account alone is never enough, and any remote/offsite cue abstains.
+ global_venue=location.get('venue') if not OFFSITE.search(raw) else None
+ out=[];day=None;day_line=None;last_heading=None;now=datetime.now(ZONE).date()
+ def valid_day(n):
+  try:
+   result=datetime(year,month,int(n)).date()
+   return result if abs((result-base).days)<=45 else None
+  except ValueError:return None
+ def add(title,day,heading,line,hour,clock,midnight=False):
+  if not day or not title:return
+  local=location_for(d,line)
+  venue=local.get('venue') or (global_venue if not OFFSITE.search(line) else None)
+  loc=local if local.get('venue') else location if venue else local
+  label=category(title)
+  if 'cineclub' in norm(first) and label=='Cultura':
+   related=[l for l in lines if norm(title) in norm(l) and not WEEK_SESSION.fullmatch(l)]
+   label='Música' if any(re.search(r'\brecital\b|\bconcierto\b',norm(l)) for l in related) else 'Cine'
+  p=emit(c,d,title,day,hour,venue,line,info['source_role'],info['type'],'explicit_calendar_heading_day_month_weekday_verified' if info['shape']=='weekly_dated_rows' else 'explicit_calendar_numeric_day_month',category=label,address=loc.get('quote') if loc.get('basis')=='owned_venue_with_explicit_address' else None)
+  if not p:return
+  p.update(account_context=account,venue_basis=loc['basis'],venue_entity_id=loc.get('venue_entity_id') if venue else None,venue_candidate=loc.get('candidate') if not venue else None,venue_profile_evidence_url=loc.get('profile_evidence_url'),event_status='scheduled_pending_review',announced_date=day.isoformat(),announced_time='00:00' if midnight else hour,
+   state='historico' if day<now else 'incompleto' if midnight or not venue else 'observado_agenda',
+   field_evidence={'title':title,'date':heading,'time':clock,'venue':loc.get('quote') if venue else None},
+   calendar_receipt={'month_heading':first.strip(),'day_heading':heading,'session_line':line,'civil_date_status':'review_midnight' if midnight else 'explicit_day'},
+   ambiguities=(['midnight_calendar_day_requires_review'] if midnight else [])+(['venue_unresolved'] if not venue else []))
+  for field,value in p['field_evidence'].items():
+   at=raw.find(value) if isinstance(value,str) and value else -1
+   p['evidence_spans'][field]={'start':at,'end':at+len(value),'quote':value} if at>=0 else None
+  out.append(p)
+ for line in lines:
+  line=line.strip()
+  if info['shape']=='weekly_dated_rows':
+   heading=WEEK_HEADING.fullmatch(line)
+   if heading:
+    day=valid_day(heading[2]);day_line=line
+    if day and day.weekday()!=DAYS.index(norm(heading[1])):day=None
+    if day and last_heading and day<=last_heading:day=None
+    if day:last_heading=day
+    continue
+   session=WEEK_SESSION.fullmatch(line)
+   if not session or day is None:continue
+   clock=f'{int(session[1]):02}:{session[2] or "00"}'
+   add(session[3],day,day_line,line,None if clock=='00:00' else clock,session[0].split('-')[0].strip().split('–')[0].strip(),clock=='00:00')
+  else:
+   row=MONTH_ROW.fullmatch(line)
+   if not row or int(row[2])!=month:continue
+   day=valid_day(row[1])
+   if not day:continue
+   # Keep the literal activity description (not the monthly heading).
+   # Long narrative titles are review candidates, never editorial approval.
+   label=row[3].strip()[:160]
+   hour,clock=timing(row[3])
+   add(label,day,line.split('-',1)[0].strip() if '-' in line else line.split('–',1)[0].strip(),line,hour,clock,bool(clock and re.match(r'0{1,2}\s*h',clock)))
+ return out
+
 def classify(d,accounts=()):
  text=d.get('text','');n=norm(text)
+ calendar=calendar_shape(text)
+ if calendar:return {'type':'cartelera','shape':calendar,'compound':True,'source_role':'curator' if curator(d,accounts) else 'source_observed'}
  if len(re.findall(r'\.\s*[-–]\s*(?:A las|Desde las|De)\s+\d',text,re.I))>=3:return {'type':'cartelera','shape':'bullet_schedule','compound':True,'source_role':'secondary_publisher'}
  if re.search(r'agenda cultural(?: completa)?\s+(?:'+DAY+r')\b',text,re.I) and len(re.findall(r'\b\d{1,2}(?:[.:]\d{2})?\s*[-–]\s*\S',text))>=3:return {'type':'agenda_compuesta','shape':'time_rows','compound':True,'source_role':'secondary_publisher'}
  date_heads=len(re.findall(r'(?:^|\n)\s*[^\w\n📍]{0,8}(?:(?:el|desde el|del)\s+)?(?:'+DAY+r')\b',text,re.I))
@@ -360,6 +449,7 @@ def interpret(c,d,accounts,baseline=()):
  info=classify(d,accounts)
  if not info['compound']:return None
  d['document_type']=info['type'];d['source_role']=info['source_role']
+ if info['shape'] in ('weekly_dated_rows','monthly_dated_rows'):return dated_calendar(c,d,info)
  if info['shape']=='bullet_schedule':return bullet_schedule(c,d,info)
  if info['shape']=='time_rows':return row_schedule(c,d,info,known_places(accounts,baseline))
  return paragraph_schedule(c,d,info)
