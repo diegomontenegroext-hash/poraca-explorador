@@ -1,0 +1,18 @@
+name: Radar 2 parser QA (no ingestion)
+on:
+  pull_request:
+    paths:
+      - 'radar2/**'
+      - 'tests/test_radar2*.py'
+      - 'tests/fixtures/radar2*'
+      - '.github/workflows/radar2-parser-qa.yml'
+permissions:
+  contents: read
+jobs:
+  parser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m compileall -q radar2
+      - run: python3 -m unittest discover -s tests -p 'test_radar2*.py' -v
