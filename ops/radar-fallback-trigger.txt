@@ -1,7 +1,7 @@
 # Rescate watchdog del slot faltante de Radar 2; una sola adquisición.
 trigger_date=2026-11-13
-trigger_slot=05
-trigger_mode=full
+trigger_slot=13
+trigger_mode=incremental
 trigger_scope=watchdog_fallback
 certification_batches=1
-certification_modes=full
+certification_modes=incremental
