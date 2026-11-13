@@ -7,6 +7,7 @@ from zoneinfo import ZoneInfo
 from pathlib import Path
 from collector import norm,compact,sha
 from semantics import normalized_original,proof,credits,clean_title
+import marked_program
 
 VERSION='compound-v1.3'
 ZONE=ZoneInfo('America/Argentina/Buenos_Aires')
@@ -115,6 +116,8 @@ def dated_calendar(c,d,info):
 
 def classify(d,accounts=()):
  text=d.get('text','');n=norm(text)
+ if d.get('source')=='Instagram' and marked_program.shape(text):
+  return {'type':'agenda_compuesta','shape':'marked_day_blocks','compound':True,'source_role':'curator' if curator(d,accounts) else 'source_observed'}
  calendar=calendar_shape(text)
  if calendar:return {'type':'cartelera','shape':calendar,'compound':True,'source_role':'curator' if curator(d,accounts) else 'source_observed'}
  if len(re.findall(r'\.\s*[-–]\s*(?:A las|Desde las|De)\s+\d',text,re.I))>=3:return {'type':'cartelera','shape':'bullet_schedule','compound':True,'source_role':'secondary_publisher'}
@@ -445,10 +448,47 @@ def paragraph_schedule(c,d,classification):
  return out
 
 
+def marked_calendar(c,d,info):
+ from extract import category
+ from account_context import location_for,preflight,OFFSITE
+ from semantics import CANCEL
+ raw=d.get('text','');account=preflight(d.get('profile_username'))
+ global_location=location_for(d,raw);out=[]
+ # A footer can connect named internal sectors to the verified host only
+ # when it provides a physical street intersection AND a literal geographic
+ # qualifier in that accepted venue name. Account ownership alone is insufficient.
+ footer=re.search(r'\b\d{1,3}\s+y\s+\d{1,3}\s*·\s*([^\n]+)\n\s*(?:La Plata|Berisso|Ensenada)\b',raw,re.I)
+ footer_local=bool(footer and account.get('account_verified') and account.get('venue_entity_id') and
+  len(norm(footer[1]))>=5 and norm(footer[1]) in norm(account.get('venue_name') or '') and not OFFSITE.search(raw))
+ for x in marked_program.parse(raw,anchor(d)):
+  block=x['block'];location=location_for(d,block);venue=location.get('venue')
+  if not venue and x['sector'] and not OFFSITE.search(block):
+   if global_location.get('venue'):location=global_location;venue=location['venue']
+   elif footer_local:
+    venue=account.get('venue_name');location=dict(location,venue=venue,basis='owned_program_explicit_address_and_sector',quote=footer[0],venue_entity_id=account['venue_entity_id'])
+  cancelled=bool(CANCEL.search(block) or CANCEL.search(raw.split('📆',1)[0]))
+  p=emit(c,d,x['title'],x['date'],x['time'],venue,block,info['source_role'],info['type'],'explicit_scoped_weekday_day_verified_from_publication',category=category(block))
+  if not p:continue
+  p.update(parser_version=marked_program.VERSION,account_context=account,venue_basis=location.get('basis'),
+   venue_entity_id=location.get('venue_entity_id') if venue else None,
+   venue_candidate=(x['place'] or location.get('candidate')) if not venue else None,
+   sublocation=x['sector'],venue_profile_evidence_url=location.get('profile_evidence_url'),
+   event_status='cancelled' if cancelled else 'scheduled_pending_review',announced_date=x['date'].isoformat(),announced_time=x['announced_time'],
+   state='historico' if x['date']<datetime.now(ZONE).date() else 'incompleto' if cancelled or not venue or not x['time'] else 'observado_agenda',
+   field_evidence={'title':x['title'],'date':x['heading'],'time':x['clock'],'venue':location.get('quote') if venue else None,'sublocation':x['place_quote']},
+   ambiguities=(['venue_unresolved'] if not venue else [])+(['midnight_calendar_day_requires_review'] if x['announced_time']=='00:00' else []),
+   program_receipt={'day_heading':x['heading'],'activity_block':block,'sector':x['sector'],'venue_witness':location.get('quote') if venue else None})
+  for field,value in p['field_evidence'].items():
+   at=raw.find(value) if isinstance(value,str) and value else -1
+   p['evidence_spans'][field]={'start':at,'end':at+len(value),'quote':value} if at>=0 else None
+  out.append(p)
+ return out
+
 def interpret(c,d,accounts,baseline=()):
  info=classify(d,accounts)
  if not info['compound']:return None
  d['document_type']=info['type'];d['source_role']=info['source_role']
+ if info['shape']=='marked_day_blocks':return marked_calendar(c,d,info)
  if info['shape'] in ('weekly_dated_rows','monthly_dated_rows'):return dated_calendar(c,d,info)
  if info['shape']=='bullet_schedule':return bullet_schedule(c,d,info)
  if info['shape']=='time_rows':return row_schedule(c,d,info,known_places(accounts,baseline))
@@ -471,6 +511,7 @@ def permanent_recommendations(c,d,accounts):
 
 def effective_version(d,accounts):
  info=classify(d,accounts)
+ if info['shape']=='marked_day_blocks':return marked_program.VERSION
  if info['compound'] or (curator(d,accounts) and info['type'] in ('recomendacion_permanente','retrospectiva') and re.search(r'^[a-z][a-z0-9_.]{2,40}$',d.get('text',''),re.M)):return VERSION
  from caption import VERSION as caption_version
  return caption_version
