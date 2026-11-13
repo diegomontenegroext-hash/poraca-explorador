@@ -26,11 +26,11 @@ class FallbackGuards(unittest.TestCase):
   with self.assertRaisesRegex(ValueError,'WINDOW'):resolved_slot('push',fallback_text=text(),now=at('2026-11-10',5,45))
   with self.assertRaisesRegex(ValueError,'WINDOW'):resolved_slot('push',fallback_text=text(),now=at('2026-11-11',1))
  def test_watchdog_observes_operator_grace_and_expiry(self):
-  for day,hour,minute in [('2026-11-10',6,56),('2026-11-10',23,27)]:
+  for day,hour,minute in [('2026-11-10',6,11),('2026-11-10',23,27)]:
    with self.subTest(day=day,hour=hour,minute=minute):
     with self.assertRaisesRegex(ValueError,'WINDOW'):
      resolved_slot('push',fallback_text=text(),now=at(day,hour,minute))
-  for hour,minute in [(6,57),(23,26)]:
+  for hour,minute in [(6,12),(23,26)]:
    with self.subTest(hour=hour,minute=minute):
     self.assertEqual(resolved_slot('push',fallback_text=text(),now=at('2026-11-10',hour,minute))['slot'],'2026-11-10/05')
  def test_fallback_invalid_mode_fails_closed(self):
