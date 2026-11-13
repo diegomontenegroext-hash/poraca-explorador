@@ -293,6 +293,394 @@ class Collector:
         published=next((x.get('datePublished') for x in self.structured(d) if x.get('datePublished')),None)
         if published:d['published_at']=published
         self.add(d,title,state=state,evidence=body,origin_account=account)
+    def follow_cultural_details(self,d,pattern,limit,accounts,method='public_linked_cultural_detail_v1',today=None):
+        """Bounded same-publisher traversal of actual public links, never guessed IDs.
+        Root and detail are archived independently by fetch; an unavailable
+        detail is a receipt, not evidence of absence or a fabricated session.
+        """
+        from extract import extract_document
+        today=today or datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date()
+        host=(urlsplit(d['url']).hostname or '').removeprefix('www.')
+        if (urlsplit(d['final_url']).hostname or '').removeprefix('www.')!=host:
+            self.checks.append({'url':d['url'],'status':'coverage_root_redirect_outside_publisher'})
+            return
+        candidates={}
+        for node in self.tree(d).walk():
+            if node.tag!='a' or not node.a.get('href'):continue
+            p=urlsplit(urljoin(d['final_url'],node.a['href']))
+            if p.scheme!='https' or (p.hostname or '').removeprefix('www.')!=host or p.username or p.password or p.port not in (None,443):continue
+            if not re.fullmatch(pattern,p.path,re.I):continue
+            if re.search(r'/(20\d{2})/',p.path) and int(re.search(r'/(20\d{2})/',p.path)[1])<today.year:continue
+            if re.search(r'\.(?:pdf|jpg|png|zip)
+        d=self.fetch('https://teatrocerca.com.ar/teatro-independiente','TeatroCerca')
+        if not d:return
+        # The listing includes expired and repeated anchors. Budget for actual
+        # future local sessions first, not the first 16 links in DOM order.
+        today=datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date()
+        months={'enero':1,'febrero':2,'marzo':3,'abril':4,'mayo':5,'junio':6,'julio':7,'agosto':8,'septiembre':9,'octubre':10,'noviembre':11,'diciembre':12}
+        links={}
+        for u in self.links(d):
+            p=urlsplit(u)
+            if p.scheme!='https' or p.hostname!='teatrocerca.com.ar' or p.username or p.password or p.port not in (None,443):continue
+            m=re.fullmatch(r'/funcion/la-plata/[^/]+/(\d+)-(\w+)-(20\d{2})/?',p.path)
+            if not m or m[2] not in months:continue
+            try:day=datetime(int(m[3]),months[m[2]],int(m[1])).date()
+            except ValueError:continue
+            if today<=day<=today+timedelta(days=30):links[p._replace(query='',fragment='').geturl()]=day
+        ordered=sorted(links,key=lambda u:links[u])
+        self.checks.append({'url':d['url'],'status':'coverage_detail_selection','eligible_links':len(ordered),'selected':min(24,len(ordered)),'deferred':max(0,len(ordered)-24),'method':'teatrocerca_future_details'})
+        for u in ordered[:24]:
+            item=self.fetch(u,'TeatroCerca',d['url'])
+            if not item:continue
+            if self.reuse(item):continue
+            title=next((n.text() for n in self.tree(item).walk() if n.tag=='h1'),item['title'].split(' en ')[0])
+            date=re.search(r'/(\d+)-(\w+)-(20\d{2})/?$',u)
+            months={'enero':1,'febrero':2,'marzo':3,'abril':4,'mayo':5,'junio':6,'julio':7,'agosto':8,'septiembre':9,'octubre':10,'noviembre':11,'diciembre':12}
+            day=f'{date[3]}-{months[date[2]]:02}-{int(date[1]):02}' if date and date[2] in months else None
+            selected=re.search(r'Función seleccionada (.*?)(?:Más funciones|Compartir)',item['text'])
+            block=selected[1] if selected else ''
+            hour=re.search(r'(\d{1,2}:\d{2}) Hs\.',block)
+            venue=re.search(r'Hs\. (.*?) · La Plata',block)
+            self.add(item,title,day,hour[1] if hour else None,venue[1] if venue else None,'Teatro','observado_agenda',block or item['text'])
+    def media_sources(self,max_articles=6,agendas_only=False):
+        for url,source in [('https://www.eldia.com/espectaculos','El Día'),('https://www.0221.com.ar/que-hago','0221')]:
+            d=self.fetch(url,source)
+            if not d:continue
+            links=self.links(d)
+            if source=='El Día':
+                links += [x['url'] for x in self.structured(d) if x.get('@type')=='ListItem' and x.get('url')]
+                links=[u for u in dict.fromkeys(links) if re.search(r'/espectaculos/[^/]+_\d+',u) and re.search(r'agenda|platense|teatro|festival|concierto|recital|musica|muestra|cierre-de-ano',norm(u))]
+                links=sorted(links,key=lambda u:(not bool(re.search(r'agenda|cartelera|programacion',norm(u))),-int(re.search(r'_(\d+)',u)[1])))[:6]
+            else:links=sorted(dict.fromkeys(u for u in links if re.search(r'/que-hago/.+-n\d+$',u)),key=lambda u:(not bool(re.search(r'agenda|cartelera|programacion',norm(u))),-int(re.search(r'-n(\d+)$',u)[1])))[:6]
+            if agendas_only:links=[u for u in links if re.search(r'agenda|cartelera|programacion',norm(u))]
+            for u in links[:max_articles]:
+                item=self.fetch(u,source,d['url'])
+                if item:
+                    from extract import extract_document
+                    extract_document(self,item,json.loads(Path(__file__).with_name('accounts.json').read_text()),'public_media_discovery')
+    def alternativa(self):
+        d=self.fetch('https://www.alternativateatral.com/cartelera.asp?prov=Buenos+Aires','Alternativa Teatral')
+        if not d:return
+        links=[u for u in self.links(d) if re.search(r'/obra\d+',u)]
+        if not links:
+            self.checks.append({'url':d['url'],'error':'DYNAMIC_LISTING_NO_WORKS_IN_HTML'})
+            # Official linked news channel is a separate discovery opportunity.
+            n=self.fetch(urljoin(d['url'],'novedades.asp'),'Alternativa Teatral',d['url'])
+            if n:
+                links=[u for u in self.links(n) if re.search(r'/obra\d+',u)]
+        for u in links[:8]:
+            item=self.fetch(u,'Alternativa Teatral',d['url'])
+            if item and 'La Plata' in item['text']:self.document_lead(item)
+    def cultural_channels(self,only=None):
+        channels=[
+          ('https://compras.evento-simple.com/sunsetwinemix','Sunset Wine Mixology','sunsetwine.mixology'),
+          ('https://circusproduce.com/','Circus','circus_ofc'),
+          ('https://residenciacorazon.com.ar/','Residencia Corazón','residenciacorazon'),
+          ('https://biblio.unlp.edu.ar/mes-de-la-plata-2026-2/','Biblioteca Pública UNLP · Mes de La Plata',None),
+          ('https://biblio.unlp.edu.ar/','Biblioteca Pública UNLP',None),
+          ('https://fesaalp.com/','FESAALP',None),
+          ('https://teatroargentino.gba.gob.ar/','Teatro Argentino oficial',None),
+          ('https://teatroargentino.gba.gob.ar/meets/no-season','Teatro Argentino calendario',None),
+          ('https://casametro.com.ar/cartelera/','Casa Metro original',None),
+          ('https://unlp.edu.ar/arte/','UNLP Arte',None),
+          ('https://www.nacio.unlp.edu.ar/','Colegio Nacional UNLP',None),
+          ('https://cenexa.conicet.gov.ar/','CENEXA',None),
+          ('https://movete.info/en-vivo/ferias/','MoVeTe ferias',None),
+          ('https://reddemuseos.unlp.edu.ar/','Red de Museos UNLP',None),
+          ('https://museo.fisica.unlp.edu.ar/','Museo de Física UNLP',None),
+          ('https://www.ucalp.edu.ar/agenda/','Agenda UCALP',None),
+          ('https://maclamuseo.com.ar/','MACLA original exhibitions','maclamuseo'),
+          ('https://www.gba.gob.ar/museo_pettoruti/muestras','Pettoruti original exhibitions','museopettoruti'),
+          ('https://institutocultural.gba.gob.ar/taxonomy/term/1746','Islas Malvinas institutional','laplata.ciudadcultural'),
+          ('https://www.casadionisio.com.ar/expoarte','ExpoArte Casa Dionisio','dionisio_vinoteca'),
+          ('https://www.casadionisio.com.ar/','Casa Dionisio','dionisio_vinoteca'),
+          ('https://tickets.sincroniadeportiva.com.ar/','Sincronía Deportiva original',None),
+          ('https://lauragan.com.ar/','Laura Gan institucional','lauraganceramica'),
+          ('https://www.eventbrite.com.ar/o/sincronia-deportiva-eventos-17694669676','Sincronía Eventbrite organizador',None),
+          ('https://linktr.ee/lutitravelguide','Luti','lutitravelguide'),
+          ('https://linktr.ee/circus_ofc','Circus links','circus_ofc'),
+          ('https://linktr.ee/guajirabar','Guajira','guajira.bar'),
+          ('https://enesoestamosfc.wordpress.com/','En Eso Estamos','en_eso_estamos'),
+          ('https://www.dynamoteatro.com/','Dynamo Teatro',None),
+          ('https://jodify.com.ar/profiles/promoter/0244a70e-e89f-4adf-ac27-ae1ed2bce374','Nómade',None),
+        ]
+        # Exact current program leads discovered by the editorial review.
+        # They use the same FULL collector, robots, original archive and interpreter.
+        # Expire the edition-specific seeds, not the permanent institution roots.
+        current_programs=[
+          ('https://museo.fisica.unlp.edu.ar/noche-de-museos-a-la-luz-de-la-luna/','Museo de Física UNLP · programa',None,'2026-11-15','institutional_program_original_v1'),
+          ('https://www.ucalp.edu.ar/el-beato-angelico-de-la-ucalp-se-suma-museos-la-luz-de-la-luna-con-arte-y-musica-coral/','UCALP · Beato Angélico programa',None,'2026-11-15','institutional_program_original_v1'),
+          ('https://infolaplata.com/llega-el-11o-encuentro-de-acordeonistas-del-rio-de-la-plata/','Infolaplata · programa acordeonistas',None,'2026-11-15','dated_local_program_secondary_v1'),
+          ('https://unlp.edu.ar/arte/comienza-la-8a-bienal-universitaria-de-arte-y-cultura-135005/','UNLP Arte',None,'2026-12-05','institutional_program_original_v1'),
+          ('https://www.nacio.unlp.edu.ar/2026/11/noche-de-los-museos-en-el-colegio-nacional/','Colegio Nacional UNLP',None,'2026-11-15','institutional_program_original_v1'),
+          ('https://cenexa.conicet.gov.ar/cenexa-invita-a-participar-de-la-caminata-movete-por-la-diabetes-pasos-que-transforman/','CENEXA',None,'2026-11-15','institutional_program_original_v1'),
+          ('https://infolaplata.com/birdman-y-el-bano-del-papa-se-destacan-en-la-nueva-cartelera-de-los-cines-municipales/','Infolaplata · cine municipal',None,'2026-11-19','dated_local_program_secondary_v1'),
+        ]
+        today=datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date().isoformat()
+        for url,source,account,expires,method in current_programs:
+            if today>expires or (only and source not in only):continue
+            d=self.fetch(url,source)
+            if not d or self.reuse(d):continue
+            from extract import extract_document
+            d['acquisition_method']=method
+            extract_document(self,d,json.loads(Path(__file__).with_name('accounts.json').read_text()),method)
+        # Permanent roots are distinct from the bounded current-program leads.
+        # A source may publish a calendar and several independent event links.
+        # Keep the original program even when all detail fetches fail.
+        routes={
+          'Dynamo Teatro':(r'/event/\d+-[a-z0-9-]+/?',8),
+          'FESAALP':(r'/peliculas/[a-z0-9-]+/?',12),
+          'Teatro Argentino oficial':(r'/meet/\d+/?',12),
+          'Teatro Argentino calendario':(r'/meet/\d+/?',12),
+          'Casa Metro original':(r'/evento/[a-z0-9-]+/?',22),
+          'Biblioteca Pública UNLP':(r'/[^/]*(?:mes-de-la-plata|museos-a-la-luz|feria-de-editoriales|muestra|proyeccion|expedicion|lectura)[^/]*/?',6),
+          'UNLP Arte':(r'/arte/[^/]+-\d+/?',4),
+          'Colegio Nacional UNLP':(r'/20\d{2}/\d{1,2}/[^/]*(?:museos|arte|cultura|concierto|teatro)[^/]*/?',4),
+          'CENEXA':(r'/[^/]*(?:caminata|movete|jornada|encuentro)[^/]*/?',3),
+          'MoVeTe ferias':(r'/en-vivo/obra/[a-z0-9-]+/?',6),
+        }
+        for url,source,account in channels:
+            if only and source not in only:continue
+            if source=='Biblioteca Pública UNLP · Mes de La Plata' and datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date().isoformat()>'2026-11-30':continue
+            d=self.fetch(url,source)
+            if not d:continue
+            if source in routes:
+                from extract import extract_document
+                accounts=json.loads(Path(__file__).with_name('accounts.json').read_text())
+                if not self.reuse(d):
+                    # Source archive and existing interpreter; do not assign a
+                    # title or date from a navigation link or root label.
+                    method='public_cultural_calendar_v1'
+                    d['acquisition_method']=method
+                    extract_document(self,d,accounts,method)
+                pattern,limit=routes[source]
+                self.follow_cultural_details(d,pattern,limit,accounts)
+                continue
+            if source in ('Red de Museos UNLP','Museo de Física UNLP','Agenda UCALP'):
+                from extract import extract_document
+                accounts=json.loads(Path(__file__).with_name('accounts.json').read_text())
+                if not self.reuse(d):
+                    self.document_lead(d,state='investigable')
+                host=urlsplit(d['final_url']).hostname
+                ranked={}
+                for node in self.tree(d).walk():
+                    if node.tag!='a' or not node.a.get('href'):continue
+                    link=urlsplit(urljoin(d['final_url'],node.a['href']))
+                    if link.scheme!='https' or link.hostname!=host or link.username or link.password:continue
+                    path=link.path.rstrip('/')
+                    if not path or path==urlsplit(d['final_url']).path.rstrip('/'):continue
+                    label=norm(path+' '+node.text())
+                    if not re.search(r'noche de museos|museos a la luz|encuentro de coros|feria de artes|muestra temporal|inauguracion|intervencion artistica',label):continue
+                    if re.search(r'\b20\d{2}\b',label) and str(datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).year) not in label:continue
+                    if re.search(r'/category/|/tag/|/wp-content/|/page/|[.](?:pdf|png|jpg)$',path,re.I):continue
+                    target=link._replace(query='',fragment='').geturl()
+                    ranked.setdefault(target,0 if re.search(r'museos a la luz|noche de museos',label) else 1)
+                for target in sorted(ranked,key=ranked.get)[:3]:
+                    item=self.fetch(target,source,d['url'])
+                    if item and not self.reuse(item):
+                        item['acquisition_method']='institutional_art_original_v1'
+                        extract_document(self,item,accounts,'institutional_art_original_v1')
+                continue
+            if source in ('Biblioteca Pública UNLP · Mes de La Plata','MACLA original exhibitions','Pettoruti original exhibitions',
+                          'Islas Malvinas institutional','ExpoArte Casa Dionisio'):
+                # Existing FULL only. An exhibition period must not be rewritten
+                # into individual daily performances. The original yields an
+                # evidence-backed research proposal, NEVER a confirmed event.
+                if not self.reuse(d):
+                    from extract import extract_document
+                    method='institutional_program_original_v1' if source.startswith('Biblioteca Pública UNLP ·') else 'institutional_art_original_v1'
+                    d['acquisition_method']=method
+                    extract_document(self,d,json.loads(Path(__file__).with_name('accounts.json').read_text()),method)
+                continue
+            if source=='Sincronía Eventbrite organizador':
+                # Only the producer's own linked event pages; HTTP/robots still
+                # control every request. No fixed future dates or trust by label.
+                if not self.reuse(d):
+                    self.add(d,source,state='actor',evidence=d['text'][:4000])
+                from extract import extract_document
+                accounts=json.loads(Path(__file__).with_name('accounts.json').read_text())
+                visited=set()
+                for u in self.links(d):
+                    if len(visited)>=4:break
+                    p=urlsplit(u)
+                    if p.scheme!='https' or p.hostname not in ('eventbrite.com.ar','www.eventbrite.com.ar'):continue
+                    if not re.fullmatch(r'/e/[a-z0-9-]+-tickets-\d+/?',p.path,re.I):continue
+                    u=p._replace(query='',fragment='').geturl()
+                    if u in visited:continue
+                    visited.add(u)
+                    child=self.fetch(u,source,d['url'])
+                    if not child or self.reuse(child):continue
+                    if 'sincronía deportiva eventos' not in child['text'][:3500].lower() and 'sincronia deportiva eventos' not in child['text'][:3500].lower():
+                        self.checks.append({'url':u,'status':'organizer_not_proven'})
+                        continue
+                    if re.search(r'evento finalizado|event finished|event ended',child['text'][:400],re.I):
+                        self.checks.append({'url':u,'status':'organizer_event_already_finished'})
+                        continue
+                    child['acquisition_method']='original_eventbrite_organizer_v1'
+                    extract_document(self,child,accounts,'original_eventbrite_organizer_v1')
+                continue
+            if source=='Sincronía Deportiva original':
+                # Inside the existing daily FULL; only links published by the
+                # organizer itself. No weekly events invented, no new workflow.
+                from extract import extract_document
+                accounts=json.loads(Path(__file__).with_name('accounts.json').read_text())
+                if not self.reuse(d):
+                    d['acquisition_method']='institutional_sports_original_v1'
+                    extract_document(self,d,accounts,'institutional_sports_original_v1')
+                visited=set()
+                for u in self.links(d):
+                    if len(visited)>=3:break
+                    link=urlsplit(u)
+                    if link.scheme!='https' or link.hostname!='tickets.sincroniadeportiva.com.ar' or not link.path.startswith('/event/'):continue
+                    if u in visited:continue
+                    visited.add(u)
+                    child=self.fetch(u,source,d['url'])
+                    if child and not self.reuse(child):
+                        child['acquisition_method']='institutional_sports_original_detail_v1'
+                        extract_document(self,child,accounts,'institutional_sports_original_detail_v1')
+                continue
+            if not self.reuse(d):self.add(d,source,state='actor',evidence=d['text'],origin_account=account)
+            if source=='Sunset Wine Mixology':
+                for u in [u for u in self.links(d) if '/sunsetwinemix/eventos/' in u][:3]:
+                    item=self.fetch(u,source,d['url'])
+                    if not item:continue
+                    if self.reuse(item):continue
+                    text=item['text'];m=re.search(r'Fecha (\d+)\.([A-Z]{3})\.(20\d{2}) (\d{1,2}:\d{2})hs',text)
+                    venue=re.search(r'Lugar (.*?) Conseguí',text)
+                    title=item['title'].split(' - ')[0]
+                    month={'ENE':1,'FEB':2,'MAR':3,'ABR':4,'MAY':5,'JUN':6,'JUL':7,'AGO':8,'SEP':9,'OCT':10,'NOV':11,'DIC':12}
+                    day=f'{m[3]}-{month[m[2]]:02}-{int(m[1]):02}' if m and m[2] in month else None
+                    place=venue[1] if venue else None
+                    # Ticket explicitly separates venue and street address in markup.
+                    place=re.split(r' (?=\d{2,4} entre )',place,maxsplit=1)[0] if place else None
+                    self.add(item,title,day,m[4] if m else None,place,'Vino / fiesta','fuente_original' if day else 'incompleto',text,account)
+    def genda(self,start,days=7):
+        for i in range(max(1,min(int(days),7))):
+            day=(start+timedelta(days=i)).isoformat();url='https://agendalaplata.ar/?fecha='+day
+            d=self.fetch(url,'Genda')
+            if not d:continue
+            tree=Tree((self.out/d['html_file']).read_text()).root
+            canonical=next((n.a.get('href') for n in tree.walk() if n.tag=='link' and n.a.get('rel')=='canonical'),None)
+            if not canonical or parse_qs(urlsplit(canonical).query).get('fecha')!=[day]:
+                self.checks.append({'url':url,'error':'SELECTED_DATE_NOT_VERIFIED'});continue
+            if self.reuse(d):continue
+            for n in tree.walk():
+                if not re.fullmatch(r'evento-\d+',n.a.get('id','')):continue
+                nodes=list(n.walk());info=next((x for x in nodes if x.a.get('data-title') and 'evento.php' in x.a.get('data-url','')),n)
+                title=info.a.get('data-title');venue=info.a.get('data-sitio')
+                if not title:
+                    title=next((x.text() for x in nodes if x.cls('lh-sm')),None)
+                hour=re.search(r'\b([0-2]?\d:[0-5]\d)\b',n.text())
+                raw_cats=next((x.text() for x in nodes if x.cls('evento-tabs')),None)
+                cats=genda_category(raw_cats)
+                evidence=n.text();ident=n.a['id'].removeprefix('evento-')
+                # Keep missing venue and completed sessions; recommendations outside
+                # the selected day have no evento-ID and cannot contaminate this set.
+                self.add(d,title,day,hour[1] if hour else None,venue,cats,'observado_agenda',evidence,source_id=ident)
+                key=sha('|'.join([d['url'],ident,day,hour[1] if hour else '']))
+                if key in self.proposals:
+                    # Public modal data-url contains an obsolete filesystem prefix.
+                    # Use the site's own share link or its public search response.
+                    pretty=next((m[0] for x in nodes for v in x.a.values() if isinstance(v,str) for m in [re.search(r'https://agendalaplata\.ar/evento/[a-z0-9-]+',v)] if m),None)
+                    if not pretty:
+                        lookup='https://agendalaplata.ar/agendalaplata.ar/components/buscador_result.php?'+urlencode({'search':title})
+                        found=self.fetch(lookup,'Genda public search',d['url'])
+                        if found:
+                            try:
+                                payload=json.loads((self.out/found['html_file']).read_text())
+                                match=next((x for x in payload.get('eventos',[]) if str(x.get('id'))==ident),None)
+                                if match:pretty=urljoin('https://agendalaplata.ar/',match.get('url') or ('/evento/'+match['slug']))
+                            except (ValueError,KeyError):pass
+                    self.proposals[key]['original_url']=pretty or d['url']
+                    self.proposals[key]['kind']='event';self.proposals[key]['acquisition_method']='genda_seven_consecutive_days'
+                    self.proposals[key]['category_source_raw']=raw_cats
+                    if pretty and not cats:
+                        detail=self.fetch(pretty,'Genda detail',d['url'])
+                        if detail:
+                            raw_cats=' '.join(x.text() for x in self.tree(detail).walk() if x.cls('tag-evento'))
+                            self.proposals[key]['category_source_raw']=raw_cats
+                            self.proposals[key]['category']=genda_category(raw_cats)
+                    self.proposals[key]['link_resolution']='source_share_url' if pretty else 'listing_fallback_no_verified_detail'
+    def genda_theatre(self):
+        d=self.fetch('https://agendalaplata.ar/teatro','Genda teatro')
+        if not d:return
+        if self.reuse(d):return
+        # The site's JSON-LD is truncated to 30 while 37 cards are visible.
+        # Read ALL date groups, including the final seven, from the public DOM.
+        months={'enero':1,'febrero':2,'marzo':3,'abril':4,'mayo':5,'junio':6,'julio':7,'agosto':8,'septiembre':9,'octubre':10,'noviembre':11,'diciembre':12}
+        at=datetime.fromisoformat(d['fetched_at']).astimezone(ZoneInfo('America/Argentina/Buenos_Aires')).date()
+        day=None;label=''
+        for n in self.tree(d).walk():
+            if n.cls('titulo-fecha'):
+                label=n.text();m=re.search(r'(\d{1,2}) de (\w+)',label,re.I);day=None
+                if m and m[2].lower() in months:
+                    month=months[m[2].lower()];year=at.year+(1 if month<at.month and at.month==12 else 0)
+                    candidate=at.replace(year=year,month=month,day=int(m[1]))
+                    if at<=candidate<=at+timedelta(days=90):day=candidate.isoformat()
+            if n.tag!='a' or not n.cls('card-evento') or not day:continue
+            nodes=list(n.walk());title=next((x.text() for x in nodes if x.cls('titulo')),None)
+            venue=next((x.text() for x in nodes if x.cls('lugar')),None)
+            hour=re.search(r'(\d{1,2}:\d{2})',next((x.text() for x in nodes if x.cls('pill-hora')),''))
+            hour=hour[1] if hour else None
+            self.add(d,title,day,hour,venue,'Teatro','observado_agenda',label+' | '+n.text()+' | Año inferido del contexto de la cartelera actual, no impreso en el rótulo del día.')
+            key=sha('|'.join([d['url'],norm(title),day,hour or '']))
+            if key in self.proposals:self.proposals[key]['original_url']=n.a.get('href')
+    def save(self):
+        result={'run_id':self.run_id,'collector_sha256':self.code_sha256,'finished_at':utc(),'documents':list(self.docs.values()),'proposals':list(self.proposals.values()),'checks':self.checks,
+                'source_followups':list(self.source_followups)}
+        processor=Path(__file__).with_name('extract.py')
+        if processor.exists():result['processor_sha256']=sha(processor.read_text())
+        (self.out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));return result
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument('--out',default='radar2-run');p.add_argument('--start');p.add_argument('--web',action='store_true');p.add_argument('--previous');p.add_argument('--discovery');p.add_argument('--baseline');p.add_argument('--legacy-baseline');p.add_argument('--run-id');a=p.parse_args()
+    start=datetime.fromisoformat(a.start).date() if a.start else datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).date()
+    previous=json.loads(Path(a.previous).read_text()) if a.previous else None
+    c=Collector(a.out,previous)
+    if a.run_id:c.run_id=a.run_id
+    c.genda(start);c.save()
+    if a.discovery:c.discovery(json.loads(Path(a.discovery).read_text()));c.save()
+    if a.web:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=4) as ex:
+            tasks=[ex.submit(f) for f in [c.teatrocerca,c.media_sources,c.alternativa,c.cultural_channels,c.genda_theatre]]
+            for t in tasks:t.result();c.save()
+    r=c.save()
+    if a.baseline:
+        from reconcile import reconcile
+        r=reconcile(r,json.loads(Path(a.baseline).read_text()))
+        if a.legacy_baseline:
+            from reconcile import mark_previous_knowledge
+            r=mark_previous_knowledge(r,json.loads(Path(a.legacy_baseline).read_text()))
+        (c.out/'result.json').write_text(json.dumps(r,ensure_ascii=False,indent=2))
+    print(json.dumps({'run_id':r['run_id'],'documents':len(r['documents']),'proposals':len(r['proposals']),'errors':[x for x in r['checks'] if x.get('error')]},ensure_ascii=False))
+if __name__=='__main__':main()
+,p.path,re.I):continue
+            u=p._replace(query='',fragment='').geturl()
+            if u.rstrip('/')==d['url'].rstrip('/'):continue
+            # A link can carry a date without the title (Argentino). Sort
+            # explicitly dated future links ahead of undated links, reject
+            # only explicit dates that are entirely past. Never infer a date.
+            labels=node.text()
+            dates=re.findall(r'(?<!\d)(\d{1,2})/(\d{1,2})/(20\d{2})(?!\d)',labels)
+            valid=[]
+            for dd,mm,yy in dates:
+                try:valid.append(datetime(int(yy),int(mm),int(dd)).date())
+                except ValueError:pass
+            future=[day for day in valid if today<=day<=today+timedelta(days=90)]
+            if valid and not future:continue
+            rank=(0,min(future).isoformat()) if future else (1,'')
+            if u not in candidates or rank<candidates[u]:candidates[u]=rank
+        selected=sorted(candidates,key=lambda u:candidates[u])[:limit]
+        self.checks.append({'url':d['url'],'status':'coverage_detail_selection','eligible_links':len(candidates),'selected':len(selected),'deferred':max(0,len(candidates)-len(selected)),'method':method})
+        for u in selected:
+            if u in self.docs:continue
+            child=self.fetch(u,d['source'],d['url'])
+            if not child:continue
+            if (urlsplit(child['final_url']).hostname or '').removeprefix('www.')!=host:
+                self.checks.append({'url':u,'status':'coverage_detail_redirect_outside_publisher'});continue
+            child['acquisition_method']=method
+            if not self.reuse(child):extract_document(self,child,accounts,method)
     def teatrocerca(self):
         d=self.fetch('https://teatrocerca.com.ar/teatro-independiente','TeatroCerca')
         if not d:return
