@@ -2,6 +2,7 @@
 import json,tempfile
 from pathlib import Path
 from compound import classify,interpret,VERSION
+from marked_program import VERSION as MARKED_VERSION
 from collector import Collector,utc
 from persist import execute,SQL
 from reconcile import reconcile
@@ -10,9 +11,9 @@ from capabilities import enrich_graph,persist_graph,carry_forward,supplement_rep
 ROOT=Path(__file__).resolve().parent.parent
 
 def retire(conn,result):
- urls=sorted({p['document_url'] for p in result['proposals'] if p.get('parser_version')==VERSION})
+ urls=sorted({p['document_url'] for p in result['proposals'] if p.get('parser_version') in (VERSION,MARKED_VERSION)})
  if not urls:return []
- ids=[p['id'] for p in result['proposals'] if p.get('parser_version')==VERSION]
+ ids=[p['id'] for p in result['proposals'] if p.get('parser_version') in (VERSION,MARKED_VERSION)]
  return execute(conn,"""UPDATE radar2.proposals p SET review_state='historico',evidence=evidence || jsonb_build_object('interpretation_superseded_by',$1::text)
  WHERE document_url IN (SELECT jsonb_array_elements_text($2::jsonb))
  AND proposal_id NOT IN (SELECT jsonb_array_elements_text($3::jsonb))
