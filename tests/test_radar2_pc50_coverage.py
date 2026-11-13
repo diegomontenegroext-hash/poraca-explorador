@@ -1,6 +1,6 @@
 """Coverage routing only: no external HTTP, admission or invented sessions."""
 import pathlib,sys,tempfile,unittest
-from datetime import date
+from datetime import date,datetime
 from unittest.mock import patch
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/'radar2'))
 from collector import Collector,Tree
@@ -42,6 +42,25 @@ class CoverageRoutes(unittest.TestCase):
   with patch.object(self.c,'tree',return_value=Tree(html).root),patch.object(self.c,'fetch',return_value=child),patch('extract.extract_document') as parse:
    self.c.follow_cultural_details(root,r'/peliculas/[a-z0-9-]+/?',2,[])
   parse.assert_not_called();self.assertEqual(self.c.checks[-1]['status'],'coverage_detail_redirect_outside_publisher')
+ def test_teatrocerca_actual_permalink_and_future_filter(self):
+  root=self.doc('https://teatrocerca.com.ar/teatro-independiente','TeatroCerca')
+  local=self.doc('https://teatrocerca.com.ar/localidad/la-plata','TeatroCerca')
+  future=datetime.now().date().replace(day=1)
+  from datetime import timedelta
+  future=datetime.now().date()+timedelta(days=2)
+  months='enero febrero marzo abril mayo junio julio agosto septiembre octubre noviembre diciembre'.split()
+  path='/obra/una-obra/funcion/la-plata/teatro/'+str(future.day)+'-'+months[future.month-1]+'-'+str(future.year)
+  valid='https://teatrocerca.com.ar'+path
+  past='https://teatrocerca.com.ar/obra/otra/funcion/la-plata/teatro/1-enero-2020'
+  calls=[]
+  def fetch(u,s,*a):
+   calls.append(u)
+   if u==root['url']:return root
+   if u==local['url']:return local
+   return None
+  with patch.object(self.c,'fetch',side_effect=fetch),patch.object(self.c,'links',return_value=[past,valid,valid+'?x=1','https://example.com'+path]):
+   self.c.teatrocerca()
+  self.assertEqual(calls,[root['url'],local['url'],valid])
  def test_permanent_roots_in_full(self):
   expected={'FESAALP','Teatro Argentino oficial','Teatro Argentino calendario','Casa Metro original','Biblioteca Pública UNLP','UNLP Arte','Colegio Nacional UNLP','CENEXA','MoVeTe ferias','Dynamo Teatro'}
   got=[]
