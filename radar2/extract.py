@@ -35,6 +35,59 @@ def day_from(text,year):
  try:return datetime(int(m[3] or year),MONTHS[m[2].lower()],int(m[1])).date().isoformat()
  except ValueError:return None
 
+
+LINKED_PROGRAM_VERSION='linked-cultural-program-v1'
+_LINKED_WEEKDAYS=('lunes','martes','miercoles','jueves','viernes','sabado','domingo')
+_LINKED_DAY=r'(lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo)'
+_LINKED_FILM_VENUES={
+ 'cine select':'Cine Select',
+ 'cine municipal select espacio incaa':'Cine Select',
+ 'cc malvinas':'Centro Cultural Islas Malvinas',
+ 'islas malvinas':'Centro Cultural Islas Malvinas',
+ 'pasaje dardo rocha sala b':'Pasaje Dardo Rocha (Sala B)',
+}
+def linked_program_rows(d,method,now):
+ """Exact public detail shapes, not a search/listing or a generic city guess.
+ Return None outside scope; [] means scoped but no standalone current session.
+ A film's production year is never a screening year.
+ """
+ if method!='public_linked_cultural_detail_v1' or d.get('final_url')!=d.get('url') or str(d.get('http_status'))!='200':return None
+ u=urlsplit(d['url']);host=(u.hostname or '').removeprefix('www.')
+ if u.scheme!='https' or u.username or u.password or u.query or u.fragment:return None
+ raw=d.get('text','');title=d.get('title','').split(' | ')[0].strip()
+ if not title or len(title)>180:return None
+ def date_for(weekday,dd,mm):
+  try:day=datetime(now.year,int(mm),int(dd)).date()
+  except ValueError:return None
+  return day.isoformat() if _LINKED_WEEKDAYS[day.weekday()]==norm(weekday) and now-timedelta(days=2)<=day<=now+timedelta(days=120) else None
+ if host=='fesaalp.com' and d.get('source')=='FESAALP' and re.fullmatch(r'/peliculas/[a-z0-9-]+/?',u.path):
+  # Exact local venue labels, not the festival's name, witness locality.
+  # Cortometrajes share programme blocks: retain source, don't invent a
+  # standalone screening or collapse several shorts into a feature.
+  if not re.search(r'Competencia Largometrajes\s+'+re.escape(title)+r'\s+De\s+',raw,re.I):return []
+  hits=list(re.finditer(re.escape(title)+r'\s+De\s+[^|]{2,180}?\s+'+_LINKED_DAY+r'\s+(\d{1,2})/(\d{1,2})\s*[-–]\s*([01]?\d|2[0-3]):([0-5]\d)\s*h\s*[-–]\s*([^|]{3,95}?)\s+Guardar en calendario',raw,re.I))
+  rows=[]
+  for m in hits:
+   venue=_LINKED_FILM_VENUES.get(norm(m[6]))
+   day=date_for(m[1],m[2],m[3])
+   if not venue or not day:continue
+   literal=m[0].rsplit(' Guardar en calendario',1)[0]
+   rows.append(dict(title=title,date=day,time=f'{int(m[4]):02}:{m[5]}',venue=venue,category='Cine',block=literal,local_witness=m[6],date_literal=m[1]+' '+m[2]+'/'+m[3]))
+  return rows
+ if host=='dynamoteatro.com' and d.get('source')=='Dynamo Teatro' and re.fullmatch(r'/event/\d+-[a-z0-9-]+/?',u.path):
+  if not re.search(r'\bDynamo Teatro\b.{0,150}\bLa Plata\b',raw,re.I):return []
+  block=re.search(r'\bFunciones\s+(.{10,650}?)\s+Lugar:\s*Dynamo Teatro\b',raw,re.I)
+  if not block:return []
+  row_re=re.compile(_LINKED_DAY+r'\s+(\d{1,2})\s+de\s+([a-záéíóú]+)\s*[—–-]\s*([01]?\d|2[0-3]):([0-5]\d)\s*hs',re.I)
+  matches=list(row_re.finditer(block[1]))
+  if not matches or row_re.sub('',block[1]).strip():return []
+  rows=[]
+  for m in matches:
+   day=date_for(m[1],m[2],MONTHS.get(m[3].lower(),0))
+   if day:rows.append(dict(title=title,date=day,time=f'{int(m[4]):02}:{m[5]}',venue='Dynamo Teatro',category='Teatro',block=block[0],local_witness='Dynamo Teatro',date_literal=m[0]))
+  return rows
+ return None
+
 def extract_document(c,d,accounts,method):
  from compound import interpret as compound_interpret,classify,VERSION as COMPOUND_VERSION
  if classify(d,accounts)['compound'] and any(p.get('document_url')==d['url'] and (json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}).get('parser_version')==COMPOUND_VERSION and (json.loads(p['evidence']) if isinstance(p.get('evidence'),str) else p.get('evidence') or {}).get('source_document_sha256')==d.get('sha256') for p in getattr(c,'baseline',[])):return []
@@ -45,11 +98,11 @@ def extract_document(c,d,accounts,method):
  discarded_finished_detail=False
  now=datetime.fromisoformat(d['fetched_at']).date();published=next((x.get('datePublished') for x in items if x.get('datePublished')),None)
  if published:d['published_at']=published
- def add(title,day,hour,venue,evidence,original=None,organizer=None,kind='event',end_date=None,category_label=None):
+ def add(title,day,hour,venue,evidence,original=None,organizer=None,kind='event',end_date=None,category_label=None,local_witness=None):
   if not day:return
   if (day< (now-timedelta(days=2)).isoformat() and not(end_date and end_date>=now.isoformat())) or day>(now+timedelta(days=120)).isoformat():
    c.checks.append({'url':d['url'],'status':'discarded_historical_or_outside_horizon','title':title,'date':day});return
-  if not re.search(r'la plata|berisso|ensenada|gonnet|gorina|city bell|villa elisa|tolosa|punta lara|abasto',norm(d['text'])):return
+  if not local_witness and not re.search(r'la plata|berisso|ensenada|gonnet|gorina|city bell|villa elisa|tolosa|punta lara|abasto',norm(d['text'])):return
   if re.search(r'\bberazategui\b|\bquilmes\b',norm(venue or '')+' '+norm(evidence)):
    c.checks.append({'url':d['url'],'status':'discarded_out_of_area','title':title});return
   related=account_links((venue or '')+' '+evidence,accounts)
@@ -63,6 +116,21 @@ def extract_document(c,d,accounts,method):
   if organizer:p['entities'].append({'name':organizer,'role':'organizer','evidence':compact(evidence)[:1000]})
   p['date_basis']='source event/program date; publication date is never substituted'
   return key
+ # Specialized public detail interpretation, after structured precedence.
+ if not any(re.search(r'Event$',str(x.get('@type',''))) for x in items):
+  linked=linked_program_rows(d,method,now)
+  if linked is not None:
+   for row in linked:
+    key=add(row['title'],row['date'],row['time'],row['venue'],row['block'],category_label=row['category'],local_witness=row['local_witness'])
+    if key:
+     p=c.proposals[key]
+     p.update(parser_version=LINKED_PROGRAM_VERSION,source_document_sha256=d.get('sha256'),document_type='programa_festival' if row['category']=='Cine' else 'cartelera',source_role='first_party',event_status='scheduled_pending_review',publication_approved=False,
+       program_receipt={'activity_block':row['block'],'date_literal':row['date_literal'],'date':row['date'],'time':row['time'],'venue':row['venue'],'local_witness':row['local_witness']},
+       field_evidence={'title':row['title'],'date':row['date_literal'],'time':row['time'],'venue':row['local_witness']},
+       territory_resolution={'status':'source_stated_local','locality':'La Plata','basis':'explicit reviewed venue label in official detail'},
+       date_basis='explicit detail weekday/day/month, acquisition-year horizon; never production year')
+   if not produced:c.checks.append({'url':d['url'],'status':'linked_program_no_standalone_current_session'})
+   return [c.proposals[k] for k in produced]
  # Explicit institutional program notices and multi-venue timetable rows.
  # This runs only for an already acquired current program, not for generic
  # search results, opening hours, old event pages or a publication date.
