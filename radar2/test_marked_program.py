@@ -17,3 +17,11 @@ assert parse(raw.replace('🕐 19.00 hs.','🕐 00.00 hs.',1),base)[0]['time'] i
 cross='📆 Sábado 31\n✅ Aventura\n10 hs\n📍 Patio\n📆 Domingo 1\n✅ Otra actividad\n11 hs\n📍 Patio'
 assert [x['date'].isoformat() for x in parse(cross,date(2026,10,30))]==['2026-10-31','2026-11-01']
 print('PASS marked program: 14 scoped claims, cross-month, date/clock guards')
+
+# An unparseable middle heading must not leak its blocks into the previous day.
+assert shape(raw.replace('📆 Sábado 14','📆 Sábado próximo'))
+assert parse(raw.replace('📆 Sábado 14','📆 Sábado próximo'),base)==[]
+assert parse(raw.replace('✅  Inauguración','✅  Actividad').replace('MUSEO DE FOTOGRAFÍA Y ARCHIVO DE MERIDIANO V','').replace('Exposición de Víctor Bugge tresalcubo.estudio  maninofotografo ','').replace('🕐 19.00 hs.\n📍 Planta Alta','',1),base)==[]
+assert all(raw.find(x['heading'],x['heading_start'])>=x['heading_start'] for x in rows)
+assert all(raw.find(x['title'],x['block_start'])>=x['block_start'] for x in rows)
+print('PASS malformed heading, incomplete block, scoped evidence offsets')

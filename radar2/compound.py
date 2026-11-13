@@ -460,7 +460,12 @@ def marked_calendar(c,d,info):
  footer=re.search(r'\b\d{1,3}\s+y\s+\d{1,3}\s*·\s*([^\n]+)\n\s*(?:La Plata|Berisso|Ensenada)\b',raw,re.I)
  footer_local=bool(footer and account.get('account_verified') and account.get('venue_entity_id') and
   len(norm(footer[1]))>=5 and norm(footer[1]) in norm(account.get('venue_name') or '') and not OFFSITE.search(raw))
- for x in marked_program.parse(raw,anchor(d)):
+ claims=marked_program.parse(raw,anchor(d))
+ if not claims:
+  key=c.add(d,next((line.strip() for line in raw.splitlines() if line.strip()),'Programa por revisar'),state='investigable',evidence=raw,origin_account=d.get('profile_username'))
+  if key:c.proposals[key].update(kind='document',parser_version=marked_program.VERSION,source_document_sha256=d.get('sha256'),document_type=info['type'],source_role=info['source_role'],acquisition_method=d.get('acquisition_method'),publication_approved=False,ambiguities=['marked_program_structure_or_date_unresolved'])
+  return []
+ for x in claims:
   block=x['block'];location=location_for(d,block);venue=location.get('venue')
   if not venue and x['sector'] and not OFFSITE.search(block):
    if global_location.get('venue'):location=global_location;venue=location['venue']
@@ -479,7 +484,8 @@ def marked_calendar(c,d,info):
    ambiguities=(['venue_unresolved'] if not venue else [])+(['midnight_calendar_day_requires_review'] if x['announced_time']=='00:00' else []),
    program_receipt={'day_heading':x['heading'],'activity_block':block,'sector':x['sector'],'venue_witness':location.get('quote') if venue else None})
   for field,value in p['field_evidence'].items():
-   at=raw.find(value) if isinstance(value,str) and value else -1
+   origin=x['heading_start'] if field=='date' else x['block_start'] if field in ('title','time','sublocation') else 0
+   at=raw.find(value,origin) if isinstance(value,str) and value else -1
    p['evidence_spans'][field]={'start':at,'end':at+len(value),'quote':value} if at>=0 else None
   out.append(p)
  return out
