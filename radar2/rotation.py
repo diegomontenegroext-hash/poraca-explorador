@@ -79,7 +79,7 @@ def claim(conn,run_id,limit=10):
     raise RuntimeError('ROTATION_CONCURRENT_UPDATE_RETRY_LATER')
 
 def complete(conn,run_id,manifest):
-    persisted=execute(conn,"SELECT run_id FROM radar2.runs WHERE run_id=$1 AND summary->>'status'='completed'",[run_id])['rows']
+    persisted=execute(conn,"SELECT run_id FROM radar2.runs WHERE run_id=$1 AND (summary->>'status'='completed' OR (summary->>'status'='readback_verified' AND summary->'neon_readback'->>'status'='completed'))",[run_id])['rows']
     if not persisted:raise RuntimeError('PERSISTENCE_MUST_COMPLETE_BEFORE_ROTATION_FINALIZATION')
     for _ in range(4):
         state=read(conn);version=state['version'];at=now();batch=state['batches'].get(run_id)

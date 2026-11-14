@@ -27,7 +27,8 @@ WITH input AS (SELECT $1::jsonb AS j),
 r AS (
  INSERT INTO radar2.runs(run_id,finished_at,summary)
  SELECT j->>'run_id',(j->>'finished_at')::timestamptz,jsonb_build_object('status','completed','documents',jsonb_array_length(j->'documents'),'proposals',jsonb_array_length(j->'proposals'),'checks',j->'checks','collector_sha256',j->>'collector_sha256','processor_sha256',j->>'processor_sha256','reconciliation',j->'reconciliation') FROM input
- ON CONFLICT(run_id) DO UPDATE SET finished_at=excluded.finished_at,summary=excluded.summary RETURNING run_id
+ ON CONFLICT(run_id) DO UPDATE SET finished_at=excluded.finished_at,
+ summary=radar2.runs.summary || excluded.summary || CASE WHEN coalesce(radar2.runs.summary->>'recovery_slot','')<>'' THEN jsonb_build_object('status','ingested_pending_readback') ELSE '{}'::jsonb END RETURNING run_id
 ),d AS (
  INSERT INTO radar2.documents(url,source,sha256,fetched_at,last_run_id,payload)
  SELECT x->>'url',x->>'source',x->>'sha256',(x->>'fetched_at')::timestamptz,r.run_id,x

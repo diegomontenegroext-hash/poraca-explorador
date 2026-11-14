@@ -1,6 +1,6 @@
 name: Por Aca - Radar operativo (Radar 2 diario; legado manual)
 
-# Cutover Radar 2: cron GitHub diario 05:27 ART; tarea ChatGPT anterior pausada 05/11/2026.
+# S1-R: ChatGPT ordinary launch; GitHub schedule is backup +90m.
 # El job Radar Definitivo legado se omite en schedule; solo funciona por despacho manual explícito.
 # Push de ops/radar-fallback-trigger.txt conserva modo piloto acotado bajo commit-tag.
 # Cutover validado por workflow_dispatch #62 (2026-11-01): cuenta SQL
@@ -14,10 +14,10 @@ on:
       - 'ops/radar-fallback-trigger.txt'
       - 'ops/e2e-verification-trigger.txt'
   schedule:
-    # Un unico workflow: FULL 05:27 ART, incrementales 13:27 y 20:27 ART.
-    - cron: '27 8 * * *'
-    - cron: '27 16 * * *'
-    - cron: '27 23 * * *'
+    # Un unico workflow: slots nominales 05:27/13:27/20:27 ART; backup +90m.
+    - cron: '57 9 * * *'
+    - cron: '57 17 * * *'
+    - cron: '57 0 * * *'
   workflow_dispatch:
     inputs:
       mode:
@@ -44,6 +44,7 @@ permissions:
 
 concurrency:
   group: poraca-radar-definitivo-isolated
+  queue: max
   cancel-in-progress: false
 
 jobs:
