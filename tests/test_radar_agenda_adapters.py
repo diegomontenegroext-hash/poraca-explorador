@@ -1283,7 +1283,9 @@ Kevin - Liniers: Eternotour
             '<li class="product"><span>Casa Metro</span>'
             '<h2>Sin fecha visible</h2></li>'
             '</ul>')
-        rows=ad.extract_listings(markup,url)
+        with patch.object(ad, "datetime", wraps=ad.datetime) as clock:
+            clock.now.return_value = datetime.fromisoformat("2026-10-31T12:00:00-03:00")
+            rows=ad.extract_listings(markup,url)
         self.assertEqual(len(rows),2)
         self.assertEqual(
             [(r["title"],r["event_date"],r["event_time"]) for r in rows],
@@ -1345,7 +1347,9 @@ Kevin - Liniers: Eternotour
                 "<h3>V Edición - 2026 -</h3>"
                 "<p>Del 30/OCT al 1/NOV 2026</p>"
                 "<p>Tres días bajo el domo del Planetario de la Universidad Nacional</p>")
-        rows=ad.extract_listings(markup,url)
+        with patch.object(ad, "datetime", wraps=ad.datetime) as clock:
+            clock.now.return_value = datetime.fromisoformat("2026-10-31T12:00:00-03:00")
+            rows=ad.extract_listings(markup,url)
         self.assertEqual(len(rows),1)
         self.assertEqual(rows[0]["event_date"],"2026-10-30")
         self.assertIsNone(rows[0]["event_time"])
@@ -1362,7 +1366,9 @@ Kevin - Liniers: Eternotour
                 "<h3>V Edición - 2026 -</h3>"
                 "<p>El festival se desarrollará entre los días 30 de octubre "
                 "y 1 de noviembre de 2026 en el Planetario de la UNLP</p>")
-        rows=ad.extract_listings(markup,url)
+        with patch.object(ad, "datetime", wraps=ad.datetime) as clock:
+            clock.now.return_value = datetime.fromisoformat("2026-10-31T12:00:00-03:00")
+            rows=ad.extract_listings(markup,url)
         self.assertEqual(len(rows),1)
         self.assertEqual(rows[0]["event_date"],"2026-10-30")
         self.assertIsNone(rows[0]["event_time"])
