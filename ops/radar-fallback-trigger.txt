@@ -1,5 +1,5 @@
 # Ordinary Radar launch
-trigger_date=2026-11-17
+trigger_date=2026-11-18
 trigger_slot=21
 trigger_mode=incremental
 trigger_scope=chatgpt_primary
