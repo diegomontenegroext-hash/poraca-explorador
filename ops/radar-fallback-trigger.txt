@@ -1,7 +1,7 @@
 # Ordinary Radar launch
-trigger_date=2026-11-23
-trigger_slot=21
-trigger_mode=incremental
+trigger_date=2026-11-26
+trigger_slot=05
+trigger_mode=full
 trigger_scope=chatgpt_primary
 certification_batches=1
-certification_modes=incremental
+certification_modes=full
