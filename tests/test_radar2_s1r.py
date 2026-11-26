@@ -53,9 +53,31 @@ class PrimaryAndBackup(unittest.TestCase):
         self.assertEqual(got['slot'],'2026-11-14/21')
     def test_backup_rejects_ambiguous_older_dispatch(self):
         with self.assertRaisesRegex(ValueError,'TOO_OLD'):
-            resolved_slot('schedule','57 9 * * *',now=at(14,13,0))
+            resolved_slot('schedule','57 9 * * *',now=at(14,18,58))
         with self.assertRaisesRegex(ValueError,'TOO_OLD'):
             resolved_slot('schedule','57 9 * * *',dispatched_at=at(14,7,0),now=at(15,0,0))
+    def test_backup_extended_window(self):
+        for cron,label,hour in [('57 9 * * *','05',5),('57 17 * * *','13',13),('57 0 * * *','21',20)]:
+            nominal=datetime(2026,11,14,hour,27,tzinfo=ZONE)
+            for lag in (0,360,361,719,720):
+                with self.subTest(cron=cron,lag=lag):
+                    stamp=nominal+timedelta(minutes=90+lag)
+                    got=operational_slot('schedule',cron,now=stamp)
+                    self.assertEqual((got['slot'],got['origin'],got['nominal_at']),('2026-11-14/'+label,'github_backup',nominal.isoformat()))
+                    self.assertEqual(got['mode'],'full' if label=='05' else 'incremental')
+            for lag in (721,900,1439):
+                with self.subTest(cron=cron,lag=lag), self.assertRaisesRegex(ValueError,'SCHEDULE_SLOT_TOO_OLD'):
+                    operational_slot('schedule',cron,now=nominal+timedelta(minutes=90+lag))
+            dispatch=nominal+timedelta(hours=13,minutes=30)
+            self.assertEqual(operational_slot('schedule',cron,dispatched_at=dispatch,now=nominal+timedelta(hours=17,minutes=59))['slot'],'2026-11-14/'+label)
+            with self.assertRaisesRegex(ValueError,'BACKUP_SLOT_TOO_OLD'):
+                operational_slot('schedule',cron,dispatched_at=dispatch,now=nominal+timedelta(hours=18))
+
+    def test_actual_rejected_dispatches(self):
+        for cron,stamp,slot in [('57 0 * * *','2026-11-26T08:56:54+00:00','2026-11-25/21'),('57 9 * * *','2026-11-25T19:43:47+00:00','2026-11-25/05'),('57 0 * * *','2026-11-25T09:17:24+00:00','2026-11-24/21')]:
+            dt=datetime.fromisoformat(stamp)
+            self.assertEqual(operational_slot('schedule',cron,now=dt)['slot'],slot)
+
     def test_claim_states_never_retry(self):
         for status in ['running','ingested_pending_readback','failed','unverified_completed',None]:
             with self.subTest(status=status), patch('fallback_guard.execute',return_value={'rows':[{'run_id':'r','status':status}]}):

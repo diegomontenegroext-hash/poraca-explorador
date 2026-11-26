@@ -76,7 +76,7 @@ def resolved_slot(event, schedule='', fallback_text='', now=None, dispatched_at=
         offset = timedelta(minutes=90 if backup else 0)
         if scheduled + offset > dispatch:
             scheduled -= timedelta(days=1)
-        if dispatch - (scheduled + offset) > timedelta(hours=6 if backup else 23):
+        if dispatch - (scheduled + offset) > timedelta(hours=12 if backup else 23):
             raise ValueError('SCHEDULE_SLOT_TOO_OLD')
         if backup and at - scheduled >= timedelta(hours=18):
             raise ValueError('BACKUP_SLOT_TOO_OLD')
